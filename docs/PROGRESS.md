@@ -9,7 +9,7 @@
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
 
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
-git: `~/graspgrade`에서 단계마다 로컬 커밋 (작성자 Joonse Lim, AI 도구 흔적 없음, 내부 메모는 `.git/info/exclude`). 원격 저장소는 아직 없다.
+git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private)를 보고서 세션이 커밋하고 푸시한다. 실험 세션은 파일만 고친다. WSL `~/graspgrade`의 별도 로컬 이력은 더 쓰지 않는다.
 
 ## copyable 라벨 v2로 교체 (EXP-16, 2026-10-27)
 
@@ -222,7 +222,7 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 사용자 결정 필요:
 - D1. (결정 2026-10-28) 튜닝 50개로 B 재현율을 먼저 올린다 (P2에서 B 격자를 50개로 확정, 과분할 억제 옵션 포함). C가 B 구간 안을 훑는 방식은 쓰지 않는다.
 - D2. (결정 2026-10-28) 크레딧이 들어오면 P1 파일럿부터, 단계마다 비용을 먼저 알리고 진행한다.
-- D3. 원격 저장소는 https://github.com/joonselim/graspgrade (private). Windows 폴더 저장소가 origin과 연결돼 있고 커밋 51개가 이미 푸시됨. WSL 저장소(로컬 커밋 11개)는 별도 이력. 두 이력 정리와 기존 커밋의 AI 흔적 제거(이력 재작성 + force push)는 사용자 승인 대기.
+- D3. (결정 2026-10-28) 원격 저장소는 https://github.com/joonselim/graspgrade (private). 보고서 세션이 Windows 폴더 저장소에서 커밋하고 푸시한다. 기존 이력은 정리하지 않는다. 실험 세션은 커밋과 푸시를 하지 않는다.
 
 유료 실행 순서와 비용 (dry-run 추정, 단가 실측):
 
