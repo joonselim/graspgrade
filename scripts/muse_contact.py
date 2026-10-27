@@ -165,7 +165,7 @@ def a_masks(ep, n30, answers):
 def c_jobs(seg_path):
     segs = json.loads(Path(seg_path).read_text())
     jobs = []
-    for ep, d in segs.items():
+    for ep, d in ((k, v) for k, v in segs.items() if k.isdigit()):  # skip the "rule" entry of rule-apply files
         n30 = d["n30"]
         for s in SIDES:
             for i, (a, b) in enumerate(d.get(s, [])):
@@ -223,7 +223,7 @@ def cmd_c(args):
 def c_segments(segs, picks):
     """Arm B segments with the boundaries Muse Spark picked. picks: {(ep, hand, i, kind): frame number 0..7}."""
     out = {}
-    for ep, d in segs.items():
+    for ep, d in ((k, v) for k, v in segs.items() if k.isdigit()):  # skip the "rule" entry of rule-apply files
         n30 = d["n30"]
         for s in SIDES:
             res = []
@@ -297,7 +297,7 @@ def cmd_selftest(args):
                   for k in range(0, len(gt[ep]["label"]["left"]), A_STEP)} for ep in eps}
     segs = json.loads(Path(args.segments).read_text())
     picks = {}
-    for ep, d in segs.items():
+    for ep, d in ((k, v) for k, v in segs.items() if k.isdigit()):  # skip the "rule" entry of rule-apply files
         e = int(ep)
         if e not in gt:
             continue

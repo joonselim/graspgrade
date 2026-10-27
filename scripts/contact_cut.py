@@ -630,6 +630,36 @@ def plot_rule(eps, data, chosen):
     fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp22_sam_rule_split.png", dpi=120)  # the EXP-14 figure is kept as it was
 
 
+def cmd_rule_apply(args):
+    """Arm B with the rule chosen on the train episodes, applied to other episodes.
+
+    The output feeds arm C (muse_contact.py c --segments ...). With --train tune
+    and --apply held_out this is the final arm B. Ground truth is used only to
+    choose the rule on the train episodes, never on the applied ones.
+    """
+    split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
+
+    def eps_of(s):
+        e = [int(x) for x in s.split(",")] if "," in s or s.isdigit() else split[s]
+        return [x for x in e if (OUT / "features" / f"episode_{x:06d}.npz").exists()]
+
+    train, apply = eps_of(args.train), eps_of(args.apply)
+    data = load_cached(train, ground_truth(train))
+    params, shifts = pick_rule(list(data.values()), "tactile_clean")
+    out = {"rule": {"params": params, "shift_start_end": shifts, "train_episodes": train}}
+    for ep in apply:
+        z = np.load(OUT / "features" / f"episode_{ep:06d}.npz")
+        n30 = int(z["n30"])
+        out[str(ep)] = {"n30": n30}
+        for s in SIDES:
+            oid = z[f"oid_{s}"] if f"oid_{s}" in z.files else None
+            segs = to_30fps(rule_segments(z[f"x_{s}"], z[f"gap_{s}"], oid=oid, **params), n30, 0, *shifts)
+            out[str(ep)][s] = [[int(a), int(b)] for a, b in segs]
+    path = Path(args.out)
+    path.write_text(json.dumps(out))
+    print(f"rule {params}, shift {shifts}, chosen on {len(train)} episodes; segments for {len(apply)} episodes -> {path}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -640,9 +670,14 @@ def main():
     c.add_argument("--plot", help="comma list of episodes to draw")
     r = sub.add_parser("rule")
     r.add_argument("--plot", help="comma list of episodes to draw")
+    a = sub.add_parser("rule-apply")
+    a.add_argument("--train", default="tune", help="split name or comma list")
+    a.add_argument("--apply", default="held_out", help="split name or comma list")
+    a.add_argument("--out", default=str(OUT / "rule_segments_applied.json"))
     sub.add_parser("smoke")
     args = ap.parse_args()
-    {"features": cmd_features, "cv": cmd_cv, "rule": cmd_rule, "smoke": cmd_smoke}[args.cmd](args)
+    {"features": cmd_features, "cv": cmd_cv, "rule": cmd_rule, "rule-apply": cmd_rule_apply,
+     "smoke": cmd_smoke}[args.cmd](args)
 
 
 if __name__ == "__main__":

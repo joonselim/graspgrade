@@ -9,7 +9,7 @@
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
 
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
-git: `~/graspgrade`에서 단계마다 로컬 커밋 (작성자 Joonse Lim, Claude 흔적 없음, 내부 메모는 `.git/info/exclude`). 원격 저장소는 아직 없다.
+git: `~/graspgrade`에서 단계마다 로컬 커밋 (작성자 Joonse Lim, AI 도구 흔적 없음, 내부 메모는 `.git/info/exclude`). 원격 저장소는 아직 없다.
 
 ## copyable 라벨 v2로 교체 (EXP-16, 2026-10-27)
 
@@ -220,24 +220,24 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 유료 호출 직전까지 준비가 끝났다. 남은 것은 (1) 사용자 결정 3개, (2) 크레딧이 들어온 뒤 유료 실행이다.
 
 사용자 결정 필요:
-- D1. 숫자 1 C를 공정하게 만들 방법 (EXP-21, 22): 튜닝 50개로 B 재현율을 올리는 것만으로 갈지 (B 과분할 문제 있음), C가 B의 긴 접촉 안도 몇 fps로 훑게 할지 (Muse 호출 증가).
-- D2. 유료 실행 전에 파일럿을 먼저 할지 (권장: SAM 3윈도우 + Muse 각 5클립, 약 $0.5).
-- D3. git 원격 저장소 (푸시와 GitHub Pages용). 지금은 로컬 커밋만 한다 (작성자 Joonse Lim, Claude 흔적 없음).
+- D1. (결정 2026-10-28) 튜닝 50개로 B 재현율을 먼저 올린다 (P2에서 B 격자를 50개로 확정, 과분할 억제 옵션 포함). C가 B 구간 안을 훑는 방식은 쓰지 않는다.
+- D2. (결정 2026-10-28) 크레딧이 들어오면 P1 파일럿부터, 단계마다 비용을 먼저 알리고 진행한다.
+- D3. 원격 저장소는 https://github.com/joonselim/graspgrade (private). Windows 폴더 저장소가 origin과 연결돼 있고 커밋 51개가 이미 푸시됨. WSL 저장소(로컬 커밋 11개)는 별도 이력. 두 이력 정리와 기존 커밋의 AI 흔적 제거(이력 재작성 + force push)는 사용자 승인 대기.
 
 유료 실행 순서와 비용 (dry-run 추정, 단가 실측):
 
 | 순서 | 내용 | 명령 | 비용 |
 | --- | --- | --- | --- |
-| P1 | 숫자 2 파일럿: SAM 3윈도우, Muse 체크리스트\/기준선 각 5클립 → 대리값(EXP-19)과 비교 | `sam_hot3d.py --role score_train --limit 3 --send`, `muse_hot3d.py --task ... --role score_train --limit 5 --send` | 약 \$0.5 |
-| P2 | 숫자 1 SAM 튜닝 나머지 47개 → B 격자를 튜닝 50개로 확정 | `sam_episodes.py --split tune --send`, `contact_cut.py features`, `contact_cut.py rule` | \$11.89 |
-| P3 | 숫자 1 SAM held-out 22개 | `sam_episodes.py --split held_out --allow-held-out --send` | \$5.45 |
-| P4 | 숫자 1 A (Muse 단독) 프롬프트 확인 3개 → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | \$2.51 + \$11.86 |
-| P5 | 숫자 1 C (B 경계마다) held-out | `muse_contact.py c --segments <held-out B> --send` | 경계당 약 \$0.013 (약 \$5~10) |
-| P6 | 숫자 2 SAM 전체 | `sam_hot3d.py --role score_train/held_out --send` | \$8.82 + \$17.76 |
-| P7 | 숫자 2 Muse 체크리스트 + 기준선 전체 | `muse_hot3d.py --task checklist/baseline --role score_train/held_out --send` | \$22.49 + \$21.68 |
-| P8 | 숫자 2 최종 | `number2_sam_checks.py` → `number2_score.py --final` | \$0 |
+| P1 | 숫자 2 파일럿: SAM 3윈도우, Muse 체크리스트/기준선 각 5클립 → 대리값(EXP-19)과 비교 | `sam_hot3d.py --role score_train --limit 3 --send`, `muse_hot3d.py --task ... --role score_train --limit 5 --send` | 약 $0.5 |
+| P2 | 숫자 1 SAM 튜닝 나머지 47개 → B 격자를 튜닝 50개로 확정 | `sam_episodes.py --split tune --send`, `contact_cut.py features`, `contact_cut.py rule` | $11.89 |
+| P3 | 숫자 1 SAM held-out 22개 | `sam_episodes.py --split held_out --allow-held-out --send` | $5.45 |
+| P4 | 숫자 1 A (Muse 단독) 프롬프트 확인 3개 → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $2.51 + $11.86 |
+| P5 | 숫자 1 C (B 경계마다) held-out | `muse_contact.py c --segments <held-out B> --send` | 경계당 약 $0.013 (약 $5~10) |
+| P6 | 숫자 2 SAM 전체 | `sam_hot3d.py --role score_train/held_out --send` | $8.82 + $17.76 |
+| P7 | 숫자 2 Muse 체크리스트 + 기준선 전체 | `muse_hot3d.py --task checklist/baseline --role score_train/held_out --send` | $22.49 + $21.68 |
+| P8 | 숫자 2 최종 | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
 
-합계 약 \$110 (지금까지 \$1.53 사용). held-out 숫자 1 B 구간 내보내기(P5 입력)는 `contact_cut.py`에 held-out 적용 명령을 P3 뒤에 추가해야 한다.
+합계 약 $110 (지금까지 $1.53 사용). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
 
 무료 (지금):
 1. (완료, EXP-12) 로컬 3개 항목은 측정은 정확하지만(카메라 vs 머리 회전 0.93, MediaPipe 좌우 96.5%) copyable 예측력이 없다 (AUC 0.49~0.53, 물체 안에서도 0.52~0.53). 물체 기준선은 사람 하나씩 빼고 사람별 평균 AUC 0.70 (0.59~0.81). 사람별 copyable 비율 차이 때문에 사람을 합친 AUC는 왜곡된다 (물체 0.62, 로컬 0.37). held-out도 사람별 AUC를 같이 낸다.

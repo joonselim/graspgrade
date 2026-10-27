@@ -79,6 +79,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/number2_sam_checks.py` | SAM 결과로 가시성, 접촉 명확성 등급 |
 | `scripts/number2_score.py` | 숫자 2 점수 학습과 비교. `--check` (튜닝만, 코드 점검), `--final` (held-out, 마지막에 한 번) |
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만), `score`, `selftest` (가상 Muse로 상한) |
+| `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
 | `scripts/viewer_data.py` | 뷰어 데모 데이터 (튜닝만): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
