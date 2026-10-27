@@ -27,11 +27,11 @@ and have dry runs with cost estimates, but most have not been sent yet.
 | Part | State |
 | --- | --- |
 | Data checks, splits, calibration | done (EXP-01 to EXP-09) |
-| Number 1: contact timing, SAM rule (arm B) | code done, pilot on 3 episodes (EXP-14, EXP-22) |
+| Number 1: contact timing, SAM rule (arm B) | code done, pilot on 3 episodes (EXP-14, EXP-22, EXP-24) |
 | Number 1: Muse Spark arms A and C | code done, best possible scores measured (EXP-21) |
 | Number 2: copyable ground truth | done, label v2 accepted on rules fixed in advance (EXP-15, EXP-16, EXP-20) |
 | Number 2: clips | 2,385 tuning and 1,426 held-out clips, cut from motion capture (EXP-11) |
-| Number 2: checklist | object items checked with stand-ins (EXP-17 to EXP-19), Muse Spark prompts written |
+| Number 2: checklist | object items checked with stand-ins (EXP-17 to EXP-19), paid pilot on HOT3D done (EXP-23), fisheye kept raw (EXP-25) |
 | Viewer | static page with demo data from tuning clips |
 
 ## Main findings so far

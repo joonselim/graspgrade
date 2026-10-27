@@ -35,5 +35,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-22](exp22_arm_b_split.md) | 2026-10-27 | Arm B splits contacts when the nearest object changes | $0 | Boundary F1 doubles (0.15 at ±5, 0.32 at ±15) and so does the arm C ceiling (0.32), but arm B now overshoots (392 boundaries for 190) and IoU falls to 0.66. |
 | [EXP-23](exp23_number2_pilot.md) | 2026-10-28 | Number 2 paid pilot (P1): SAM and Muse on HOT3D | $0.20 | SAM finds the grasped object in 99% of contact frames and our code picks it as nearest in 92%. Muse object grades match the 3D model stand-ins in 27 of 30. Muse costs $0.0097 per call, so P7 drops to about $35. |
 | [EXP-24](exp24_arm_b_persist.md) | 2026-10-28 | Arm B splits only when the new object stays nearest | $0 | Waiting 3 frames lifts IoU from 0.66 to 0.72 but lowers boundary F1 at ±5 from 0.151 to 0.145. Even with the right number of boundaries, F1 is 0.09. The option stays in the grid for the 50 episodes. |
+| [EXP-25](exp25_fisheye_check.md) | 2026-10-28 | Does undistorting the fisheye frames help MediaPipe? | $0 | No. Undistorted frames give 10 points fewer hands found (70.6% to 60.3%), slightly worse 2D points and only 7% better hand shape, against a rule set in advance. Fisheye stays raw and is reported as a limit. |
 
 Total Meta API spend so far: about $1.73 of $150.

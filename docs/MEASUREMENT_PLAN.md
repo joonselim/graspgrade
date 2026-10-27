@@ -349,6 +349,9 @@ tuning clips compares its grades with these stand-ins.
   or lowers the median hand shape feature error by 20% or more. Otherwise
   we keep the raw preview and report fisheye as a limit. Muse frames stay
   raw in both cases, because testing Muse on undistorted frames costs credit.
+- Result (EXP-25): undistortion fails the rule (hand found -10.3 points, 2D
+  error 10.8% worse, hand shape error 6.9% better). Decided: raw preview,
+  fisheye reported as a limit.
 
 ## Budget
 
@@ -356,13 +359,13 @@ Estimates at measured prices, $150 in total.
 
 | Item | Cost |
 | --- | --- |
-| Spent so far | $1.53 |
+| Spent so far | $1.73 |
 | Number 1, SAM: remaining 47 tuning episodes / 22 held-out episodes | $11.89 / $5.45 |
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
 | Number 1, Muse arm C (held-out boundaries, plus tuning) | about $9 |
 | Number 2, SAM: all held-out clips plus 400 tuning clips, overlapping clips in one request | about $27 |
-| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips | about $44 |
-| Total | about $113 |
+| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call) | about $35 |
+| Total | about $104 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
 frames). Each arm is first run on one tuning episode or a few clips to

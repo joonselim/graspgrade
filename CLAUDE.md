@@ -77,6 +77,8 @@ Windows 사본을 WSL로 동기화:
 | `scripts/sam_hot3d.py` | 숫자 2 SAM 윈도우 전송. `--send` 없으면 비용만. 크레딧 사용 |
 | `scripts/muse_hot3d.py` | 숫자 2 Muse 체크리스트/기준선 호출. `--send` 없으면 비용만. 크레딧 사용 |
 | `scripts/number2_sam_checks.py` | SAM 결과로 가시성, 접촉 명확성 등급 |
+| `scripts/number2_pilot.py` | P1 파일럿 점검 (EXP-23): SAM이 고른 물체 vs 데이터셋 2D 박스, Muse 물체 등급 vs 3D 모델 대리값, 실제 호출 단가 (API 호출 없음) |
+| `scripts/hot3d_fisheye_check.py` | 어안 왜곡 보정 점검 (EXP-25): 원본 vs 보정 프레임에서 MediaPipe 손 검출, 2D 오차, 손 모양 오차를 모캡과 비교. `FISHEYE_FOCAL=1.0`은 보조 확인 |
 | `scripts/number2_score.py` | 숫자 2 점수 학습과 비교. `--check` (튜닝만, 코드 점검), `--final` (held-out, 마지막에 한 번) |
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만), `score`, `selftest` (가상 Muse로 상한) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
