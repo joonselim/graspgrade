@@ -114,7 +114,7 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - 모캡 물체 이동(0.2초 동안 0.03 m/s 초과)으로 센 잡기 이벤트 2,624개. 손목 0.25 m 이내 + 클립 QA 90% 이상이면 2,152개 (튜닝 1,439, held-out 713). 클립(이동 + 앞뒤 1초) 중앙값 4.6초, 53%가 5초 미만이라 SAM 최소 50프레임 과금.
 - SAM 10fps, 프롬프트 2개: 전부 $59, 겹치는 클립 합치면 $44, held-out 전부 + 튜닝 400개(seed 20261026)면 $32. 계획은 마지막 안.
 - Muse 추정: 클립당 2회 x 6프레임(720px로 줄임) 약 $0.024 → 1,113개 약 $27. HOT3D 해상도 토큰 수는 미측정.
-- 정답 있는 136 시퀀스 preview 영상(12.3 GB) 다운로드를 백그라운드로 시작했다 (`out/hot3d_preview_download.log`).
+- 정답 있는 136 시퀀스 preview 영상(12.3 GB) 다운로드 완료, 136개 sha1 통과 (`out/hot3d_preview_download.log`).
 
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
@@ -140,13 +140,12 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 1. Day 3~4 (진행 중, 위 "접촉 자르기" 절): OpenGraph 접촉 자르기 (SAM 10fps `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
    - 2D 겹침만으로는 접촉 전에도 76~100% 프레임이 붙어 보인다. 동반 이동이 필수다 (EXP-02, 03).
    - 촉각 독립 정답은 임계값 800(80 택셀 합)으로 만든다. 0으로 하면 에피소드 63~71이 틀린다 (EXP-04).
-2. Day 5 첫 작업: HOT3D 카메라 보정 방향 확인 (아래 미해결 1). 그다음 copyable 라벨 쏠림 확인 (브리프 8-1).
-3. (진행 중, 2026-10-27 시작) 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
+2. Day 5 첫 작업: copyable 라벨 쏠림 확인 (브리프 8-1). 보정 방향은 EXP-08에서 해결했다.
+3. (완료, 136개 sha1 통과) 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
 
 ## 미해결
 
-1. HOT3D `camera_models.json`(FISHEYE624)이 똑바로 선 preview 기준인지, 90도 돌아간 Aria 원본 기준인지 모른다.
-   확인 방법: `box2d_hands.csv`(스트림 214-1)의 정답 박스와 투영한 MANO 손을 겹쳐 본다.
+1. (해결, EXP-08) HOT3D 보정과 2D 박스는 Aria 원본 방향이다. preview는 원본을 시계 방향 90도 돌린 것: 원본 (u, v) → preview (1407 - v, u). preview 프레임 k = 스트림 214-1의 k번째 RGB 타임스탬프.
 2. HOT3D 툴킷 / projectaria_tools / MANO 모델 등록은 아직 안 했다.
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, one-pager 이름 변경, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다.
 

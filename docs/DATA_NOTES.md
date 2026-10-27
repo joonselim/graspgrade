@@ -118,10 +118,12 @@ Quest combined. Quest video is greyscale. With Aria only, 9 persons have GT.
   124 s. So the VRS file is not needed for video.
 - The image is fisheye and already upright.
 - Camera model in `ground_truth/camera_models.json`: label `camera-rgb`,
-  `FISHEYE624`, 1408x1408, with `T_Device_Camera`. Not yet checked: whether
-  this calibration is for the upright preview or for the raw Aria orientation,
-  which is rotated 90 degrees. This must be settled before projecting MANO
-  into the image.
+  `FISHEYE624`, 1408x1408, with `T_Device_Camera`.
+- Checked in EXP-08: the calibration and the dataset 2D boxes
+  (`box2d_objects.csv`, `box2d_hands.csv`) are in the raw Aria orientation.
+  The preview is raw turned 90 degrees clockwise: raw pixel (u, v) maps to
+  preview (1407 - v, u). Preview frame k is the k-th RGB timestamp of stream
+  214-1. The video has one frame fewer, the missing one is at the end.
 - `box2d_hands.csv` has ground-truth 2D hand boxes per stream. Stream `214-1`
   is RGB. Useful as a free check on SAM hand boxes.
 - `masks/` has per-frame hand visible, object visible, QA pass.
