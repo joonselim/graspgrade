@@ -200,6 +200,39 @@ number 2 before any paid call.
 | Train the score weights | 400 random tuning clips (seed 20261026) from 2,385 | 53.3% in all tuning clips |
 | Report AUC | all 1,426 held-out clips | 51.7% |
 
+(The copyable shares in this table are from the EXP-10 label. With the v2
+label the tuning share is 47.0%. Held-out v2 labels are not computed yet.)
+
+### Option A check (written 2026-10-27, before computing, EXP-18)
+
+Option A keeps the question and the v2 label, and turns the "object
+property" check into several concrete object items that Muse Spark would
+rate from the video. Before any paid call we test, for free, whether object
+geometry can carry the signal that object identity carries (EXP-17: 0.741).
+
+- Features per object, from its 3D model only: the three sides of its
+  oriented bounding box (largest, middle, smallest), flatness (smallest over
+  largest), elongation (middle over largest), volume, and fill (volume over
+  box volume). Each clip gets the features of its object.
+- Model: logistic regression on these features, tuning clips, v2 label.
+- Two tests:
+  1. leave one person out, AUC per person and the mean over the six
+     people, next to the object identity reference (0.741),
+  2. leave one object out: the model never sees the object it scores.
+     AUC over all clips pooled, with a 95% interval that resamples
+     sequences. The object identity reference cannot score an unseen object,
+     so it is at 0.5 here by construction.
+- Decision rule:
+  - pass if both AUCs are 0.65 or more: go ahead with option A,
+  - fail if either is below 0.60: option A has no basis, move to option D or C,
+  - in between: weak, decide with the user.
+
+Result (EXP-18): pass. Object geometry from the 3D models reaches AUC 0.695
+leaving one person out (object identity 0.742) and 0.673 leaving one object
+out (0.645 to 0.698, object identity 0.5). The largest side of the object is
+the strongest feature. Option A goes ahead: the object property check becomes
+concrete object items for Muse Spark.
+
 ### Our score
 
 - Seven checks, each graded high, mid or low (1, 0.5, 0): visibility,
