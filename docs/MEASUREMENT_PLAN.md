@@ -67,6 +67,17 @@ Details fixed now:
 - Reported per hand and pooled, on the glove ground truth and on the labels.
 - The start and end delay of arm B against the glove, on tuning and on held-out.
 
+### Open decisions from the pilot (EXP-14)
+
+- The raw glove signal flickers around the threshold: on three episodes,
+  21 of 124 segments are shorter than 0.2 s and 28 gaps are 0.1 s or less.
+  Proposed: the main ground truth joins glove dropouts up to 0.1 s and drops
+  blips under 0.1 s. To be decided before any held-out run.
+- Arm B joins touches that follow each other, because the hand stays near
+  some object. Proposed: also break a contact when the nearest object
+  changes or the hand leaves for a moment, chosen on tuning episodes.
+- Arm C only refines the boundaries arm B finds, so arm B sets its recall.
+
 ### What we expect
 
 The glove measures pressure, which video cannot see. Arm B already showed
@@ -102,7 +113,8 @@ comparison between arms, and we report ±5 frames as it comes out.
 - Seven checks, each graded high, mid or low (1, 0.5, 0): visibility,
   camera stability, contact clarity, action completeness, finger occlusion
   (Muse Spark), object property (Muse Spark), retargeting recoverability
-  (MediaPipe and dex-retargeting, Allegro).
+  (MediaPipe and dex-retargeting, Allegro). Since EXP-13 the last one is
+  measured as hand shape fit from MediaPipe hand points during contact.
 - A logistic regression on the 400 tuning clips turns them into a 0 to 100 score.
 - A check with no spread on the tuning clips is dropped from the
   regression and explained in the demo (proposal risk 5).
@@ -138,6 +150,12 @@ comparison between arms, and we report ±5 frames as it comes out.
   one tuning person out, mean over people). So the retargeting check gets
   hand shape features first (hand opening, finger curl, grasp type), tested
   for free on tuning clips before any paid call.
+- Result (EXP-13): hand shape from video (opening, finger curl, spread,
+  closure, pinch vs power) predicts copyable at AUC 0.63, object identity at
+  0.69, both together at 0.72. The retargeting recoverability check becomes
+  "hand shape fit": a logistic regression on the ten video features, graded
+  by tuning terciles, trained on tuning clips outside the 400 used for the
+  score weights.
 - Pooled AUC over people with different copyable shares ranks people
   instead of clips (EXP-12). Per-person AUC is reported next to pooled AUC.
 

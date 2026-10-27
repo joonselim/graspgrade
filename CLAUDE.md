@@ -56,7 +56,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/sam_fps_compare.py` | 같은 클립의 SAM 10fps 결과와 30fps 결과 비교, 그림 저장 (API 호출 없음) |
 | `scripts/sam_episodes.py` | OpenGraph 에피소드 전체를 10fps로 SAM에 보냄 (`hand`, `small object`). `--send` 없으면 클립 생성과 비용 출력만 |
 | `scripts/sam_fast.py` | SAM 출력 빠른 리더. 공식 파서와 같은 디코더를 numba로 컴파일 (마스크당 약 3ms, 공식은 400ms). `--check`로 공식 파서와 대조 |
-| `scripts/contact_cut.py` | 숫자 1: SAM 마스크로 손별 접촉 구간 추정 (특징 + 로지스틱 회귀 + 히스테리시스), boundary F1 / contact IoU 평가 |
+| `scripts/contact_cut.py` | 숫자 1: SAM 마스크로 손별 접촉 구간 추정 (특징 + 로지스틱 회귀 + 히스테리시스), boundary F1 / contact IoU 평가. `rule`은 B 규칙(겹침 + 동반 이동)과 참고 행을 leave-one-out으로 평가 |
 | `scripts/sam_track_check.py` | 에피소드 전체 SAM 추적 점검 (검출률, id 수명, 손 좌우, 접촉 프레임에서 손 검출), 타임라인 그림 |
 | `scripts/hot3d_clip_count.py` | 모캡 물체 이동으로 HOT3D 잡기 클립 수와 길이를 세고 숫자 2 SAM 비용 계산 (API 호출 없음) |
 | `scripts/hot3d_calib_check.py` | HOT3D 보정 방향 확인: 물체 모델 투영 vs 2D 박스, MediaPipe 손 vs 2D 손 박스 (방향, 프레임 밀림) |
@@ -65,5 +65,6 @@ Windows 사본을 WSL로 동기화:
 | `scripts/hot3d_clips.py` | 숫자 2 클립: 모캡 손가락 끝-물체 거리로 접촉 구간을 찾아 클립 생성 (전 프레임, 병렬). `--plot SEQ OBJECT` 그림 |
 | `scripts/hot3d_local_checks.py` | 숫자 2 로컬 채점 3개 항목 (카메라 안정성, 리타게팅 복원성, 동작 완결성). `video` (시퀀스별 MediaPipe + 광학 흐름, 캐시) → `clips` |
 | `scripts/hot3d_signal_check.py` | 튜닝 클립에서 항목별 AUC, 물체 기준선 AUC (사람 하나씩 빼기), 사람별 AUC |
+| `scripts/hot3d_hand_shape.py` | 접촉 중 손 모양 특징 10개 (영상 MediaPipe, 모캡 상한) → 튜닝 AUC, 물체 기준선과 비교 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

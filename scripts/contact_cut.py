@@ -59,6 +59,24 @@ BASE = ["hand_present", "obj_present", "log_gap", "near_3px", "obj_next_to_hand"
 
 # ---------------------------------------------------------------- ground truth
 
+GLOVE_JOIN, GLOVE_MIN = 3, 3  # frames: join pressure dropouts up to 0.1 s, drop pressure blips under 0.1 s
+
+
+def clean_glove(mask):
+    """Glove contact after removing threshold flicker (an option for the main ground truth, see EXP-14)."""
+    out = np.zeros_like(mask)
+    runs = []
+    for a, b in segments(mask):
+        if runs and a - runs[-1][1] <= GLOVE_JOIN:
+            runs[-1] = (runs[-1][0], b)
+        else:
+            runs.append((a, b))
+    for a, b in runs:
+        if b - a >= GLOVE_MIN:
+            out[a:b] = True
+    return out
+
+
 def ground_truth(episodes):
     cols = ["episode_index", "frame_index", "annotation.hand",
             "observation.tactile.left", "observation.tactile.right"]
@@ -71,6 +89,7 @@ def ground_truth(episodes):
             "label": {s: np.isin(lab, [s, "both"]) for s in SIDES},
             "tactile": {s: np.stack(e[f"observation.tactile.{s}"].values).sum(1) > TACTILE_THR for s in SIDES},
         }
+        gt[int(ep)]["tactile_clean"] = {s: clean_glove(gt[int(ep)]["tactile"][s]) for s in SIDES}
     return gt
 
 
@@ -321,9 +340,9 @@ def load_cached(eps, gt):
         n30 = int(z["n30"])
         n10 = z["x_left"].shape[0]
         for s in SIDES:
-            y = {g: gt[ep][g][s][::STEP][:n10] for g in ("label", "tactile")}
+            y = {g: gt[ep][g][s][::STEP][:n10] for g in ("label", "tactile", "tactile_clean")}
             data[(ep, s)] = {"x": with_context(z[f"x_{s}"]), "base": z[f"x_{s}"], "y": y, "n30": n30,
-                             "gt30": {g: gt[ep][g][s] for g in ("label", "tactile")}, "gap": z[f"gap_{s}"]}
+                             "gt30": {g: gt[ep][g][s] for g in ("label", "tactile", "tactile_clean")}, "gap": z[f"gap_{s}"]}
     return data
 
 
@@ -460,6 +479,137 @@ def cmd_smoke(args):
     print("rule gap <= 3 px:", evaluate(units, [rule_probs(u) for u in units], 0.5, 0.5, (0, 0)))
 
 
+# ---------------------------------------------------------------- arm B: SAM rule (measurement plan)
+
+RULE_GRID = {"gap_px": (2, 4, 8, 12), "move": (0.05, 0.1, 0.2), "comove": (0.5, 0.7)}
+FILL, MIN_LEN = 2, 2  # 10 fps frames: join near-runs split by up to 0.2 s, drop contacts under 0.2 s
+
+
+def rule_segments(base, gap, gap_px, move, comove):
+    """Arm B, per hand at 10 fps.
+
+    near: the hand mask is within gap_px of an object mask.
+    co-moving: the nearest object moves at least `move` object sizes over 0.3 s
+    (camera motion removed) and moves with the hand (comove at most `comove`).
+    A contact is a near-run that contains at least one co-moving frame, from the
+    start of the run to its end. So a touch counts once the object moved with
+    the hand, and it lasts while the hand stays at the object.
+    """
+    b = dict(zip(BASE, base.T))
+    near = np.nan_to_num(gap, nan=1e9) <= gap_px
+    obj_move = np.maximum(b["obj_move_future"], b["obj_move_past"])
+    moving = near & (b["hand_present"] > 0) & (obj_move >= move) & (b["comove"] <= comove)
+    runs = []
+    for a, e in segments(near):
+        if runs and a - runs[-1][1] <= FILL:
+            runs[-1] = (runs[-1][0], e)
+        else:
+            runs.append((a, e))
+    return [(a, e) for a, e in runs if e - a >= MIN_LEN and moving[a:e].any()]
+
+
+def score_rule(units, params, target, shifts=(0, 0)):
+    sc = Score()
+    for u in units:
+        sc.add(to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts), u["gt30"][target])
+    return sc.result()
+
+
+def pick_rule(units, target):
+    """Grid search on tuning units: best F1 at 15 frames plus IoU, then the median start and end delay."""
+    best = None
+    for g in RULE_GRID["gap_px"]:
+        for m in RULE_GRID["move"]:
+            for c in RULE_GRID["comove"]:
+                p = {"gap_px": g, "move": m, "comove": c}
+                r = score_rule(units, p, target)
+                key = r["boundary_f1_15"] + r["contact_iou"]
+                if best is None or key > best[0]:
+                    best = (key, p, r)
+    _, p, r = best
+    return p, (-int(round(r["start_error_median"] or 0)), -int(round(r["end_error_median"] or 0)))
+
+
+def reference(units, target, kind):
+    sc = Score()
+    for u in units:
+        sc.add([(0, u["n30"])] if kind == "always" else [], u["gt30"][target])
+    return sc.result()
+
+
+def cmd_rule(args):
+    """Arm B and the reference rows, leave one tuning episode out (parameters chosen on the others)."""
+    split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
+    eps = [e for e in split["tune"] if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
+    data = load_cached(eps, ground_truth(eps))
+    report = {"episodes": eps, "note": "glove = tactile sum > 800 (main), label = dataset labels (check)"}
+    for target, name in (("tactile", "glove"), ("tactile_clean", "glove_clean"), ("label", "label")):
+        sc, chosen, per_ep = Score(), {}, {}
+        for ep in eps:
+            train = [u for (e, s), u in data.items() if e != ep]
+            test = [u for (e, s), u in data.items() if e == ep]
+            params, shifts = pick_rule(train, target)
+            chosen[ep] = {"params": params, "shift_start_end": shifts}
+            one = Score()
+            for u in test:
+                segs = to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts)
+                sc.add(segs, u["gt30"][target])
+                one.add(segs, u["gt30"][target])
+            per_ep[ep] = {k: one.result()[k] for k in ("boundary_f1_5", "boundary_f1_15", "contact_iou")}
+        units = list(data.values())
+        report[name] = {
+            "arm_B_sam_rule_leave_one_out": sc.result(),
+            "arm_B_per_episode": per_ep,
+            "arm_B_chosen_on_other_episodes": chosen,
+            "reference_always_in_contact": reference(units, target, "always"),
+            "reference_never_in_contact": reference(units, target, "never"),
+            "contact_share": round(float(np.mean(np.concatenate([u["gt30"][target] for u in units]))), 3),
+        }
+    (OUT / "rule_report.json").write_text(json.dumps(report, indent=1, default=str))
+    for name in ("glove", "glove_clean", "label"):
+        r = report[name]
+        print(name, "contact share", r["contact_share"])
+        for row in ("arm_B_sam_rule_leave_one_out", "reference_always_in_contact", "reference_never_in_contact"):
+            x = r[row]
+            print(f"  {row}: F1@5 {x['boundary_f1_5']}  F1@15 {x['boundary_f1_15']}  IoU {x['contact_iou']}  "
+                  f"start err {x['start_error_median']}  end err {x['end_error_median']}  "
+                  f"boundaries {x['boundaries_pred']}/{x['boundaries_ref']}")
+        print("  per episode", r["arm_B_per_episode"])
+        print("  chosen", r["arm_B_chosen_on_other_episodes"])
+    if args.plot:
+        plot_rule([int(e) for e in args.plot.split(",")], data, report["glove"]["arm_B_chosen_on_other_episodes"])
+
+
+def plot_rule(eps, data, chosen):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(len(eps), 1, figsize=(12, 1.9 * len(eps)), squeeze=False)
+    for ax, ep in zip(axes[:, 0], eps):
+        params, shifts = chosen[ep]["params"], chosen[ep]["shift_start_end"]
+        y, ticks = 0, []
+        for s in SIDES:
+            u = data[(ep, s)]
+            t = np.arange(u["n30"]) / 30
+            pm = np.zeros(u["n30"], bool)
+            for a, b in to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts):
+                pm[a:b] = True
+            for mask, c, lab in ((u["gt30"]["tactile"], "#2b8a3e", f"{s}: glove > 800"),
+                                 (pm, "#e8590c", f"{s}: arm B (SAM rule)")):
+                ax.fill_between(t, y, y + 0.8, where=mask, color=c, step="mid", lw=0)
+                ticks.append((y + 0.4, lab))
+                y += 1
+            y += 0.4
+        ax.set_yticks([p for p, _ in ticks])
+        ax.set_yticklabels([n for _, n in ticks], fontsize=7)
+        ax.set_xlim(0, t[-1])
+        ax.set_title(f"Episode {ep}, rule chosen on the other pilot episodes: {params}", fontsize=9)
+        ax.grid(axis="x", alpha=0.3)
+    axes[-1, 0].set_xlabel("seconds")
+    fig.tight_layout()
+    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp14_sam_rule_pilot.png", dpi=120)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -468,9 +618,11 @@ def main():
     f.add_argument("--episodes")
     c = sub.add_parser("cv")
     c.add_argument("--plot", help="comma list of episodes to draw")
+    r = sub.add_parser("rule")
+    r.add_argument("--plot", help="comma list of episodes to draw")
     sub.add_parser("smoke")
     args = ap.parse_args()
-    {"features": cmd_features, "cv": cmd_cv, "smoke": cmd_smoke}[args.cmd](args)
+    {"features": cmd_features, "cv": cmd_cv, "rule": cmd_rule, "smoke": cmd_smoke}[args.cmd](args)
 
 
 if __name__ == "__main__":
