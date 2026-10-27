@@ -466,6 +466,39 @@ Reported in the final run next to the main results, whichever way it comes out.
   error 10.8% worse, hand shape error 6.9% better). Decided: raw preview,
   fisheye reported as a limit.
 
+## One prompt revision on tuning (written 2026-10-28, before sending any revised prompt)
+
+The first real answers on tuning (EXP-29, error analysis in EXP-30) show two
+systematic Muse Spark errors. Prompts may still change, because nothing has
+been sent on held-out. Each prompt is revised once, tested on the same tuning
+data, and the version for held-out is picked by a rule fixed here.
+
+- Number 2 checklist, version 2: Muse Spark estimates the longest, middle and
+  shortest side of the whole object in cm, using the hand (about 19 cm) and
+  common objects as rulers. Our code turns the three numbers into the size,
+  shape, thickness and width grades with the same anchors as before (EXP-19
+  table). Handle, free space and finger occlusion stay graded as before.
+  Reason: version 1 calls 72 of 103 mid-size objects small and 56 of 133 wide
+  objects narrow, which looks like a scale and definition problem.
+  - Sent on the same 400 score_train clips.
+  - Rule: version 2 is used for P7b if its R3 (learned weights on the seven
+    grades, leave one person out, mean over people) is higher than version 1
+    (0.638). Otherwise version 1 stays. Ties keep version 1.
+- Number 1 arm A, version 2: the prompt says that a hand which lets go of an
+  object, even for a moment between two grasps, is not touching, and asks to
+  check for a visible gap between fingers and object in every frame.
+  Reason: version 1 marks a release of 0.2 to 1 s as "not touching" in only
+  about 10% of cases, so it joins touches and finds 68 of 190 boundaries.
+  - Sent on the same tuning episodes 0, 30 and 53.
+  - Rule: version 2 is used for held-out if its boundary F1 at ±5 frames with
+    the shift learned on the other two episodes (cleaned glove) is higher than
+    version 1 (0.132). Otherwise version 1 stays. Ties keep version 1.
+- Muse Spark alone (R1) keeps its prompt. It is the comparison the proposal
+  defines (the same question, no checklist), and its weakness on tuning (0.52)
+  is that it does not know which objects fail, not a wording problem. This
+  is reported as a limit: the checklist got one revision on tuning, R1 none.
+- No further revision after this one. Both versions are reported on tuning.
+
 ## Release: the ground truth as a reusable benchmark (written 2026-10-28)
 
 The proposal's problem is that teams filter video with their own rules and

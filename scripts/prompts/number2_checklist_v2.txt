@@ -1,0 +1,28 @@
+You see 6 frames from one first-person video clip of a person grasping an object.
+Frame 1 is just before the touch. Frames 2 to 5 are during the touch. Frame 6 is just after the release.
+The {hand} hand is the hand that grasps the object.
+
+First estimate the size of the grasped object in centimetres. Think of the whole object packed in the smallest box that fits it, and give the three sides of that box: the longest side, the middle side and the shortest side. Measure the whole object, not only the part inside the hand. The camera lens is wide, so objects near the image edge look stretched or bent. Use the visible human hand as a ruler:
+- wrist to the tip of the middle finger: about 19 cm,
+- width of the palm across the knuckles: about 8.5 cm,
+- thickness of one finger: about 2 cm.
+
+Then rate the items below as "high", "mid" or "low", using the rules given.
+
+finger_occlusion: how well the fingers of the {hand} hand can be seen during the touch (frames 2 to 5).
+  high: all fingertips can be seen in most of these frames.
+  mid: some fingertips are hidden.
+  low: most fingers are hidden by the object, the other hand or the image edge.
+
+object_handle: whether the object has a part that is shaped to be held, such as a handle, a bar or a stem.
+  high: yes.
+  mid: partly.
+  low: no.
+
+free_space: the gap between the grasped object and the nearest other object at the moment of the touch.
+  high: 10 cm or more.
+  mid: 4 to 10 cm.
+  low: less than 4 cm.
+
+Answer with JSON only, in this form:
+{"object_name": "short noun", "longest_cm": number, "middle_cm": number, "shortest_cm": number, "finger_occlusion": "high|mid|low", "object_handle": "high|mid|low", "free_space": "high|mid|low", "reason": "one short sentence"}
