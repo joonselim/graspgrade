@@ -363,6 +363,36 @@ def rule_probs(u):
     return (np.nan_to_num(u["gap"], nan=1e9) <= 3).astype(float)
 
 
+def plot_cv(eps, keys, units, probs, hi, lo, shifts):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    img = ROOT / "docs" / "experiments" / "img"
+    for ep in eps:
+        fig, axes = plt.subplots(2, 1, figsize=(12, 4.4), sharex=True)
+        for ax, s in zip(axes, SIDES):
+            i = keys.index((ep, s))
+            u, p = units[i], probs[i]
+            t30 = np.arange(u["n30"]) / 30
+            pm = np.zeros(u["n30"], bool)
+            for a, b in to_30fps(postprocess(p, hi, lo), u["n30"], 0, *shifts):
+                pm[a:b] = True
+            ax.fill_between(t30, 1.05, 1.25, where=u["gt30"]["label"], color="#2b8a3e", step="mid", lw=0, label="label contact")
+            ax.fill_between(t30, 1.3, 1.5, where=u["gt30"]["tactile"], color="#868e96", step="mid", lw=0, label="tactile > 800")
+            ax.fill_between(t30, -0.25, -0.05, where=pm, color="#e8590c", step="mid", lw=0, label="predicted contact")
+            ax.plot(np.arange(len(p)) / 10, p, color="#1c7ed6", lw=0.8, label="contact probability")
+            ax.set_ylim(-0.3, 1.55)
+            ax.set_yticks([0, 0.5, 1])
+            ax.set_ylabel(f"{s} hand")
+            ax.grid(alpha=0.3)
+        axes[0].legend(fontsize=7, ncol=4, loc="upper right", bbox_to_anchor=(1, 1.32))
+        axes[1].set_xlabel("seconds")
+        fig.suptitle(f"Episode {ep}: contact from SAM masks (model trained on the other episodes)", y=0.99)
+        fig.tight_layout()
+        fig.savefig(img / f"exp06_ep{ep}_contact.png", dpi=120)
+        plt.close(fig)
+
+
 def cmd_cv(args):
     split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
     eps = [e for e in split["tune"] if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
@@ -371,13 +401,14 @@ def cmd_cv(args):
     folds = [eps[i::5] for i in range(5)]
     report = {"episodes": eps}
     for target in ("label", "tactile"):
-        units, probs = [], []
+        units, probs, keys = [], [], []
         for fold in folds:
             train = [u for (e, s), u in data.items() if e not in fold]
             test = [(k, u) for k, u in data.items() if k[0] in fold]
             model = fit(train, target)
             for k, u in test:
                 units.append(u)
+                keys.append(k)
                 probs.append(model.predict_proba(u["x"])[:, 1])
         hi, lo, shifts = tune_post(units, probs, target)
         report[target] = {
@@ -386,6 +417,8 @@ def cmd_cv(args):
             "logreg_cv_no_shift": evaluate(units, probs, hi, lo, (0, 0), target),
             "rule_gap_3px": evaluate(units, [rule_probs(u) for u in units], 0.5, 0.5, (0, 0), target),
         }
+        if target == "label" and args.plot:
+            plot_cv([int(e) for e in args.plot.split(",")], keys, units, probs, hi, lo, shifts)
     model = fit(list(data.values()), "label")
     coef = model[-1].coef_[0].reshape(len(CONTEXT), len(BASE))
     report["coef_at_offset_0"] = dict(zip(BASE, np.round(coef[CONTEXT.index(0)], 3).tolist()))
@@ -433,7 +466,8 @@ def main():
     f = sub.add_parser("features")
     f.add_argument("--split", default="tune", choices=["tune", "held_out"])
     f.add_argument("--episodes")
-    sub.add_parser("cv")
+    c = sub.add_parser("cv")
+    c.add_argument("--plot", help="comma list of episodes to draw")
     sub.add_parser("smoke")
     args = ap.parse_args()
     {"features": cmd_features, "cv": cmd_cv, "smoke": cmd_smoke}[args.cmd](args)
