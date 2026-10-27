@@ -50,6 +50,16 @@ Two ground truths are available for number 1: these anchor labels, or our own
 threshold on the raw tactile columns. The labels are already derived from the
 same tactile signal.
 
+Raw tactile as ground truth needs a threshold. With "sum of 80 taxels > 0",
+labels and tactile agree on 97% of frames in episodes 0 to 62 but only 72% to
+74% in episodes 63 to 71, where the gloves read small pressure at rest. With
+threshold 800 they agree on 98.7% (left) and 97.2% (right) of all frames. See
+`docs/experiments/exp04_local_data_checks.md`.
+
+Head IMU (`observation.imu.head`, last three values are the gyro): the camera
+is almost still in episodes 0 to 47 and 63 to 71 and moves in the spray bottle
+episodes 48 to 62.
+
 `meta/opengraph/tactile_highlights/` has per episode: task sentence, object
 list, contact percent per hand, and a force time series.
 

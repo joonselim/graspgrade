@@ -17,6 +17,7 @@
 - Meta API 호출은 크레딧($150)을 쓴다. 사용자 승인 없이 호출하지 않는다.
 - `.env` 값과 HOT3D 서명 URL은 절대 출력하지 않는다.
 - sudo는 사용자 비밀번호가 필요하다. apt 작업은 사용자에게 넘긴다.
+- 실험을 하면 같은 턴에 `docs/experiments/`에 제출용 영어 기록(설정, 수치, 비용, 이미지, 결론)을 쓰고 README 표에 한 줄 추가한다. 이미지는 `docs/experiments/img/`.
 
 ## 위치
 
@@ -51,3 +52,5 @@ Windows 사본을 WSL로 동기화:
 | `scripts/make_splits.py` | 튜닝 / held-out 분할 생성 (seed 20261026) |
 | `scripts/meta_smoke.py` | Meta API 스모크 테스트 (Muse Spark 이미지 1장, SAM 3.1 5초 클립). 크레딧 사용 |
 | `scripts/sam_prompt_compare.py` | 같은 클립에서 SAM 물체 프롬프트별 검출, id 안정성, 손과의 겹침 비교 (API 호출 없음) |
+| `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
+| `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

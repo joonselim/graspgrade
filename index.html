@@ -325,7 +325,8 @@
       <strong>Day 1~2 목표가 전부 끝났다. 정답 검증까지 했다.</strong>
       환경 구축, 두 데이터셋 다운로드, 에피소드 자르기, 분할 고정, Meta API 스모크 테스트,
       SAM 물체 프롬프트 비교(에피소드 2개), OpenGraph 전체 138,629 프레임 정답 검증까지 마쳤다.
-      쓴 크레딧은 약 $0.34다. 다음은 Day 3~4의 OpenGraph 접촉 자르기다.
+      쓴 크레딧은 약 $0.34다. 물체 프롬프트는 <code>small object</code>, 촉각 임계값은 800으로 정했다.
+      다음은 10fps 테스트와 Day 3~4의 OpenGraph 접촉 자르기다.
     </div>
   </section>
 
@@ -336,6 +337,37 @@
       <div class="tile"><div class="n">261</div><div class="k">접촉 구간 (138,629 프레임)</div></div>
       <div class="tile"><div class="n">97~99%</div><div class="k">라벨 vs 촉각 프레임 일치</div></div>
       <div class="tile"><div class="n">93.5%</div><div class="k">오른손 접촉 시작 ±5프레임 이내</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>실험 기록</h2>
+    <p class="small">
+      실험마다 설정, 수치, 비용, 이미지, 결론을 남긴다. 기록 원문은 제출용 영어로
+      <code>docs/experiments/</code>에 있다.
+    </p>
+    <div class="card scroll">
+      <table>
+        <thead><tr><th>#</th><th>내용</th><th class="num">비용</th><th>결론</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>EXP-01</td><td>Meta Model API 스모크 테스트</td><td class="num">$0.035</td>
+            <td>Muse Spark와 SAM 3.1 둘 다 우리 클립에서 동작한다. SAM은 5초 클립당 $0.03이고 장갑 낀 양손을 모든 프레임에서 찾는다.</td>
+          </tr>
+          <tr>
+            <td>EXP-02</td><td>SAM 물체 프롬프트, 작은 용기 클립</td><td class="num">$0.15</td>
+            <td>일반 프롬프트 중에서는 <code>small object</code>만 동작한다. 2D 겹침은 접촉을 보여주지 못한다.</td>
+          </tr>
+          <tr>
+            <td>EXP-03</td><td>SAM 물체 프롬프트, 스프레이병 클립</td><td class="num">$0.15</td>
+            <td><code>small object</code>는 큰 스프레이병도 모든 프레임에서 찾는다. 이것을 물체 프롬프트로 쓴다.</td>
+          </tr>
+          <tr>
+            <td>EXP-04</td><td>API 없이 OpenGraph 점검</td><td class="num">$0</td>
+            <td>라벨은 임계값 800에서 촉각과 맞고 0에서는 안 맞는다. 머리 IMU로 카메라 흔들림을 공짜로 얻는다.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -457,8 +489,9 @@
       <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462"
            alt="왼쪽은 촉각 임계값에 따른 라벨 일치율 그래프, 오른쪽은 에피소드별 머리 각속도 막대 그래프">
       <figcaption>
-        <b>왼쪽: 임계값을 어디에 두든 결론이 같다.</b> 임계값 800 위로는 일치율이 평평하다.
-        에피소드 63~71만 낮은 쪽(약 96~97%)에 있고, 400 아래에서는 급격히 무너진다. 임계값 800은 안전한 선택이다.<br>
+        <b>왼쪽: 촉각 임계값은 800으로 정했다.</b> 800 위로는 일치율이 평평하다.
+        임계값을 0으로 두면 에피소드 63~71이 72~74%까지 떨어진다. 그 에피소드들은 가만히 있어도
+        장갑이 약한 압력을 읽기 때문이다. 800에서는 전체가 왼손 98.7%, 오른손 97.2%다.<br>
         <b>오른쪽: 카메라 안정성 항목은 살아 있다.</b> 빨간 막대가 스프레이병 작업(에피소드 48~62)이고
         나머지보다 50~100배 흔들린다. p95 최소 0.004, 중앙값 0.0105, 최대 0.827 rad/s.
         생성: <code>scripts/refine_plots.py</code>
@@ -535,7 +568,7 @@
       </table>
     </div>
 
-    <h3>에피소드 53, 베이지 책상 위의 스프레이병</h3>
+    <h3>에피소드 53, 베이지 책상 위의 스프레이병 (프레임 136~285)</h3>
     <div class="card scroll">
       <table>
         <thead>
@@ -563,8 +596,8 @@
           <div class="rowbody"><code>object</code>, <code>item</code>, <code>handheld object</code>는 전부 0%다. 에피소드가 달라도 같았다.</div>
         </li>
         <li>
-          <div class="rowhead"><span class="name">물체 이름을 아는 쪽이 더 깨끗하다</span><span class="pill wait">결정 대기</span></div>
-          <div class="rowbody">에피소드 53에서 <code>bottle</code>과 <code>spray bottle</code>은 프레임당 정확히 1개를 냈고, <code>small object</code>는 1.44개로 군더더기가 붙었다. 다만 OpenGraph에는 <code>target_object</code> 컬럼이 있어 이름을 쓸 수 있다. <code>small object</code> 하나로 통일할지, 에피소드마다 이름을 넣을지는 아직 안 정했다.</div>
+          <div class="rowhead"><span class="name">물체 프롬프트는 <code>small object</code>로 정했다</span><span class="pill done">결정</span></div>
+          <div class="rowbody"><code>small object</code>가 작은 용기뿐 아니라 큰 스프레이병도 150프레임 전부 잡았다. 마스크는 이름을 직접 부른 <code>spray bottle</code>과 같고, 배경 물체 하나를 66프레임 더 잡는 차이뿐이다. 에피소드마다 <code>target_object</code> 이름을 넣지 않아도 되므로 파이프라인이 단순해진다.</div>
         </li>
         <li>
           <div class="rowhead"><span class="name">2D 겹침만으로는 접촉을 못 가린다</span><span class="pill open">설계 수정</span></div>
@@ -685,8 +718,8 @@
     <h2>다음 할 일</h2>
     <ol class="steps">
       <li class="hot">
-        <div class="rowhead"><span class="name">물체 프롬프트와 프레임 레이트 결정</span><span class="pill wait">결정 대기</span></div>
-        <div class="rowbody">프롬프트는 <code>small object</code> 하나로 통일할지 <code>target_object</code> 이름을 쓸지, 그리고 30fps($27.73)로 갈지 10fps($9.24)로 갈지를 정한다. 두 선택 모두 전체 비용을 바꾼다.</div>
+        <div class="rowhead"><span class="name">10fps 테스트</span><span class="pill wait">승인 필요</span></div>
+        <div class="rowbody">같은 5초 클립을 10fps로 보내 추적과 경계가 유지되는지 본다. 유지되면 OpenGraph 전체 SAM 비용이 프롬프트당 $27.7에서 $9.2로 떨어진다. 크레딧을 쓰므로 승인이 필요하다.</div>
       </li>
       <li>
         <div class="rowhead"><span class="name">Day 3~4: OpenGraph 접촉 자르기 (숫자 1)</span></div>
