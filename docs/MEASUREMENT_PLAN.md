@@ -460,6 +460,29 @@ Reported in the final run next to the main results, whichever way it comes out.
   error 10.8% worse, hand shape error 6.9% better). Decided: raw preview,
   fisheye reported as a limit.
 
+## Release: the ground truth as a reusable benchmark (written 2026-10-28)
+
+The proposal's problem is that teams filter video with their own rules and
+do not publish a score others can reuse. The heaviest and most checked part
+of this project is the ground truth, so it is released as a benchmark that
+scores any video filter against sensors, whatever our checklist scores.
+
+What is released, and under which license (from the license files that come
+with the data: `data/ego-tactile/README.md`, `data/hot3d/assets/license.txt`.
+This is our reading of those texts, not legal advice):
+
+| Part | Content | Derived from | License |
+| --- | --- | --- | --- |
+| Number 1 benchmark | Per episode and hand, contact segments from the cleaned glove (frame ranges at 30 fps), raw glove segments, tuning and held-out split, scoring script (boundary F1 at ±5 and ±15 frames, contact IoU) | OpenGraph Ego-Tactile, CC BY 4.0 | CC BY 4.0, credit to OpenGraph Labs |
+| Number 2 benchmark | Clip list (sequence, hand, object, start, length, contact frames), copyable v2 label with the failing condition (grip, reach, collision), depth limit curve, tuning and held-out split, scoring script (AUC per person, sequence bootstrap, top 20%) | HOT3D hand data (CC BY-NC-SA 4.0), object poses (CC BY-SA 4.0), object models (CC BY-SA with no sale) | CC BY-NC-SA 4.0, credit to Meta HOT3D, no sale of object model data |
+| Code | The scripts that rebuild both benchmarks from the original downloads | | our own code license |
+
+- No raw video, sensor or mocap file is copied. Users download the original
+  datasets themselves (HOT3D needs a sign-up) and run the scripts.
+- The copyable label uses the HOT3D hand data, so the number 2 benchmark
+  cannot be offered for commercial use.
+- Every release file names its source dataset and license.
+
 ## Budget
 
 Estimates at measured prices, $150 in total.
