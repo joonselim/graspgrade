@@ -133,6 +133,51 @@ How we choose, fixed before looking at the results:
   passes, we report that and revisit the definition.
 - Copyable share per object is reported, but it is not used to choose.
 
+Result (EXP-15): no method passes. `ratio` (the EXP-10 label) has poor
+fidelity (31 mm) and depends on hand size (+0.19). The faithful methods
+(`scale1` 6.9 mm, `position` 11.4 mm) call 94% to 96% of grasps copyable,
+outside the band. The label is on hold, and with it every number built on it
+(EXP-11 shares, EXP-12 object reference, EXP-13 hand shape check). The
+EXP-11 clips are not affected. Next: a new definition with `position`
+retargeting, collision checked on the Allegro link meshes, and a reach check
+on the human contact points, written here before computing.
+
+### Copyable definition v2 (written 2026-10-27, before computing, EXP-16)
+
+Retargeting and geometry:
+
+- Position retargeting (dex-retargeting Allegro offline config): Allegro
+  fingertips and finger bases fitted to the human ones at the contact frame,
+  with a free hand base.
+- The Allegro hand surface is points sampled on the visual mesh of every
+  link (about 300 per link), placed by forward kinematics.
+- The hand may then shift up to 2 cm (1 cm grid), as in EXP-10.
+
+A clip is copyable when, for at least one shift, all three hold:
+
+1. Grip: the Allegro thumb tip and at least one other Allegro fingertip are
+   within 1.5 cm of the object surface.
+2. Reach: for every human finger (thumb, index, middle, ring) whose tip is
+   within 15 mm of the surface, the matching Allegro fingertip is within
+   2.0 cm of that human fingertip. The little finger has no Allegro match and
+   is not checked.
+3. No collision: no Allegro mesh point is more than 5 mm inside the object.
+
+Why these numbers: 1.5 cm is the human contact distance used since EXP-09.
+2.0 cm is about the width of an Allegro fingertip. 5 mm allows for mocap and
+model error (EXP-09 fingertips sit about 2 mm from the surface).
+
+Acceptance, fixed now:
+
+- Main thresholds above. The copyable share must be between 20% and 80%.
+- Hand size: rank correlation of hand length and label inside objects,
+  absolute value 0.1 or less.
+- Also reported, not used to accept: a table over reach (1, 2, 3 cm) and
+  depth (2, 5, 10 mm), the share per object and per person, and which of the
+  three conditions fails.
+- If the main thresholds fail, the thresholds are not moved. We report the
+  result and decide with the user how to change the number 2 question.
+
 ### Final clip sets
 
 | Use | Clips | Copyable |

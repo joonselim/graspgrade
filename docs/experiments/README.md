@@ -25,5 +25,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-12](exp12_local_checks_signal.md) | 2026-10-27 | Free checklist items and object-only reference | $0 | The three free checks measure well (camera vs headset 0.93) but do not predict copyable (AUC 0.49 to 0.53). Object identity alone reaches 0.70 (leave one person out). Pooled AUC across people is misleading. |
 | [EXP-13](exp13_hand_shape_check.md) | 2026-10-27 | Hand shape during contact as the retargeting check | $0 | Video hand shape predicts copyable at 0.63 (mocap upper bound 0.67), mostly as a stand-in for object size. Object alone 0.69. Both together 0.72. |
 | [EXP-14](exp14_sam_rule_pilot.md) | 2026-10-27 | Arm B (SAM rule) and reference rows, pilot | $0 | Code check on 3 tuning episodes: arm B IoU 0.75 vs 0.67 for always-in-contact, but it finds only 52 of 190 to 248 boundaries. The raw glove flickers under 0.1 s, so the cleaned glove is now the main ground truth. |
+| [EXP-15](exp15_label_methods.md) | 2026-10-27 | Copyable label methods: robot or retargeting? | $0 | The EXP-10 label mostly measures a retargeting side effect (fingertips 31 mm off the human ones). Faithful retargeting calls 94% to 96% copyable. No method passes the pre-set criteria. The label is on hold. |
 
 Total Meta API spend so far: about $1.53 of $150.
