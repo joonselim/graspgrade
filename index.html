@@ -434,7 +434,7 @@
           <tbody>
             <tr><td class="first">우리 점수 대 Muse Spark 단독</td><td>체크리스트 없이 같은 질문을 받은 Muse Spark와의 비교. 지원서의 주 비교</td></tr>
             <tr><td class="first">물체 기준선</td><td>튜닝 클립에서 잰 물체별 "따라할 수 있음" 비율만으로 예측. 물체 종류만으로 얼마나 맞히는지 보여주는 참고값(v2 라벨에서 물체별 1~96%)</td></tr>
-            <tr><td class="first">Muse Spark 대 Muse Spark + 7개 항목</td><td>GraspGrade가 기존 필터를 대체하지 않고 그 위에 더하는 구조인지 확인</td></tr>
+            <tr><td class="first">Muse Spark 대 Muse Spark + 12개 항목</td><td>GraspGrade가 기존 필터를 대체하지 않고 그 위에 더하는 구조인지 확인</td></tr>
           </tbody>
         </table>
       </div>
@@ -2206,16 +2206,19 @@ video:  에피소드 하나 전체, 10fps
       <li><b>접촉 신호.</b> 손과 물체 마스크의 겹침과 동반 이동으로 접촉 구간을 정함. 기준값은 튜닝 에피소드에서.</li>
       <li><b>경계 확정.</b> 접촉 시작과 끝 주변 약 7프레임(30fps)만 Muse Spark에 보내 경계와 근거를 받음.</li>
       <li><b>자르기.</b> 경계 앞뒤에 여유를 두고 구간을 잘라냄.</li>
-      <li><b>채점.</b> 구간마다 7개 항목을 등급으로 매기고 로지스틱 회귀로 0~100점 산출.</li>
+      <li><b>채점.</b> 구간마다 12개 항목을 등급으로 매기고 로지스틱 회귀로 0~100점 산출.</li>
     </ol>
 
     <h3>채점 항목</h3>
     <div class="tags">
       <span class="tag">가시성</span><span class="tag">카메라 안정성</span><span class="tag">접촉 명확성</span>
-      <span class="tag">동작 완결성</span><span class="tag">손가락 가림</span><span class="tag">물체 성질</span>
-      <span class="tag">손 모양 적합도</span>
+      <span class="tag">동작 완결성</span><span class="tag">손가락 가림</span><span class="tag">손 모양 적합도</span>
     </div>
-    <p class="note">"물체 성질"은 물체 항목 6개로 늘릴 예정(EXP-17, EXP-18): 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간. 화면 속 사람 손을 자로 삼아 상·중·하로 매김. 대리 등급 점검 통과(EXP-19). 전체 체크리스트 구성은 측정 계획에서 확정 예정.</p>
+    <div class="tags" style="margin-top:6px">
+      <span class="tag">물체: 손 대비 크기</span><span class="tag">물체: 모양</span><span class="tag">물체: 두께</span>
+      <span class="tag">물체: 감쌀 폭</span><span class="tag">물체: 손잡이</span><span class="tag">물체: 빈 공간</span>
+    </div>
+    <p class="note">"물체 성질" 하나를 물체 항목 6개로 늘림(EXP-17~19). 화면 속 사람 손(손목–중지 끝 약 19cm)을 자로 삼아 상·중·하로 매김. 가시성과 접촉 명확성은 SAM 결과에서, 카메라 안정성·동작 완결성·손 모양 적합도는 영상에서 무료로, 손가락 가림과 물체 항목 6개는 Muse Spark가 클립 프레임 6장을 보고 매김.</p>
     <p class="note">장면 전환이 있거나 접촉이 없으면 0점. 등급(상 1, 중 0.5, 하 0)을 입력으로 로지스틱 회귀를 학습하고, 확률에 100을 곱해 점수로 씀. 가중치를 그대로 읽을 수 있어 점수의 근거를 설명할 수 있음.</p>
 
     <div class="tbl" style="margin-top:18px">
@@ -2240,7 +2243,7 @@ video:  에피소드 하나 전체, 10fps
         </table>
       </div>
     </div>
-    <p class="note">비교 대상: 평가 1은 Muse Spark 단독, SAM 규칙, SAM 규칙 + Muse Spark 경계 확인. 평가 2는 체크리스트 없이 같은 질문을 받은 Muse Spark, 물체 기준선, Muse Spark + 7개 항목. GraspGrade는 기존 데이터 필터를 대체하지 않고 그 위에 더하는 층으로 설계함. 자세한 내용은 요약 페이지의 측정 계획.</p>
+    <p class="note">비교 대상: 평가 1은 Muse Spark 단독, SAM 규칙, SAM 규칙 + Muse Spark 경계 확인. 평가 2는 체크리스트 없이 같은 질문을 받은 Muse Spark, 물체 기준선, Muse Spark + 12개 항목. GraspGrade는 기존 데이터 필터를 대체하지 않고 그 위에 더하는 층으로 설계함. 자세한 내용은 요약 페이지의 측정 계획.</p>
   </section>
 
   <!-- 7 -->
@@ -2269,7 +2272,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 23:29 KST
+    마지막 갱신 2026-10-27 23:30 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2349,9 +2352,9 @@ video:  에피소드 하나 전체, 10fps
     {
       title: "점수 학습 · 평가 2", from: 7, to: 7, status: "doing",
       req: [
-        "클립마다 7개 항목 등급과 0~100점",
+        "클립마다 12개 항목 등급과 0~100점",
         "튜닝 클립 400개로 로지스틱 회귀 학습, 가중치 공개",
-        "검증 클립 1,426개에서 AUC: 우리 점수 대 Muse Spark 단독, 물체 기준선, Muse Spark + 7개 항목"
+        "검증 클립 1,426개에서 AUC: 우리 점수 대 Muse Spark 단독, 물체 기준선, Muse Spark + 12개 항목"
       ],
       chk: [
         ["done", "유료 호출 없는 항목 3개의 단독 AUC 점검 (신호 없음, EXP-12)"],
