@@ -1,0 +1,10 @@
+You see 6 frames from one first-person video clip of a person grasping an object.
+Frame 1 is just before the touch. Frames 2 to 5 are during the touch. Frame 6 is just after the release.
+The {hand} hand is the hand that grasps the object.
+
+A robot hand must copy this grasp. The robot hand is an Allegro hand: it has four fingers and is about 1.3 times the size of a human hand. Copying means the robot puts its thumb and at least one other fingertip where the person touches the object, without pushing any part of the robot hand into the object.
+
+How likely is it that the robot hand can copy this grasp?
+
+Answer with JSON only, in this form:
+{"copyable_probability": 0 to 100, "reason": "one short sentence"}

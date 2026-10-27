@@ -1,0 +1,10 @@
+You see 7 frames from a first-person video, in time order, 1/6 of a second apart. They are numbered 1 to 7.
+The person wears beige gloves on both hands. Look only at the person's {hand} hand.
+
+Somewhere in these frames the {hand} hand {change}.
+
+{question}
+Touching means the hand is in contact with an object: holding it, pressing it or resting on it. A hand that is only close to an object, or above it, is not touching.
+
+Answer with JSON only, in this form:
+{"frame": 1 to 7, or 0 if the hand does not change in these frames, "confidence": 0 to 1, "reason": "one short sentence"}

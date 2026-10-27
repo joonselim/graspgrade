@@ -1,0 +1,7 @@
+You see {n} frames from a first-person video, in time order, 0.2 seconds apart. They are numbered 1 to {n}.
+The person wears beige gloves on both hands. The left hand is on the person's left side.
+
+For every frame, say whether each hand is touching an object. Touching means the hand is in contact with an object: holding it, pressing it or resting on it. A hand that is only close to an object, or above it, is not touching.
+
+Answer with JSON only, in this form, with one entry per frame:
+{"frames": [{"i": 1, "left": true, "right": false}, {"i": 2, "left": true, "right": false}]}

@@ -1,0 +1,43 @@
+You see 6 frames from one first-person video clip of a person grasping an object.
+Frame 1 is just before the touch. Frames 2 to 5 are during the touch. Frame 6 is just after the release.
+The {hand} hand is the hand that grasps the object.
+
+Rate each item below as "high", "mid" or "low", using the rules given. Use the visible human hand as a ruler: from the wrist to the tip of the middle finger is about 19 cm.
+
+finger_occlusion: how well the fingers of the {hand} hand can be seen during the touch (frames 2 to 5).
+  high: all fingertips can be seen in most of these frames.
+  mid: some fingertips are hidden.
+  low: most fingers are hidden by the object, the other hand or the image edge.
+
+object_size: the longest side of the grasped object.
+  high: up to 0.8 hand lengths (up to about 15 cm).
+  mid: 0.8 to 1.3 hand lengths (about 15 to 25 cm).
+  low: more than 1.3 hand lengths (more than about 25 cm).
+
+object_shape: the middle side of the object compared with its longest side.
+  high: blocky, the middle side is at least 0.6 of the longest side.
+  mid: the middle side is 0.3 to 0.6 of the longest side.
+  low: stick-like, the middle side is less than 0.3 of the longest side.
+
+object_thickness: the shortest side of the object.
+  high: 4 cm or more.
+  mid: 2 to 4 cm.
+  low: less than 2 cm, the object is flat or thin.
+
+object_width: the middle side of the object, which is the width the hand has to wrap around.
+  high: up to 8 cm.
+  mid: 8 to 14 cm.
+  low: more than 14 cm.
+
+object_handle: whether the object has a part that is shaped to be held, such as a handle, a bar or a stem.
+  high: yes.
+  mid: partly.
+  low: no.
+
+free_space: the gap between the grasped object and the nearest other object at the moment of the touch.
+  high: 10 cm or more.
+  mid: 4 to 10 cm.
+  low: less than 4 cm.
+
+Answer with JSON only, in this form:
+{"object_name": "short noun", "finger_occlusion": "high|mid|low", "object_size": "high|mid|low", "object_shape": "high|mid|low", "object_thickness": "high|mid|low", "object_width": "high|mid|low", "object_handle": "high|mid|low", "free_space": "high|mid|low", "reason": "one short sentence"}

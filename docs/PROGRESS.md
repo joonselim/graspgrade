@@ -165,6 +165,15 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - `out/hot3d_clips/clips_labeled.csv`가 숫자 2의 클립 목록 + 정답이다.
 - SAM 비용 다시 계산: held-out 전부 + 튜닝 400개, 겹치는 클립을 한 요청으로 합치면 $17.76 + $8.82 = 약 $27. Muse는 클립마다 약 $0.024라 전부면 약 $44, held-out 절반이면 약 $27.
 
+## 숫자 2 유료 실행 준비 (2026-10-27, 무료로 완료)
+
+- `hot3d_number2_inputs.py`: 최종 클립 세트 `out/number2/clips_final.csv` (score_train 400, item_train 1,985, held_out 1,426, 정답 v2). 겹치는 클립을 합친 SAM 윈도우 513개를 10fps mp4로 잘라 둠 (`out/number2/sam_windows/`, 2.6 GB). Muse용 720 px 프레임 클립당 6장, 10,956장 (`out/number2/muse_frames/`).
+- `sam_hot3d.py` (SAM, `--send` 없으면 비용만): score_train $8.82, held_out $17.76. `small object` 프롬프트는 HOT3D에서 미검증이라 `--limit 3`으로 파일럿 먼저.
+- `muse_hot3d.py` (Muse, `--send` 없으면 비용만): 체크리스트 $4.93 + $17.56, 기준선 $4.75 + $16.93 (추정, 프레임당 1,100 토큰). 응답은 클립별로 캐시, 다시 돌리면 빠진 것만 보낸다. 프롬프트 `scripts/prompts/number2_checklist.txt`, `number2_baseline.txt`.
+- `number2_sam_checks.py`: SAM 결과에서 가시성과 접촉 명확성 (OpenGraph 에피소드로 자체 점검 통과).
+- `number2_score.py --check`: 튜닝만으로 전체 코드 경로 점검 (대리 등급 사용, 결과 아님). `--final`은 유료 실행이 다 끝난 뒤 한 번.
+- 유료 순서 제안: SAM 파일럿 3윈도우 (약 $0.2) → Muse 체크리스트/기준선 파일럿 각 5클립 (약 $0.2) → 대리값과 비교 → 전체 실행.
+
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
 1. OpenGraph 영상은 AV1이다. OpenCV는 못 읽는다. 항상 `data/episodes_720p`의 H.264를 쓴다.
