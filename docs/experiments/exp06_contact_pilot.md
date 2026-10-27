@@ -1,5 +1,7 @@
 # EXP-06: Contact cutting pilot on three whole episodes
 
+> Note, 2026-10-27: the logistic regression tested here is now an appendix. The compared arms for number 1 are set in [the measurement plan](../MEASUREMENT_PLAN.md): Muse Spark alone, a SAM rule (overlap plus co-movement), and the SAM rule plus a Muse Spark boundary check. The main ground truth is the glove (tactile sum above 800).
+
 Date: 2026-10-27. Scripts: `scripts/sam_episodes.py`, `scripts/sam_fast.py`,
 `scripts/sam_track_check.py`, `scripts/contact_cut.py`.
 Raw output: `out/sam10/`, `out/contact/`. Meta API cost: $1.15 (6 calls, 5,762 frames).

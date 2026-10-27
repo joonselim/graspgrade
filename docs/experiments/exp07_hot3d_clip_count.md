@@ -1,5 +1,7 @@
 # EXP-07: How many grasp clips does HOT3D give, and what will number 2 cost?
 
+> Note, 2026-10-27: this page counts clips for pricing only. The clip set used for number 2 is the one cut from hand to object distance in [EXP-11](exp11_number2_clips_and_labels.md): 400 tuning clips for the weights and all 1,426 held-out clips for the AUC. See [the measurement plan](../MEASUREMENT_PLAN.md).
+
 Date: 2026-10-27. Script: `scripts/hot3d_clip_count.py`.
 Raw output: `out/hot3d_clips/events.csv`, `summary.json`. Meta API cost: $0.
 
