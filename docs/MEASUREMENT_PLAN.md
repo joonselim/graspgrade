@@ -264,6 +264,13 @@ Free check with stand-ins, before any paid call:
   and 0.673). Fail if either is below 0.60. It does not tell whether Muse
   Spark reads the items correctly.
 
+Result (EXP-19): pass. Six stand-in grades reach 0.683 leaving one person out
+and 0.666 leaving one object out, close to the exact sizes. Size next to the
+hand does most of the work. Handle and width point the other way from their
+meaning once size is known. The regression learns these directions on
+tuning clips. Before the full paid run, a short Muse Spark pilot on a few
+tuning clips compares its grades with these stand-ins.
+
 ### Our score
 
 - Seven checks, each graded high, mid or low (1, 0.5, 0): visibility,
