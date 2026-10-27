@@ -1,0 +1,16 @@
+clips.csv is licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License
+(CC BY-NC-SA 4.0), https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+It is derived from the HOT3D dataset by Meta Platforms Technologies, LLC
+(https://www.projectaria.com/datasets/hot3D/). Under the HOT3D Dataset
+License Agreement, hand annotations are CC BY-NC-SA 4.0, sequence data and
+object annotations are CC BY-SA 4.0, and 3D object models are CC BY-SA 4.0
+with the added term that they may not be sold. The copyable labels use the
+hand annotations, object poses and object models, so this file is shared
+under CC BY-NC-SA 4.0 and must not be sold.
+
+Changes: grasp clips were cut from hand to object distances, and each clip
+got a label from retargeting the hand onto an Allegro robot hand model and
+checking grip, reach and collision against the object model. No pose values,
+meshes or images are included.

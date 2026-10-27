@@ -81,6 +81,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/hot3d_fisheye_check.py` | 어안 왜곡 보정 점검 (EXP-25): 원본 vs 보정 프레임에서 MediaPipe 손 검출, 2D 오차, 손 모양 오차를 모캡과 비교. `FISHEYE_FOCAL=1.0`은 보조 확인 |
 | `scripts/number2_score.py` | 숫자 2 점수 학습과 비교. `--check` (튜닝만, 코드 점검), `--gate` (P7a 뒤 게이트, `--standin`은 대리값 점검), `--final` (held-out, 마지막에 한 번). 출력에 물체 하나씩 빼기 보고 포함 |
 | `scripts/number2_power.py` | 비교 5 (학습 가중치 vs 같은 가중치) 검정력: 튜닝 3명짜리 가짜 held-out 20개, 대리값 (EXP-27, API 호출 없음) |
+| `scripts/benchmark_export.py` | 정답을 공개 벤치마크로 내보냄 (`benchmark/number1/ground_truth.json`, `benchmark/number2/clips.csv`, 그림). 채점은 `benchmark/score_number1.py`, `score_number2.py` (프로젝트 코드와 독립, EXP-28) |
 | `scripts/number2_gate_noise.py` | 대리값 등급에 무작위 오류를 섞어 게이트 결과가 어떻게 떨어지는지 (EXP-26, API 호출 없음) |
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A, C 보정을 튜닝에서 배워 적용, 짝지은 부트스트랩), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |

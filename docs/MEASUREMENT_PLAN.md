@@ -488,6 +488,8 @@ This is our reading of those texts, not legal advice):
 - The copyable label uses the HOT3D hand data, so the number 2 benchmark
   cannot be offered for commercial use.
 - Every release file names its source dataset and license.
+- Done (EXP-28): `benchmark/` with both label files, license notes, example
+  inputs and standalone scorers that reproduce the project numbers.
 
 ## Budget
 

@@ -33,6 +33,7 @@ and have dry runs with cost estimates, but most have not been sent yet.
 | Number 2: clips | 2,385 tuning and 1,426 held-out clips, cut from motion capture (EXP-11) |
 | Number 2: checklist | object items checked with stand-ins (EXP-17 to EXP-19), paid pilot on HOT3D done (EXP-23), fisheye kept raw (EXP-25) |
 | Viewer | static page with demo data from tuning clips |
+| Benchmark | both ground truths as label files with standalone scorers, in `benchmark/` (EXP-28) |
 
 ## Main findings so far
 

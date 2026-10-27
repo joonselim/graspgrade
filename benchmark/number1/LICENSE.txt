@@ -1,0 +1,8 @@
+ground_truth.json is licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/
+
+It is derived from the Ego-Tactile Manipulation dataset by OpenGraph Labs
+(https://huggingface.co/datasets/OpenGraphLabs-Research/ego-tactile-manipulation),
+CC BY 4.0. Changes: contact segments were computed from the glove signal
+(sum of 80 sensors over 800), and a cleaned version joins gaps of 3 frames
+or less and drops pieces shorter than 3 frames. No sensor values are included.

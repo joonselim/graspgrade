@@ -403,6 +403,7 @@
       <li>물체 항목 6개(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간)를 상·중·하 기준과 함께 고정. 정답에서 낸 대리 등급으로 0.683, 처음 보는 물체 0.666으로 통과. 손 대비 크기가 대부분을 설명함. Muse Spark가 영상에서 이 등급을 읽는지는 짧은 유료 파일럿으로 먼저 확인.</li>
       <li>Muse Spark 게이트(튜닝 400개)는 빡빡함. 완벽한 대리 등급으로도 사람 하나씩 빼기 0.657로 기준 0.65를 겨우 넘고, 파일럿 수준의 일치율(90%)이면 "약함"이 예상돼 검증 클립에 보내기 전에 결정이 필요할 수 있음. 튜닝에서는 물체 기준선이 우리 점수를 이기지만(0.776 대 0.721), 처음 보는 물체에서는 우리 점수가 0.675를 지키고 물체 기준선은 0.5.</li>
       <li>튜닝 점검에서 Muse Spark 체크리스트 등급의 가중치를 배우면 단순 평균보다 AUC가 +0.067 높음(주로 감쌀 폭과 손잡이의 방향을 바로잡아서). 사람 3명짜리 검증 세트로도 이 차이를 잡아낼 수 있음. 평가 1의 시점 보정 코드도 점검을 통과함.</li>
+      <li>두 정답을 누구나 영상 필터를 채점할 수 있는 벤치마크로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현해, 최종 점수가 어떻게 나오든 남는 결과물.</li>
       <li>HOT3D 어안 영상은 왜곡을 풀지 않음. 풀면 MediaPipe가 손을 10%p 덜 찾아 미리 정한 기준을 통과하지 못함. 원본을 쓰고 한계로 보고.</li>
       <li>평가 2 첫 유료 파일럿(튜닝 클립 5개): SAM은 붐비는 HOT3D 탁자에서도 잡은 물체를 접촉 프레임 99%에서 찾고, 우리 코드가 92%에서 그것을 손에 가장 가까운 물체로 고름. Muse Spark의 물체 등급은 3D 모델 대리 등급과 30개 중 27개 일치.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
@@ -497,6 +498,7 @@
             <tr><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">어안 왜곡을 풀면 MediaPipe가 나아지는가</td><td>아님. 왜곡을 풀면 손을 10%p 덜 찾고(70.6% → 60.3%) 2D 지점도 나빠짐. 원본을 쓰고 어안은 한계로 보고.</td></tr>
             <tr><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</td><td>코드는 계획대로 동작. 게이트가 빡빡해 완벽한 등급으로도 0.657로 겨우 통과, 파일럿 일치율이면 "약함" 예상. 처음 보는 물체에서 우리 점수 0.675, 물체 기준선 0.5.</td></tr>
             <tr><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력</td><td>배운 시점 보정이 6프레임 지연을 되돌림(C 0.149 → 0.307). 튜닝에서 학습 가중치가 단순 평균보다 +0.067. 사람 3명 검증 세트로 95%(등급 오류가 있으면 77%) 잡아냄.</td></tr>
+            <tr><td class="first"><a href="#exp-28">EXP-28</a></td><td class="wrap-ok">정답을 다시 쓸 수 있는 벤치마크로</td><td>두 정답을 라벨 파일과 독립 채점 코드로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현. 평가 1은 CC BY 4.0, 평가 2는 CC BY-NC-SA 4.0.</td></tr>
           </tbody>
         </table>
       </div>
@@ -613,7 +615,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2645,6 +2647,80 @@ Answer with JSON only.</pre>
         <li>한계: 대리 등급은 Muse Spark 등급이 아니고, 무작위 오류는 Muse Spark 실수의 단순한 모델이며, 가짜 검증 사람들도 실제 검증처럼 튜닝 사람과 물체를 공유함.</li>
       </ul>
     </article>
+
+    <!-- EXP-28 -->
+    <article class="exp" id="exp-28">
+      <div class="exp-h"><span class="id">EXP-28</span><span class="t">정답을 다시 쓸 수 있는 벤치마크로</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>팀마다 자기 규칙으로 영상을 거르고, 다른 사람이 다시 쓸 수 있는 점수는 공개하지 않는다는 것이 지원서의 문제 제기다. 이 프로젝트에서 가장 무겁고 가장 많이 검증한 부분은 정답(평가 1은 정리한 장갑, 평가 2는 v2 라벨)이다. 우리 체크리스트 점수와 상관없이 어떤 영상 필터든 채점하는 벤치마크로 낼 수 있는가, 공개용 채점 코드가 프로젝트 코드와 같은 숫자를 내는가.</dd>
+        <dt>입력</dt><dd>데이터에 딸린 라이선스 문서: OpenGraph는 CC BY 4.0, HOT3D는 시퀀스 데이터 CC BY-SA 4.0, 손 데이터 CC BY-NC-SA 4.0, 물체 모델 CC BY-SA 4.0(판매 불가). v2 라벨은 손 데이터를 쓰므로 평가 2는 CC BY-NC-SA 4.0. 법률 검토가 아니라 문서를 읽은 해석.</dd>
+        <dt>방법</dt><dd>우리가 만든 라벨만 내보냄. 영상, 센서, 모션캡처 값은 넣지 않음. 채점 코드 두 개를 프로젝트 코드와 따로 쓰고, 프로젝트 코드가 이미 낸 튜닝 수치와 비교.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">평가 1 정답</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>에피소드와 손마다 정리한 장갑의 접촉 구간(주)과 장갑 원신호 구간, 30fps 프레임 범위</li>
+            <li>채점: 경계 F1(±5, ±15프레임), 접촉 IoU</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">평가 2 정답</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>클립마다 위치, "따라할 수 있음" 라벨, 처음 실패하는 조건(잡기, 도달, 충돌), 깊이 2mm와 10mm에서의 라벨</li>
+            <li>채점: 사람별 AUC, 시퀀스 부트스트랩, 상위 20% 비율</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">파일에 든 것</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">튜닝</th><th class="n">검증</th></tr></thead>
+            <tbody>
+              <tr><td class="first">평가 1 에피소드 / 정리한 접촉</td><td class="n">50 / 955</td><td class="n">22 / 287</td></tr>
+              <tr><td class="first">평가 2 클립 / 사람 / 물체</td><td class="n">2,385 / 6 / 33</td><td class="n">1,426 / 3 / 33 (모두 튜닝에도 있음)</td></tr>
+              <tr><td class="first">평가 2 따라할 수 있음 (5mm)</td><td class="n">47.0%</td><td class="n">46.4%</td></tr>
+              <tr><td class="first">평가 2 따라할 수 있음 2mm / 10mm</td><td class="n">17.5% / 65.7%</td><td class="n"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">내보낸 라벨은 클립 3,811개 모두 프로젝트 클립 표의 라벨과 같다(내보낼 때 확인).</p>
+
+      <figure>
+        <img src="assets/exp28_benchmark.png" loading="lazy" width="1320" height="456" alt="왼쪽은 정리한 장갑 접촉 길이 분포, 오른쪽은 클립별 따라할 수 있음과 처음 실패하는 조건 비율">
+        <div class="keys"><span class="key"><i style="--c:#75a9da"></i>튜닝 접촉</span><span class="key"><i style="--c:#f19b6d"></i>검증 접촉</span><span class="key"><i style="--c:#2b8a3e"></i>따라할 수 있음</span><span class="key"><i style="--c:#c92a2a"></i>충돌로 실패</span><span class="key"><i style="--c:#f08c00"></i>도달로 실패</span><span class="key"><i style="--c:#868e96"></i>잡기로 실패</span></div>
+        <figcaption>왼쪽: 정리한 장갑 접촉의 길이. 오른쪽: "따라할 수 있음" 비율과, 아닌 클립에서 처음 실패하는 조건.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">공개용 채점 코드 대 프로젝트 코드</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>입력</th><th class="n">공개용</th><th class="n">프로젝트 코드</th></tr></thead>
+            <tbody>
+              <tr><td class="first">방법 B 구간(EXP-24), 파일럿, 정리한 장갑: F1 ±5, F1 ±15, IoU</td><td class="n">0.145, 0.291, 0.718</td><td class="n">0.145, 0.291, 0.718</td></tr>
+              <tr><td class="first">같은 구간, 장갑 원신호</td><td class="n">0.155, 0.293, 0.717</td><td class="n">0.155, 0.293, 0.717</td></tr>
+              <tr><td class="first">항상 접촉, 파일럿: F1 ±5, IoU</td><td class="n">0.02, 0.669</td><td class="n">0.02, 0.669 (EXP-14)</td></tr>
+              <tr><td class="first">물체 비율 기준선, 점수 학습용 클립: AUC, 구간</td><td class="n">0.776, 0.731~0.819</td><td class="n">0.776, 0.731~0.819 (EXP-26)</td></tr>
+              <tr><td class="first">같은 기준선, 사람별 AUC</td><td class="n">6명 모두 같음</td><td class="n"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">유지 선택지 실험(EXP-24)은 장갑 원신호 기준으로 0.164를 냈는데, 그때는 원신호에 맞춰 규칙을 다시 골랐기 때문이다. 내보낸 구간은 정리한 장갑으로 고른 것이고, 프로젝트 자체 점검도 이 구간에 0.155를 낸다.</p>
+
+      <ul class="plain concl">
+        <li>정답이 이제 설명서, 라이선스 안내, 예시 입력이 딸린 독립 벤치마크가 됨. 최종 실행에서 우리 체크리스트가 어떻게 나오든 쓸모가 남음.</li>
+        <li>공개용 채점 코드가 프로젝트 수치를 그대로 재현해서, 이 코드로 채점한 결과를 우리 결과와 비교할 수 있음.</li>
+        <li>라이선스: 평가 1은 CC BY 4.0으로 공유 가능. 평가 2는 HOT3D 손 데이터를 쓰므로 CC BY-NC-SA 4.0, 판매 불가.</li>
+        <li>33개 물체가 두 세트에 모두 있어 물체 비율 기준선이 검증에서도 강함. 설명서에 이 점을 적고 처음 보는 물체 점검을 권함.</li>
+        <li>한계: 장갑 한 가지 구성의 에피소드 72개, HOT3D 9명. v2 라벨은 충돌 깊이 한도에 좌우되므로 2mm와 10mm 라벨을 함께 넣음.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -2703,7 +2779,7 @@ Answer with JSON only.</pre>
       <li>평가 2 최종 보고에 "체크리스트 대 학습"을 더함: Muse Spark 단독, 체크리스트 등급 단순 평균, 같은 등급의 로지스틱 회귀를 같은 검증 클립에서 짝지어 비교.</li>
       <li>최종 보고에 "처음 보는 물체" 비교를 더함: 검증 물체마다 우리 점수를 그 물체 없이 다시 학습해 채점하고, Muse Spark 단독, 같은 방식으로 다시 맞춘 Muse Spark + 우리 항목, 물체 기준선(0.5)과 나란히 둠.</li>
       <li>게이트와 처음 보는 물체 비교의 코드를 대리 등급으로 점검(<a href="#exp-26">EXP-26</a>). 게이트는 완벽한 등급으로도 0.657로 겨우 통과해, 실제 Muse Spark 등급이면 "약함"이 나올 가능성이 큼.</li>
-      <li>공개 계획: 이 프로젝트에서 가장 많이 검증한 부분인 정답을, 어떤 영상 필터든 센서 기준으로 채점할 수 있는 벤치마크로 공개함. 평가 1은 정리한 장갑 접촉 구간과 채점 코드(원 데이터와 같은 CC BY 4.0), 평가 2는 클립 목록과 v2 라벨, 실패 조건, 채점 코드(HOT3D 손 데이터를 써서 CC BY-NC-SA 4.0, 상업적 사용 불가). 원본 파일은 넣지 않고 다시 만드는 스크립트를 줌.</li>
+      <li>정답을 벤치마크로 묶음(<a href="#exp-28">EXP-28</a>). 평가 1은 에피소드 72개의 정리한 장갑 접촉 구간, 평가 2는 클립 3,811개의 v2 라벨과 처음 실패하는 조건, 2mm와 10mm 라벨. 우리가 만든 라벨만 넣고 원본 영상·센서·모션캡처는 넣지 않음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현함. 평가 1은 CC BY 4.0, 평가 2는 HOT3D 손 데이터 때문에 CC BY-NC-SA 4.0.</li>
       <li>다음: 평가 2 SAM 전체, Muse Spark 튜닝 400개와 게이트, 통과하면 검증 클립, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
@@ -2797,7 +2873,7 @@ Answer with JSON only.</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 06:03 KST
+    마지막 갱신 2026-10-28 06:11 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2930,7 +3006,7 @@ Answer with JSON only.</pre>
       chk: [
         ["todo", "검증 세트 최종 측정"],
         ["todo", "수치 반영, 최종 점검"],
-        ["todo", "정답을 벤치마크로 공개: 평가 1 접촉 구간(CC BY 4.0), 평가 2 클립과 라벨(CC BY-NC-SA 4.0), 채점과 재구성 코드. 원본 영상·센서·모션캡처는 넣지 않음"],
+        ["done", "정답을 벤치마크로 묶음: 라벨 파일, 라이선스 안내, 독립 채점 코드, 프로젝트 수치 재현 (EXP-28)"],
         ["todo", "제출"]
       ]
     }
