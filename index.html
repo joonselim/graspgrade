@@ -369,6 +369,7 @@
   .near a {
     display: flex; align-items: center; justify-content: flex-end; gap: 7px;
     height: var(--row); color: var(--ink); pointer-events: auto;
+    transform: perspective(160px) rotateX(var(--r, 0deg)); transform-origin: right center;
   }
   .near a:hover { text-decoration: none; }
   .near .lab { opacity: var(--o, 0); white-space: nowrap; }
@@ -3259,7 +3260,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 08:13 KST
+    마지막 갱신 2026-10-28 08:17 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3719,7 +3720,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         var d = Math.abs(k - p);
         if (d > 7) continue;
         var st = links[k].style;
-        st.setProperty("--w", Math.max(6, 46 - 7 * d).toFixed(1) + "px");
+        st.setProperty("--w", Math.max(4, 28 - 4.5 * d).toFixed(1) + "px");
+        st.setProperty("--r", Math.max(-70, Math.min(70, (k - p) * 13)).toFixed(1) + "deg");
         st.setProperty("--lo", Math.max(0.15, 1 - 0.16 * d).toFixed(2));
         st.setProperty("--o", Math.max(0, 1 - 0.45 * d).toFixed(2));
       }
@@ -3728,6 +3730,32 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         links[i].classList.add("on");
         on = i;
       }
+    }
+    // Picking a line scrolls there smoothly instead of jumping, so the wheel
+    // turns all the way to it. The hash is set without triggering the router.
+    box.addEventListener("click", function (e) {
+      var a = e.target.closest("a");
+      if (!a) return;
+      var t = document.getElementById(a.getAttribute("href").slice(1));
+      if (!t) return;
+      e.preventDefault();
+      history.replaceState(null, "", a.getAttribute("href"));
+      glide(t.getBoundingClientRect().top + window.scrollY - 64);
+    });
+    // Own eased scroll, so the length of the trip sets the speed and the
+    // wheel keeps turning the whole way.
+    var glideId = 0;
+    function glide(y) {
+      var id = ++glideId, y0 = window.scrollY, dy = y - y0, t0 = performance.now();
+      var dur = Math.min(1100, 350 + Math.abs(dy) / 40);
+      (function step() {
+        if (id !== glideId) return;
+        var t = Math.min(1, (performance.now() - t0) / dur);
+        var ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        window.scrollTo({ top: y0 + dy * ease, behavior: "instant" });
+        update();
+        if (t < 1) setTimeout(step, 16);
+      })();
     }
     // Scroll events already come at most once per frame, so update right away.
     window.addEventListener("scroll", update, { passive: true });
