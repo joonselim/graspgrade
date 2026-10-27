@@ -63,6 +63,36 @@ Details fixed now:
   about 0.2 s before glove pressure (EXP-06, to be measured again on all 50
   tuning episodes). This is the correction the proposal asked for.
 
+### Timing shift for every arm (written 2026-10-28, before any arm A or C call)
+
+Until now only arm B got a timing shift learned from the glove. Arms A and C
+also see visible contact, which starts before glove pressure, so without a
+shift they are judged unfairly against the glove. Each arm therefore gets
+its own shift, learned on tuning episodes only, and both versions are
+reported.
+
+- Shift: the median start error and the median end error (prediction minus
+  glove, boundaries matched one to one within 15 frames, the code of
+  `contact_cut.Score`) on tuning, with the sign turned. Starts and ends get
+  separate shifts.
+- Arm A: the shift is measured on the tuning episodes that are sent to arm A
+  for the prompt check (P4: episodes 0, 30, 53) and applied to every held-out
+  arm A segment.
+- Arm C: Muse Spark moves some arm B boundaries and keeps the others. Kept
+  boundaries already carry the arm B shift. The arm C shift is measured only
+  on boundaries Muse Spark moved, on 100 starts and 100 ends drawn at random
+  (seed 20261026) from the arm B output on tuning episodes, and applied only
+  to moved boundaries on held-out.
+- Rows in the number 1 table: A, A + shift, B, C, C + shift, and the two
+  reference rows. The main metric for the shift is boundary F1 at ±5 frames.
+- Test: for A + shift against A and for C + shift against C, a paired
+  bootstrap over the 22 held-out episodes (1,000 draws, the same episodes for
+  both rows in each draw, F1 recomputed from the pooled counts). The shift
+  adds value if the 95% interval of the difference lies above 0.
+- What this shows: a value that only the glove can give, put on top of a
+  Meta model output. It is a constant per arm, so it is reported as a
+  calibration from sensor truth, not as a new model.
+
 ### Metrics
 
 - Boundary F1 at ±5 frames (0.167 s) and ±15 frames (0.5 s). Starts and ends
@@ -303,6 +333,7 @@ tuning clips compares its grades with these stand-ins.
 | 2 | Object-only reference: the copyable share of each object on the tuning clips, given to each held-out clip | Shows how much object identity alone predicts (26% to 94% by object). It uses object names from the dataset, so it is a reference, not a video method. |
 | 3 | Muse Spark alone vs Muse Spark plus our seven checks in one logistic regression | The plug-in framing: GraspGrade adds to an existing filter instead of replacing it |
 | 4 | Unseen objects: comparisons 1 and 2 again, with every learned part of our score refit without the object being scored (see "Leave one object out on held-out" below) | Held-out persons grasp the same objects as the tuning persons (EXP-20), so the object-only reference may beat our score on held-out. Our score can also rate an object it has never seen. The object-only reference cannot (0.5 by construction). |
+| 5 | Three Muse Spark rows on the same clips: Muse Spark alone (baseline prompt), Muse Spark checklist grades with fixed equal weights (no learning), Muse Spark checklist grades with a logistic regression trained on the 400 score_train clips | Splits what the checklist adds from what learning on the labels adds (see "Checklist against learning" below) |
 
 ### Metrics
 
@@ -333,7 +364,9 @@ same signal on tuning clips.
   - pass if both AUCs are 0.65 or more: send P7b,
   - stop if either is below 0.60: P7b is not sent, and the next step is
     decided with the user,
-  - in between: weak, decide with the user before sending P7b.
+  - in between: weak. Decided by the user on 2026-10-28, before P7a: P7b is
+    sent. EXP-26 showed that 400 clips give 0.657 even with perfect grades,
+    so "weak" is the expected verdict for a good grader.
 - Reported with the gate, but not part of it: the same two tests on the
   EXP-19 stand-in grades of the same 400 clips, the Muse Spark baseline AUC
   per person, and how often each Muse Spark item equals its stand-in.
@@ -343,6 +376,31 @@ same signal on tuning clips.
   400 clips give 0.657 and 0.666, so the gate passes by a small margin. With
   random grade errors at the P1 agreement level (about 90%) the expected
   verdict is "weak". The rule above is unchanged.
+
+### Checklist against learning (written 2026-10-28, before any P7 call)
+
+The main comparison (our score against Muse Spark alone) mixes two things:
+asking Muse Spark through the checklist, and learning weights from the
+labels. Comparison 5 separates them. All three rows use Muse Spark answers
+only, on the same held-out clips.
+
+| Row | Score | What it adds over the row above |
+| --- | --- | --- |
+| R1 | Muse Spark alone: the baseline probability | (start) |
+| R2 | Mean of the seven Muse Spark checklist grades (finger occlusion and the six object items), equal weights. High always means "easier for the robot hand", set from the item meaning before any data (EXP-19), so no learning is needed. | asking through the checklist |
+| R3 | Logistic regression on the same seven grades, trained on the 400 score_train clips | learning from the labels |
+
+- Tests on held-out, paired bootstrap over the 51 held-out sequences (1,000
+  draws, the same sequences for both rows in each draw): R3 minus R2
+  (value of learning, the main question of this section), R2 minus R1, and
+  R3 minus R1. A difference counts as a gain if its 95% interval lies above 0.
+  All three are reported whatever they show.
+- Our full score (R3 plus the local and SAM checks) stays comparison 1, and
+  its gain over R3 is reported the same way.
+- Power, checked for free before P7 with stand-in grades (EXP-27): how often
+  a held-out sized set (3 persons) finds R3 minus R2 above 0, with stand-in
+  grades as they are and with 15% of grades replaced at random (about the P1
+  agreement). It is a check on the design, not a result.
 
 ### Leave one object out on held-out (written 2026-10-28, before computing)
 
@@ -411,10 +469,10 @@ Estimates at measured prices, $150 in total.
 | Spent so far | $1.73 |
 | Number 1, SAM: remaining 47 tuning episodes / 22 held-out episodes | $11.89 / $5.45 |
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
-| Number 1, Muse arm C (held-out boundaries, plus tuning) | about $9 |
+| Number 1, Muse arm C: held-out boundaries (the EXP-24 arm B finds about 120 per episode, so about 2,600) plus 200 tuning boundaries for the arm C shift. Depends on the arm B chosen on 50 episodes | about $37 |
 | Number 2, SAM: all held-out clips plus 400 tuning clips, overlapping clips in one request | about $27 |
-| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips only if the gate passes | about $7.7 + $27.6 |
-| Total | about $104 |
+| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips unless the gate says stop | about $7.7 + $27.6 |
+| Total | about $132 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
 frames). Each arm is first run on one tuning episode or a few clips to
