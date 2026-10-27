@@ -156,7 +156,6 @@ huggingface-cli download OpenGraphLabs-Research/ego-tactile-manipulation \
   > GraspGrade finds the parts of hand videos that a robot hand can actually learn from. It cuts each video at the moment of touch and scores each clip, using SAM 3.1 and Muse Spark. We test both steps against real touch sensor and motion capture data.
 - AI project:
   > I built fuqua.app with Inseok, my teammate for this hackathon. It is an app for Fuqua MBA students, and about 30% of the school uses it. Its course recommender uses a CART model trained on past course ratings and each student's concentration to rank classes for each student. Its grading tool uses CART on past grade distributions to estimate the grade curve of each class. I also built space.fuqua.app and ran a vibe coding workshop, so classmates with no coding background could build their own portfolio site with AI and publish it at their own fuqua.app address, like joonse.fuqua.app.
-  - 주의: CART 모델의 입력 데이터("past course ratings and each student's concentration", "past grade distributions")는 Claude가 지어낸 문구이다. 실제와 다르면 질문을 받았을 때 바로 드러난다.
 
 ## 2. 한 줄 정의
 
