@@ -85,16 +85,31 @@ def _half(obj):
     return full[::2, ::2]
 
 
+def hand_sides(boxes):
+    """Left or right for each hand id.
+
+    Hands cross the image centre often, so the side comes from frames that show
+    two hands: the id that is more often the left one of the pair is the left
+    hand. An id never seen with another hand falls back to its median x.
+    """
+    left, seen, xs = {}, {}, {}
+    for hs in boxes.values():
+        cx = {i: (b[0] + b[2]) / 2 for i, b in hs.items()}
+        for i, x in cx.items():
+            xs.setdefault(i, []).append(x)
+            others = [v for j, v in cx.items() if j != i]
+            if others:
+                seen[i] = seen.get(i, 0) + 1
+                left[i] = left.get(i, 0) + (x < min(others))
+    return {i: ("left" if (left[i] / seen[i] > 0.5 if seen.get(i) else np.median(v) < W / 2) else "right")
+            for i, v in xs.items()}
+
+
 def frame_table(folder, suffix, n10):
     """Per 10 fps frame and side: hand and nearest object measurements."""
     hands = dict(sam_fast.read_frames(folder / f"sam_hand{suffix}"))
     objs = dict(sam_fast.read_frames(folder / f"sam_small_object{suffix}"))
-    # side of each hand id from its median box centre over the whole clip
-    xs = {}
-    for f, hs in hands.items():
-        for o in hs:
-            xs.setdefault(o.id, []).append((o.box[0] + o.box[2]) / 2)
-    side_of = {i: ("left" if np.median(v) < W / 2 else "right") for i, v in xs.items()}
+    side_of = hand_sides({f: {o.id: o.box for o in hs} for f, hs in hands.items()})
 
     rec = {s: {k: np.full(n10, np.nan) for k in
                ("hx", "hy", "harea", "gap", "near", "ox", "oy", "oarea", "oid")} for s in SIDES}
