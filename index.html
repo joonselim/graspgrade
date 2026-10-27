@@ -348,31 +348,37 @@
   #xtip[hidden] { display: none; }
   #xtip .id { opacity: 0.7; margin-right: 6px; font-variant-numeric: tabular-nums; }
   #xtip .go { color: inherit; text-decoration: underline; margin-left: 8px; pointer-events: auto; white-space: nowrap; }
-  /* nearby experiments: a small window at the bottom right that rolls with the page scroll */
+  /* nearby experiments: transparent tick marks at the bottom right. Every
+     experiment has a line, the current one is the longest and the lines
+     shrink with distance, like a level meter, rolling with the scroll. */
   .near {
-    position: fixed; z-index: 30; right: 12px; bottom: 12px;
-    height: calc(var(--row) * 7); overflow: hidden;
-    --row: 21px;
-    background: color-mix(in srgb, var(--sheet) 68%, transparent);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    border: 1px solid color-mix(in srgb, var(--rule) 80%, transparent); border-radius: 2px;
-    font-family: var(--mono); font-size: 12px; line-height: var(--row);
-    opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s;
+    position: fixed; z-index: 30; right: 14px; bottom: 14px;
+    width: 120px; height: calc(var(--row) * 13);
+    --row: 13px;
+    font-family: var(--mono); font-size: 11px;
+    pointer-events: none;
+    opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s;
   }
   body[data-page="detail"] .near.show { opacity: 1; visibility: visible; }
   .near .win {
     height: 100%; overflow: hidden;
-    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
-            mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+    -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
+            mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
   }
   .near .strip { display: flex; flex-direction: column; will-change: transform; }
   .near a {
-    display: block; height: var(--row); color: var(--muted);
-    padding: 0 10px 0 8px; border-left: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
+    display: flex; align-items: center; justify-content: flex-end; gap: 7px;
+    height: var(--row); color: var(--ink); pointer-events: auto;
   }
-  .near a:hover { color: var(--ink); text-decoration: none; }
-  .near a.on { color: var(--ink); font-weight: 700; border-left-color: var(--ink); }
+  .near a:hover { text-decoration: none; }
+  .near .lab { opacity: var(--o, 0); white-space: nowrap; }
+  .near a.on .lab { font-weight: 700; }
+  .near a:hover .lab { opacity: 1; }
+  .near i {
+    display: block; height: 2px; width: var(--w, 8px);
+    background: var(--ink); opacity: var(--lo, 0.2);
+  }
+  .near a:hover i { opacity: 1; }
   /* key experiments page */
   .ch { margin-top: 26px; }
   .ch h3 { margin: 0 0 8px; }
@@ -3253,7 +3259,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 07:28 KST
+    마지막 갱신 2026-10-28 08:13 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3679,8 +3685,11 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     box.setAttribute("aria-label", "가까운 실험");
     var strip = el("div", "strip");
     var links = arts.map(function (art) {
-      var a = el("a", null, art.id.toUpperCase());
+      var a = el("a");
       a.href = "#" + art.id;
+      a.title = art.id.toUpperCase();
+      a.appendChild(el("span", "lab", art.id.toUpperCase()));
+      a.appendChild(el("i"));
       strip.appendChild(a);
       return a;
     });
@@ -3692,7 +3701,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
     function update() {
       if (document.body.dataset.page !== "detail" || !arts.length) return;
-      if (!row) row = links[0].offsetHeight || 21;
+      if (!row) row = links[0].offsetHeight || 13;
       var tops = arts.map(function (x) { return x.getBoundingClientRect().top; });
       var end = stop ? stop.getBoundingClientRect().top : Infinity;
       var shown = tops[0] <= line && end > line;
@@ -3701,10 +3710,19 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       var i = 0;
       while (i + 1 < arts.length && tops[i + 1] <= line) i++;
       var next = i + 1 < arts.length ? tops[i + 1] : end;
-      var f = i + Math.min(1, Math.max(0, (line - tops[i]) / Math.max(1, next - tops[i])));
-      // f runs from i to i + 1 across experiment i. Keep the current row in the middle.
-      var y = Math.min(Math.max(f - 3.5, 0), Math.max(arts.length - 7, 0));
-      strip.style.transform = "translateY(" + (-y * row).toFixed(1) + "px)";
+      // p runs from i - 0.5 to i + 0.5 while experiment i is read, so the
+      // longest line passes smoothly from one experiment to the next.
+      var p = i - 0.5 + Math.min(1, Math.max(0, (line - tops[i]) / Math.max(1, next - tops[i])));
+      var mid = box.clientHeight / 2;
+      strip.style.transform = "translateY(" + (mid - (p + 0.5) * row).toFixed(1) + "px)";
+      for (var k = 0; k < links.length; k++) {
+        var d = Math.abs(k - p);
+        if (d > 7) continue;
+        var st = links[k].style;
+        st.setProperty("--w", Math.max(6, 46 - 7 * d).toFixed(1) + "px");
+        st.setProperty("--lo", Math.max(0.15, 1 - 0.16 * d).toFixed(2));
+        st.setProperty("--o", Math.max(0, 1 - 0.45 * d).toFixed(2));
+      }
       if (i !== on) {
         if (on >= 0) links[on].classList.remove("on");
         links[i].classList.add("on");
