@@ -224,6 +224,18 @@
   .fill.good { background: var(--ok); }
   .barrow .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
 
+  /* ---------- per episode spark ---------- */
+  .spark { display: flex; align-items: flex-end; gap: 1px; height: 84px; }
+  .spark i {
+    display: block; flex: 1 1 0; min-width: 2px;
+    background: var(--accent); border-radius: 2px 2px 0 0;
+  }
+  .spark i.hi { background: var(--warn); }
+  .sparkaxis {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--faint); margin-top: 6px;
+  }
+
   /* ---------- key-value table ---------- */
   dl.kv { margin: 0; display: grid; grid-template-columns: 1fr; gap: 0; }
   dl.kv > div {
@@ -310,20 +322,20 @@
   <section>
     <h2>한 줄 상태</h2>
     <div class="status">
-      <strong>Day 1~2 목표가 전부 끝났다.</strong>
+      <strong>Day 1~2 목표가 전부 끝났다. 정답 검증까지 했다.</strong>
       환경 구축, 두 데이터셋 다운로드, 에피소드 자르기, 분할 고정, Meta API 스모크 테스트,
-      SAM 물체 프롬프트 비교까지 마쳤다. 쓴 크레딧은 약 $0.19다.
-      다음은 Day 3~4의 OpenGraph 접촉 자르기다.
+      SAM 물체 프롬프트 비교(에피소드 2개), OpenGraph 전체 138,629 프레임 정답 검증까지 마쳤다.
+      쓴 크레딧은 약 $0.34다. 다음은 Day 3~4의 OpenGraph 접촉 자르기다.
     </div>
   </section>
 
   <section>
     <h2>숫자</h2>
     <div class="tiles">
-      <div class="tile"><div class="n">$0.19</div><div class="k">쓴 크레딧 / $150</div></div>
-      <div class="tile"><div class="n">72 / 72</div><div class="k">OpenGraph 에피소드 자르기</div></div>
-      <div class="tile"><div class="n">136</div><div class="k">HOT3D 정답 시퀀스 (9명)</div></div>
-      <div class="tile"><div class="n">82.3%</div><div class="k">MediaPipe 평균 검출률</div></div>
+      <div class="tile"><div class="n">$0.34</div><div class="k">쓴 크레딧 / $150</div></div>
+      <div class="tile"><div class="n">261</div><div class="k">접촉 구간 (138,629 프레임)</div></div>
+      <div class="tile"><div class="n">97~99%</div><div class="k">라벨 vs 촉각 프레임 일치</div></div>
+      <div class="tile"><div class="n">93.5%</div><div class="k">오른손 접촉 시작 ±5프레임 이내</div></div>
     </div>
   </section>
 
@@ -369,11 +381,89 @@
           MediaPipe 검출률이 14%까지 떨어지는 장면이 이것이고, 이런 장면이 데이터의 약 20%다.
         </figcaption>
       </figure>
+
+      <figure>
+        <img src="assets/ep53_compare.jpg" loading="lazy" width="1280" height="720"
+             alt="같은 스프레이병 장면의 네 프레임에서 SAM이 두 손과 스프레이병에 박스와 마스크를 붙인 결과">
+        <figcaption>
+          <b>같은 장면에 SAM 3.1을 돌린 결과.</b> MediaPipe가 14%를 내는 바로 그 배경에서
+          150프레임 전부 두 손을 잡았고 스프레이병도 끝까지 따라갔다.
+          장갑 때문에 생기는 손실은 MediaPipe 쪽 문제이지 파이프라인 전체의 문제가 아니라는 뜻이다.
+        </figcaption>
+      </figure>
     </div>
 
     <p class="small" style="margin-top:14px">
       영상과 프레임 출처: OpenGraph Ego-Tactile, CC-BY-4.0.
     </p>
+  </section>
+
+  <section>
+    <h2>접촉 정답 검증 (전체 138,629 프레임)</h2>
+    <p class="small">
+      숫자 1의 정답을 그대로 믿어도 되는지 먼저 봤다. 데이터셋이 준 anchor 라벨과,
+      촉각 신호에 임계값 800을 직접 걸어 만든 접촉을 전체 프레임에서 비교했다.
+      출처 <code>scripts/refine_check.py</code>, <code>out/refine_check/summary.json</code>
+    </p>
+
+    <div class="card">
+      <dl class="kv">
+        <div><dt>라벨 vs 촉각, 프레임 일치 (왼손)</dt><dd>98.66%</dd></div>
+        <div><dt>라벨 vs 촉각, 프레임 일치 (오른손)</dt><dd>97.15%</dd></div>
+        <div><dt>접촉 구간</dt><dd>261개</dd></div>
+        <div><dt>5프레임보다 짧은 구간</dt><dd>0개</dd></div>
+        <div><dt>5프레임보다 짧은 간격</dt><dd>0개</dd></div>
+        <div><dt>구간 길이 p10 / p50 / p90</dt><dd>24 / 246 / 978 프레임</dd></div>
+      </dl>
+    </div>
+
+    <h3>접촉 시작 시점이 얼마나 어긋나나</h3>
+    <div class="card scroll">
+      <table>
+        <thead>
+          <tr><th></th><th class="num">건수</th><th class="num">중앙값</th><th class="num">정확히 0</th><th class="num">±5프레임 이내</th><th class="num">p90 |차이|</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>오른손</td><td class="num">660</td><td class="num">0</td><td class="num">51.5%</td><td class="num">93.5%</td><td class="num">4</td></tr>
+          <tr><td>왼손</td><td class="num">280</td><td class="num">-1</td><td class="num">29.6%</td><td class="num">79.6%</td><td class="num">9</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <p style="margin:0 0 10px"><b>읽은 것</b></p>
+      <ul class="rows">
+        <li>
+          <div class="rowhead"><span class="name">±5프레임 허용창은 오른손에서는 쓸 수 있다</span><span class="pill done">확인</span></div>
+          <div class="rowbody">오른손은 93.5%가 ±5프레임 안에 들어오고 중앙값이 0이다. 계획했던 허용창을 그대로 쓸 수 있다.</div>
+        </li>
+        <li>
+          <div class="rowhead"><span class="name">왼손은 더 넓은 창이 필요하다</span><span class="pill wait">조정</span></div>
+          <div class="rowbody">왼손은 ±5프레임 안이 79.6%, p90이 9프레임이다. 왼손 건수가 오른손의 절반도 안 되는(280 vs 660) 점과 함께, 허용창을 넓히거나 손별로 따로 보고해야 한다.</div>
+        </li>
+        <li>
+          <div class="rowhead"><span class="name">라벨과 촉각 중 무엇을 써도 결론이 같다</span></div>
+          <div class="rowbody">프레임 일치가 97~99%다. 정답 정의 때문에 숫자 1이 흔들릴 걱정은 접었다.</div>
+        </li>
+        <li>
+          <div class="rowhead"><span class="name">후처리 규칙이 필요 없다</span></div>
+          <div class="rowbody">5프레임보다 짧은 구간과 간격이 둘 다 0개다. 잘게 쪼개진 접촉을 병합하거나 버리는 규칙을 넣지 않아도 된다.</div>
+        </li>
+      </ul>
+    </div>
+
+    <h3>임계값과 카메라 흔들림</h3>
+    <figure>
+      <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462"
+           alt="왼쪽은 촉각 임계값에 따른 라벨 일치율 그래프, 오른쪽은 에피소드별 머리 각속도 막대 그래프">
+      <figcaption>
+        <b>왼쪽: 임계값을 어디에 두든 결론이 같다.</b> 임계값 800 위로는 일치율이 평평하다.
+        에피소드 63~71만 낮은 쪽(약 96~97%)에 있고, 400 아래에서는 급격히 무너진다. 임계값 800은 안전한 선택이다.<br>
+        <b>오른쪽: 카메라 안정성 항목은 살아 있다.</b> 빨간 막대가 스프레이병 작업(에피소드 48~62)이고
+        나머지보다 50~100배 흔들린다. p95 최소 0.004, 중앙값 0.0105, 최대 0.827 rad/s.
+        생성: <code>scripts/refine_plots.py</code>
+      </figcaption>
+    </figure>
   </section>
 
   <section>
@@ -418,8 +508,10 @@
     <div class="card">
       <div class="chart" id="budget"></div>
       <p class="small" style="margin:14px 0 0">
-        측정 단가로 계산한 추정이다. HOT3D 정답 시퀀스 전체를 SAM에 넣으면 프롬프트 하나에 약 $96이라
-        크레딧 안에 들어가지 않는다. 숫자 2용 클립 구간만 넣어야 한다.
+        측정 단가로 계산한 추정이다. 10fps로 줄이면 OpenGraph 전체가 $9.24로 떨어진다.
+        접촉 구간 길이 중앙값이 246프레임(8.2초)이라 10fps로도 경계를 놓칠 가능성은 낮아 보인다.
+        HOT3D 정답 시퀀스 전체를 SAM에 넣으면 프롬프트 하나에 약 $96이라 크레딧 안에 들어가지 않는다.
+        숫자 2용 클립 구간만 넣어야 한다.
         속도는 순차로 에피소드당 약 5분이고, 분당 3,000 요청 제한이 있으니 병렬로 돌린다.
       </p>
     </div>
@@ -427,6 +519,7 @@
 
   <section>
     <h2>SAM 물체 프롬프트 비교</h2>
+    <h3 style="margin-top:0">에피소드 1, 매트 위의 둥근 용기</h3>
     <div class="card scroll">
       <table>
         <thead>
@@ -441,20 +534,45 @@
         </tbody>
       </table>
     </div>
+
+    <h3>에피소드 53, 베이지 책상 위의 스프레이병</h3>
+    <div class="card scroll">
+      <table>
+        <thead>
+          <tr><th>프롬프트</th><th class="num">잡은 프레임</th><th class="num">프레임당 개수</th><th>id</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>hand</code></td><td class="num">100%</td><td class="num">2.00</td><td>0, 1 (양손)</td></tr>
+          <tr><td><code>small object</code></td><td class="num">100%</td><td class="num">1.44</td><td>0, 1</td></tr>
+          <tr><td><code>handheld object</code></td><td class="num zero">0%</td><td class="num">0</td><td>—</td></tr>
+          <tr><td><code>bottle</code></td><td class="num">100%</td><td class="num">1.00</td><td>0</td></tr>
+          <tr><td><code>spray bottle</code></td><td class="num">100%</td><td class="num">1.00</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <div class="card">
       <p style="margin:0 0 10px"><b>읽은 것</b></p>
       <ul class="rows">
         <li>
+          <div class="rowhead"><span class="name">SAM은 MediaPipe가 포기한 장면에서도 손을 잡는다</span><span class="pill done">중요</span></div>
+          <div class="rowbody">에피소드 53은 MediaPipe 검출률이 14%인 베이지 장갑 + 베이지 배경 장면이다. 그런데 <code>hand</code> 프롬프트는 150프레임 전부에서 양손을 잡았다. 장갑 문제는 MediaPipe를 쓰는 항목에만 남는다.</div>
+        </li>
+        <li>
           <div class="rowhead"><span class="name">일반적인 단어는 아무것도 못 잡는다</span></div>
-          <div class="rowbody"><code>object</code>와 <code>item</code>은 0%다. <code>small object</code>는 구체적인 이름과 거의 같은 결과를 냈다. 1차 후보는 <code>small object</code>다.</div>
+          <div class="rowbody"><code>object</code>, <code>item</code>, <code>handheld object</code>는 전부 0%다. 에피소드가 달라도 같았다.</div>
+        </li>
+        <li>
+          <div class="rowhead"><span class="name">물체 이름을 아는 쪽이 더 깨끗하다</span><span class="pill wait">결정 대기</span></div>
+          <div class="rowbody">에피소드 53에서 <code>bottle</code>과 <code>spray bottle</code>은 프레임당 정확히 1개를 냈고, <code>small object</code>는 1.44개로 군더더기가 붙었다. 다만 OpenGraph에는 <code>target_object</code> 컬럼이 있어 이름을 쓸 수 있다. <code>small object</code> 하나로 통일할지, 에피소드마다 이름을 넣을지는 아직 안 정했다.</div>
         </li>
         <li>
           <div class="rowhead"><span class="name">2D 겹침만으로는 접촉을 못 가린다</span><span class="pill open">설계 수정</span></div>
-          <div class="rowbody">오른손 마스크와 물체 마스크의 간격이 3px 이하인 프레임이 촉각 접촉 전에도 97~100%였다. 1인칭이라 손이 물체 위를 가리기 때문이다. 접촉 신호에 "동반 이동"(손과 물체가 같이 움직이는지)이 반드시 필요하다.</div>
+          <div class="rowbody">오른손 마스크와 물체 마스크의 간격이 3px 이하인 프레임 비율이, 에피소드 1에서는 접촉 전 98~100% / 접촉 후 100%로 아예 구분이 안 됐다. 에피소드 53은 접촉 전 76~80% / 접촉 후 100%로 조금 벌어지지만 이것만으로 자를 수는 없다. 1인칭이라 손이 물체 위를 가리기 때문이다. 접촉 신호에 "동반 이동"(손과 물체가 같이 움직이는지)이 반드시 필요하다.</div>
         </li>
         <li>
           <div class="rowhead"><span class="name">빈 결과도 돈이 나간다</span></div>
-          <div class="rowbody">프롬프트마다 150프레임이 과금됐다. 0%가 나온 프롬프트도 $0.03이다. 이 비교에 합계 $0.15를 썼다.</div>
+          <div class="rowbody">프롬프트마다 150프레임이 과금됐다. 0%가 나온 프롬프트도 $0.03이다. 두 에피소드 10번 호출에 합계 $0.30을 썼다.</div>
         </li>
       </ul>
     </div>
@@ -497,7 +615,11 @@
       </li>
       <li>
         <div class="rowhead"><span class="name">SAM 물체 프롬프트 비교</span><span class="pill done">완료</span></div>
-        <div class="rowbody">프롬프트 5개, 합계 $0.15. <code>scripts/sam_prompt_compare.py</code></div>
+        <div class="rowbody">에피소드 2개(용기, 스프레이병)에 프롬프트 10번, 합계 $0.30. <code>scripts/sam_prompt_compare.py</code></div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">접촉 정답 전수 검증</span><span class="pill done">완료</span></div>
+        <div class="rowbody">138,629 프레임 전부에서 라벨과 촉각을 비교하고, 접촉 구간과 카메라 흔들림을 집계했다. <code>scripts/refine_check.py</code>, <code>out/refine_check/</code></div>
       </li>
       <li>
         <div class="rowhead"><span class="name">git 저장소와 이 페이지</span><span class="pill done">완료</span></div>
@@ -563,8 +685,8 @@
     <h2>다음 할 일</h2>
     <ol class="steps">
       <li class="hot">
-        <div class="rowhead"><span class="name">SAM 물체 프롬프트 확정</span><span class="pill wait">승인 필요</span></div>
-        <div class="rowbody">1차 후보는 <code>small object</code>다. 다른 물체, 특히 스프레이병 에피소드의 5초 클립에서 <code>small object</code>와 <code>handheld object</code> 같은 대안을 확인한다. 클립당 약 $0.03.</div>
+        <div class="rowhead"><span class="name">물체 프롬프트와 프레임 레이트 결정</span><span class="pill wait">결정 대기</span></div>
+        <div class="rowbody">프롬프트는 <code>small object</code> 하나로 통일할지 <code>target_object</code> 이름을 쓸지, 그리고 30fps($27.73)로 갈지 10fps($9.24)로 갈지를 정한다. 두 선택 모두 전체 비용을 바꾼다.</div>
       </li>
       <li>
         <div class="rowhead"><span class="name">Day 3~4: OpenGraph 접촉 자르기 (숫자 1)</span></div>
@@ -715,8 +837,8 @@
         <div class="rowbody">겹침만으로는 분리가 안 되는 것이 확인됐다. 동반 이동 계산이 잘 안 되면 숫자 1이 통째로 흔들린다.</div>
       </li>
       <li>
-        <div class="rowhead"><span class="name">분산이 0인 항목</span></div>
-        <div class="rowbody">HOT3D는 단단한 물체뿐이고 실험실 고정 촬영이다. "물체 성질"과 "카메라 안정성"은 분산이 0일 수 있다. 그런 경우 회귀에서 빼고 데모에서 설명한다.</div>
+        <div class="rowhead"><span class="name">분산이 0인 항목</span><span class="pill done">일부 해소</span></div>
+        <div class="rowbody">OpenGraph는 카메라 흔들림에 50~100배 차이가 있어서 "카메라 안정성"이 살아 있다. HOT3D는 단단한 물체뿐이고 고정 촬영이라 "물체 성질"과 "카메라 안정성"이 여전히 분산 0일 수 있다. 그런 경우 회귀에서 빼고 데모에서 설명한다.</div>
       </li>
       <li>
         <div class="rowhead"><span class="name">검증 세트가 3명뿐</span></div>
@@ -750,7 +872,7 @@
         <div><dt>팀</dt><dd>임준세, 이인석 (2인)</dd></div>
         <div><dt>트랙</dt><dd>Indie Dev Track, 지원서 제출 완료 (10/21)</dd></div>
         <div><dt>테마</dt><dd>Push the Frontier (robotics)</dd></div>
-        <div><dt>크레딧</dt><dd>$150 중 약 $0.19 사용</dd></div>
+        <div><dt>크레딧</dt><dd>$150 중 약 $0.34 사용</dd></div>
         <div><dt>작업 장비</dt><dd>데스크톱 RTX 3070 8GB, RAM 32GB, WSL2 Ubuntu 24.04</dd></div>
         <div><dt>디스크</dt><dd>데이터 14 GB 사용, C: 여유 170 GB에서 시작</dd></div>
         <div><dt>이전 이름</dt><dd>TouchGrain</dd></div>
@@ -885,10 +1007,11 @@
   ];
 
   var BUDGET = [
-    { k: "지금까지 쓴 것", v: 0.19, tone: "good" },
+    { k: "지금까지 쓴 것", v: 0.34, tone: "good" },
     { k: "Muse Spark 경계", v: 8, tone: "" },
-    { k: "SAM, OpenGraph 1프롬프트", v: 27.7, tone: "" },
-    { k: "SAM, OpenGraph 2프롬프트", v: 55, tone: "mid" },
+    { k: "SAM, OpenGraph 10fps", v: 9.24, tone: "good" },
+    { k: "SAM, OpenGraph 30fps", v: 27.73, tone: "" },
+    { k: "SAM, OpenGraph 30fps 2프롬프트", v: 55, tone: "mid" },
     { k: "SAM, HOT3D 전체", v: 96, tone: "low" }
   ];
   var CAP = 150;
