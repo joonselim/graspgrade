@@ -421,7 +421,7 @@
         </table>
       </div>
     </div>
-    <p class="note">정답은 촉각 장갑(손당 80개 센서 합 &gt; 800), 데이터셋 라벨은 확인용. 지표는 boundary F1(±5, ±15프레임)과 contact IoU, 손별과 합산. B의 시작·끝 지연도 함께 보고. 장갑은 압력을 재고 영상은 압력을 볼 수 없으므로 ±5프레임에서는 세 방법 모두 낮게 나올 수 있고, 주장하는 것은 방법 사이의 차이다.</p>
+    <p class="note">정답은 정리한 촉각 장갑(손당 80개 센서 합 &gt; 800에서 0.1초 이하 끊김은 잇고 0.1초보다 짧은 조각은 버림). 장갑 원신호와 데이터셋 라벨은 확인용으로 같이 보고(EXP-14에서 확정). 지표는 boundary F1(±5, ±15프레임)과 contact IoU, 손별과 합산. B의 시작·끝 지연도 함께 보고. 장갑은 압력을 재고 영상은 압력을 볼 수 없으므로 ±5프레임에서는 세 방법 모두 낮게 나올 수 있고, 주장하는 것은 방법 사이의 차이다.</p>
 
     <div class="tbl" style="margin-top:18px">
       <p class="cap">평가 2: 우리 점수가 로봇 손이 따라할 수 있는 클립을 고르는가</p>
@@ -489,11 +489,6 @@
               <td class="first">방법 B가 연이은 접촉을 묶음</td>
               <td>손이 늘 어떤 물체 곁에 있어 접촉 여러 개가 한 구간이 됨. 경계 190~248개 중 52개만 찾음 (EXP-14)</td>
               <td>가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 끊는 규칙을 튜닝 50개에서 정함</td>
-            </tr>
-            <tr>
-              <td class="first">장갑 정답의 깜빡임</td>
-              <td>압력이 임계값을 넘나들어 0.2초 미만 구간과 0.1초 이하 틈이 생김. 영상으로는 볼 수 없는 경계</td>
-              <td>0.1초 이하 끊김과 튀는 값을 정리한 장갑 신호를 주 정답으로 쓰는 안. 검증 세트 전에 결정</td>
             </tr>
             <tr>
               <td class="first">HOT3D 어안 왜곡</td>
@@ -894,7 +889,7 @@ video:  clip.mp4 (150 frames)</pre>
     <!-- EXP-06 -->
     <article class="exp" id="exp-06">
       <div class="exp-h"><span class="id">EXP-06</span><span class="t">접촉 구간 검출 파일럿</span><span class="d">10/27</span></div>
-      <p class="note">이 실험 뒤 측정 계획을 다시 맞추면서, 여기서 쓴 특징 13개 로지스틱 회귀는 비교 대상이 아니라 부록이 됐고 정답의 주 기준은 촉각 장갑으로 바뀌었다. 비교 대상은 요약 페이지의 측정 계획을 따른다.</p>
+      <p class="note">이 실험 뒤 측정 계획을 다시 맞추면서, 여기서 쓴 특징 13개 로지스틱 회귀는 비교 대상이 아니라 부록이 됐고 정답의 주 기준은 촉각 장갑으로 바뀌었다. 비교 대상은 요약 페이지의 측정 계획을 따른다. 접촉 그림 세 장은 주 정답(정리한 장갑)으로 다시 학습한 모델로 새로 그렸고, 표는 처음 실행(라벨, 장갑 원신호) 그대로다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>튜닝 50개를 모두 보내기 전에, SAM 3.1이 에피소드 전체(1~2.5분)에서 추적을 유지하는가. 접촉 추정이 끝까지 돌고 첫 신호가 나오는가.</dd>
         <dt>입력</dt><dd>튜닝 에피소드 3개. 0번은 146초, 투명 용기 사이로 작은 흑백 원판을 옮기며 오른손이 48번 닿는다. 30번은 68초, 주황색 종이 상자. 53번은 74초, 스프레이병이고 머리가 움직인다.</dd>
@@ -994,7 +989,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp06_ep53_contact.png" loading="lazy" width="1440" height="528" alt="에피소드 53에서 손별 접촉 확률, 예측 접촉, 라벨 접촉, 촉각 접촉을 시간축에 그린 그림">
-        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>접촉 확률</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#868e96"></i>촉각 800 초과</span><span class="key"><i class="" style="--c:#e8590c"></i>예측 접촉</span></div><figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 오래 쥐는 구간은 잡는다. 9초와 13초의 짧게 놓는 순간은 놓치고, 끝은 손이 병 옆에 남아 있는 동안 1~3초 늦는다.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>접촉 확률</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#868e96"></i>촉각 800 초과</span><span class="key"><i class="" style="--c:#e8590c"></i>예측 접촉</span></div><figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 오래 쥐는 구간은 잡는다. 짧게 놓는 순간은 놓치고, 손이 병 옆에 남아 있는 동안 끝이 늦게 끊긴다.</figcaption>
       </figure>
       <div class="two">
         <figure>
@@ -1608,8 +1603,8 @@ video:  에피소드 하나 전체, 10fps
         <div>
           <div class="k">정답 세 가지</div>
           <ul class="plain" style="font-size:13.5px;margin:0">
-            <li>장갑 원신호: 촉각 합 &gt; 800 (계획의 주 정답)</li>
-            <li>장갑 정리본: 0.1초 이하 압력 끊김은 잇고, 0.1초 미만 튀는 값은 버림</li>
+            <li>장갑 정리본 (이 실험 이후 주 정답): 촉각 합 &gt; 800에서 0.1초 이하 압력 끊김은 잇고, 0.1초 미만 튀는 값은 버림</li>
+            <li>장갑 원신호: 정리하지 않은 촉각 합 &gt; 800 (확인용)</li>
             <li>데이터셋 접촉 라벨 (확인용)</li>
           </ul>
         </div>
@@ -1624,11 +1619,11 @@ video:  에피소드 하나 전체, 10fps
           <table class="min">
             <thead><tr><th>정답</th><th>방법</th><th class="n">F1 ±5</th><th class="n">F1 ±15</th><th class="n">IoU</th><th class="n">찾은 경계 / 정답</th></tr></thead>
             <tbody>
+              <tr><td class="first"><b>장갑 정리본 (주)</b></td><td><b>방법 B</b></td><td class="n"><b>0.07</b></td><td class="n"><b>0.15</b></td><td class="n"><b>0.747</b></td><td class="n"><b>52 / 190</b></td></tr>
+              <tr><td class="first">장갑 정리본 (주)</td><td>항상 접촉</td><td class="n">0.02</td><td class="n">0.02</td><td class="n">0.669</td><td class="n">12 / 190</td></tr>
+              <tr><td class="first">장갑 정리본 (주)</td><td>항상 비접촉</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0 / 190</td></tr>
               <tr><td class="first">장갑 원신호</td><td>방법 B</td><td class="n">0.04</td><td class="n">0.12</td><td class="n">0.745</td><td class="n">52 / 248</td></tr>
               <tr><td class="first">장갑 원신호</td><td>항상 접촉</td><td class="n">0.02</td><td class="n">0.02</td><td class="n">0.666</td><td class="n">12 / 248</td></tr>
-              <tr><td class="first">장갑 원신호</td><td>항상 비접촉</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0 / 248</td></tr>
-              <tr><td class="first">장갑 정리본</td><td>방법 B</td><td class="n">0.07</td><td class="n">0.15</td><td class="n">0.747</td><td class="n">52 / 190</td></tr>
-              <tr><td class="first">장갑 정리본</td><td>항상 접촉</td><td class="n">0.02</td><td class="n">0.02</td><td class="n">0.669</td><td class="n">12 / 190</td></tr>
               <tr><td class="first">라벨</td><td>방법 B</td><td class="n">0.02</td><td class="n">0.14</td><td class="n">0.744</td><td class="n">52 / 156</td></tr>
               <tr><td class="first">라벨</td><td>항상 접촉</td><td class="n">0.04</td><td class="n">0.04</td><td class="n">0.663</td><td class="n">12 / 156</td></tr>
             </tbody>
@@ -1639,7 +1634,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp14_sam_rule_pilot.png" loading="lazy" width="1440" height="684" alt="세 에피소드에서 손별로 장갑 접촉과 방법 B 예측을 시간축에 그린 그림">
-        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>장갑 800 초과</span><span class="key"><i style="--c:#e8590c"></i>방법 B 예측 (기준값은 나머지 두 에피소드에서)</span></div>
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B 예측 (기준값은 나머지 두 에피소드에서 이 정답으로)</span></div>
         <figcaption>오래 쥐는 구간은 찾는다(53번, 0번 왼손). 손이 쉬지 않고 물체들 곁에서 일할 때(0번 오른손, 30번)는 여러 접촉을 하나의 긴 덩어리로 묶는다.</figcaption>
       </figure>
 
@@ -1647,7 +1642,7 @@ video:  에피소드 하나 전체, 10fps
         <li>방법 B와 참고 행 두 개가 장갑과 라벨 정답에 대해 끝까지 돎. 기준값은 다른 에피소드에서 고름. 튜닝 50개에 돌릴 코드는 준비됨.</li>
         <li>방법 B는 IoU에서 "항상 접촉"을 이기지만(0.75 대 0.67) 경계는 190~248개 중 52개만 찾음. 1인칭 시점에서는 손이 늘 어떤 물체 몇 픽셀 안에 있어서 접촉 사이에 근접 구간이 거의 끊기지 않음. EXP-02, 03에서 이미 보였던 문제.</li>
         <li>방법 C도 같은 한계를 가짐. C는 B가 찾은 경계만 옮기므로 B가 묶어 버린 접촉을 되살리지 못함.</li>
-        <li>검증 세트를 돌리기 전에 정할 제안 두 가지: (1) 주 정답을 장갑 정리본으로(깜빡임 정리 규칙은 결과를 보지 않고 지금 고정). (2) 가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 접촉을 끊는 규칙 추가, 튜닝 50개에서만 고름.</li>
+        <li>결정: 주 정답을 장갑 정리본으로 확정(깜빡임 정리 규칙은 결과를 보지 않고 고정). 남은 것: 가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 접촉을 끊는 규칙 추가, 튜닝 50개에서만 고름.</li>
         <li>에피소드 3개로는 규칙을 고를 수 없음. 다음 단계는 튜닝 나머지 47개 SAM 실행이 필요함(유료 호출 보류 중).</li>
       </ul>
     </article>
@@ -1668,7 +1663,7 @@ video:  에피소드 하나 전체, 10fps
 
     <h3>채점</h3>
     <ul class="plain">
-      <li>정답: 촉각 장갑(손당 80개 센서 합 &gt; 800). 데이터셋 라벨은 확인용으로 같이 채점.</li>
+      <li>정답: 정리한 촉각 장갑(손당 80개 센서 합 &gt; 800에서 0.1초 이하 끊김은 잇고 0.1초보다 짧은 조각은 버림). 압력이 임계값을 넘나들며 생기는, 영상으로는 볼 수 없는 깜빡임을 없앤 것. 장갑 원신호와 데이터셋 라벨은 확인용으로 같이 채점.</li>
       <li>boundary F1(±5, ±15프레임, 시작은 시작끼리 끝은 끝끼리 1:1), contact IoU. 손별과 합산.</li>
       <li>허용 범위와 지표는 검증 세트를 돌리기 전에 지금 고정함.</li>
     </ul>
@@ -1743,7 +1738,7 @@ video:  에피소드 하나 전체, 10fps
             <tr>
               <td class="first">평가 1</td>
               <td>영상만으로 접촉 시작과 끝을 찾는가</td>
-              <td>OpenGraph 촉각 장갑(센서 합 &gt; 800). 확인용 데이터셋 라벨</td>
+              <td>OpenGraph 촉각 장갑(센서 합 &gt; 800, 0.1초 미만 깜빡임 정리). 확인용 장갑 원신호와 데이터셋 라벨</td>
               <td>boundary F1(±5, ±15프레임), contact IoU</td>
             </tr>
             <tr>
@@ -1785,7 +1780,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 21:41 KST
+    마지막 갱신 2026-10-27 21:53 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -1830,7 +1825,8 @@ video:  에피소드 하나 전체, 10fps
         ["done", "SAM 입력 결정 (small object, 10fps)"],
         ["done", "72개 에피소드 10fps 클립 준비, SAM 출력 디코더 고속화"],
         ["done", "파일럿 3개로 전 과정 확인 (EXP-06)"],
-        ["done", "측정 계획 고정 (정답은 촉각 장갑, 비교 대상 3가지)"],
+        ["done", "측정 계획 고정 (비교 대상 3가지)"],
+        ["done", "주 정답 확정: 깜빡임을 정리한 촉각 장갑"],
         ["done", "방법 B와 참고 행 구현, 파일럿 3개로 점검 (EXP-14)"],
         ["todo", "튜닝 나머지 47개 SAM 실행 (유료 호출 보류)"],
         ["todo", "B SAM 규칙 기준값과 시작 지연 정하기 (튜닝 50개)"],

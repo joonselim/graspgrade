@@ -21,7 +21,9 @@ Scores, pooled over episodes and hands:
   boundary F1 at +-5 frames (0.167 s) and +-15 frames (0.5 s), starts and ends
   matched one to one, only to the same kind;
   contact IoU over all frames.
-Ground truth: dataset labels (annotation.hand), and tactile sum > 800 as a check.
+Ground truth (fixed 2026-10-27): the cleaned glove is the main one, tactile sum > 800
+with dropouts up to 0.1 s joined and blips under 0.1 s dropped (clean_glove). The raw
+glove and the dataset labels (annotation.hand) are reported next to it as checks.
 """
 
 import argparse
@@ -63,7 +65,7 @@ GLOVE_JOIN, GLOVE_MIN = 3, 3  # frames: join pressure dropouts up to 0.1 s, drop
 
 
 def clean_glove(mask):
-    """Glove contact after removing threshold flicker (an option for the main ground truth, see EXP-14)."""
+    """Main ground truth: glove contact after removing threshold flicker (EXP-14)."""
     out = np.zeros_like(mask)
     runs = []
     for a, b in segments(mask):
@@ -346,14 +348,14 @@ def load_cached(eps, gt):
     return data
 
 
-def fit(units, target="label"):
+def fit(units, target="tactile_clean"):
     x = np.vstack([u["x"] for u in units])
     y = np.concatenate([u["y"][target] for u in units])
     model = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, max_iter=2000))
     return model.fit(x, y)
 
 
-def evaluate(units, probs, hi, lo, shifts, target="label"):
+def evaluate(units, probs, hi, lo, shifts, target="tactile_clean"):
     sc = Score()
     for u, p in zip(units, probs):
         segs = to_30fps(postprocess(p, hi, lo), u["n30"], 0, *shifts)
@@ -361,7 +363,7 @@ def evaluate(units, probs, hi, lo, shifts, target="label"):
     return sc.result()
 
 
-def tune_post(units, probs, target="label"):
+def tune_post(units, probs, target="tactile_clean"):
     """Pick thresholds on out-of-fold probabilities, then the start and end delay."""
     best = None
     for hi in (0.4, 0.5, 0.6, 0.7):
@@ -419,7 +421,7 @@ def cmd_cv(args):
     data = load_cached(eps, gt)
     folds = [eps[i::5] for i in range(5)]
     report = {"episodes": eps}
-    for target in ("label", "tactile"):
+    for target in ("tactile_clean", "tactile", "label"):
         units, probs, keys = [], [], []
         for fold in folds:
             train = [u for (e, s), u in data.items() if e not in fold]
@@ -436,13 +438,13 @@ def cmd_cv(args):
             "logreg_cv_no_shift": evaluate(units, probs, hi, lo, (0, 0), target),
             "rule_gap_3px": evaluate(units, [rule_probs(u) for u in units], 0.5, 0.5, (0, 0), target),
         }
-        if target == "label" and args.plot:
+        if target == "tactile_clean" and args.plot:
             plot_cv([int(e) for e in args.plot.split(",")], keys, units, probs, hi, lo, shifts)
-    model = fit(list(data.values()), "label")
+    model = fit(list(data.values()), "tactile_clean")
     coef = model[-1].coef_[0].reshape(len(CONTEXT), len(BASE))
     report["coef_at_offset_0"] = dict(zip(BASE, np.round(coef[CONTEXT.index(0)], 3).tolist()))
     (OUT / "cv_report.json").write_text(json.dumps(report, indent=1))
-    print(json.dumps({t: report[t] for t in ("label", "tactile")}, indent=1))
+    print(json.dumps({t: report[t] for t in ("tactile_clean", "tactile", "label")}, indent=1))
 
 
 def cmd_features(args):
@@ -464,7 +466,7 @@ def cmd_smoke(args):
         n10 = 50
         feats, rec = unit_features(folder, suffix, n10)
         for s in SIDES:
-            g30 = {g: gt[ep][g][s][start:start + 150] for g in ("label", "tactile")}
+            g30 = {g: gt[ep][g][s][start:start + 150] for g in ("label", "tactile", "tactile_clean")}
             units.append({"name": f"{name}_{s}", "x": with_context(feats[s]), "base": feats[s],
                           "y": {g: g30[g][::STEP] for g in g30}, "n30": 150, "gt30": g30, "gap": rec[s]["gap"]})
     for u in units:
@@ -542,8 +544,8 @@ def cmd_rule(args):
     split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
     eps = [e for e in split["tune"] if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
     data = load_cached(eps, ground_truth(eps))
-    report = {"episodes": eps, "note": "glove = tactile sum > 800 (main), label = dataset labels (check)"}
-    for target, name in (("tactile", "glove"), ("tactile_clean", "glove_clean"), ("label", "label")):
+    report = {"episodes": eps, "note": "glove_clean = tactile sum > 800 with flicker under 0.1 s removed (main). glove = raw tactile sum > 800 and label = dataset labels (checks)"}
+    for target, name in (("tactile_clean", "glove_clean"), ("tactile", "glove"), ("label", "label")):
         sc, chosen, per_ep = Score(), {}, {}
         for ep in eps:
             train = [u for (e, s), u in data.items() if e != ep]
@@ -566,7 +568,7 @@ def cmd_rule(args):
             "contact_share": round(float(np.mean(np.concatenate([u["gt30"][target] for u in units]))), 3),
         }
     (OUT / "rule_report.json").write_text(json.dumps(report, indent=1, default=str))
-    for name in ("glove", "glove_clean", "label"):
+    for name in ("glove_clean", "glove", "label"):
         r = report[name]
         print(name, "contact share", r["contact_share"])
         for row in ("arm_B_sam_rule_leave_one_out", "reference_always_in_contact", "reference_never_in_contact"):
@@ -577,7 +579,7 @@ def cmd_rule(args):
         print("  per episode", r["arm_B_per_episode"])
         print("  chosen", r["arm_B_chosen_on_other_episodes"])
     if args.plot:
-        plot_rule([int(e) for e in args.plot.split(",")], data, report["glove"]["arm_B_chosen_on_other_episodes"])
+        plot_rule([int(e) for e in args.plot.split(",")], data, report["glove_clean"]["arm_B_chosen_on_other_episodes"])
 
 
 def plot_rule(eps, data, chosen):
@@ -594,7 +596,7 @@ def plot_rule(eps, data, chosen):
             pm = np.zeros(u["n30"], bool)
             for a, b in to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts):
                 pm[a:b] = True
-            for mask, c, lab in ((u["gt30"]["tactile"], "#2b8a3e", f"{s}: glove > 800"),
+            for mask, c, lab in ((u["gt30"]["tactile_clean"], "#2b8a3e", f"{s}: glove (main truth)"),
                                  (pm, "#e8590c", f"{s}: arm B (SAM rule)")):
                 ax.fill_between(t, y, y + 0.8, where=mask, color=c, step="mid", lw=0)
                 ticks.append((y + 0.4, lab))

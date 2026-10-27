@@ -1,6 +1,6 @@
 # EXP-06: Contact cutting pilot on three whole episodes
 
-> Note, 2026-10-27: the logistic regression tested here is now an appendix. The compared arms for number 1 are set in [the measurement plan](../MEASUREMENT_PLAN.md): Muse Spark alone, a SAM rule (overlap plus co-movement), and the SAM rule plus a Muse Spark boundary check. The main ground truth is the glove (tactile sum above 800).
+> Note, 2026-10-27: the logistic regression tested here is now an appendix. The compared arms for number 1 are set in [the measurement plan](../MEASUREMENT_PLAN.md): Muse Spark alone, a SAM rule (overlap plus co-movement), and the SAM rule plus a Muse Spark boundary check. The main ground truth is the cleaned glove (tactile sum above 800, flicker under 0.1 s removed, EXP-14). The contact images on this page were redrawn on 2026-10-27 with the model trained on that ground truth. The tables are from the original run on labels and raw glove.
 
 Date: 2026-10-27. Scripts: `scripts/sam_episodes.py`, `scripts/sam_fast.py`,
 `scripts/sam_track_check.py`, `scripts/contact_cut.py`.

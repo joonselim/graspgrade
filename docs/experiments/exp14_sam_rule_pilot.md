@@ -30,9 +30,9 @@ This is a code check on three tuning episodes, not a result.
   chosen on the other two episodes (leave one out), by boundary F1 at
   ±15 frames plus IoU.
 - Ground truth:
-  - glove: tactile sum above 800, raw (main, as in the plan),
-  - glove, cleaned: the same, with pressure dropouts up to 0.1 s joined and
-    pressure blips under 0.1 s dropped,
+  - glove, cleaned (main since this experiment): tactile sum above 800, with
+    pressure dropouts up to 0.1 s joined and pressure blips under 0.1 s dropped,
+  - glove, raw: tactile sum above 800 with no cleaning (check),
   - labels: the dataset contact labels (check).
 
 ## Results
@@ -50,11 +50,11 @@ add boundaries that no video method can see: 248 boundaries on the raw glove,
 
 | Ground truth | Method | Boundary F1 ±5 | Boundary F1 ±15 | Contact IoU | Boundaries found / true |
 | --- | --- | --- | --- | --- | --- |
+| **Glove, cleaned (main)** | Arm B | 0.07 | 0.15 | 0.747 | 52 / 190 |
+| Glove, cleaned (main) | Always in contact | 0.02 | 0.02 | 0.669 | 12 / 190 |
+| Glove, cleaned (main) | Never in contact | 0 | 0 | 0 | 0 / 190 |
 | Glove, raw | Arm B | 0.04 | 0.12 | 0.745 | 52 / 248 |
 | Glove, raw | Always in contact | 0.02 | 0.02 | 0.666 | 12 / 248 |
-| Glove, raw | Never in contact | 0 | 0 | 0 | 0 / 248 |
-| Glove, cleaned | Arm B | 0.07 | 0.15 | 0.747 | 52 / 190 |
-| Glove, cleaned | Always in contact | 0.02 | 0.02 | 0.669 | 12 / 190 |
 | Labels | Arm B | 0.02 | 0.14 | 0.744 | 52 / 156 |
 | Labels | Always in contact | 0.04 | 0.04 | 0.663 | 12 / 156 |
 
@@ -68,8 +68,8 @@ picked on the scored predictions, so those numbers are optimistic.
 
 ![arm B on the pilot](img/exp14_sam_rule_pilot.png)
 
-*Green: glove above 800. Orange: arm B, with parameters chosen on the other
-two episodes. Long holds are found (ep53, ep0 left hand). When a hand works
+*Green: the cleaned glove (main ground truth). Orange: arm B, with parameters
+chosen on the other two episodes against it. Long holds are found (ep53, ep0 left hand). When a hand works
 next to objects without pause (ep0 right hand, ep30), arm B joins many
 touches into one long block.*
 
@@ -84,11 +84,11 @@ touches into one long block.*
   between touches. This was already visible in EXP-02 and EXP-03.
 - That limits arm C as well. Arm C only moves the boundaries that arm B
   finds, so it cannot add the touches arm B joined together.
-- Two proposals, to decide before any held-out run:
-  1. Main ground truth: use the cleaned glove (dropouts and blips under 0.1 s
+- Decisions:
+  1. Decided on 2026-10-27: the main ground truth is the cleaned glove (dropouts and blips under 0.1 s
      removed). The raw glove asks video to see pressure flicker. The
      cleaning rule is fixed now and does not use any result.
-  2. Arm B: also break a near-run when the nearest object changes or when
+  2. Still open. Arm B: also break a near-run when the nearest object changes or when
      the hand moves away from the object for a moment. This should split
      touches that follow each other (ep0 right hand). Any new rule is chosen
      on the 50 tuning episodes only.

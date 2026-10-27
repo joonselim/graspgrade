@@ -32,10 +32,14 @@ The plan below fixes all three. Nothing here needs new data or a new model.
 
 - OpenGraph Ego-Tactile, 72 episodes, 30 fps. Tuning: 50 episodes.
   Held-out: 22 episodes (`splits/opengraph.json`).
-- Main ground truth: the touch glove. A hand is in contact when the sum of
-  its 80 taxels is above 800 (EXP-04).
-- Check: the dataset contact labels, which agree with the glove on 98.7%
-  (left) and 97.2% (right) of frames. Results are reported on both.
+- Main ground truth (fixed 2026-10-27): the touch glove, cleaned. A hand is
+  in contact when the sum of its 80 taxels is above 800 (EXP-04). Pressure
+  dropouts of 0.1 s or less are joined, and pressure blips shorter than
+  0.1 s are dropped (EXP-14). This removes threshold flicker that no video
+  method can see.
+- Checks, reported next to it: the raw glove (no cleaning) and the dataset
+  contact labels. The labels agree with the raw glove on 98.7% (left) and
+  97.2% (right) of frames.
 
 ### What we compare (the three arms from the proposal)
 
@@ -64,15 +68,15 @@ Details fixed now:
 - Boundary F1 at ±5 frames (0.167 s) and ±15 frames (0.5 s). Starts and ends
   are matched one to one, each only to its own kind.
 - Contact IoU over all frames.
-- Reported per hand and pooled, on the glove ground truth and on the labels.
+- Reported per hand and pooled, on the cleaned glove (main), the raw glove
+  and the labels.
 - The start and end delay of arm B against the glove, on tuning and on held-out.
 
 ### Open decisions from the pilot (EXP-14)
 
-- The raw glove signal flickers around the threshold: on three episodes,
-  21 of 124 segments are shorter than 0.2 s and 28 gaps are 0.1 s or less.
-  Proposed: the main ground truth joins glove dropouts up to 0.1 s and drops
-  blips under 0.1 s. To be decided before any held-out run.
+- Decided: the raw glove flickers around the threshold (on three episodes,
+  21 of 124 segments are shorter than 0.2 s and 28 gaps are 0.1 s or less),
+  so the main ground truth is the cleaned glove (see Data and ground truth).
 - Arm B joins touches that follow each other, because the hand stays near
   some object. Proposed: also break a contact when the nearest object
   changes or the hand leaves for a moment, chosen on tuning episodes.

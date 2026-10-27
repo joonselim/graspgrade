@@ -50,6 +50,12 @@ Two ground truths are available for number 1: these anchor labels, or our own
 threshold on the raw tactile columns. The labels are already derived from the
 same tactile signal.
 
+Number 1 main ground truth (fixed 2026-10-27, EXP-14): tactile sum > 800 per
+hand, then dropouts of 0.1 s (3 frames) or less joined and pieces shorter than
+0.1 s dropped (`contact_cut.clean_glove`). The raw glove and the labels are
+reported as checks. On the three pilot episodes this changes the boundary
+count from 248 (raw) to 190 (labels: 156).
+
 Raw tactile as ground truth needs a threshold. With "sum of 80 taxels > 0",
 labels and tactile agree on 97% of frames in episodes 0 to 62 but only 72% to
 74% in episodes 63 to 71, where the gloves read small pressure at rest. With
