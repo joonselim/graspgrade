@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>GraspGrade 진행 보고</title>
+<title>GraspGrade 진행</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
@@ -151,6 +151,17 @@
   }
   figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
   figcaption::before { content: "그림 " counter(fig) ". "; color: var(--ink); font-weight: 700; }
+  .keys { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 9px; font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+  .key { display: inline-flex; align-items: center; gap: 7px; }
+  .key i { flex: none; width: 12px; height: 12px; background: var(--c); }
+  .key i + i { margin-left: -3px; }
+  .key i.ln { width: 18px; height: 2.5px; }
+  .key i.dash { width: 18px; height: 0; background: none; border-top: 2px dashed var(--c); }
+  .key i.box { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
+  .key i.dot { width: 9px; height: 9px; border-radius: 50%; }
+  .key i.light { box-shadow: 0 0 0 1px var(--faint); }
+  .key i.mask { opacity: 0.8; }
+  figure .keys + figcaption { margin-top: 4px; }
   .two { display: grid; gap: 18px; grid-template-columns: 1fr; }
   @media (min-width: 640px) { .two { grid-template-columns: 1fr 1fr; } }
 
@@ -185,7 +196,22 @@
     background: repeating-linear-gradient(-45deg, var(--doing) 0 6px,
       color-mix(in srgb, var(--doing) 70%, var(--sheet)) 6px 12px);
   }
-  .g-row:hover .g-bar { filter: brightness(1.08); }
+  .g-row:not(.axis) { position: relative; outline: none; }
+  .g-row:not(.axis)::before {
+    content: ""; position: absolute; inset: 0 -10px; z-index: 0; pointer-events: none;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .g-row > * { position: relative; z-index: 1; }
+  .g-row:not(.axis):hover::before, .g-row:not(.axis):focus-visible::before {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .g-row:not(.axis):hover .g-label { text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 3px; }
+  .g-row:not(.axis):hover .g-bar { filter: brightness(1.1); }
+  .g-row.sel::before, .g-row.sel:hover::before {
+    background: color-mix(in srgb, var(--done) 10%, transparent);
+    box-shadow: inset 3px 0 0 var(--ink);
+  }
   .g-row.sel .g-label { font-weight: 700; }
   .axis .g-track { height: auto; }
   .axis .g-day {
@@ -213,7 +239,9 @@
     flex: 0 0 min(300px, 84%); scroll-snap-align: start;
     border: 1px solid var(--rule); background: var(--sheet); padding: 14px 16px 12px;
   }
-  .phase.sel { border-color: var(--ink-2); }
+  .phase { cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+  .phase:hover { border-color: var(--muted); }
+  .phase.sel { border-color: var(--ink); background: color-mix(in srgb, var(--done) 5%, var(--sheet)); }
   .phase .ph-top {
     display: flex; justify-content: space-between; gap: 8px;
     font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
@@ -321,7 +349,7 @@
 
   <div class="page" data-page="summary">
   <header class="doc-head">
-    <h1 class="doc-title">GraspGrade 진행 보고</h1>
+    <h1 class="doc-title">GraspGrade 진행</h1>
     <p class="doc-sub">1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 구간에 로봇 손이 따라할 수 있는 정도를 0~100점으로 매긴다.</p>
   </header>
 
@@ -604,7 +632,7 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp01_sam_hand_f330.jpg" loading="lazy" width="1280" height="720" alt="프레임 330에서 SAM이 왼손을 빨간색, 오른손을 파란색으로 분할한 결과">
-        <figcaption>정리한 박스와 마스크를 프레임 330 위에 그린 것. 빨강 id 0이 왼손, 파랑 id 1이 오른손. 오른손 마스크는 장갑 손가락은 덮지만 손목의 흰 센서 박스는 뺀다.</figcaption>
+        <div class="keys"><span class="key"><i class="mask" style="--c:#e8604c"></i>왼손 (id 0)</span><span class="key"><i class="mask" style="--c:#6e6ef0"></i>오른손 (id 1)</span></div><figcaption>정리한 박스와 마스크를 프레임 330 위에 그린 것. 오른손 마스크는 장갑 손가락은 덮지만 손목의 흰 센서 박스는 뺀다.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -657,7 +685,7 @@ video:  clip.mp4 (150 frames)</pre>
       <div class="two">
         <figure>
           <img src="assets/compare_small_object.jpg" loading="lazy" width="1280" height="720" alt="small object 프롬프트로 네 프레임에서 용기를 분할한 결과">
-          <figcaption><code>small object</code>, 프레임 0 / 50 / 100 / 140. 파란 박스는 손, 노랑과 분홍이 찾은 물체.</figcaption>
+          <div class="keys"><span class="key"><i class="box" style="--c:#2a2ad6"></i>손</span><span class="key"><i class="mask" style="--c:#e4c84c"></i><i class="mask" style="--c:#c43cc4"></i>찾은 물체</span></div><figcaption><code>small object</code>, 프레임 0 / 50 / 100 / 140.</figcaption>
         </figure>
         <figure>
           <img src="assets/exp02_round_container.jpg" loading="lazy" width="1280" height="720" alt="round container 프롬프트로 같은 네 프레임을 분할한 결과">
@@ -701,7 +729,7 @@ video:  clip.mp4 (150 frames)</pre>
         </figure>
         <figure>
           <img src="assets/ep53_compare.jpg" loading="lazy" width="1280" height="720" alt="같은 장면에서 SAM이 두 손과 스프레이병을 분할한 결과">
-          <figcaption><code>small object</code> 결과. id 0(노랑)이 모든 프레임에서 스프레이병. id 1(분홍, 왼쪽 끝)은 책상 끝의 다른 물체.</figcaption>
+          <div class="keys"><span class="key"><i class="box" style="--c:#2a2ad6"></i>손</span><span class="key"><i class="mask" style="--c:#e4c84c"></i>id 0 스프레이병</span><span class="key"><i class="mask" style="--c:#c43cc4"></i>id 1 책상 끝의 다른 물체</span></div><figcaption><code>small object</code> 결과. 스프레이병은 모든 프레임에서 같은 id를 유지한다.</figcaption>
         </figure>
       </div>
 
@@ -773,7 +801,7 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462" alt="왼쪽은 촉각 임계값별 라벨 일치율, 오른쪽은 에피소드별 머리 각속도">
-        <figcaption>왼쪽: 임계값별 라벨 일치율. 800 이상에서 평탄하다. 임계값 0이면 에피소드 63~71이 72~74%로 떨어지는데, 이 에피소드들은 손을 쉬고 있을 때도 장갑이 약한 압력을 기록한다. 오른쪽: 에피소드별 머리 각속도. 빨간 막대가 스프레이병 작업(에피소드 48~62).</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#e05252"></i>오른쪽 그림: 스프레이병 작업 (에피소드 48~62)</span><span class="key"><i class="" style="--c:#2f6fe0"></i>오른쪽 그림: 나머지 에피소드</span></div><figcaption>왼쪽: 임계값별 라벨 일치율. 800 이상에서 평탄하다. 임계값 0이면 에피소드 63~71이 72~74%로 떨어지는데, 이 에피소드들은 손을 쉬고 있을 때도 장갑이 약한 압력을 기록한다. 오른쪽: 에피소드별 머리 각속도.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -832,7 +860,7 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp05_ep53_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 53의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과">
-        <figcaption>에피소드 53. 위가 30fps, 아래가 10fps, 같은 원본 프레임. 손(파랑)과 스프레이병(노랑)이 같다.</figcaption>
+        <div class="keys"><span class="key"><i class="mask" style="--c:#5aa0e8"></i>손</span><span class="key"><i class="mask" style="--c:#d8bd50"></i>스프레이병</span></div><figcaption>에피소드 53. 위가 30fps, 아래가 10fps, 같은 원본 프레임. 두 줄의 마스크가 같다.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp05_ep1_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 1의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과">
@@ -896,7 +924,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp06_ep0_timeline.png" loading="lazy" width="1440" height="609" alt="에피소드 0 전체에서 물체 id별 등장 구간, 손 검출, 접촉 라벨을 시간축에 그린 그림">
-        <figcaption>에피소드 0. 파랑은 SAM이 손을 잡은 구간, 초록은 라벨상 접촉, 주황은 <code>small object</code>의 물체 id별 등장 구간. 원판과 용기가 많아 물체 id가 16개, 한 프레임에 최대 12개까지 쓰인다. SAM의 한도는 16개.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#1c7ed6"></i>SAM이 손을 잡은 구간</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#e8590c"></i>물체 id별 등장 구간</span></div><figcaption>에피소드 0. 원판과 용기가 많아 물체 id가 16개, 한 프레임에 최대 12개까지 쓰인다. SAM의 한도는 16개.</figcaption>
       </figure>
 
       <p>먼저 고쳐야 했던 것이 하나 있다. 처음에는 손 id마다 화면상 가운데 위치로 왼손·오른손을 정했다. 그런데 손은 화면 중앙을 자주 넘는다. 에피소드 53의 왼손은 프레임의 56%에서 화면 오른쪽에 있어서 오른손으로 잘못 붙었다. 지금은 두 손이 같이 보이는 프레임에서 더 자주 왼쪽에 있는 id를 왼손으로 정한다. 위 표는 고친 방식 기준이다.</p>
@@ -953,7 +981,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp06_ep53_contact.png" loading="lazy" width="1440" height="528" alt="에피소드 53에서 손별 접촉 확률, 예측 접촉, 라벨 접촉, 촉각 접촉을 시간축에 그린 그림">
-        <figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 파란 선이 접촉 확률, 초록이 라벨, 회색이 촉각 800 초과, 주황이 예측 접촉. 오래 쥐는 구간은 잡는다. 9초와 13초의 짧게 놓는 순간은 놓치고, 끝은 손이 병 옆에 남아 있는 동안 1~3초 늦는다.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>접촉 확률</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#868e96"></i>촉각 800 초과</span><span class="key"><i class="" style="--c:#e8590c"></i>예측 접촉</span></div><figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 오래 쥐는 구간은 잡는다. 9초와 13초의 짧게 놓는 순간은 놓치고, 끝은 손이 병 옆에 남아 있는 동안 1~3초 늦는다.</figcaption>
       </figure>
       <div class="two">
         <figure>
@@ -1111,11 +1139,11 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp08_P0002_016222d1_orientation.jpg" loading="lazy" width="1680" height="560" alt="P0002 시퀀스 한 프레임에 세 방향으로 투영한 물체 모델과 데이터셋 박스를 그린 그림">
-        <figcaption>P0002_016222d1. 초록은 데이터셋 물체 박스, 주황은 투영한 3D 모델. 왼쪽부터 투영 그대로, 시계 90°, 반시계 90°. 시계 방향만 모델이 책상 위 실제 주걱과 접시에 놓인다. 데이터셋 박스는 그대로 그리면 모니터 근처 엉뚱한 곳에 있다.</figcaption>
+        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0002_016222d1. 왼쪽부터 투영 그대로, 시계 90°, 반시계 90°. 시계 방향만 모델이 책상 위 실제 주걱과 접시에 놓인다. 데이터셋 박스는 그대로 그리면 모니터 근처 엉뚱한 곳에 있다.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp08_P0001_10a27bf7_orientation.jpg" loading="lazy" width="1680" height="560" alt="P0001 시퀀스 한 프레임에 세 방향으로 투영한 물체 모델과 데이터셋 박스를 그린 그림">
-        <figcaption>P0001_10a27bf7. 시계 방향이면 머그가 오른손 아래, 덤벨이 실제 초록 덤벨 위에 놓인다.</figcaption>
+        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0001_10a27bf7. 시계 방향이면 머그가 오른손 아래, 덤벨이 실제 덤벨 위에 놓인다.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1171,7 +1199,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp09_P0001_10a27bf7_hands.jpg" loading="lazy" width="1680" height="560" alt="P0001 시퀀스의 세 장면에 계산한 손 뼈대를 그린 그림">
-        <figcaption>P0001_10a27bf7. 파랑은 손 0, 주황은 손 1, 빨간 점은 손가락 끝. 뼈대가 덤벨, 휴대폰, 머그를 쥔 실제 손 위에 놓인다. 손 0이 왼손, 손 1이 오른손.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#3b8eea"></i>손 0 (왼손)</span><span class="key"><i class="ln" style="--c:#f2b233"></i>손 1 (오른손)</span><span class="key"><i class="dot" style="--c:#e0261f"></i>손가락 끝</span></div><figcaption>P0001_10a27bf7. 뼈대가 덤벨, 휴대폰, 머그를 쥔 실제 손 위에 놓인다.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp09_P0002_016222d1_hands.jpg" loading="lazy" width="1680" height="560" alt="P0002 시퀀스의 세 장면에 계산한 손 뼈대를 그린 그림">
@@ -1251,7 +1279,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp10_copyable_rate.png" loading="lazy" width="845" height="494" alt="near 기준에 따른 따라할 수 있음 비율을 손목 이동 한계별로 그린 그래프" style="max-width:640px">
-        <figcaption>near 기준이 커질수록 올라가는 "따라할 수 있음" 비율, 손목 이동 한계 세 가지. 노란 띠가 계획의 20~80% 범위.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#f3dd6b"></i>계획의 20~80% 범위</span></div><figcaption>near 기준이 커질수록 올라가는 "따라할 수 있음" 비율, 손목 이동 한계 세 가지.</figcaption>
       </figure>
 
       <ul class="plain">
@@ -1294,7 +1322,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp10_examples.jpg" loading="lazy" width="1680" height="420" alt="튜닝 잡기 네 개에 물체 모델, 사람 손 지점, 로봇 손 링크를 그린 그림">
-        <figcaption>튜닝 잡기 네 개. 초록은 물체 모델, 흰 점은 사람 손 지점, 주황은 손목 이동 후 Allegro 링크, 빨강은 Allegro 손가락 끝. 왼쪽 둘은 따라할 수 있음(커피포트), 오른쪽 둘은 따라할 수 없음(보드 마커, 파마산 캔).</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#10cc10"></i>물체 모델</span><span class="key"><i class="dot light" style="--c:#ffffff"></i>사람 손 지점</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>Allegro 링크 (손목 이동 후)</span><span class="key"><i class="dot" style="--c:#ff2020"></i>Allegro 손가락 끝</span></div><figcaption>튜닝 잡기 네 개. 왼쪽 둘은 따라할 수 있음(커피포트), 오른쪽 둘은 따라할 수 없음(보드 마커, 파마산 캔).</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1370,7 +1398,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp11_clips_timeline.png" loading="lazy" width="1440" height="624" alt="한 시퀀스에서 감자 으깨개와 양손 손가락 끝 거리, 그리고 잘린 클립과 라벨을 시간축에 그린 그림">
-        <figcaption>P0002_016222d1(튜닝). 위: 감자 으깨개에서 각 손의 두 번째로 가까운 손가락 끝까지의 거리. 점선 15mm 아래가 접촉. 아래: 이 시퀀스에서 잘린 모든 클립, "따라할 수 있음" 라벨로 색을 칠함.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>왼손</span><span class="key"><i class="ln" style="--c:#e8590c"></i>오른손</span><span class="key"><i class="dash" style="--c:var(--ink)"></i>15mm</span><span class="key"><i class="" style="--c:#2b8a3e"></i>따라할 수 있음</span><span class="key"><i class="" style="--c:#c92a2a"></i>따라할 수 없음</span></div><figcaption>P0002_016222d1(튜닝). 위: 감자 으깨개에서 각 손의 두 번째로 가까운 손가락 끝까지의 거리. 점선 아래가 접촉. 아래: 이 시퀀스에서 잘린 모든 클립. 아래 막대가 왼손, 위 막대가 오른손.</figcaption>
       </figure>
 
       <p>같은 시퀀스 안에서 겹치는 클립은 하나의 SAM 요청으로 묶어 보낸다. SAM이 그 구간의 모든 손과 물체를 추적하고, 클립마다 자기 프레임만 꺼내 쓴다. 이렇게 하면 처리할 프레임이 절반 정도로 준다.</p>
@@ -1448,7 +1476,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp12_signal_check.png" loading="lazy" width="1040" height="442" alt="무료 항목 세 개와 물체 기준선의 AUC를 비교한 그래프" style="max-width:720px">
-        <figcaption>회색: 무료 항목 세 개, 각각과 합친 것. 파랑: 물체만, 그리고 물체 + 세 항목. 세 항목은 물체 위에 아무것도 더하지 못한다.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#868e96"></i>무료 항목 세 개 (각각, 합친 것)</span><span class="key"><i class="" style="--c:#1c7ed6"></i>물체만, 물체 + 세 항목</span></div><figcaption>세 항목은 물체 위에 아무것도 더하지 못한다.</figcaption>
       </figure>
 
       <h4>사람을 합친 AUC의 함정</h4>
@@ -1784,7 +1812,13 @@ video:  에피소드 하나 전체, 10fps
       tr.appendChild(bar);
       row.appendChild(tr);
 
+      row.tabIndex = 0;
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-label", (i + 1) + "단계 " + p.title);
       row.addEventListener("click", function () { select(i, true); });
+      row.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(i, true); }
+      });
       host.appendChild(row);
     });
   }
@@ -1819,6 +1853,7 @@ video:  에피소드 하나 전체, 10fps
         ck.appendChild(li);
       });
       c.appendChild(ck);
+      c.addEventListener("click", function () { select(i, false); });
       host.appendChild(c);
     });
 
@@ -1880,7 +1915,7 @@ video:  에피소드 하나 전체, 10fps
     document.querySelectorAll(".topnav a").forEach(function (a) {
       a.classList.toggle("on", a.dataset.nav === page);
     });
-    document.title = page === "detail" ? "GraspGrade 실험 상세" : "GraspGrade 진행 보고";
+    document.title = page === "detail" ? "GraspGrade 실험 상세" : "GraspGrade 진행";
 
     // instant, or the page-wide smooth scrolling animates across the whole page
     if (target) {
