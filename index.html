@@ -348,15 +348,27 @@
   #xtip[hidden] { display: none; }
   #xtip .id { opacity: 0.7; margin-right: 6px; font-variant-numeric: tabular-nums; }
   #xtip .go { color: inherit; text-decoration: underline; margin-left: 8px; pointer-events: auto; white-space: nowrap; }
-  /* nearby experiments: small overlay at the bottom right while reading the experiments */
+  /* nearby experiments: a small window at the bottom right that rolls with the page scroll */
   .near {
     position: fixed; z-index: 30; right: 12px; bottom: 12px;
-    display: none; flex-direction: column;
+    height: calc(var(--row) * 7); overflow: hidden;
+    --row: 21px;
     background: var(--sheet); border: 1px solid var(--rule); border-radius: 2px;
-    padding: 4px 0; font-family: var(--mono); font-size: 12px; line-height: 1.2;
+    font-family: var(--mono); font-size: 12px; line-height: var(--row);
+    opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s;
   }
-  body[data-page="detail"] .near.show { display: flex; }
-  .near a { color: var(--muted); padding: 3px 10px 3px 8px; border-left: 2px solid transparent; }
+  body[data-page="detail"] .near.show { opacity: 1; visibility: visible; }
+  .near .win {
+    height: 100%; overflow: hidden;
+    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+            mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+  }
+  .near .strip { display: flex; flex-direction: column; will-change: transform; }
+  .near a {
+    display: block; height: var(--row); color: var(--muted);
+    padding: 0 10px 0 8px; border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
   .near a:hover { color: var(--ink); text-decoration: none; }
   .near a.on { color: var(--ink); font-weight: 700; border-left-color: var(--ink); }
 </style>
@@ -3105,7 +3117,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 06:56 KST
+    마지막 갱신 2026-10-28 07:25 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3518,42 +3530,54 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     window.addEventListener("hashchange", hide);
   }
 
-  // While reading the experiments, show the current one and three on each
-  // side at the bottom right, so a nearby experiment is one click away.
+  // While reading the experiments, a small window at the bottom right lists
+  // every experiment and rolls with the page: the position inside the current
+  // experiment moves the list by the same fraction of a row, so the current
+  // one stays in the middle with three on each side.
   function buildNear() {
     var arts = [].slice.call(document.querySelectorAll('.page[data-page="detail"] article.exp[id^="exp-"]'));
     var stop = document.getElementById("s-now");
     var box = el("nav", "near");
     box.setAttribute("aria-label", "가까운 실험");
+    var strip = el("div", "strip");
+    var links = arts.map(function (art) {
+      var a = el("a", null, art.id.toUpperCase());
+      a.href = "#" + art.id;
+      strip.appendChild(a);
+      return a;
+    });
+    var win = el("div", "win");
+    win.appendChild(strip);
+    box.appendChild(win);
     document.body.appendChild(box);
-    var cur = -2, ticking = false;
-    function draw(i) {
-      box.innerHTML = "";
-      var from = Math.max(0, Math.min(i - 3, arts.length - 7)), to = Math.min(arts.length, from + 7);
-      for (var k = from; k < to; k++) {
-        var a = el("a", k === i ? "on" : null, arts[k].id.toUpperCase());
-        a.href = "#" + arts[k].id;
-        box.appendChild(a);
+    var line = 110, on = -1, row = 0;
+
+    function update() {
+      if (document.body.dataset.page !== "detail" || !arts.length) return;
+      if (!row) row = links[0].offsetHeight || 21;
+      var tops = arts.map(function (x) { return x.getBoundingClientRect().top; });
+      var end = stop ? stop.getBoundingClientRect().top : Infinity;
+      var shown = tops[0] <= line && end > line;
+      box.classList.toggle("show", shown);
+      if (!shown) return;
+      var i = 0;
+      while (i + 1 < arts.length && tops[i + 1] <= line) i++;
+      var next = i + 1 < arts.length ? tops[i + 1] : end;
+      var f = i + Math.min(1, Math.max(0, (line - tops[i]) / Math.max(1, next - tops[i])));
+      // f runs from i to i + 1 across experiment i. Keep the current row in the middle.
+      var y = Math.min(Math.max(f - 3.5, 0), Math.max(arts.length - 7, 0));
+      strip.style.transform = "translateY(" + (-y * row).toFixed(1) + "px)";
+      if (i !== on) {
+        if (on >= 0) links[on].classList.remove("on");
+        links[i].classList.add("on");
+        on = i;
       }
     }
-    function spy() {
-      ticking = false;
-      if (document.body.dataset.page !== "detail") return;
-      var i = -1;
-      for (var k = 0; k < arts.length; k++) {
-        if (arts[k].getBoundingClientRect().top <= 110) i = k; else break;
-      }
-      if (stop && stop.getBoundingClientRect().top <= 110) i = -1;
-      if (i === cur) return;
-      cur = i;
-      box.classList.toggle("show", i >= 0);
-      if (i >= 0) draw(i);
-    }
-    window.addEventListener("scroll", function () {
-      if (!ticking) { ticking = true; setTimeout(spy, 60); }
-    }, { passive: true });
-    window.addEventListener("hashchange", function () { setTimeout(spy, 50); });
-    setTimeout(spy, 50);
+    // Scroll events already come at most once per frame, so update right away.
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    window.addEventListener("hashchange", function () { setTimeout(update, 50); });
+    setTimeout(update, 50);
   }
 
   function render() {
