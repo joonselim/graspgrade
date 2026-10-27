@@ -424,7 +424,7 @@
         </table>
       </div>
     </div>
-    <p class="more"><a href="#detail">실험 상세 보기 →</a> &nbsp; <a href="#s-now">진행 중인 접촉 구간 검출 →</a></p>
+    <p class="more"><a href="#detail">실험 상세 보기 →</a> &nbsp; <a href="#s-now">진행 중인 작업 →</a></p>
   </section>
 
   <!-- 5 -->
@@ -962,7 +962,8 @@ video:  에피소드 하나 전체, 10fps
   </section>
 
   <section id="s-now">
-    <h2><span class="no">2</span>진행 중: 접촉 구간 검출</h2>
+    <h2><span class="no">2</span>진행 중인 작업</h2>
+    <h3 style="margin-top:0">접촉 구간 검출</h3>
     <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개 에피소드(EXP-06)로 전 과정이 끝까지 도는 것을 확인했다. 다음은 튜닝 나머지 47개를 SAM에 넣고 튜닝 50개 전체로 교차 검증하는 단계다.</p>
 
     <h3>접촉 추정 방법</h3>
@@ -995,6 +996,33 @@ video:  에피소드 하나 전체, 10fps
       </div>
     </div>
     <p class="note">파일럿에서 마스크만으로는 ±5프레임 경계가 나오지 않았다. Muse Spark 경계 확인과 Muse Spark 단독 비교군은 튜닝 전체 결과를 본 뒤 진행한다.</p>
+
+    <h3>다음 단계 준비: HOT3D 잡기 클립</h3>
+    <p>평가 2에 쓸 HOT3D 클립이 몇 개 나오는지 모션캡처만으로 미리 셌다. HOT3D에서는 손이 옮길 때만 물체가 움직이므로, 물체가 움직인 구간 하나를 잡기 한 번으로 보고 앞뒤 1초를 붙여 클립으로 잡았다. 실제 평가 2 클립은 손과 물체 사이 거리로 다시 자른다.</p>
+    <div class="tbl">
+      <p class="cap">모션캡처로 센 잡기 클립</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th></th><th class="n">튜닝</th><th class="n">검증</th><th class="n">전체</th></tr></thead>
+          <tbody>
+            <tr><td class="first">시퀀스</td><td class="n">85</td><td class="n">51</td><td class="n">136</td></tr>
+            <tr><td class="first">물체가 움직인 구간</td><td class="n">1,709</td><td class="n">915</td><td class="n">2,624</td></tr>
+            <tr><td class="first">그중 손목이 25cm 안에 온 것</td><td class="n">1,581</td><td class="n">871</td><td class="n">2,452</td></tr>
+            <tr><td class="first">거기에 데이터셋 품질 검사 90% 이상 통과</td><td class="n">1,439</td><td class="n">713</td><td class="n">2,152</td></tr>
+            <tr><td class="first">클립 길이 중앙값 (p90)</td><td class="n">4.3초 (10.3초)</td><td class="n">5.5초 (11.7초)</td><td class="n">4.6초 (10.9초)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <figure>
+      <img src="assets/exp07_hot3d_clips.png" loading="lazy" width="1320" height="432" alt="왼쪽은 HOT3D 잡기 클립 길이 분포, 오른쪽은 시퀀스당 클립 수 분포">
+      <figcaption>왼쪽: 클립 길이 분포. 점선은 SAM 요청 최소 길이(10fps로 50프레임, 5초). 오른쪽: 시퀀스당 클립 수, 튜닝과 검증.</figcaption>
+    </figure>
+    <ul class="plain">
+      <li>쓸 수 있는 잡기 클립은 2,152개. 가장 많이 잡힌 물체는 흰 머그(164), 퍼즐 장난감(127), 커피포트(126), 휴대폰(123).</li>
+      <li>절반 이상이 5초보다 짧아 SAM 요청 최소 길이에 못 미침. 같은 시퀀스 안에서 가까운 클립을 묶으면 726개 구간이 됨.</li>
+      <li>정답이 있는 136개 시퀀스의 HOT3D 영상을 받는 중. 106개 완료.</li>
+    </ul>
   </section>
 
   <section>
@@ -1082,7 +1110,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 18:25 KST
+    마지막 갱신 2026-10-27 18:34 KST
   </footer>
 
 </main>
@@ -1230,7 +1258,7 @@ video:  에피소드 하나 전체, 10fps
       ]
     },
     {
-      title: "HOT3D 정답 라벨링", from: 5, to: 6, status: "todo",
+      title: "HOT3D 정답 라벨링", from: 5, to: 6, status: "doing",
       req: [
         "모캡 손을 Allegro 로봇 손으로 옮겨 구간마다 재현 가능 여부 판정",
         "튜닝 세트의 재현 가능 비율 20~80%",
@@ -1239,7 +1267,8 @@ video:  에피소드 하나 전체, 10fps
       chk: [
         ["todo", "카메라 보정 기준 방향 확인"],
         ["todo", "HOT3D 툴킷, MANO 손 모델 준비"],
-        ["todo", "정답 있는 136개 시퀀스 영상 수집"],
+        ["done", "모션캡처로 잡기 클립 수 집계 (2,152개)"],
+        ["doing", "정답 있는 136개 시퀀스 영상 수집 (106개 완료)"],
         ["todo", "손가락 끝과 물체 표면 거리 기준 설정"],
         ["todo", "재현 가능 비율 점검 후 기준 고정"]
       ]
