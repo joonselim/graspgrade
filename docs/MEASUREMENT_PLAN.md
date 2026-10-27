@@ -497,7 +497,7 @@ Estimates at measured prices, $150 in total.
 
 | Item | Cost |
 | --- | --- |
-| Spent so far | $1.73 |
+| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a) | $12.35 |
 | Number 1, SAM: remaining 47 tuning episodes / 22 held-out episodes | $11.89 / $5.45 |
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
 | Number 1, Muse arm C: held-out boundaries (the EXP-24 arm B finds about 120 per episode, so about 2,600) plus 200 tuning boundaries for the arm C shift. Depends on the arm B chosen on 50 episodes | about $37 |

@@ -4,7 +4,7 @@
 
 ## 한 줄 상태
 
-P1 숫자 2 파일럿 완료 (EXP-23, $0.20). 무료 작업은 B 유지 옵션 (EXP-24), 어안 결정 (EXP-25)까지 끝났다. 쓴 크레딧은 약 $1.73이다. 다음은 P2 (숫자 1 SAM 튜닝 47개, $11.89, 승인 필요).
+P1 파일럿 (EXP-23), A 튜닝 3개와 P7a (EXP-29, $10.62)까지 보냈다. 쓴 크레딧은 약 $12.35이다. 무료 작업은 EXP-28 (공개 벤치마크)까지 끝났다. 다음 유료 단계는 P2 (숫자 1 SAM 튜닝 47개, $11.89, 승인 필요).
 숫자 2: 정답은 copyable v2 (EXP-16, held-out EXP-20), 체크리스트는 물체 항목 중심 (EXP-18, 19), 클립·SAM 윈도우·Muse 프레임·프롬프트 준비 완료. 숫자 1: B 규칙과 A, C 코드 준비, 파일럿 3개만 측정.
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
 
@@ -235,10 +235,10 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | P1 (완료, EXP-23) | 숫자 2 파일럿: SAM 3윈도우, Muse 체크리스트/기준선 각 5클립 → 대리값(EXP-19)과 비교 | `sam_hot3d.py --role score_train --limit 3 --send`, `muse_hot3d.py --task ... --role score_train --limit 5 --send`, `number2_pilot.py` | $0.20 |
 | P2 | 숫자 1 SAM 튜닝 나머지 47개 → B 격자를 튜닝 50개로 확정 | `sam_episodes.py --split tune --send`, `contact_cut.py features`, `contact_cut.py rule` | $11.89 |
 | P3 | 숫자 1 SAM held-out 22개 | `sam_episodes.py --split held_out --allow-held-out --send` | $5.45 |
-| P4 | 숫자 1 A (Muse 단독) 튜닝 3개 (프롬프트 확인 + A 보정값) → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $2.51 + $11.86 |
+| P4 | 숫자 1 A (Muse 단독) 튜닝 3개 (완료, EXP-29, $2.64, A 보정 시작 +7 / 끝 -7) → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $11.86 남음 |
 | P5 | 숫자 1 C: 튜닝 경계 200개 (C 보정값) → held-out 경계 전부 | `muse_contact.py c --segments out/contact/rule_segments.json --sample 100 --send` → `c --segments <held-out B> --send` | 약 $2.61 + 약 $34 (B가 에피소드당 경계 약 120개, 50개로 B를 다시 고르면 바뀜) |
 | P6 | 숫자 2 SAM 전체 (파일럿 3윈도우는 이미 보냄) | `sam_hot3d.py --role score_train/held_out --send` | $8.72 + $17.76 |
-| P7a | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개만 (파일럿 5개는 이미 보냄) → 게이트 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | 약 $7.7 |
+| P7a (완료, EXP-29) | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개 → 게이트 weak (0.636 / 0.601), 결정대로 P7b 진행 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | $7.98 |
 | P7b | 게이트가 stop이 아니면: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
 | P8 | 숫자 2 최종 (물체 하나씩 빼기 보고 포함) | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
 
@@ -256,7 +256,12 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 - 공개 (측정 계획 Release 절): 숫자 1 정답 (정리한 장갑 구간 + 채점 스크립트)은 CC BY 4.0, 숫자 2 정답 (클립 + copyable v2 + 실패 조건 + 채점 스크립트)은 HOT3D 손 데이터에서 나와 CC BY-NC-SA 4.0. 원본 영상/센서/모캡은 넣지 않고 재생성 코드를 낸다. 라이선스 해석은 데이터에 딸린 라이선스 파일 기준이며 법률 검토는 아니다.
 - (완료, EXP-28) `benchmark/`: 숫자 1 정답 (72 에피소드, 정리한 장갑 + 원신호 구간), 숫자 2 정답 (3,811 클립, copyable v2 + 실패 조건 + 2/10 mm 라벨), 라이선스 안내, 예시 입력, 독립 채점 스크립트 2개. 채점 결과가 프로젝트 코드 수치와 정확히 같다. 33개 물체가 튜닝과 held-out에 모두 있어 물체 비율 기준선이 강하다는 점을 README에 적었다. 다시 만들기: `scripts/benchmark_export.py`.
 
-합계 약 $130 남음 (지금까지 $1.73 사용, C가 커져 $150 안이지만 여유가 줄었다). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
+튜닝 확인 (EXP-29, 진짜 Muse, held-out 안 씀):
+- 시간 보정: Muse는 시작을 약 7프레임 일찍, 끝을 약 7프레임 늦게 본다. 다른 두 에피소드에서 배운 보정으로 A의 F1(±5)이 0.062 → 0.132 (3개라 구간 0.000~0.132). A는 짧은 접촉을 하나로 묶어 경계를 190개 중 68개만 찾지만 IoU는 0.80~0.82로 가장 높다.
+- 숫자 2 (사람 하나씩 빼기): Muse 단독 0.516, 체크리스트 평균 0.627, 학습 0.646, 대리값 학습 0.671, 물체 이름표 0.688. 체크리스트 효과 +0.111 (구간 0.034~0.184)는 있고, 학습 효과 +0.019 (-0.023~0.058)는 없다. 처음 보는 물체에서 학습 점수 0.607 vs Muse 단독 0.516 vs 이름표 0.5.
+- Muse 등급과 대리값 일치율: 크기 75%, 모양 83%, 두께 78%, 폭 49%, 손잡이 90%, 주변 공간 62%. P1의 27/30은 낙관적이었다. 진짜 등급에서는 폭이 반대 방향으로 학습되지 않는다.
+
+합계 약 $120 남음 (지금까지 $12.35 사용, C가 커져 $150 안이지만 여유가 줄었다). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
 
 무료 (지금):
 1. (완료, EXP-12) 로컬 3개 항목은 측정은 정확하지만(카메라 vs 머리 회전 0.93, MediaPipe 좌우 96.5%) copyable 예측력이 없다 (AUC 0.49~0.53, 물체 안에서도 0.52~0.53). 물체 기준선은 사람 하나씩 빼고 사람별 평균 AUC 0.70 (0.59~0.81). 사람별 copyable 비율 차이 때문에 사람을 합친 AUC는 왜곡된다 (물체 0.62, 로컬 0.37). held-out도 사람별 AUC를 같이 낸다.
