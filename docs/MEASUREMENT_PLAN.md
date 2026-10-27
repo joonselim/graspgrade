@@ -233,6 +233,37 @@ out (0.645 to 0.698, object identity 0.5). The largest side of the object is
 the strongest feature. Option A goes ahead: the object property check becomes
 concrete object items for Muse Spark.
 
+### Object items for Muse Spark (written 2026-10-27, before computing, EXP-19)
+
+Six items. Muse Spark rates each one from the clip frames as high, mid or
+low. High always means "easier for a large four-finger robot hand". The
+direction was set from what the items mean, not from the data. The
+anchors use the visible human hand as the ruler (wrist to middle fingertip,
+about 19 cm).
+
+| Item | High | Mid | Low |
+| --- | --- | --- | --- |
+| Size next to the hand: longest side | up to 0.8 hand lengths (about 15 cm) | 0.8 to 1.3 (15 to 25 cm) | over 1.3 (over 25 cm) |
+| Shape: middle side over longest side | 0.6 or more (blocky) | 0.3 to 0.6 | under 0.3 (stick-like) |
+| Thickness: shortest side | 4 cm or more | 2 to 4 cm | under 2 cm (flat or thin) |
+| Width the hand must wrap: middle side | up to 8 cm | 8 to 14 cm | over 14 cm |
+| Handle: a part shaped to be held | yes | partly | no |
+| Free space: gap to the nearest other object at the grasp | 10 cm or more | 4 to 10 cm | under 4 cm |
+
+Free check with stand-ins, before any paid call:
+
+- Grades computed from the truth instead of Muse Spark: the first four from
+  the 3D model box, handle by eye from one video frame per object (judged
+  before looking at any label, EXP-19 contact sheet), free space from mocap
+  object poses at the contact frame.
+- The six grades in a logistic regression, tuning clips, v2 label: leave one
+  person out (mean AUC over the six people) and leave one object out
+  (pooled AUC).
+- Pass if both are 0.65 or more (the EXP-18 bar). This tells whether the
+  coarse three-level items keep the signal of the exact numbers (EXP-18: 0.695
+  and 0.673). Fail if either is below 0.60. It does not tell whether Muse
+  Spark reads the items correctly.
+
 ### Our score
 
 - Seven checks, each graded high, mid or low (1, 0.5, 0): visibility,
