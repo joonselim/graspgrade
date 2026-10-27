@@ -131,6 +131,12 @@ Quest combined. Quest video is greyscale. With Aria only, 9 persons have GT.
   15 PCA pose values, wrist transform, 10 betas. 7486 rows in 124 s because RGB
   and SLAM timestamps are interleaved.
 - Hands are bare with small mocap markers.
+- UmeTrack is enough for fingertips, no MANO (EXP-09, `scripts/hot3d_hands.py`).
+  `umetrack_hand_user_profile.json` is a kinematic model (22 joints, 21
+  landmarks, landmarks 0-4 are fingertips). Hand 0 = left, uses the profile
+  as is. Hand 1 = right, profile mirrored along x. Landmarks are in the same
+  world frame as the objects. During grasps the closest fingertip is about
+  2 mm from the object surface.
 
 ## Splits (fixed, `splits/`)
 

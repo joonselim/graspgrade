@@ -140,13 +140,13 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 1. Day 3~4 (진행 중, 위 "접촉 자르기" 절): OpenGraph 접촉 자르기 (SAM 10fps `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
    - 2D 겹침만으로는 접촉 전에도 76~100% 프레임이 붙어 보인다. 동반 이동이 필수다 (EXP-02, 03).
    - 촉각 독립 정답은 임계값 800(80 택셀 합)으로 만든다. 0으로 하면 에피소드 63~71이 틀린다 (EXP-04).
-2. Day 5 첫 작업: copyable 라벨 쏠림 확인 (브리프 8-1). 보정 방향은 EXP-08에서 해결했다.
+2. 다음 무료 작업: UmeTrack 랜드마크 → dex-retargeting(Allegro) → Allegro 손가락 끝과 물체 표면 거리 → copyable 라벨 → 튜닝 세트 쏠림 확인 (브리프 8-1). 보정 방향(EXP-08)과 손가락 끝(EXP-09)은 해결.
 3. (완료, 136개 sha1 통과) 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
 
 ## 미해결
 
 1. (해결, EXP-08) HOT3D 보정과 2D 박스는 Aria 원본 방향이다. preview는 원본을 시계 방향 90도 돌린 것: 원본 (u, v) → preview (1407 - v, u). preview 프레임 k = 스트림 214-1의 k번째 RGB 타임스탬프.
-2. HOT3D 툴킷 / projectaria_tools / MANO 모델 등록은 아직 안 했다.
+2. (MANO 불필요, EXP-09) 손가락 끝은 UmeTrack 프로필 + 직접 짠 순운동학으로 얻는다. hand 0 = 왼손(프로필 그대로), hand 1 = 오른손(x축 반전). HOT3D 툴킷 / projectaria_tools 설치도 필요 없었다 (투영은 EXP-08 코드).
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, one-pager 이름 변경, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다.
 
 ## 디스크
