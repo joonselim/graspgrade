@@ -237,8 +237,15 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | P4 | 숫자 1 A (Muse 단독) 프롬프트 확인 3개 → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $2.51 + $11.86 |
 | P5 | 숫자 1 C (B 경계마다) held-out | `muse_contact.py c --segments <held-out B> --send` | 경계당 약 $0.013 (약 $5~10) |
 | P6 | 숫자 2 SAM 전체 (파일럿 3윈도우는 이미 보냄) | `sam_hot3d.py --role score_train/held_out --send` | $8.72 + $17.76 |
-| P7 | 숫자 2 Muse 체크리스트 + 기준선 전체 (파일럿 5클립씩은 이미 보냄) | `muse_hot3d.py --task checklist/baseline --role score_train/held_out --send` | dry-run $22.49 + $21.68, P1 실측 단가로 약 $35 |
-| P8 | 숫자 2 최종 | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
+| P7a | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개만 (파일럿 5개는 이미 보냄) → 게이트 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | 약 $7.7 |
+| P7b | 게이트 통과 시에만: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
+| P8 | 숫자 2 최종 (물체 하나씩 빼기 보고 포함) | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
+
+P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400개에서 Muse 물체 항목 6개 등급으로 로지스틱 회귀, v2 라벨. (1) 사람 하나씩 빼기 6명 평균 AUC, (2) 물체 하나씩 빼기 AUC (시퀀스 부트스트랩 95% 구간). 둘 다 0.65 이상이면 P7b, 하나라도 0.60 미만이면 P7b를 보내지 않고 사용자와 정한다, 그 사이도 사용자와 정한다. 같이 보고하되 게이트에는 안 쓰는 것: 같은 400개의 대리값 AUC, Muse 단독 사람별 AUC, 항목별 Muse-대리값 일치율. SAM 결과 없이 판단할 수 있어 P6과 순서가 무관하다.
+
+물체 하나씩 빼기 보고 (측정 계획 비교 4, 계산 전 기록): held-out 물체마다 라벨로 배우는 부분(점수 가중치, 손 모양 적합도 모델과 그 구간 기준)을 그 물체 없이 다시 학습해 그 물체의 held-out 클립을 채점한다. 전부 모아 AUC (시퀀스 부트스트랩), 사람별 AUC. 같은 클립에서 Muse 단독, 같은 방식으로 다시 맞춘 Muse + 우리 항목, 물체 기준선 (처음 보는 물체라 0.5)과 비교한다. 결과 방향과 상관없이 주 결과 옆에 낸다. 이유: held-out 사람도 같은 물체를 잡아서 (EXP-20) 물체 기준선이 주 비교에서 우리 점수를 이길 수 있다.
+
+남은 무료 작업: `number2_score.py`에 게이트 계산과 물체 하나씩 빼기 보고를 넣고, 대리값으로 코드 점검 (튜닝만).
 
 합계 약 $102 남음 (지금까지 $1.73 사용). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
 
@@ -252,7 +259,7 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 
 유료 (크레딧이 들어온 뒤, 단계마다 비용을 먼저 알린다):
 7. 숫자 1: SAM 튜닝 나머지 47개 ($11.89) → B 임계값과 시작 보정을 튜닝에서 고정 → A, C 프롬프트를 튜닝 몇 개로 확정 → held-out 22개 SAM ($5.45) + A + C.
-8. 숫자 2: SAM (겹치는 클립 합쳐 약 $27) → Muse 체크리스트 + 기준선 (약 $44) → 튜닝 400개로 가중치 학습 → held-out 1,426개 AUC.
+8. 숫자 2: SAM (겹치는 클립 합쳐 약 $27) → Muse 튜닝 400개 (약 $7.7) → 게이트 → 통과하면 Muse held-out (약 $27.6) → 튜닝 400개로 가중치 학습 → held-out 1,426개 AUC + 물체 하나씩 빼기 보고.
 
 완료된 준비: copyable 라벨 (EXP-10), 숫자 2 클립과 held-out 라벨 (EXP-11), HOT3D 영상 136개 다운로드.
 

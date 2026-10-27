@@ -302,6 +302,7 @@ tuning clips compares its grades with these stand-ins.
 | 1 | Our score vs Muse Spark alone, asked the same question with no checklist | The main comparison from the proposal |
 | 2 | Object-only reference: the copyable share of each object on the tuning clips, given to each held-out clip | Shows how much object identity alone predicts (26% to 94% by object). It uses object names from the dataset, so it is a reference, not a video method. |
 | 3 | Muse Spark alone vs Muse Spark plus our seven checks in one logistic regression | The plug-in framing: GraspGrade adds to an existing filter instead of replacing it |
+| 4 | Unseen objects: comparisons 1 and 2 again, with every learned part of our score refit without the object being scored (see "Leave one object out on held-out" below) | Held-out persons grasp the same objects as the tuning persons (EXP-20), so the object-only reference may beat our score on held-out. Our score can also rate an object it has never seen. The object-only reference cannot (0.5 by construction). |
 
 ### Metrics
 
@@ -312,6 +313,50 @@ tuning clips compares its grades with these stand-ins.
 - Share of copyable clips in our top 20% against the base rate.
 - All clips, and one-hand clips only (about a third of clips have both hands
   on the object).
+
+### Muse Spark run in two steps, with a gate (written 2026-10-28, before any P7 call)
+
+The free check of EXP-19 used stand-in grades. The P1 pilot (EXP-23) showed
+that Muse Spark grades match them in 27 of 30 cases, but on 5 clips only.
+Before paying for all held-out clips, the real Muse Spark grades must show the
+same signal on tuning clips.
+
+- P7a: the checklist call and the baseline call on the 400 score_train
+  clips only (tuning persons). About $7.7 at the EXP-23 price.
+- Gate, computed on these 400 clips only, v2 label, nothing from held-out:
+  - model: logistic regression on the six Muse Spark object item grades
+    (size, shape, thickness, width, handle, free space), as in EXP-19,
+  - test 1: leave one person out, mean AUC over the six tuning people,
+  - test 2: leave one object out, pooled AUC with a 95% interval that
+    resamples sequences.
+- Decision rule (the EXP-18 and EXP-19 bar):
+  - pass if both AUCs are 0.65 or more: send P7b,
+  - stop if either is below 0.60: P7b is not sent, and the next step is
+    decided with the user,
+  - in between: weak, decide with the user before sending P7b.
+- Reported with the gate, but not part of it: the same two tests on the
+  EXP-19 stand-in grades of the same 400 clips, the Muse Spark baseline AUC
+  per person, and how often each Muse Spark item equals its stand-in.
+- P7b: the checklist call and the baseline call on all 1,426 held-out clips.
+  About $27.6.
+
+### Leave one object out on held-out (written 2026-10-28, before computing)
+
+Reported in the final run next to the main results, whichever way it comes out.
+
+- For each object in the held-out clips, every part of our score that learns
+  from labels is fit again without that object: the score weights
+  (score_train clips), the hand shape fit model and its cut points (item_train
+  clips). Cut points that use no labels (SAM check terciles) stay as they are.
+  The refit score then rates the held-out clips of that object.
+- The scores of all held-out clips are pooled into one AUC with a 95% interval
+  that resamples the 51 held-out sequences, plus AUC per held-out person.
+- Next to it, on the same clips: Muse Spark alone (it learns nothing from
+  our labels, so it is unchanged), Muse Spark plus our checks refit the same
+  way, and the object-only reference, which has no share for an unseen object
+  and gives every clip the training base rate (AUC 0.5).
+- The main comparisons (1 to 3) stay as they are. This one shows whether our
+  score keeps its value on objects it has not seen.
 
 ### Checks before any paid call
 
@@ -364,7 +409,7 @@ Estimates at measured prices, $150 in total.
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
 | Number 1, Muse arm C (held-out boundaries, plus tuning) | about $9 |
 | Number 2, SAM: all held-out clips plus 400 tuning clips, overlapping clips in one request | about $27 |
-| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call) | about $35 |
+| Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips only if the gate passes | about $7.7 + $27.6 |
 | Total | about $104 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
