@@ -334,6 +334,19 @@
     .phase { flex: 1 1 260px; break-inside: avoid; }
     figure, .tbl, .io { break-inside: avoid; }
   }
+  /* experiment references: hover (or tap on touch screens) shows what the experiment was */
+  .xref { border-bottom: 1px dotted currentColor; }
+  .xref:hover { text-decoration: none; }
+  .xref.t { color: inherit; }
+  #xtip {
+    position: absolute; z-index: 60; max-width: min(300px, calc(100vw - 24px));
+    background: var(--ink); color: var(--sheet);
+    font-size: 12.5px; line-height: 1.45; padding: 6px 9px; border-radius: 2px;
+    pointer-events: none;
+  }
+  #xtip[hidden] { display: none; }
+  #xtip .id { opacity: 0.7; margin-right: 6px; font-variant-numeric: tabular-nums; }
+  #xtip .go { color: inherit; text-decoration: underline; margin-left: 8px; pointer-events: auto; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -443,7 +456,7 @@
         </table>
       </div>
     </div>
-    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음". EXP-10 정의는 리타게팅 부작용을 주로 재서 보류했다(EXP-15). 새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 튜닝에서 47%, +0.04로 받아들여짐(EXP-16). 같은 기준으로 검증 46.4%, 물체별 비율은 튜닝과 순위 상관 0.85(EXP-20). 깊이 한도별 곡선을 항상 같이 보고한다. 이 라벨에서 물체 기준선은 0.74, 우리 영상 항목은 물체 위에 약 0.01만 더한다(EXP-17). 그래서 "물체 성질"을 Muse Spark가 매기는 구체적인 물체 항목 여러 개로 늘린다. 물체 형상만으로 0.695, 처음 보는 물체에서 0.673(EXP-18). 상·중·하 물체 항목 6개의 대리 등급으로 0.683, 0.666(EXP-19). 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
+    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음". 처음 만든 정답 라벨(EXP-10)의 정의는 리타게팅 부작용을 주로 재서 보류했다(EXP-15). 새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 튜닝에서 47%, +0.04로 받아들여짐(EXP-16). 같은 기준으로 검증 46.4%, 물체별 비율은 튜닝과 순위 상관 0.85(EXP-20). 깊이 한도별 곡선을 항상 같이 보고한다. 이 라벨에서 물체 기준선은 0.74, 우리 영상 항목은 물체 위에 약 0.01만 더한다(EXP-17). 그래서 "물체 성질"을 Muse Spark가 매기는 구체적인 물체 항목 여러 개로 늘린다. 물체 형상만으로 0.695, 처음 보는 물체에서 0.673(EXP-18). 상·중·하 물체 항목 6개의 대리 등급으로 0.683, 0.666(EXP-19). 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
   </section>
 
   <section>
@@ -459,10 +472,10 @@
             <tr><td class="first"><a href="#exp-04">EXP-04</a></td><td class="wrap-ok">API 없이 데이터 점검</td><td>라벨은 촉각 임계값 800에서 일치. 머리 IMU로 카메라 흔들림 측정 가능.</td></tr>
             <tr><td class="first"><a href="#exp-05">EXP-05</a></td><td class="wrap-ok">입력 30fps 대 10fps</td><td>손과 잡는 물체 마스크가 같음. 10fps로 결정.</td></tr>
             <tr><td class="first"><a href="#exp-06">EXP-06</a></td><td class="wrap-ok">접촉 구간 검출 파일럿</td><td>에피소드 전체에서 손 추적 유지. 경계 F1 0.18(±5)로 마스크만으로는 부족. 이 로지스틱 회귀는 이후 부록으로 돌림.</td></tr>
-            <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 규모 가늠용이고 실제 클립 세트는 EXP-11.</td></tr>
+            <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 규모 가늠용이고 실제 클립 세트는 평가 2 클립 실험(EXP-11)에서 다시 자름.</td></tr>
             <tr><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
-            <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. EXP-15에서 이 라벨이 리타게팅 부작용을 주로 잰다고 확인돼 v2로 교체.</td></tr>
+            <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. 라벨 방식 점검(EXP-15)에서 이 라벨이 리타게팅 부작용을 주로 잰다고 확인돼 v2로 교체.</td></tr>
             <tr><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
             <tr><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">무료 채점 항목의 신호와 물체 기준선</td><td>무료 항목 3개는 측정은 정확하지만 "따라할 수 있음" 예측력 없음(AUC 0.49~0.53). 물체만으로 0.70. v2 라벨에서는 물체 0.74, 무료 항목 0.53(EXP-17).</td></tr>
             <tr><td class="first"><a href="#exp-13">EXP-13</a></td><td class="wrap-ok">손 모양으로 바꾼 리타게팅 항목</td><td>영상 손 모양 0.63, 물체와 합치면 0.72(물체만 0.69). 리타게팅 항목을 "손 모양 적합도"로 교체. v2 라벨에서는 0.52로 신호 사라짐(EXP-17).</td></tr>
@@ -682,7 +695,7 @@ video:  clip.mp4 (150 frames)</pre>
       <dl class="spec">
         <dt>질문</dt><dd>SAM 3.1은 호출마다 짧은 텍스트 하나만 받는다. 에피소드마다 물체 이름을 넣지 않고, 단어 하나로 모든 물체를 잡을 수 있는가.</dd>
         <dt>입력</dt><dd>EXP-01과 같은 클립. 어두운 매트 위 작은 용기 2개, 오른손이 하나를 집는다. 촉각 접촉은 클립 프레임 51.</dd>
-        <dt>방법</dt><dd>일반 단어 4개(<code>object</code>, <code>held object</code>, <code>item</code>, <code>small object</code>)와 비교용 실제 이름 <code>round container</code>를 각각 따로 호출. 손은 EXP-01의 <code>hand</code> 결과를 씀.</dd>
+        <dt>방법</dt><dd>일반 단어 4개(<code>object</code>, <code>held object</code>, <code>item</code>, <code>small object</code>)와 비교용 실제 이름 <code>round container</code>를 각각 따로 호출. 손은 API 연결 확인(EXP-01)의 <code>hand</code> 결과를 씀.</dd>
       </dl>
 
       <div class="io two">
@@ -755,7 +768,7 @@ video:  clip.mp4 (150 frames)</pre>
       <dl class="spec">
         <dt>질문</dt><dd>EXP-02는 작은 용기였다. 스프레이병은 크고, 장갑과 비슷한 색의 밝은 책상 위에 있으며, 전체 프레임의 약 20%를 차지한다. 여기서도 <code>small object</code>가 통하는가.</dd>
         <dt>입력</dt><dd>OpenGraph 에피소드 53, 프레임 136~285 (5초, 720p). 오른손이 책상 위 스프레이병으로 손을 뻗는다. 촉각 접촉은 클립 프레임 50. 이 에피소드는 머리가 움직인다.</dd>
-        <dt>방법</dt><dd><code>hand</code>, <code>small object</code>, <code>handheld object</code>, <code>bottle</code>, 비교용 <code>spray bottle</code>을 각각 호출. 숫자는 EXP-02와 같은 방법으로 계산.</dd>
+        <dt>방법</dt><dd><code>hand</code>, <code>small object</code>, <code>handheld object</code>, <code>bottle</code>, 비교용 <code>spray bottle</code>을 각각 호출. 숫자는 작은 용기 실험(EXP-02)과 같은 방법으로 계산.</dd>
       </dl>
 
       <div class="two">
@@ -788,7 +801,7 @@ video:  clip.mp4 (150 frames)</pre>
       <ul class="plain concl">
         <li><code>small object</code>가 큰 병도 모든 프레임에서 찾고, 마스크는 실제 이름 <code>spray bottle</code>과 같음. 배경 물체 하나를 66프레임 더 잡는 차이뿐. OpenGraph 전체의 물체 프롬프트로 채택.</li>
         <li>MediaPipe가 14%를 내는 유형의 장면인데 <code>hand</code>는 150프레임 모두 양손을 잡음. 어떤 프롬프트도 장갑을 물체로 잡지 않음.</li>
-        <li>오른손과 물체가 3px 안에 붙어 보이는 비율은 접촉 전 76~80%, 접촉 후 100%. EXP-02보다는 벌어지지만 이것만으로는 자를 수 없음.</li>
+        <li>오른손과 물체가 3px 안에 붙어 보이는 비율은 접촉 전 76~80%, 접촉 후 100%. 작은 용기 실험(EXP-02)보다는 벌어지지만 이것만으로는 자를 수 없음.</li>
       </ul>
     </article>
 
@@ -853,7 +866,7 @@ video:  clip.mp4 (150 frames)</pre>
       <div class="exp-h"><span class="id">EXP-05</span><span class="t">입력 30fps 대 10fps</span><span class="d">10/27</span></div>
       <dl class="spec">
         <dt>질문</dt><dd>세 프레임 중 하나만 보내도 손과 물체 추적이 그대로인가.</dd>
-        <dt>입력</dt><dd>EXP-02(에피소드 1)와 EXP-03(에피소드 53)의 같은 두 클립. 클립 프레임 0, 3, 6, …, 147만 남긴 50프레임.</dd>
+        <dt>입력</dt><dd>앞의 물체 프롬프트 실험에서 쓴 두 클립(작은 용기 에피소드 1은 EXP-02, 스프레이병 에피소드 53은 EXP-03). 클립 프레임 0, 3, 6, …, 147만 남긴 50프레임.</dd>
         <dt>방법</dt><dd><code>hand</code>와 <code>small object</code>를 10fps 클립으로 다시 호출하고, 같은 시점의 30fps 결과와 마스크를 비교.</dd>
       </dl>
 
@@ -935,7 +948,7 @@ video:  에피소드 하나 전체, 10fps
         </div>
         <div>
           <div class="k">2. 받은 원문</div>
-          <p>형식은 EXP-01과 같다. 프레임마다 <code>&lt;Nf&gt;</code>로 시작하는 한 줄. 에피소드 하나에 원문이 약 100 MB(압축 기준).</p>
+          <p>형식은 API 연결 확인(EXP-01)과 같다. 프레임마다 <code>&lt;Nf&gt;</code>로 시작하는 한 줄. 에피소드 하나에 원문이 약 100 MB(압축 기준).</p>
           <p>Meta 공식 파서는 마스크 하나에 약 0.4초라 전체를 읽는 데 18시간쯤 걸린다. 같은 디코더를 다시 구현해 약 3ms로 줄였고, 마스크 345개가 공식 결과와 비트 단위로 같았다.</p>
         </div>
       </div>
@@ -1042,7 +1055,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-07 -->
     <article class="exp" id="exp-07">
       <div class="exp-h"><span class="id">EXP-07</span><span class="t">HOT3D 잡기 클립 수</span><span class="d">10/27</span></div>
-      <p class="note">이 집계는 클립 규모를 가늠하는 용도로만 쓴다. 평가 2에 실제로 쓰는 클립은 손–물체 거리로 다시 자른 EXP-11 세트다(가중치 학습 튜닝 400개, AUC 검증 1,426개).</p>
+      <p class="note">이 집계는 클립 규모를 가늠하는 용도로만 쓴다. 평가 2에 실제로 쓰는 클립은 손–물체 거리로 다시 자른 평가 2 클립 세트(EXP-11)다(가중치 학습 튜닝 400개, AUC 검증 1,426개).</p>
       <dl class="spec">
         <dt>질문</dt><dd>평가 2는 HOT3D의 잡기 장면을 클립으로 잘라 SAM 3.1과 Muse Spark에 넣는다. 시퀀스 전체를 넣지 않고 잡기 주변만 넣으려면, 클립이 몇 개이고 얼마나 긴가.</dd>
         <dt>입력</dt><dd>정답이 있는 HOT3D Aria 136개 시퀀스(튜닝 85, 검증 51, RGB 480,375 프레임)의 모션캡처. 영상은 쓰지 않음.</dd>
@@ -1111,7 +1124,7 @@ video:  에피소드 하나 전체, 10fps
         <li>HOT3D에서 쓸 만한 잡기 클립은 약 2,150개, 길이 중앙값 4.6초.</li>
         <li>움직인 물체의 93%에 손목이 25cm 안으로 들어옴. 물체 움직임만으로도 잡기를 잘 찾아냄.</li>
         <li>튜닝 클립을 전부 쓸 필요는 없음. 점수는 입력 7개짜리 로지스틱 회귀라 튜닝 클립 수백 개면 충분하고, AUC와 신뢰구간은 검증 클립에서 나옴.</li>
-        <li>이때의 결정(검증 713개 + 튜닝 400개)은 EXP-11 클립 세트로 대체됨.</li>
+        <li>이때의 결정(검증 713개 + 튜닝 400개)은 평가 2 클립 세트(EXP-11)로 대체됨.</li>
       </ul>
     </article>
 
@@ -1214,7 +1227,7 @@ video:  에피소드 하나 전체, 10fps
           <ul class="plain" style="font-size:13.5px;margin:0">
             <li>확인 1: 지점 21개를 원본 영상에 투영(EXP-08의 렌즈 모델)해 데이터셋 손 박스 안에 들어오는 비율. 시퀀스마다 120프레임</li>
             <li>확인 2: 뼈대를 영상 위에 그려서 눈으로 확인</li>
-            <li>확인 3: EXP-07의 잡기 구간마다, 움직임 한가운데와 시작 1.5초 전에 가장 가까운 손가락 끝과 물체 표면(3D 모델에서 2만 점)의 거리</li>
+            <li>확인 3: 잡기 클립 집계(EXP-07)의 잡기 구간마다, 움직임 한가운데와 시작 1.5초 전에 가장 가까운 손가락 끝과 물체 표면(3D 모델에서 2만 점)의 거리</li>
           </ul>
         </div>
       </div>
@@ -1374,7 +1387,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-11 -->
     <article class="exp" id="exp-11">
       <div class="exp-h"><span class="id">EXP-11</span><span class="t">평가 2 클립과 검증 세트 라벨</span><span class="d">10/27</span></div>
-      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 "따라할 수 있음" 비율은 이전 라벨 기준이다. 클립 자체는 그대로 쓴다. 검증 클립의 v2 라벨은 46.4%(<a href="#exp-20">EXP-20</a>).</p>
+      <p class="note">이전 라벨: 이 실험은 처음 만든 정답 라벨(EXP-10)을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 "따라할 수 있음" 비율은 이전 라벨 기준이다. 클립 자체는 그대로 쓴다. 검증 클립의 v2 라벨은 46.4%(<a href="#exp-20">EXP-20</a>).</p>
       <dl class="spec">
         <dt>질문</dt><dd>튜닝 세트에서 고정한 기준(EXP-10)으로 검증 세트에서도 "따라할 수 있음" 비율이 비슷하게 나오는가. 그리고 계획대로 우리 영상 파이프라인이 아니라 모션캡처 손–물체 거리로 평가 2 클립을 자르면 어떤 클립과 라벨이 나오는가.</dd>
         <dt>입력</dt><dd>정답이 있는 HOT3D 136개 시퀀스 전체, 30fps RGB 프레임 전부.</dd>
@@ -1452,7 +1465,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-12 -->
     <article class="exp" id="exp-12">
       <div class="exp-h"><span class="id">EXP-12</span><span class="t">무료 채점 항목의 신호와 물체 기준선</span><span class="d">10/27</span></div>
-      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 물체 기준선과 항목별 AUC는 이전 라벨 기준이다. v2 라벨로 다시 잰 값은 <a href="#exp-17">EXP-17</a>(물체 0.74, 무료 항목 0.53).</p>
+      <p class="note">이전 라벨: 이 실험은 처음 만든 정답 라벨(EXP-10)을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 물체 기준선과 항목별 AUC는 이전 라벨 기준이다. v2 라벨로 다시 잰 값은 <a href="#exp-17">EXP-17</a>(물체 0.74, 무료 항목 0.53).</p>
       <dl class="spec">
         <dt>질문</dt><dd>평가 2의 주 비교는 우리 점수 대 체크리스트 없이 같은 질문을 받은 Muse Spark다. "따라할 수 있음" 비율이 물체마다 26~94%로 달라서, 물체만 알아봐도 꽤 맞힐 수 있다. 크레딧을 쓰기 전에, 유료 호출 없이 계산되는 채점 항목 3개에 신호가 있는지, 물체만으로는 얼마나 맞히는지 본다.</dd>
         <dt>입력</dt><dd>EXP-11의 튜닝 클립 2,385개(53.3%가 "따라할 수 있음"). 검증 클립은 보지 않음.</dd>
@@ -1534,7 +1547,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-13 -->
     <article class="exp" id="exp-13">
       <div class="exp-h"><span class="id">EXP-13</span><span class="t">손 모양으로 바꾼 리타게팅 항목</span><span class="d">10/27</span></div>
-      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 AUC는 이전 라벨 기준이다. v2 라벨에서 영상 손 모양은 0.52로 신호를 잃었다(<a href="#exp-17">EXP-17</a>). 이전 라벨의 0.63은 리타게팅 부작용을 배운 것이었다.</p>
+      <p class="note">이전 라벨: 이 실험은 처음 만든 정답 라벨(EXP-10)을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 AUC는 이전 라벨 기준이다. v2 라벨에서 영상 손 모양은 0.52로 신호를 잃었다(<a href="#exp-17">EXP-17</a>). 이전 라벨의 0.63은 리타게팅 부작용을 배운 것이었다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>EXP-12의 무료 항목은 영상은 잘 재지만 "따라할 수 있음"을 가르지 못했다. 지원서는 리타게팅 항목을 "손 모양이 로봇 손에 맞는가"라고 적었다. 영상에서 얻은 손 모양이 "따라할 수 있음"을 예측하는가, 물체 기준선 위에 무언가를 더하는가.</dd>
         <dt>입력</dt><dd>튜닝 클립 2,385개 중 접촉 동안 MediaPipe가 그 손을 한 번도 찾지 못한 54개를 뺀 2,331개(53.4%가 "따라할 수 있음"). 검증 클립은 쓰지 않음.</dd>
@@ -1603,7 +1616,7 @@ video:  에피소드 하나 전체, 10fps
       </figure>
 
       <ul class="plain concl">
-        <li>영상 손 모양은 "따라할 수 있음"을 예측함(0.63). EXP-12 항목들과 다름. 완벽한 모션캡처 손 모양(0.67)이 얻는 것의 대부분을 영상으로 얻음.</li>
+        <li>영상 손 모양은 "따라할 수 있음"을 예측함(0.63). 무료 채점 항목(EXP-12)과 다름. 완벽한 모션캡처 손 모양(0.67)이 얻는 것의 대부분을 영상으로 얻음.</li>
         <li>주로 물체 크기를 대신 재는 신호임. 손을 크게 벌리면 큰 물체이고, 큰 물체(캔, 우유팩)는 덜 따라할 수 있음. 같은 물체 안에서는 가르지 못함(0.48).</li>
         <li>물체 기준선(0.69)보다는 낮지만, 둘을 합치면 0.72로 물체 위에 약 0.03을 더함.</li>
         <li>평가 2에서는 무료 항목보다 낫지만, Muse Spark가 물체를 잘 알아보면 주 비교에서는 여전히 질 수 있음. 이득이 보일 곳은 보완재 비교(Muse Spark 단독 대 Muse Spark + 우리 항목).</li>
@@ -1662,7 +1675,7 @@ video:  에피소드 하나 전체, 10fps
           </table>
         </div>
       </div>
-      <p class="note">에피소드별(장갑 원신호): 0번 IoU 0.72·F1 ±15 0.05, 30번 0.60·0.23, 53번 0.94·0.27. 매번 gap_px 2가 골라졌다. 장갑 원신호 대비 시작은 4프레임 빠르고 끝은 6프레임 늦다(중앙값). 참고로 EXP-06의 부록 모델은 같은 에피소드에서 F1 0.16 / 0.30, IoU 0.64였지만, 그 기준값은 채점한 예측에서 골라서 낙관적인 값이다.</p>
+      <p class="note">에피소드별(장갑 원신호): 0번 IoU 0.72·F1 ±15 0.05, 30번 0.60·0.23, 53번 0.94·0.27. 매번 gap_px 2가 골라졌다. 장갑 원신호 대비 시작은 4프레임 빠르고 끝은 6프레임 늦다(중앙값). 참고로 접촉 구간 파일럿(EXP-06)의 부록 모델은 같은 에피소드에서 F1 0.16 / 0.30, IoU 0.64였지만, 그 기준값은 채점한 예측에서 골라서 낙관적인 값이다.</p>
 
       <figure>
         <img src="assets/exp14_sam_rule_pilot.png" loading="lazy" width="1440" height="684" alt="세 에피소드에서 손별로 장갑 접촉과 방법 B 예측을 시간축에 그린 그림">
@@ -1672,7 +1685,7 @@ video:  에피소드 하나 전체, 10fps
 
       <ul class="plain concl">
         <li>방법 B와 참고 행 두 개가 장갑과 라벨 정답에 대해 끝까지 돎. 기준값은 다른 에피소드에서 고름. 튜닝 50개에 돌릴 코드는 준비됨.</li>
-        <li>방법 B는 IoU에서 "항상 접촉"을 이기지만(0.75 대 0.67) 경계는 190~248개 중 52개만 찾음. 1인칭 시점에서는 손이 늘 어떤 물체 몇 픽셀 안에 있어서 접촉 사이에 근접 구간이 거의 끊기지 않음. EXP-02, 03에서 이미 보였던 문제.</li>
+        <li>방법 B는 IoU에서 "항상 접촉"을 이기지만(0.75 대 0.67) 경계는 190~248개 중 52개만 찾음. 1인칭 시점에서는 손이 늘 어떤 물체 몇 픽셀 안에 있어서 접촉 사이에 근접 구간이 거의 끊기지 않음. 물체 프롬프트 실험(EXP-02, EXP-03)에서 이미 보였던 문제.</li>
         <li>방법 C도 같은 한계를 가짐. C는 B가 찾은 경계만 옮기므로 B가 묶어 버린 접촉을 되살리지 못함.</li>
         <li>결정: 주 정답을 장갑 정리본으로 확정(깜빡임 정리 규칙은 결과를 보지 않고 고정). 남은 것: 가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 접촉을 끊는 규칙 추가, 튜닝 50개에서만 고름.</li>
         <li>에피소드 3개로는 규칙을 고를 수 없음. 다음 단계는 튜닝 나머지 47개 SAM 실행이 필요함(유료 호출 보류 중).</li>
@@ -1744,11 +1757,11 @@ video:  에피소드 하나 전체, 10fps
 
       <ul class="plain concl">
         <li>미리 정한 규칙으로는 통과하는 방식이 없음.</li>
-        <li>지적이 맞았음. EXP-10 라벨은 주로 리타게팅의 부작용을 잼. Allegro 손가락 끝이 사람이 둔 곳에서 31mm, 단단히 쥔 캔 표면에서 25mm 떨어지고, 라벨이 손 크기에 따라 달라짐(+0.19). EXP-10에서 쏠림 점검을 통과한 53%는 이 왜곡에서 나온 값.</li>
+        <li>지적이 맞았음. 처음 만든 정답 라벨(EXP-10)은 주로 리타게팅의 부작용을 잼. Allegro 손가락 끝이 사람이 둔 곳에서 31mm, 단단히 쥔 캔 표면에서 25mm 떨어지고, 라벨이 손 크기에 따라 달라짐(+0.19). 그 실험(EXP-10)에서 쏠림 점검을 통과한 53%는 이 왜곡에서 나온 값.</li>
         <li>손가락 끝을 충실하게 옮기면(크기 1.0, 위치 맞춤) 사람 잡기의 94~96%가 "따라할 수 있음". 실패는 키보드, 접시 같은 납작하거나 얇은 물체로, 큰 네 손가락 손에 그럴듯함.</li>
         <li>지금 규칙은 리타게팅이 정직해지면 잡기를 가르지 못함. 계획의 위험 1(라벨 쏠림)이 제대로 된 이유로 나타난 것.</li>
         <li>규칙의 약한 부분: "Allegro 손 어느 부분도 물체 안 깊이 들어가지 않음"을 손가락과 손바닥 모양이 아니라 링크 원점 약 20개에서만 검사함. 큰 손이 손가락 끝을 사람 자리에 두면 손가락 몸통이나 손바닥이 물체를 파고드는 경우가 많은데 이 검사가 놓침.</li>
-        <li>라벨이 고쳐질 때까지 그 위에 쌓은 결과는 보류: EXP-11의 검증 세트 비율, EXP-12의 물체 기준선, EXP-13의 손 모양 항목. EXP-11 클립 자체는 유효.</li>
+        <li>라벨이 고쳐질 때까지 그 위에 쌓은 결과는 보류: 검증 세트 비율(EXP-11), 물체 기준선(EXP-12), 손 모양 항목(EXP-13). 평가 2 클립(EXP-11) 자체는 유효.</li>
         <li>다음 정의 후보(계산 전에 측정 계획에 고정): 위치 맞춤 리타게팅, 실제 Allegro 링크 메쉬로 충돌 검사(손가락이나 손바닥 표면이 deep보다 깊이 들어가면 불가), 물체에 닿은 사람 손가락마다 대응하는 Allegro 손가락 끝이 사람 접촉점 근처에 닿는지 확인. 그다음 같은 기준(손 크기 상관 0 근처, 비율 20~80%)으로 튜닝에서만 고름.</li>
       </ul>
     </article>
@@ -1757,7 +1770,7 @@ video:  에피소드 하나 전체, 10fps
     <article class="exp" id="exp-16">
       <div class="exp-h"><span class="id">EXP-16</span><span class="t">정답 라벨 v2: 메쉬 충돌과 접촉점 도달</span><span class="d">10/27</span></div>
       <dl class="spec">
-        <dt>질문</dt><dd>EXP-15에서 EXP-10 라벨은 리타게팅 부작용을 주로 쟀고, 충실하게 옮기면 거의 모든 잡기가 "따라할 수 있음"이 됐다. 충돌을 링크 원점에서만 검사했기 때문이다. 더 엄격하고 물리적인 정의로 쓸 수 있는 라벨이 나오는가.</dd>
+        <dt>질문</dt><dd>라벨 방식 점검(EXP-15)에서 처음 만든 정답 라벨(EXP-10)은 리타게팅 부작용을 주로 쟀고, 충실하게 옮기면 거의 모든 잡기가 "따라할 수 있음"이 됐다. 충돌을 링크 원점에서만 검사했기 때문이다. 더 엄격하고 물리적인 정의로 쓸 수 있는 라벨이 나오는가.</dd>
         <dt>입력</dt><dd>튜닝 클립 2,385개(EXP-11), 클립마다 접촉 프레임 한 장과 그 클립의 손. 검증 클립은 쓰지 않음.</dd>
         <dt>방법</dt><dd>정의, 기준값, 받아들이는 규칙을 계산 전에 측정 계획에 적음. 위치 맞춤 리타게팅으로 Allegro 손가락 끝과 뿌리를 사람 손에 맞추고(손 받침은 자유), 링크 21개마다 시각 메쉬에서 약 300점을 뽑아 순운동학으로 놓음. 손을 최대 2cm(1cm 격자) 옮겨 보며 세 조건을 모두 만족하는 위치가 하나라도 있으면 "따라할 수 있음".</dd>
       </dl>
@@ -1774,7 +1787,7 @@ video:  에피소드 하나 전체, 10fps
         <div>
           <div class="k">기준값의 근거와 받아들이는 규칙</div>
           <ul class="plain" style="font-size:13.5px;margin:0">
-            <li>1.5cm: EXP-09부터 쓴 사람 접촉 거리</li>
+            <li>1.5cm: 손가락 끝 3D 위치 실험(EXP-09)부터 쓴 사람 접촉 거리</li>
             <li>2.0cm: Allegro 손가락 끝 폭 정도</li>
             <li>5mm: 모션캡처와 모델 오차 크기(EXP-09에서 손가락 끝이 표면에서 약 2mm)</li>
             <li>받아들임: 비율 20~80%, 같은 물체 안 손 길이와 라벨의 순위 상관 |r| ≤ 0.1. 실패해도 기준값은 옮기지 않음</li>
@@ -1869,7 +1882,7 @@ video:  에피소드 하나 전체, 10fps
       </figure>
 
       <ul class="plain concl">
-        <li>v2 라벨은 계산 전에 정한 규칙을 통과함. 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(물체 안 +0.04, 사람별 44~54%, EXP-10 라벨은 29~74%).</li>
+        <li>v2 라벨은 계산 전에 정한 규칙을 통과함. 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(물체 안 +0.04, 사람별 44~54%, 처음 라벨(EXP-10)은 29~74%).</li>
         <li>실패가 물리적으로 말이 됨. 더 큰 Allegro 손가락이 납작하거나 붐비는 물체(키보드, 뒤집개)에 부딪히고, 넓은 물체(그릇, 접시)는 사람처럼 감싸지 못함. 원통이 더는 "따라할 수 없음"으로 몰리지 않음. 아령 10%, 보온병 14%처럼 덜 분명한 것은 따로 볼 필요가 있음.</li>
         <li>한계: 비율이 깊이 한도에 크게 좌우됨(2mm 18%, 10mm 66%). 5mm는 모션캡처와 모델 오차 크기라, 라벨은 부분적으로 "측정 오차 안에서 Allegro 손이 물체와 얼마나 겹치는가"임. 기준값은 계산 전에 고정했고 곡선을 함께 보고함.</li>
         <li>한계: 도달 1cm면 거의 남지 않음. 맞춘 Allegro 손가락 끝이 사람 것에서 약 11mm 떨어져 있기 때문. 클립마다 한 프레임만 보고, 자유 받침이 손을 사람 손목에서 26mm 옮김. 안쪽·바깥쪽 부호는 가장 가까운 표면 점으로 정함.</li>
@@ -1881,7 +1894,7 @@ video:  에피소드 하나 전체, 10fps
     <article class="exp" id="exp-17">
       <div class="exp-h"><span class="id">EXP-17</span><span class="t">v2 라벨을 무엇이 예측하는가 (EXP-12, 13 다시)</span><span class="d">10/27</span></div>
       <dl class="spec">
-        <dt>질문</dt><dd>EXP-12와 EXP-13은 리타게팅 부작용을 주로 재던 EXP-10 라벨로 채점했다. v2 라벨(EXP-16)에서는 무료 항목, 영상 손 모양, 물체 종류가 "따라할 수 있음"을 얼마나 예측하는가.</dd>
+        <dt>질문</dt><dd>무료 채점 항목(EXP-12)과 손 모양 항목(EXP-13)은 리타게팅 부작용을 주로 재던 처음 라벨(EXP-10)로 채점했다. v2 라벨(EXP-16)에서는 무료 항목, 영상 손 모양, 물체 종류가 "따라할 수 있음"을 얼마나 예측하는가.</dd>
         <dt>입력</dt><dd>튜닝 클립 중 접촉 동안 MediaPipe 손이 있는 2,331개(EXP-13과 같이 54개 제외). v2 비율 47%. 검증 클립은 쓰지 않음.</dd>
         <dt>방법</dt><dd>EXP-12, 13과 같은 특징과 모델. 튜닝 6명 중 한 명씩 빼고 학습해 뺀 사람을 채점하고, 사람별 AUC의 6명 평균을 씀. 그림이 깊이 한도에 따라 달라지는지 보려고 v2 라벨을 깊이 2mm, 10mm로도 채점함.</dd>
       </dl>
@@ -2022,7 +2035,7 @@ video:  에피소드 하나 전체, 10fps
     <article class="exp" id="exp-19">
       <div class="exp-h"><span class="id">EXP-19</span><span class="t">체크리스트용 물체 항목 6개, 대리 등급으로 점검</span><span class="d">10/27</span></div>
       <dl class="spec">
-        <dt>질문</dt><dd>선택지 A는 "물체 성질"을 Muse Spark가 상·중·하로 매기는 구체적인 항목들로 바꾼다. EXP-18에서 정확한 물체 크기는 신호를 담았다. 기준을 고정한 거친 3단계 항목 6개도 그 신호를 지키는가. 여기서는 Muse Spark가 답할 것을 대신해 정답(3D 모델, 모션캡처, 물체를 직접 본 판단)에서 등급을 냄.</dd>
+        <dt>질문</dt><dd>선택지 A는 "물체 성질"을 Muse Spark가 상·중·하로 매기는 구체적인 항목들로 바꾼다. 물체 형상 점검(EXP-18)에서 정확한 물체 크기는 신호를 담았다. 기준을 고정한 거친 3단계 항목 6개도 그 신호를 지키는가. 여기서는 Muse Spark가 답할 것을 대신해 정답(3D 모델, 모션캡처, 물체를 직접 본 판단)에서 등급을 냄.</dd>
         <dt>입력</dt><dd>v2 라벨이 붙은 튜닝 클립 2,385개(47.0%). 검증 클립은 쓰지 않음.</dd>
         <dt>방법</dt><dd>항목, 기준, 통과 규칙은 계산 전에 측정 계획에 적음. 상은 항상 "큰 네 손가락 로봇 손에 쉬움"이고, 방향은 데이터가 아니라 항목의 뜻으로 정함. 등급 6개로 로지스틱 회귀. 사람 하나씩 빼기(6명 평균 AUC)와 물체 하나씩 빼기(합친 AUC), 둘 다 0.65 이상이면 통과.</dd>
       </dl>
@@ -2198,9 +2211,9 @@ video:  에피소드 하나 전체, 10fps
     <article class="exp" id="exp-22">
       <div class="exp-h"><span class="id">EXP-22</span><span class="t">가장 가까운 물체가 바뀌면 접촉을 끊는 방법 B</span><span class="d">10/27</span></div>
       <dl class="spec">
-        <dt>질문</dt><dd>EXP-14에서 방법 B는 연이은 접촉을 하나로 묶어 경계 190개 중 52개만 찾았다. EXP-21에서는 그 때문에 C의 최고 점수도 0.15에 묶였다. 가장 가까운 물체가 바뀔 때 접촉을 끊거나, 짧은 틈을 잇지 않고 남기면 B가 접촉을 더 찾는가.</dd>
+        <dt>질문</dt><dd>EXP-14에서 방법 B는 연이은 접촉을 하나로 묶어 경계 190개 중 52개만 찾았다. 최고 점수 실험(EXP-21)에서는 그 때문에 C의 최고 점수도 0.15에 묶였다. 가장 가까운 물체가 바뀔 때 접촉을 끊거나, 짧은 틈을 잇지 않고 남기면 B가 접촉을 더 찾는가.</dd>
         <dt>입력</dt><dd>튜닝 파일럿 에피소드 0, 30, 53. 주 정답은 정리한 촉각 장갑.</dd>
-        <dt>방법</dt><dd>EXP-14와 같은 특징과 에피소드 하나씩 빼기 탐색에 선택지 두 개를 더함. 격자에 EXP-14 규칙도 들어 있어 탐색이 그것을 고를 수도 있음. 그 뒤 새 B 위에서 C의 최고 점수(완벽한 경계 선택)를 다시 잼.</dd>
+        <dt>방법</dt><dd>EXP-14와 같은 특징과 에피소드 하나씩 빼기 탐색에 선택지 두 개를 더함. 격자에 첫 B 규칙(EXP-14)도 들어 있어 탐색이 그것을 고를 수도 있음. 그 뒤 새 B 위에서 C의 최고 점수(완벽한 경계 선택)를 다시 잼.</dd>
       </dl>
 
       <div class="io two">
@@ -2260,7 +2273,7 @@ video:  에피소드 하나 전체, 10fps
     <article class="exp" id="exp-23">
       <div class="exp-h"><span class="id">EXP-23</span><span class="t">평가 2 유료 파일럿: HOT3D에서 SAM과 Muse Spark</span><span class="d">10/28</span></div>
       <dl class="spec">
-        <dt>질문</dt><dd>평가 2 전체 실행 전에 호출이 HOT3D에서 제대로 되고 답이 말이 되는지 본다. SAM 3.1이 붐비는 HOT3D 탁자에서 잡은 물체를 찾고, 우리 코드가 그것을 손에 가장 가까운 물체로 고르는가. Muse Spark의 물체 등급이 EXP-19의 3D 모델 대리 등급과 맞는가.</dd>
+        <dt>질문</dt><dd>평가 2 전체 실행 전에 호출이 HOT3D에서 제대로 되고 답이 말이 되는지 본다. SAM 3.1이 붐비는 HOT3D 탁자에서 잡은 물체를 찾고, 우리 코드가 그것을 손에 가장 가까운 물체로 고르는가. Muse Spark의 물체 등급이 3D 모델 대리 등급(EXP-19)과 맞는가.</dd>
         <dt>입력</dt><dd>점수 학습용 튜닝 클립에서만 뽑음(seed 20261026). SAM은 구간 3개(10fps 500프레임, 안에 클립 5개), Muse Spark는 클립 5개. 검증 클립은 보내지도 채점하지도 않음.</dd>
         <dt>방법</dt><dd>SAM 프롬프트는 <code>hand</code>와 <code>small object</code>. 모션캡처 접촉 프레임마다 데이터셋의 잡은 물체 2D 박스와 (가) SAM 물체 박스 전체, (나) 우리 코드가 손에 가장 가깝다고 고른 SAM 물체를 비교(박스 IoU 0.5 이상이면 일치). Muse Spark에는 체크리스트 질문과 단독 질문을 각각 보냄(클립당 720px 프레임 6장).</dd>
       </dl>
@@ -2337,7 +2350,7 @@ Answer with JSON only.</pre>
 
       <ul class="plain concl">
         <li>SAM은 HOT3D에서 동작함. 접촉 프레임의 99%에서 잡은 물체를 찾고, "가장 가까운 물체" 규칙이 92%에서 그것을 고름. 틀린 경우는 몇 프레임 동안 화면에서 더 가까운 옆 물체.</li>
-        <li>Muse Spark 물체 등급이 대리 등급과 30개 중 27개 일치. 틀린 것은 8cm 근처의 경계값과 물체가 화면 밖에 있던 클립. EXP-19가 대리 등급으로 보인 신호를 Muse Spark 등급으로 쓸 근거가 됨.</li>
+        <li>Muse Spark 물체 등급이 대리 등급과 30개 중 27개 일치. 틀린 것은 8cm 근처의 경계값과 물체가 화면 밖에 있던 클립. 대리 등급 점검(EXP-19)에서 본 신호를 Muse Spark 등급으로 쓸 근거가 됨.</li>
         <li>가시성은 SAM 다섯 클립 모두 1.0. 값이 충분히 달라지지 않을 수 있고, 전체 실행에서 확인.</li>
         <li>계획은 바뀌지 않음. 평가 2 전체 SAM과 Muse Spark 실행을 계획대로 진행할 수 있음.</li>
         <li>한계: 점검당 클립 5개, 그중 3개가 같은 물체. 호출이 되는지 보는 점검이지 측정이 아님.</li>
@@ -2350,7 +2363,7 @@ Answer with JSON only.</pre>
       <dl class="spec">
         <dt>질문</dt><dd>EXP-22에서 B는 가장 가까운 물체가 바뀌면 새 접촉을 시작했다. 경계 F1은 두 배가 됐지만, 쥔 물체와 옆 물체 사이에서 가장 가까운 물체가 깜빡여 경계를 실제 190개에 392개나 찾았다. 새 물체가 몇 프레임 동안 계속 가장 가까울 때만 바뀐 것으로 세면 나아지는가. 튜닝 50개 전에 하는 코드 점검이고, 세 에피소드로는 어느 값이 좋은지 정할 수 없음.</dd>
         <dt>입력</dt><dd>튜닝 파일럿 에피소드 0, 30, 53. 주 정답은 정리한 촉각 장갑.</dd>
-        <dt>방법</dt><dd>B 격자에 "유지" 선택지 추가: 10fps에서 1, 3, 5프레임. 이보다 짧게 바뀐 가장 가까운 물체는 직전에 쥐던 물체로 봄(1은 EXP-22 규칙). 격자는 432가지, EXP-14·22와 같은 에피소드 하나씩 빼기 탐색. 추가로 EXP-22에서 고른 규칙에 유지만 1, 2, 3, 5, 8로 바꿔 봄.</dd>
+        <dt>방법</dt><dd>B 격자에 "유지" 선택지 추가: 10fps에서 1, 3, 5프레임. 이보다 짧게 바뀐 가장 가까운 물체는 직전에 쥐던 물체로 봄(1은 바로 앞 실험(EXP-22)의 규칙). 격자는 432가지, 앞의 B 실험(EXP-14, EXP-22)과 같은 에피소드 하나씩 빼기 탐색. 추가로 바로 앞 실험(EXP-22)에서 고른 규칙에 유지만 1, 2, 3, 5, 8로 바꿔 봄.</dd>
       </dl>
 
       <div class="tbl">
@@ -2371,7 +2384,7 @@ Answer with JSON only.</pre>
       <p class="note">빼고 채점한 세 에피소드 모두 유지 3프레임을 골랐다. 장갑 원신호 기준으로도 같은 그림이다(F1 0.164, 0.299, IoU 0.717).</p>
 
       <div class="tbl">
-        <p class="cap">유지 프레임만 바꾸면 (나머지는 EXP-22에서 고른 그대로)</p>
+        <p class="cap">유지 프레임만 바꾸면 (나머지는 바로 앞 실험(EXP-22)에서 고른 그대로)</p>
         <div class="wrap">
           <table class="min">
             <thead><tr><th>유지</th><th class="n">F1 ±5</th><th class="n">F1 ±15</th><th class="n">IoU</th><th class="n">찾은 경계 / 실제</th></tr></thead>
@@ -2389,7 +2402,7 @@ Answer with JSON only.</pre>
       <figure>
         <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙 (유지 3프레임)</span></div>
-        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 EXP-22보다 덜하다.</figcaption>
+        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜하다.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2415,7 +2428,7 @@ Answer with JSON only.</pre>
           <ul class="plain" style="font-size:13.5px;margin:0">
             <li>손 찾음: 지점 오차 중앙값이 손 크기(손목–중지 뿌리)의 0.5 미만인 MediaPipe 손이 있음</li>
             <li>2D 오차: 지점 오차 중앙값 / 손 크기</li>
-            <li>손 모양 오차: EXP-13의 손 모양 특징 10개를 MediaPipe 3D 지점과 모션캡처에서 각각 계산해 비교, 특징마다 프레임 간 퍼짐으로 나눈 뒤 평균</li>
+            <li>손 모양 오차: 손 모양 실험(EXP-13)의 특징 10개를 MediaPipe 3D 지점과 모션캡처에서 각각 계산해 비교, 특징마다 프레임 간 퍼짐으로 나눈 뒤 평균</li>
           </ul>
         </div>
         <div>
@@ -2461,7 +2474,7 @@ Answer with JSON only.</pre>
         <li>왜곡을 풀면 규칙을 통과하지 못함. 손을 10%p 덜 찾고, 2D 지점이 조금 나빠지고, 손 모양은 7%만 나아짐. 초점 1.0으로도 같은 답이라 초점 선택 문제가 아님.</li>
         <li>가장자리에서 손이 잘린 탓만이 아님. 편 프레임 안에 손이 다 들어와도 11%p 덜 찾음. 핀홀 영상이 손이 많은 바깥쪽을 늘리고 가운데를 줄이는 것이 이유로 보임.</li>
         <li>결정: 원본 어안을 쓰고 어안을 한계로 보고.</li>
-        <li>곁가지 발견: 두 경우 모두 손 모양 오차가 모션캡처 퍼짐의 약 0.8. 이 영상에서 MediaPipe 3D 손 모양은 왜곡과 상관없이 모션캡처 손을 느슨하게만 따라감. EXP-17에서 영상 손 모양이 v2 라벨에 신호가 없던 것과 맞음.</li>
+        <li>곁가지 발견: 두 경우 모두 손 모양 오차가 모션캡처 퍼짐의 약 0.8. 이 영상에서 MediaPipe 3D 손 모양은 왜곡과 상관없이 모션캡처 손을 느슨하게만 따라감. v2 라벨 예측 실험(EXP-17)에서 영상 손 모양이 v2 라벨에 신호가 없던 것과 맞음.</li>
         <li>Muse Spark 프레임도 원본. 편 프레임에서 Muse Spark가 물체 크기를 더 잘 읽는지는 유료라 시험하지 않음.</li>
         <li>한계: 클립마다 프레임 한 장, MediaPipe만, 정답은 모션캡처 손(잡는 동안 물체 표면에서 약 2mm, EXP-09).</li>
       </ul>
@@ -2479,7 +2492,7 @@ Answer with JSON only.</pre>
       <li><b>B. SAM 규칙.</b> SAM 3.1 손·물체 마스크(10fps)의 겹침과 동반 이동으로 접촉 신호를 만듦. 기준값과 시작 지연(파일럿에서 약 0.2초)은 튜닝 50개에서 정함.</li>
       <li><b>C. B + Muse Spark 경계 확인.</b> B의 시작과 끝마다 주변 약 7프레임(30fps)을 Muse Spark에 보내 첫 접촉 또는 마지막 접촉 프레임, 근거, 확신도를 받음.</li>
     </ol>
-    <p class="note">세 방법 모두 30fps 손별 접촉 구간을 내고, 짧은 틈을 잇고 아주 짧은 구간을 버리는 규칙은 똑같이 적용함(튜닝에서 정함). 참고 행으로 "항상 접촉", "항상 비접촉"을 같이 보고함. EXP-06의 특징 13개 로지스틱 회귀는 부록.</p>
+    <p class="note">세 방법 모두 30fps 손별 접촉 구간을 내고, 짧은 틈을 잇고 아주 짧은 구간을 버리는 규칙은 똑같이 적용함(튜닝에서 정함). 참고 행으로 "항상 접촉", "항상 비접촉"을 같이 보고함. 접촉 구간 파일럿(EXP-06)의 특징 13개 로지스틱 회귀는 부록.</p>
 
     <h3>채점</h3>
     <ul class="plain">
@@ -2504,7 +2517,7 @@ Answer with JSON only.</pre>
 
     <h3>HOT3D 준비</h3>
     <ul class="plain">
-      <li>EXP-07의 잡기 집계(2,152개)는 클립 수를 가늠하는 용도였고, 보고 수치에는 EXP-11 클립을 씀.</li>
+      <li>EXP-07의 잡기 집계(2,152개)는 클립 수를 가늠하는 용도였고, 보고 수치에는 평가 2 클립(EXP-11)을 씀.</li>
       <li>정답이 있는 136개 시퀀스의 HOT3D 영상을 모두 받음.</li>
       <li>카메라 보정 방향 확정. 보정값과 2D 박스는 원본 기준이고 영상에 쓸 때 시계 방향 90도 회전 (<a href="#exp-08">EXP-08</a>).</li>
       <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>).</li>
@@ -2613,7 +2626,7 @@ Answer with JSON only.</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 04:37 KST
+    마지막 갱신 2026-10-28 04:46 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2929,10 +2942,97 @@ Answer with JSON only.</pre>
     }
   }
 
+  // Wrap every "EXP-NN" mention outside the jump bar, headings and the
+  // experiment list itself, and show the experiment title on hover or tap.
+  function linkRefs() {
+    var names = {};
+    document.querySelectorAll('td.first > a[href^="#exp-"]').forEach(function (a) {
+      var t = a.parentElement.nextElementSibling;
+      if (t && t.classList.contains("wrap-ok")) names[a.textContent.trim()] = t.textContent.trim();
+    });
+    var skip = "script, style, code, pre, a, .exp-h, nav.jump, .xref";
+    var re = /EXP-\d\d/g;
+    var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (!re.test(n.nodeValue)) return NodeFilter.FILTER_SKIP;
+        re.lastIndex = 0;
+        return n.parentElement.closest(skip) ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [];
+    while (walk.nextNode()) nodes.push(walk.currentNode);
+    nodes.forEach(function (n) {
+      var frag = document.createDocumentFragment(), txt = n.nodeValue, last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(txt))) {
+        if (!names[m[0]]) continue;
+        frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var a = el("a", "xref t", m[0]);
+        a.href = "#" + m[0].toLowerCase();
+        frag.appendChild(a);
+        last = m.index + m[0].length;
+      }
+      if (!last) return;
+      frag.appendChild(document.createTextNode(txt.slice(last)));
+      n.parentNode.replaceChild(frag, n);
+    });
+    document.querySelectorAll('a[href^="#exp-"]').forEach(function (a) {
+      var id = a.textContent.trim();
+      if (!names[id] || a.closest("nav.jump") || (a.parentElement.classList.contains("first") && a.closest("td"))) return;
+      a.classList.add("xref");
+      a.dataset.x = id;
+    });
+
+    var tip = el("div");
+    tip.id = "xtip";
+    tip.hidden = true;
+    document.body.appendChild(tip);
+    var touch = window.matchMedia("(hover: none)").matches;
+    var openFor = null;
+    function show(a) {
+      var id = a.textContent.trim();
+      tip.innerHTML = "";
+      tip.appendChild(el("span", "id", id));
+      tip.appendChild(document.createTextNode(names[id]));
+      if (touch) {
+        var go = el("a", "go", "보기 →");
+        go.href = a.getAttribute("href");
+        tip.appendChild(go);
+      }
+      tip.hidden = false;
+      var r = a.getBoundingClientRect();
+      var w = tip.offsetWidth, vw = document.documentElement.clientWidth;
+      var left = Math.min(Math.max(8, r.left + window.scrollX), window.scrollX + vw - w - 8);
+      tip.style.left = left + "px";
+      tip.style.top = (r.bottom + window.scrollY + 6) + "px";
+      openFor = a;
+    }
+    function hide() { tip.hidden = true; openFor = null; }
+    document.addEventListener("mouseover", function (e) {
+      if (touch) return;
+      var a = e.target.closest && e.target.closest(".xref");
+      if (a) show(a);
+    });
+    document.addEventListener("mouseout", function (e) {
+      if (touch) return;
+      if (e.target.closest && e.target.closest(".xref")) hide();
+    });
+    document.addEventListener("click", function (e) {
+      if (!touch) return;
+      var a = e.target.closest && e.target.closest(".xref");
+      if (a) {
+        e.preventDefault();
+        if (openFor === a) hide(); else show(a);
+      } else if (!e.target.closest("#xtip")) hide();
+    });
+    window.addEventListener("hashchange", hide);
+  }
+
   function render() {
     renderGantt();
     renderPhases();
     renderChart();
+    linkRefs();
     route();
     window.addEventListener("hashchange", route);
   }
