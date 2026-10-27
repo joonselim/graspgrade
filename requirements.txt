@@ -10,3 +10,4 @@ scikit-learn
 openai
 huggingface_hub
 meta-sam-parser==0.1.0
+numba==0.60.0
