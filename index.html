@@ -102,18 +102,30 @@
   .doc-kicker { font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em; margin: 0 0 6px; }
   .doc-title { font-size: 30px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; margin: 0 0 6px; }
   .doc-sub { font-size: 15px; color: var(--ink-2); margin: 0 0 20px; }
-  .meta {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid var(--rule); margin: 0;
-  }
-  .meta > div { padding: 10px 12px 0 0; }
-  .meta dt { font-size: 12px; color: var(--muted); margin: 0; }
-  .meta dd { margin: 2px 0 0; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .meta dd small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .doc-head .doc-sub { margin-bottom: 0; }
   @media (max-width: 720px) {
     .doc-title { font-size: 25px; }
-    .meta { grid-template-columns: 1fr 1fr; row-gap: 6px; }
   }
+
+  /* ---------- page nav ---------- */
+  .topnav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 22px;
+    margin: calc(var(--sheet-pad) * -1) calc(var(--sheet-pad) * -1) 28px;
+    padding: 0 var(--sheet-pad);
+    background: var(--sheet); border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+  }
+  .topnav .brand { font-weight: 800; letter-spacing: -0.02em; margin-right: auto; padding: 14px 0; }
+  .topnav a {
+    color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent;
+    text-decoration: none;
+  }
+  .topnav a:hover { color: var(--ink); text-decoration: none; }
+  .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  .page[hidden] { display: none; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 13px; font-family: var(--mono); }
+  .more { margin-top: 10px; font-size: 14px; }
 
   /* ---------- sections ---------- */
   section { margin-top: 44px; }
@@ -252,7 +264,7 @@
   .scroll-hint { font-size: 12px; color: var(--faint); margin-top: 2px; }
 
   /* ---------- experiments ---------- */
-  .exp { margin-top: 34px; padding-top: 4px; scroll-margin-top: 16px; }
+  .exp { margin-top: 34px; padding-top: 4px; scroll-margin-top: 64px; }
   .exp-h {
     display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
     border-bottom: 1px solid var(--rule); padding-bottom: 6px; margin-bottom: 12px;
@@ -337,16 +349,17 @@
 <div id="app" hidden>
 <main class="sheet">
 
+  <nav class="topnav" aria-label="페이지">
+    <span class="brand">GraspGrade</span>
+    <a href="#summary" data-nav="summary">요약</a>
+    <a href="#detail" data-nav="detail">실험 상세</a>
+  </nav>
+
+  <div class="page" data-page="summary">
   <header class="doc-head">
     <p class="doc-kicker">Meta Global AI Developer Hackathon · Indie Dev Track</p>
     <h1 class="doc-title">GraspGrade 진행 보고</h1>
     <p class="doc-sub">1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 구간에 로봇 손이 따라할 수 있는 정도를 0~100점으로 매긴다.</p>
-    <dl class="meta">
-      <div><dt>보고 시점</dt><dd>2026-10-27<small>Day 2 / 10</small></dd></div>
-      <div><dt>제출 마감</dt><dd>11/04 12:00 ET<small>11/05 02:00 KST</small></dd></div>
-      <div><dt>남은 기간</dt><dd id="dday">—<small id="dleft">&nbsp;</small></dd></div>
-      <div><dt>팀</dt><dd>임준세, 이인석<small>2인</small></dd></div>
-    </dl>
   </header>
 
   <!-- 1 -->
@@ -394,11 +407,9 @@
     </div>
   </section>
 
-  <!-- 3 -->
-  <section id="s-exp">
-    <h2><span class="no">3</span>실험</h2>
-    <p>지금까지 한 실험 다섯 개. 각 실험마다 넣은 입력, 모델에 보낸 요청, 돌아온 원문, 그 원문을 숫자로 정리한 방법과 결과를 순서대로 적는다.</p>
-
+  <section>
+    <h2><span class="no">3</span>실험 목록</h2>
+    <p>지금까지 한 실험과 결론. 번호를 누르면 실험 상세 페이지의 해당 기록으로 간다.</p>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -413,7 +424,91 @@
         </table>
       </div>
     </div>
+    <p class="more"><a href="#detail">실험 상세 보기 →</a></p>
+  </section>
 
+  <!-- 5 -->
+  <section>
+    <h2><span class="no">4</span>열린 문제</h2>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>문제</th><th>현재 상태</th><th>해결 방법</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">HOT3D 카메라 보정 기준 방향</td>
+              <td>보정 값이 똑바로 선 영상 기준인지, 90도 돌아간 원본 기준인지 미확인</td>
+              <td>정답 2D 손 박스와 투영한 3D 손을 겹쳐 확인</td>
+            </tr>
+            <tr>
+              <td class="first">HOT3D 도구 준비</td>
+              <td>툴킷과 MANO 손 모델 미설치</td>
+              <td>평가 2 착수 전 설치, MANO 등록</td>
+            </tr>
+            <tr>
+              <td class="first">왼손 접촉 시작 오차</td>
+              <td>±5프레임 이내 79.6%</td>
+              <td>허용 범위 확대 또는 손별 보고</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2><span class="no">5</span>위험 요소</h2>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>위험</th><th>내용</th><th>대응</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">평가 2 정답 쏠림</td>
+              <td>Allegro 손이 사람 손보다 커서 기준에 따라 거의 전부 가능 또는 불가로 쏠릴 수 있음</td>
+              <td>손목 위치를 수 cm 범위에서 최적화한 뒤 판정. 튜닝 세트 가능 비율이 20~80% 밖이면 기준 재조정</td>
+            </tr>
+            <tr>
+              <td class="first">동반 이동 신호 품질</td>
+              <td>겹침만으로는 접촉 구분이 안 되어 동반 이동 계산에 의존</td>
+              <td>튜닝 에피소드에서 촉각 정답으로 먼저 검증</td>
+            </tr>
+            <tr>
+              <td class="first">HOT3D 항목 변별력</td>
+              <td>단단한 물체만 있고 고정 촬영이라 물체 성질, 카메라 안정성의 분산이 0일 수 있음</td>
+              <td>분산이 없으면 회귀에서 제외하고 OpenGraph 결과로 설명</td>
+            </tr>
+            <tr>
+              <td class="first">작은 검증 세트</td>
+              <td>HOT3D 검증 인원 3명</td>
+              <td>AUC에 부트스트랩 신뢰구간 함께 보고</td>
+            </tr>
+            <tr>
+              <td class="first">실험실 데이터 한계</td>
+              <td>문제는 일반 영상인데 검증은 실험실 데이터</td>
+              <td>직접 촬영한 1인칭 영상 적용 예시를 데모에 포함</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="page" data-page="detail" hidden>
+  <header class="doc-head">
+    <p class="doc-kicker">Meta Global AI Developer Hackathon · Indie Dev Track</p>
+    <h1 class="doc-title">실험 상세</h1>
+    <p class="doc-sub">실험마다 넣은 입력, 모델에 보낸 요청, 돌아온 원문, 그 원문을 숫자로 정리한 방법과 결과를 순서대로 적는다.</p>
+    <nav class="jump" aria-label="실험 바로가기">
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a>
+    </nav>
+  </header>
+
+  <section id="s-exp">
+    <h2><span class="no">1</span>실험</h2>
     <!-- EXP-01 -->
     <article class="exp" id="exp-01">
       <div class="exp-h"><span class="id">EXP-01</span><span class="t">Meta API 연결 확인</span><span class="d">10/27</span></div>
@@ -736,7 +831,7 @@ video:  clip.mp4 (150 frames)</pre>
 
   <!-- 4 -->
   <section>
-    <h2><span class="no">4</span>장갑 낀 손 검출</h2>
+    <h2><span class="no">2</span>장갑 낀 손 검출</h2>
     <p>OpenGraph는 촉각 장갑을 낀 손이라 MediaPipe 손 관절 검출이 불안정하다. 8개 에피소드 19,363프레임에서 한 손 이상 검출된 비율을 쟀다.</p>
     <figure>
       <div class="chart" id="mpchart"></div>
@@ -749,38 +844,9 @@ video:  clip.mp4 (150 frames)</pre>
     </ul>
   </section>
 
-  <!-- 5 -->
-  <section>
-    <h2><span class="no">5</span>열린 문제</h2>
-    <div class="tbl">
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>문제</th><th>현재 상태</th><th>해결 방법</th></tr></thead>
-          <tbody>
-            <tr>
-              <td class="first">HOT3D 카메라 보정 기준 방향</td>
-              <td>보정 값이 똑바로 선 영상 기준인지, 90도 돌아간 원본 기준인지 미확인</td>
-              <td>정답 2D 손 박스와 투영한 3D 손을 겹쳐 확인</td>
-            </tr>
-            <tr>
-              <td class="first">HOT3D 도구 준비</td>
-              <td>툴킷과 MANO 손 모델 미설치</td>
-              <td>평가 2 착수 전 설치, MANO 등록</td>
-            </tr>
-            <tr>
-              <td class="first">왼손 접촉 시작 오차</td>
-              <td>±5프레임 이내 79.6%</td>
-              <td>허용 범위 확대 또는 손별 보고</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
   <!-- 6 -->
   <section>
-    <h2><span class="no">6</span>방법 개요</h2>
+    <h2><span class="no">3</span>방법 개요</h2>
     <h3 style="margin-top:0">처리 흐름</h3>
     <ol class="flow">
       <li><b>분할.</b> SAM 3.1에 10fps 영상과 프롬프트 <code>hand</code>, <code>small object</code>를 넣어 프레임마다 손과 물체의 박스와 마스크를 얻음.</li>
@@ -825,7 +891,7 @@ video:  clip.mp4 (150 frames)</pre>
 
   <!-- 7 -->
   <section>
-    <h2><span class="no">7</span>데이터와 분할</h2>
+    <h2><span class="no">4</span>데이터와 분할</h2>
     <div class="tbl">
       <p class="cap">사용 데이터</p>
       <div class="wrap">
@@ -845,48 +911,11 @@ video:  clip.mp4 (150 frames)</pre>
     <p class="note">분할은 seed 20261026으로 고정했고 다시 뽑지 않는다. 검증 세트는 최종 측정 전까지 쓰지 않는다. HOT3D는 사람 단위로 나눠 같은 사람이 양쪽에 섞이지 않게 했다.</p>
   </section>
 
-  <!-- 8 -->
-  <section>
-    <h2><span class="no">8</span>위험 요소</h2>
-    <div class="tbl">
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>위험</th><th>내용</th><th>대응</th></tr></thead>
-          <tbody>
-            <tr>
-              <td class="first">평가 2 정답 쏠림</td>
-              <td>Allegro 손이 사람 손보다 커서 기준에 따라 거의 전부 가능 또는 불가로 쏠릴 수 있음</td>
-              <td>손목 위치를 수 cm 범위에서 최적화한 뒤 판정. 튜닝 세트 가능 비율이 20~80% 밖이면 기준 재조정</td>
-            </tr>
-            <tr>
-              <td class="first">동반 이동 신호 품질</td>
-              <td>겹침만으로는 접촉 구분이 안 되어 동반 이동 계산에 의존</td>
-              <td>튜닝 에피소드에서 촉각 정답으로 먼저 검증</td>
-            </tr>
-            <tr>
-              <td class="first">HOT3D 항목 변별력</td>
-              <td>단단한 물체만 있고 고정 촬영이라 물체 성질, 카메라 안정성의 분산이 0일 수 있음</td>
-              <td>분산이 없으면 회귀에서 제외하고 OpenGraph 결과로 설명</td>
-            </tr>
-            <tr>
-              <td class="first">작은 검증 세트</td>
-              <td>HOT3D 검증 인원 3명</td>
-              <td>AUC에 부트스트랩 신뢰구간 함께 보고</td>
-            </tr>
-            <tr>
-              <td class="first">실험실 데이터 한계</td>
-              <td>문제는 일반 영상인데 검증은 실험실 데이터</td>
-              <td>직접 촬영한 1인칭 영상 적용 예시를 데모에 포함</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+  </div>
 
   <footer>
     자료: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta). 영상과 프레임 그림은 OpenGraph에서 가져옴.<br>
-    마지막 갱신 2026-10-27 17:14 KST
+    마지막 갱신 2026-10-27 17:36 KST
   </footer>
 
 </main>
@@ -1023,7 +1052,7 @@ video:  clip.mp4 (150 frames)</pre>
       ],
       chk: [
         ["done", "SAM 입력 프레임 수 결정 (10fps)"],
-        ["todo", "전체 에피소드 SAM 분할 (손, 물체)"],
+        ["doing", "튜닝 50개 에피소드 SAM 분할 (손, 물체)"],
         ["todo", "겹침 + 동반 이동 기반 접촉 신호"],
         ["todo", "Muse Spark로 접촉 경계 확정 (경계 주변은 30fps)"],
         ["todo", "영상 접촉과 촉각 압력 사이 시간차 보정"],
@@ -1091,7 +1120,6 @@ video:  clip.mp4 (150 frames)</pre>
   var STATUS_TXT = { done: "완료", doing: "진행 중", todo: "예정" };
 
   var START = Date.UTC(2026, 9, 26, 4, 0, 0);      // 10/26 00:00 ET (EDT)
-  var DEADLINE = Date.UTC(2026, 10, 4, 17, 0, 0);  // 11/04 12:00 ET (EST)
 
   function dayIndex() {
     var d = Math.floor((Date.now() - START) / 86400000) + 1;
@@ -1235,23 +1263,41 @@ video:  clip.mp4 (150 frames)</pre>
     });
   }
 
-  function renderClock() {
-    var ms = DEADLINE - Date.now();
-    var dd = document.getElementById("dday");
-    var dl = document.getElementById("dleft");
-    if (ms <= 0) { dd.firstChild.nodeValue = "마감"; dl.textContent = ""; return; }
-    var d = Math.floor(ms / 86400000);
-    var h = Math.floor(ms / 3600000) % 24;
-    dd.firstChild.nodeValue = "D-" + d;
-    dl.textContent = d + "일 " + h + "시간 남음";
+  // ---------- pages ----------
+  // #summary (default), #detail, or #exp-NN which opens the detail page at that experiment.
+
+  function route() {
+    var h = location.hash.replace(/^#/, "");
+    var target = null;
+    var page = "summary";
+    if (h === "detail") page = "detail";
+    else if (/^exp-\d+$/.test(h) && document.getElementById(h)) { page = "detail"; target = h; }
+
+    var changed = false;
+    document.querySelectorAll(".page").forEach(function (p) {
+      var show = p.dataset.page === page;
+      if (p.hidden === show) changed = true;
+      p.hidden = !show;
+    });
+    document.querySelectorAll(".topnav a").forEach(function (a) {
+      a.classList.toggle("on", a.dataset.nav === page);
+    });
+    document.title = page === "detail" ? "GraspGrade 실험 상세" : "GraspGrade 진행 보고";
+
+    // instant, or the page-wide smooth scrolling animates across the whole page
+    if (target) {
+      document.getElementById(target).scrollIntoView({ behavior: "instant", block: "start" });
+    } else if (changed || h === "summary" || h === "detail") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }
 
   function render() {
     renderGantt();
     renderPhases();
     renderChart();
-    renderClock();
-    setInterval(renderClock, 60000);
+    route();
+    window.addEventListener("hashchange", route);
   }
 
   // Runs last so the data above is defined when a returning visitor skips the gate.
