@@ -40,7 +40,7 @@ git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private
 - 숫자 2 비교: (1) 우리 점수 vs Muse 단독 (주 비교), (2) 물체별 copyable 비율만 쓴 참고 기준선, (3) Muse 단독 vs Muse + 우리 7개 항목 (보완재 프레이밍). AUC 신뢰구간은 시퀀스 51개 단위 부트스트랩, 사람별 AUC, 상위 20% 양성 비율, 한 손 클립만의 결과도 같이.
 - 유료 호출 전 무료 확인: 로컬 3개 항목의 단일 AUC (EXP-12), 물체 기준선 AUC (튜닝, 사람 하나씩 빼기). 신호가 없으면 리타게팅 항목을 "손 모양이 로봇 손에 맞는가"에 가깝게 보강한다.
 - (결정, EXP-25) 어안 왜곡 보정은 하지 않는다. 미리 정한 기준으로 보정하면 MediaPipe 손 검출이 70.6% → 60.3%로 떨어지고 2D 오차도 나빠진다. 원본 어안을 쓰고 한계로 보고한다. Muse 프레임도 원본 그대로.
-- 예상 총지출 약 $104 / $150 (P1 실측으로 Muse 단가가 낮아짐).
+- 예상 총지출 약 $132 / $150 (P1 실측으로 Muse 단가는 낮아졌지만, B 과분할로 C 경계가 늘어 C가 약 $37).
 
 지적 중 틀린 것 (기록용): SAM 프롬프트를 Muse 물체 이름으로 만든다는 계획은 원래 없었다. 시작 시점 보정은 지원서 Day 3~4에 있던 계획 그대로다.
 
@@ -234,22 +234,27 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | P1 (완료, EXP-23) | 숫자 2 파일럿: SAM 3윈도우, Muse 체크리스트/기준선 각 5클립 → 대리값(EXP-19)과 비교 | `sam_hot3d.py --role score_train --limit 3 --send`, `muse_hot3d.py --task ... --role score_train --limit 5 --send`, `number2_pilot.py` | $0.20 |
 | P2 | 숫자 1 SAM 튜닝 나머지 47개 → B 격자를 튜닝 50개로 확정 | `sam_episodes.py --split tune --send`, `contact_cut.py features`, `contact_cut.py rule` | $11.89 |
 | P3 | 숫자 1 SAM held-out 22개 | `sam_episodes.py --split held_out --allow-held-out --send` | $5.45 |
-| P4 | 숫자 1 A (Muse 단독) 프롬프트 확인 3개 → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $2.51 + $11.86 |
-| P5 | 숫자 1 C (B 경계마다) held-out | `muse_contact.py c --segments <held-out B> --send` | 경계당 약 $0.013 (약 $5~10) |
+| P4 | 숫자 1 A (Muse 단독) 튜닝 3개 (프롬프트 확인 + A 보정값) → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $2.51 + $11.86 |
+| P5 | 숫자 1 C: 튜닝 경계 200개 (C 보정값) → held-out 경계 전부 | `muse_contact.py c --segments out/contact/rule_segments.json --sample 100 --send` → `c --segments <held-out B> --send` | 약 $2.61 + 약 $34 (B가 에피소드당 경계 약 120개, 50개로 B를 다시 고르면 바뀜) |
 | P6 | 숫자 2 SAM 전체 (파일럿 3윈도우는 이미 보냄) | `sam_hot3d.py --role score_train/held_out --send` | $8.72 + $17.76 |
 | P7a | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개만 (파일럿 5개는 이미 보냄) → 게이트 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | 약 $7.7 |
-| P7b | 게이트 통과 시에만: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
+| P7b | 게이트가 stop이 아니면: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
 | P8 | 숫자 2 최종 (물체 하나씩 빼기 보고 포함) | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
 
-P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400개에서 Muse 물체 항목 6개 등급으로 로지스틱 회귀, v2 라벨. (1) 사람 하나씩 빼기 6명 평균 AUC, (2) 물체 하나씩 빼기 AUC (시퀀스 부트스트랩 95% 구간). 둘 다 0.65 이상이면 P7b, 하나라도 0.60 미만이면 P7b를 보내지 않고 사용자와 정한다, 그 사이도 사용자와 정한다. 같이 보고하되 게이트에는 안 쓰는 것: 같은 400개의 대리값 AUC, Muse 단독 사람별 AUC, 항목별 Muse-대리값 일치율. SAM 결과 없이 판단할 수 있어 P6과 순서가 무관하다.
+P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400개에서 Muse 물체 항목 6개 등급으로 로지스틱 회귀, v2 라벨. (1) 사람 하나씩 빼기 6명 평균 AUC, (2) 물체 하나씩 빼기 AUC (시퀀스 부트스트랩 95% 구간). 둘 다 0.65 이상이면 P7b, 하나라도 0.60 미만이면 P7b를 보내지 않고 사용자와 정한다. 그 사이(weak)면 P7b를 보낸다 (사용자 결정 2026-10-28, P7a 전). 같이 보고하되 게이트에는 안 쓰는 것: 같은 400개의 대리값 AUC, Muse 단독 사람별 AUC, 항목별 Muse-대리값 일치율. SAM 결과 없이 판단할 수 있어 P6과 순서가 무관하다.
 
 물체 하나씩 빼기 보고 (측정 계획 비교 4, 계산 전 기록): held-out 물체마다 라벨로 배우는 부분(점수 가중치, 손 모양 적합도 모델과 그 구간 기준)을 그 물체 없이 다시 학습해 그 물체의 held-out 클립을 채점한다. 전부 모아 AUC (시퀀스 부트스트랩), 사람별 AUC. 같은 클립에서 Muse 단독, 같은 방식으로 다시 맞춘 Muse + 우리 항목, 물체 기준선 (처음 보는 물체라 0.5)과 비교한다. 결과 방향과 상관없이 주 결과 옆에 낸다. 이유: held-out 사람도 같은 물체를 잡아서 (EXP-20) 물체 기준선이 주 비교에서 우리 점수를 이길 수 있다.
 
 (완료, EXP-26) `number2_score.py --gate` (Muse 등급이 400개 모두 있어야 돈다, `--standin`은 대리값으로 점검)와 물체 하나씩 빼기 보고 (`--check`, `--final` 출력의 `unseen_objects`)를 넣고 튜닝에서만 점검했다. 기존 `--check` 수치는 그대로다.
-- 게이트가 빡빡하다: 완벽한 대리값으로도 사람 하나씩 빼기 0.657 (기준 0.65), 물체 하나씩 빼기 0.666. 등급을 무작위로 바꿔 보면 P1 수준 일치율(90%)에서 대부분 "weak"(사용자와 결정), 87% 아래면 대부분 "stop". P7a 전에 게이트 기준을 그대로 둘지 사용자 결정이 필요할 수 있다.
+- 게이트가 빡빡하다: 완벽한 대리값으로도 사람 하나씩 빼기 0.657 (기준 0.65), 물체 하나씩 빼기 0.666. 등급을 무작위로 바꿔 보면 P1 수준 일치율(90%)에서 대부분 "weak"(사용자와 결정), 87% 아래면 대부분 "stop". 그래서 weak면 P7b를 보내기로 미리 정했다.
 - 튜닝 `--check`에서 물체 기준선 0.776이 우리 점수 0.721을 이긴다. 처음 보는 물체에서는 우리 점수 0.675, 물체 기준선 0.5.
 
-합계 약 $102 남음 (지금까지 $1.73 사용). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
+시간 보정과 학습 분리 (측정 계획에 계산 전 기록, EXP-27로 코드 점검, 2026-10-28):
+- 숫자 1: A와 C도 각자 튜닝에서 배운 시작/끝 보정을 받는다 (지금까지 B만 받았다). A 보정은 P4 튜닝 3개에서, C 보정은 튜닝 경계 200개 중 Muse가 옮긴 경계에서만 재고, 옮긴 경계에만 적용한다. 행: A, A+보정, B, C, C+보정. held-out 22개 에피소드 짝지은 부트스트랩에서 F1(±5) 차이의 95% 구간이 0 위면 가치. 점검: 6프레임 일찍 답하는 가상 Muse에서 A 0.863 → 0.956, C 0.149 → 0.307 (지연 없는 상한 회복). 보정이 없으면 C는 지연 때문에 절반이 된다.
+- 숫자 2 비교 5: R1 Muse 단독, R2 체크리스트 등급 평균 (학습 없음, 의미 방향), R3 같은 등급 + 회귀. R3-R2, R2-R1, R3-R1, 우리 점수-R3을 시퀀스 짝지은 부트스트랩으로. 튜닝 대리값에서 R3-R2 +0.067 (0.014~0.120), 우리 점수-R3 +0.007. 3명짜리 가짜 held-out에서 검출률 95% (등급 오류 15%면 77%).
+- 공개 (측정 계획 Release 절): 숫자 1 정답 (정리한 장갑 구간 + 채점 스크립트)은 CC BY 4.0, 숫자 2 정답 (클립 + copyable v2 + 실패 조건 + 채점 스크립트)은 HOT3D 손 데이터에서 나와 CC BY-NC-SA 4.0. 원본 영상/센서/모캡은 넣지 않고 재생성 코드를 낸다. 라이선스 해석은 데이터에 딸린 라이선스 파일 기준이며 법률 검토는 아니다.
+
+합계 약 $130 남음 (지금까지 $1.73 사용, C가 커져 $150 안이지만 여유가 줄었다). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
 
 무료 (지금):
 1. (완료, EXP-12) 로컬 3개 항목은 측정은 정확하지만(카메라 vs 머리 회전 0.93, MediaPipe 좌우 96.5%) copyable 예측력이 없다 (AUC 0.49~0.53, 물체 안에서도 0.52~0.53). 물체 기준선은 사람 하나씩 빼고 사람별 평균 AUC 0.70 (0.59~0.81). 사람별 copyable 비율 차이 때문에 사람을 합친 AUC는 왜곡된다 (물체 0.62, 로컬 0.37). held-out도 사람별 AUC를 같이 낸다.

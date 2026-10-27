@@ -92,6 +92,9 @@ reported.
 - What this shows: a value that only the glove can give, put on top of a
   Meta model output. It is a constant per arm, so it is reported as a
   calibration from sensor truth, not as a new model.
+- Code check (EXP-27): with perfect answers made 6 frames early, the learned
+  shifts bring arm A back from 0.863 to 0.956 and arm C from 0.149 to 0.307,
+  the no-lag ceilings.
 
 ### Metrics
 
@@ -401,6 +404,9 @@ only, on the same held-out clips.
   a held-out sized set (3 persons) finds R3 minus R2 above 0, with stand-in
   grades as they are and with 15% of grades replaced at random (about the P1
   agreement). It is a check on the design, not a result.
+- Result (EXP-27): on tuning with stand-ins, R3 minus R2 is +0.067 (0.014 to
+  0.120). Pseudo held-out sets of 3 persons find it in 95% of sets, and in
+  77% with 15% of grades replaced at random.
 
 ### Leave one object out on held-out (written 2026-10-28, before computing)
 

@@ -26,6 +26,11 @@ object, and the refit score rates the test clips of that object. Muse alone
 is unchanged. The object-only reference gives every clip the training base
 rate. Written into the output of --check and --final.
 
+Checklist against learning (comparison 5): R1 Muse alone, R2 the mean of the
+Muse checklist grades (equal weights, no learning), R3 a logistic regression
+on the same grades. Paired AUC differences with a 95% interval resampling
+sequences: R3 - R2, our score - R3, and R2 - R1, R3 - R1 when Muse alone exists.
+
 Gate (docs/MEASUREMENT_PLAN.md, "Muse Spark run in two steps"): logistic
 regression on the six object item grades of the 400 score_train clips,
 leave one person out (mean AUC over people) and leave one object out
@@ -161,6 +166,47 @@ def metrics(d, score, seed=20261026):
             "auc_one_hand_clips": round(float(roc_auc_score(y[one], s[one])), 3)}
 
 
+def paired_auc(d, base, new, n=1000, seed=20261026):
+    """AUC of column `new` minus column `base` on the same clips, resampling whole sequences."""
+    d = d.dropna(subset=[base, new])
+    y, seqs = d.copyable.values, d.sequence.values
+    a, b = d[base].values, d[new].values
+    rng = np.random.default_rng(seed)
+    uniq = np.unique(seqs)
+    idx = {q: np.where(seqs == q)[0] for q in uniq}
+    diffs = []
+    for _ in range(n):
+        i = np.concatenate([idx[q] for q in rng.choice(uniq, len(uniq))])
+        if y[i].min() != y[i].max():
+            diffs.append(roc_auc_score(y[i], b[i]) - roc_auc_score(y[i], a[i]))
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return {"rows": f"{new} minus {base}", "clips": len(d), "sequences": len(uniq),
+            "difference": round(float(roc_auc_score(y, b) - roc_auc_score(y, a)), 3),
+            "ci95_by_sequence": [round(float(lo), 3), round(float(hi), 3)], "gain": bool(lo > 0)}
+
+
+def checklist_vs_learning(train, test, items):
+    """Comparison 5: R1 Muse alone, R2 checklist grades with equal weights, R3 the same grades learned.
+
+    The checklist grades are the Muse items present in both sets (with --check, the
+    six stand-in object items, finger occlusion has no stand-in)."""
+    cols = [c for c in MUSE_ITEMS if c in items]
+    if not cols:
+        return None
+    test = test.copy()
+    test["R2_equal_weights"] = test[cols].mean(axis=1)
+    test["R3_learned"], w = fit_score(train, test, cols)
+    out = {"grades": cols, "R3_weights": w, "R2_equal_weights": metrics(test, "R2_equal_weights"),
+           "R3_learned": metrics(test, "R3_learned"),
+           "paired": [paired_auc(test, "R2_equal_weights", "R3_learned"),
+                      paired_auc(test, "R3_learned", "our_score")]}
+    if "muse_baseline" in test and test.muse_baseline.notna().any():
+        out["R1_muse_alone"] = metrics(test, "muse_baseline")
+        out["paired"] += [paired_auc(test, "muse_baseline", "R2_equal_weights"),
+                          paired_auc(test, "muse_baseline", "R3_learned")]
+    return out
+
+
 def fit_score(train, test, cols):
     m = LogisticRegression(C=0.5, max_iter=2000).fit(train[cols], train.copyable)
     return m.predict_proba(test[cols])[:, 1], dict(zip(cols, np.round(m.coef_[0], 3).tolist()))
@@ -278,6 +324,7 @@ def main():
         te["plug_in"], out["plug_in_weights"] = fit_score(tr, te, ["muse_baseline"] + items)
         out["muse_plus_checks"] = metrics(te, "plug_in")
     out["unseen_objects"] = unseen_objects(d, items, train_role, test_role)
+    out["checklist_vs_learning"] = checklist_vs_learning(train, test, items)
     name ="number2_check.json" if args.check else "number2_final.json"
     (N2 / name).write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))

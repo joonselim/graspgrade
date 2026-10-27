@@ -402,6 +402,7 @@
       <li>평가 2 방향 결정: 질문과 v2 라벨은 그대로 두고 "물체 성질" 항목을 구체적인 물체 항목(손 대비 크기, 길이, 납작함, 폭, 손잡이, 주변 물체)으로 늘림. 물체 3D 모델의 크기·모양 숫자 7개만으로 0.695(물체 이름 0.742), 처음 보는 물체에서도 0.673이 나와 미리 정한 기준을 통과함.</li>
       <li>물체 항목 6개(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간)를 상·중·하 기준과 함께 고정. 정답에서 낸 대리 등급으로 0.683, 처음 보는 물체 0.666으로 통과. 손 대비 크기가 대부분을 설명함. Muse Spark가 영상에서 이 등급을 읽는지는 짧은 유료 파일럿으로 먼저 확인.</li>
       <li>Muse Spark 게이트(튜닝 400개)는 빡빡함. 완벽한 대리 등급으로도 사람 하나씩 빼기 0.657로 기준 0.65를 겨우 넘고, 파일럿 수준의 일치율(90%)이면 "약함"이 예상돼 검증 클립에 보내기 전에 결정이 필요할 수 있음. 튜닝에서는 물체 기준선이 우리 점수를 이기지만(0.776 대 0.721), 처음 보는 물체에서는 우리 점수가 0.675를 지키고 물체 기준선은 0.5.</li>
+      <li>튜닝 점검에서 Muse Spark 체크리스트 등급의 가중치를 배우면 단순 평균보다 AUC가 +0.067 높음(주로 감쌀 폭과 손잡이의 방향을 바로잡아서). 사람 3명짜리 검증 세트로도 이 차이를 잡아낼 수 있음. 평가 1의 시점 보정 코드도 점검을 통과함.</li>
       <li>HOT3D 어안 영상은 왜곡을 풀지 않음. 풀면 MediaPipe가 손을 10%p 덜 찾아 미리 정한 기준을 통과하지 못함. 원본을 쓰고 한계로 보고.</li>
       <li>평가 2 첫 유료 파일럿(튜닝 클립 5개): SAM은 붐비는 HOT3D 탁자에서도 잡은 물체를 접촉 프레임 99%에서 찾고, 우리 코드가 92%에서 그것을 손에 가장 가까운 물체로 고름. Muse Spark의 물체 등급은 3D 모델 대리 등급과 30개 중 27개 일치.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
@@ -495,6 +496,7 @@
             <tr><td class="first"><a href="#exp-24">EXP-24</a></td><td class="wrap-ok">새 물체가 유지될 때만 끊는 방법 B</td><td>3프레임 기다리면 IoU 0.66 → 0.72지만 F1 ±5는 0.151 → 0.145. 경계 수를 맞춰도 F1 0.09라 자리가 틀린 게 문제. 선택지는 튜닝 50개 격자에 남김.</td></tr>
             <tr><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">어안 왜곡을 풀면 MediaPipe가 나아지는가</td><td>아님. 왜곡을 풀면 손을 10%p 덜 찾고(70.6% → 60.3%) 2D 지점도 나빠짐. 원본을 쓰고 어안은 한계로 보고.</td></tr>
             <tr><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</td><td>코드는 계획대로 동작. 게이트가 빡빡해 완벽한 등급으로도 0.657로 겨우 통과, 파일럿 일치율이면 "약함" 예상. 처음 보는 물체에서 우리 점수 0.675, 물체 기준선 0.5.</td></tr>
+            <tr><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력</td><td>배운 시점 보정이 6프레임 지연을 되돌림(C 0.149 → 0.307). 튜닝에서 학습 가중치가 단순 평균보다 +0.067. 사람 3명 검증 세트로 95%(등급 오류가 있으면 77%) 잡아냄.</td></tr>
           </tbody>
         </table>
       </div>
@@ -611,7 +613,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2574,12 +2576,81 @@ Answer with JSON only.</pre>
         <li>한계: 무작위 교체는 단순한 오류 모델. 실제 Muse Spark 오류는 몰려 있을 가능성이 큼(예: 파일럿의 8cm 근처 폭).</li>
       </ul>
     </article>
+
+    <!-- EXP-27 -->
+    <article class="exp" id="exp-27">
+      <div class="exp-h"><span class="id">EXP-27</span><span class="t">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력 점검</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>측정 계획에 두 묶음이 새로 들어갔다(둘 다 데이터 전에 적음). 평가 1에서는 A와 C도 튜닝에서 배운 시점 보정을 받고(지금까지는 B만), 에피소드 짝지은 부트스트랩으로 확인한다. 평가 2에서는 Muse Spark 단독(R1), 체크리스트 등급 단순 평균(R2), 같은 등급의 학습된 가중치(R3)를 시퀀스 짝지은 부트스트랩으로 비교한다. 코드가 그대로 하는가, 그리고 사람 3명짜리 검증 세트로 "R3가 R2보다 낫다"를 잡아낼 수 있는가.</dd>
+        <dt>입력</dt><dd>튜닝만. Muse Spark 답은 쓰지 않음. 평가 1은 장갑에서 만든 답, 평가 2는 대리 등급(EXP-19).</dd>
+        <dt>방법</dt><dd>평가 1: 완벽한 답이 모든 변화를 6프레임 일찍 보게 만들어(보이는 접촉이 장갑 압력보다 먼저 오는 것처럼, EXP-06) 파일럿 3개에서 A와 C의 보정을 배움. 보정이 맞으면 지연 없는 최고 점수로 돌아와야 함. 평가 2: 튜닝 6명 중 3명을 가짜 검증 세트로 고르는 20가지마다 나머지 3명의 400개로 R3를 학습하고 R3 − R2를 짝지은 시퀀스 부트스트랩으로 검정. 대리 등급 그대로 한 번, 등급 15%를 무작위로 바꿔 세 번(파일럿 일치율 수준, EXP-23).</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">평가 1: 6프레임 일찍 보는 완벽한 답, 정리한 장갑, 파일럿 에피소드</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행</th><th class="n">경계 F1 ±5</th><th class="n">IoU</th><th class="n">지연 없는 최고 점수</th></tr></thead>
+            <tbody>
+              <tr><td class="first">A</td><td class="n">0.863</td><td class="n">0.948</td><td class="n">0.956</td></tr>
+              <tr><td class="first">A + 보정 (배운 값: 시작 +3, 끝 +3프레임)</td><td class="n"><b>0.956</b></td><td class="n">0.975</td><td class="n"></td></tr>
+              <tr><td class="first">C</td><td class="n">0.149</td><td class="n">0.728</td><td class="n">0.297</td></tr>
+              <tr><td class="first">C + 보정 (배운 값: +5, +6프레임, 옮긴 경계에만)</td><td class="n"><b>0.307</b></td><td class="n">0.750</td><td class="n"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">A는 5fps라 6프레임 단위로 끊겨서, 배운 보정이 샘플 반 칸인 3프레임이다. 보정이 없으면 6프레임 지연이 C를 절반으로 만든다(0.297 → 0.149). Muse Spark가 보이는 접촉을 고르면서 B의 보정을 지우기 때문이고, 새 행이 바로 이 경우를 위한 것이다. 보정 없는 자체 점검 결과는 전과 바이트 단위로 같다.</p>
+
+      <div class="tbl">
+        <p class="cap">평가 2: 튜닝 점검, 대리 등급 (손가락 가림은 대리 등급이 없어 물체 항목 6개로)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행</th><th class="n">AUC</th><th class="n">95% 구간</th></tr></thead>
+            <tbody>
+              <tr><td class="first">R2 단순 평균</td><td class="n">0.647</td><td class="n">0.592~0.699</td></tr>
+              <tr><td class="first">R3 학습된 가중치</td><td class="n">0.714</td><td class="n">0.657~0.769</td></tr>
+              <tr><td class="first">우리 전체 점수</td><td class="n">0.721</td><td class="n">0.668~0.775</td></tr>
+              <tr><td class="first"><b>R3 − R2</b></td><td class="n"><b>+0.067</b></td><td class="n">0.014~0.120</td></tr>
+              <tr><td class="first">우리 점수 − R3</td><td class="n">+0.007</td><td class="n">−0.012~0.030</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">학습된 가중치: 크기 +2.13, 감쌀 폭 −1.04, 손잡이 −0.21. 단순 평균은 감쌀 폭과 손잡이를 뜻대로 세는데, 라벨은 그 방향이 틀렸다고 말한다(EXP-19). 학습이 이득을 보는 곳이 여기다. 영상과 SAM 항목은 R3 위에 거의 더하지 못한다(+0.007, EXP-17과 같음).</p>
+
+      <div class="tbl">
+        <p class="cap">검정력: 사람 3명짜리 가짜 검증 세트 (클립 중앙값 1,192개, 시퀀스 41개. 실제 검증은 1,426개, 51개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>등급</th><th class="n">세트 수</th><th class="n">R3 − R2 중앙값 (범위)</th><th class="n">구간이 0 위인 비율</th></tr></thead>
+            <tbody>
+              <tr><td class="first">대리 등급 그대로</td><td class="n">20</td><td class="n">+0.062 (+0.021~+0.102)</td><td class="n"><b>95%</b></td></tr>
+              <tr><td class="first">15%를 무작위로 바꿈</td><td class="n">60</td><td class="n">+0.049 (−0.002~+0.075)</td><td class="n"><b>77%</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp27_power.png" loading="lazy" width="960" height="456" alt="가짜 검증 세트마다 학습 가중치와 단순 평균의 AUC 차이와 95% 구간">
+        <div class="keys"><span class="key"><i class="dot" style="--c:#1971c2"></i>대리 등급</span><span class="key"><i class="dot" style="--c:#e8590c"></i>등급 15%를 무작위로 바꿈</span><span class="key"><i class="ln" style="--c:var(--ink)"></i>0</span></div>
+        <figcaption>점 하나가 가짜 검증 세트 하나, 막대는 95% 구간. 차이 순으로 정렬.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>시점 보정 코드는 동작함. 6프레임 일찍 오는 답에서 A와 C의 최고 점수를 되찾음. 보정이 없으면 C는 지연 때문에 최고 점수의 절반을 잃음.</li>
+        <li>"체크리스트 대 학습" 비교도 동작하고, 튜닝에서는 가중치를 배우면 단순 평균보다 AUC가 약 0.07 높음. 주로 감쌀 폭과 손잡이의 방향을 뒤집어서.</li>
+        <li>사람 3명짜리 검증 세트로 충분함. 완벽한 등급이면 세트의 95%, 파일럿 수준의 등급 오류가 있으면 77%에서 이 이득을 잡아냄.</li>
+        <li>한계: 대리 등급은 Muse Spark 등급이 아니고, 무작위 오류는 Muse Spark 실수의 단순한 모델이며, 가짜 검증 사람들도 실제 검증처럼 튜닝 사람과 물체를 공유함.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
     <h2><span class="no">2</span>진행 중인 작업</h2>
     <h3 style="margin-top:0">접촉 구간 검출</h3>
-    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). A와 C도 코드를 끝냈고, 완벽한 답으로 잰 최고 점수는 A 0.96, C 0.15다(<a href="#exp-21">EXP-21</a>). C가 B의 경계에 묶이는 문제는 B가 물체 바뀜으로 접촉을 끊게 해서 줄였지만(C 최고 0.32), 대신 너무 많이 끊는다(<a href="#exp-22">EXP-22</a>). 튜닝 50개로 B 격자를 확정해 재현율을 올리기로 했고, C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않는다. 너무 많이 끊는 것을 줄이는 "유지" 선택지도 격자에 넣었다(<a href="#exp-24">EXP-24</a>). A와 C도 B처럼 장갑 기준 시점 보정을 튜닝에서 배워 적용하고, 보정 전후를 둘 다 보고하기로 계산 전에 정했다. 유료 호출이 풀리면 파일럿부터 돌린다. 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
+    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). A와 C도 코드를 끝냈고, 완벽한 답으로 잰 최고 점수는 A 0.96, C 0.15다(<a href="#exp-21">EXP-21</a>). C가 B의 경계에 묶이는 문제는 B가 물체 바뀜으로 접촉을 끊게 해서 줄였지만(C 최고 0.32), 대신 너무 많이 끊는다(<a href="#exp-22">EXP-22</a>). 튜닝 50개로 B 격자를 확정해 재현율을 올리기로 했고, C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않는다. 너무 많이 끊는 것을 줄이는 "유지" 선택지도 격자에 넣었다(<a href="#exp-24">EXP-24</a>). A와 C도 B처럼 장갑 기준 시점 보정을 튜닝에서 배워 적용하고, 보정 전후를 둘 다 보고하기로 계산 전에 정했다. 보정 코드는 일부러 6프레임 일찍 보게 만든 답에서 A와 C의 최고 점수를 되찾아 점검을 통과했다(<a href="#exp-27">EXP-27</a>). 유료 호출이 풀리면 파일럿부터 돌린다. 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
 
     <h3>비교 대상</h3>
     <ol class="flow">
@@ -2726,7 +2797,7 @@ Answer with JSON only.</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 06:01 KST
+    마지막 갱신 2026-10-28 06:03 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2778,6 +2849,7 @@ Answer with JSON only.</pre>
         ["done", "B에 물체 바뀜 끊기 선택지 추가: 파일럿 F1 두 배, 과분할 (EXP-22)"],
         ["done", "결정: 튜닝 50개로 B 재현율을 올림, C는 B 경계만 확인"],
         ["done", "B에 유지 선택지 추가: IoU 0.72, F1은 조금 내려감 (EXP-24)"],
+        ["done", "A·C 시점 보정 코드 점검: 6프레임 지연을 되돌림 (EXP-27)"],
         ["todo", "튜닝 나머지 47개 SAM 실행 (유료 호출 보류)"],
         ["todo", "B SAM 규칙 기준값과 시작 지연 정하기 (튜닝 50개)"],
         ["todo", "A Muse Spark 단독 (5fps)"],
@@ -2824,6 +2896,7 @@ Answer with JSON only.</pre>
         ["done", "유료 실행 준비: 클립 세트, SAM 구간 513개, 프레임, 채점 코드 점검"],
         ["done", "SAM·Muse Spark 파일럿: 잡은 물체 99%, 등급 일치 27/30 (EXP-23)"],
         ["done", "게이트와 처음 보는 물체 비교 코드 점검 (EXP-26)"],
+        ["done", "체크리스트 대 학습 코드와 검정력 점검 (EXP-27)"],
         ["todo", "SAM 전체 (점수 학습 400개, 검증 1,426개)"],
         ["todo", "Muse Spark 튜닝 400개 → 게이트 (물체 등급 AUC 둘 다 0.65 이상)"],
         ["todo", "게이트가 멈춤이 아니면 Muse Spark 검증 1,426개"],
