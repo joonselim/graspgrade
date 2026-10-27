@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0d10">
+<title>GraspGrade 진행 상황</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --line: #e2e5ea;
+    --text: #15181d;
+    --muted: #666e7a;
+    --faint: #98a0ab;
+    --accent: #2b6cff;
+    --ok: #0f8a4f;
+    --warn: #b06a00;
+    --stop: #c23b3b;
+    --radius: 14px;
+    --pad: 16px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0d10;
+      --surface: #14171c;
+      --surface-2: #1c2026;
+      --line: #272c34;
+      --text: #e8ebef;
+      --muted: #9aa3af;
+      --faint: #6b7380;
+      --accent: #6b9bff;
+      --ok: #45c17e;
+      --warn: #e0a033;
+      --stop: #ef6b6b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0d10;
+    --surface: #14171c;
+    --surface-2: #1c2026;
+    --line: #272c34;
+    --text: #e8ebef;
+    --muted: #9aa3af;
+    --faint: #6b7380;
+    --accent: #6b9bff;
+    --ok: #45c17e;
+    --warn: #e0a033;
+    --stop: #ef6b6b;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+      "Malgun Gothic", "Noto Sans KR", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- gate ---------- */
+  #gate {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: var(--bg);
+  }
+  #gate .box { width: 100%; max-width: 340px; text-align: center; }
+  #gate h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  #gate p { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+  #gate form { display: flex; flex-direction: column; gap: 10px; }
+  #pw {
+    width: 100%; padding: 14px; font-size: 16px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface); color: var(--text);
+  }
+  #pw:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  #gate button {
+    padding: 14px; font-size: 16px; font-weight: 600;
+    border: 0; border-radius: 10px; cursor: pointer;
+    background: var(--accent); color: #fff;
+  }
+  #err { color: var(--stop); font-size: 14px; min-height: 20px; margin: 0; }
+  #app[hidden] { display: none; }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 860px; margin: 0 auto; padding: 20px var(--pad) 72px; }
+  header.top { padding-top: 8px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--faint); margin: 0 0 6px;
+  }
+  h1.title { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .lede { color: var(--muted); font-size: 15px; margin: 0 0 18px; }
+
+  section { margin-top: 32px; }
+  h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--faint);
+    margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 16px; margin: 20px 0 8px; }
+  p { margin: 0 0 12px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: var(--pad);
+  }
+  .card + .card { margin-top: 12px; }
+
+  /* ---------- countdown + day bar ---------- */
+  .clock { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 520px) { .clock { grid-template-columns: 1.6fr 1fr; } }
+  .big {
+    font-size: clamp(24px, 7.4vw, 32px); font-weight: 700;
+    line-height: 1.15; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .small { font-size: 13px; color: var(--muted); }
+  .daybar { display: flex; gap: 3px; margin-top: 14px; }
+  .daybar span {
+    flex: 1; height: 8px; border-radius: 3px; background: var(--surface-2);
+    border: 1px solid var(--line);
+  }
+  .daybar span.past { background: var(--accent); border-color: var(--accent); }
+  .daybar span.now { background: var(--warn); border-color: var(--warn); }
+
+  /* ---------- tiles ---------- */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 620px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px;
+  }
+  .tile .n { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .tile .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ---------- status line ---------- */
+  .status {
+    border-left: 3px solid var(--warn); background: var(--surface);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px var(--pad);
+  }
+  .status strong { display: block; font-size: 17px; margin-bottom: 4px; }
+
+  /* ---------- rows ---------- */
+  ul.rows { list-style: none; margin: 0; padding: 0; }
+  ul.rows > li {
+    border: 1px solid var(--line); background: var(--surface);
+    border-radius: var(--radius); padding: 13px var(--pad);
+  }
+  ul.rows > li + li { margin-top: 8px; }
+  .rowhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .rowhead .name { font-weight: 600; }
+  .rowbody { font-size: 14px; color: var(--muted); margin-top: 3px; }
+  .rowbody code, code { font-family: var(--mono); font-size: 0.9em; background: var(--surface-2);
+    padding: 1px 5px; border-radius: 5px; }
+
+  .pill {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .pill.done { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.wait { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
+  .pill.open { color: var(--stop); background: color-mix(in srgb, var(--stop) 14%, transparent); }
+  .pill.plain { color: var(--muted); background: var(--surface-2); }
+
+  ol.steps { margin: 0; padding-left: 0; list-style: none; counter-reset: s; }
+  ol.steps > li {
+    counter-increment: s;
+    position: relative; padding: 13px var(--pad) 13px 46px;
+    border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius);
+  }
+  ol.steps > li + li { margin-top: 8px; }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute; left: 14px; top: 13px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--surface-2); color: var(--muted);
+    font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
+  }
+  ol.steps > li.hot { border-color: var(--warn); }
+  ol.steps > li.hot::before { background: var(--warn); color: #fff; }
+
+  /* ---------- bar chart ---------- */
+  .chart { display: grid; gap: 7px; }
+  .barrow { display: grid; grid-template-columns: 94px 1fr 44px; gap: 8px; align-items: center; font-size: 13px; }
+  .barrow .lbl { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track { height: 18px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+  .fill { height: 100%; border-radius: 5px; background: var(--accent); }
+  .fill.low { background: var(--stop); }
+  .fill.mid { background: var(--warn); }
+  .barrow .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+
+  /* ---------- key-value table ---------- */
+  dl.kv { margin: 0; display: grid; grid-template-columns: 1fr; gap: 0; }
+  dl.kv > div {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+  }
+  dl.kv > div:last-child { border-bottom: 0; }
+  dl.kv dt { color: var(--muted); margin: 0; }
+  dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ---------- chips ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12px; font-family: var(--mono);
+    padding: 3px 8px; border-radius: 6px;
+    background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+  }
+
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 440px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; color: var(--faint); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+
+  footer {
+    margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--faint);
+  }
+  .themebtn {
+    position: fixed; right: 12px; bottom: 12px; z-index: 50;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    font-size: 16px; cursor: pointer;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h1>GraspGrade</h1>
+    <p>진행 상황 보기. 비밀번호가 필요하다.</p>
+    <form id="gateform">
+      <input id="pw" type="password" inputmode="text" autocomplete="current-password"
+             placeholder="비밀번호" aria-label="비밀번호">
+      <button type="submit">열기</button>
+      <p id="err" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+<button class="themebtn" id="themebtn" title="밝기 전환" aria-label="밝기 전환">◐</button>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Meta Global AI Developer Hackathon · Indie Dev Track</p>
+    <h1 class="title">GraspGrade</h1>
+    <p class="lede">
+      1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 클립에
+      "로봇 손이 따라할 수 있는가" 점수(0~100)를 매긴다. 자르기는 촉각 장갑
+      데이터로, 점수는 모션캡처 데이터로 검증한다.
+    </p>
+  </header>
+
+  <section>
+    <div class="card">
+      <div class="clock">
+        <div>
+          <div class="big" id="cd">—</div>
+          <div class="small">제출 마감까지 (11/04 12:00 ET = 11/05 02:00 KST)</div>
+        </div>
+        <div>
+          <div class="big" id="dayno">—</div>
+          <div class="small">10일 중 (10/26 ~ 11/04)</div>
+        </div>
+      </div>
+      <div class="daybar" id="daybar"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>한 줄 상태</h2>
+    <div class="status">
+      <strong>Meta API 호출 직전까지 끝났다.</strong>
+      환경 구축, 두 데이터셋 다운로드, 에피소드 자르기, 분할 고정까지 완료.
+      Meta Model API는 아직 한 번도 호출하지 않았다. 크레딧 $150은 그대로 남아 있다.
+    </div>
+  </section>
+
+  <section>
+    <h2>숫자</h2>
+    <div class="tiles">
+      <div class="tile"><div class="n">0</div><div class="k">Meta API 호출</div></div>
+      <div class="tile"><div class="n">72 / 72</div><div class="k">OpenGraph 에피소드 자르기</div></div>
+      <div class="tile"><div class="n">136</div><div class="k">HOT3D 정답 시퀀스 (9명)</div></div>
+      <div class="tile"><div class="n">82.3%</div><div class="k">MediaPipe 평균 검출률</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>끝난 것</h2>
+    <ul class="rows">
+      <li>
+        <div class="rowhead"><span class="name">WSL2 + 시스템 패키지</span><span class="pill done">완료</span></div>
+        <div class="rowbody">Ubuntu-24.04, ffmpeg 6.1.1 (libdav1d 포함). Windows 네이티브는 불가능하다 (pinocchio 휠 없음).</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">venv + 패키지 버전 고정</span><span class="pill done">완료</span></div>
+        <div class="rowbody">dex_retargeting 0.4.6, mediapipe 0.10.21, numpy 1.26.4, torch 2.14.1+cpu, openai 3.39.0, pin 2.7.0.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">환경 검증</span><span class="pill done">완료</span></div>
+        <div class="rowbody">dex-retargeting 샘플 621프레임, Allegro 오른손. 검출률 1.000, jitter 1.23 mm/frame, 리타게팅 오차 중앙값 17.0%. <code>scripts/verify_env.py</code></div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">키 등록</span><span class="pill done">완료</span></div>
+        <div class="rowbody">MODEL_API_KEY, HUGGING_FACE_TOKEN. 모드 600, gitignore 처리.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">OpenGraph 다운로드</span><span class="pill done">완료</span></div>
+        <div class="rowbody">72 에피소드, 138,629 프레임, 30fps, 5.9 GB.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">OpenGraph 에피소드 자르기</span><span class="pill done">완료</span></div>
+        <div class="rowbody">72개 전부 720p H.264로 재인코딩. 프레임 수 일치, 시작 프레임 정렬 확인. <code>scripts/cut_episodes.py</code></div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">MediaPipe 검출률 측정</span><span class="pill done">완료</span></div>
+        <div class="rowbody">8 에피소드 19,363프레임. 평균 82.3%, 배경에 따라 14%~100%.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">HOT3D 다운로드</span><span class="pill done">부분</span></div>
+        <div class="rowbody">198 시퀀스 전부 ground_truth + hand_data + 물체 3D 모델 (7.3 GB). 영상은 P0001_10a27bf7 1개만 받았다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">분할 고정</span><span class="pill done">완료</span></div>
+        <div class="rowbody">seed 20261026. 다시 뽑지 않는다. <code>scripts/make_splits.py</code></div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">git 저장소</span><span class="pill done">완료</span></div>
+        <div class="rowbody">스크립트, 문서, 분할만 커밋. <code>.env</code>, <code>data/</code>, <code>out/</code>은 제외.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>계획과 달랐던 사실</h2>
+    <p class="small">다운로드한 파일로 직접 확인한 값. 계획서와 다르면 이쪽이 맞다.</p>
+    <ul class="rows">
+      <li>
+        <div class="rowhead"><span class="name">OpenGraph 영상은 AV1이다</span></div>
+        <div class="rowbody">OpenCV pip 휠은 AV1을 못 읽는다. 항상 <code>data/episodes_720p</code>의 H.264를 쓴다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">라벨은 사람이 달지 않았다</span></div>
+        <div class="rowbody">촉각과 그립 힘에서 자동 생성됐다. 접촉 = <code>annotation.anchor != "transition"</code>. 접촉 시작 = transition에서 contact_on으로 넘어가는 지점.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">±5프레임 = ±0.167초</span></div>
+        <div class="rowbody">30fps, 타임스탬프 간격이 정확히 1/30초.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">HOT3D 정답 있는 사람은 19명이 아니라 9명</span></div>
+        <div class="rowbody">19명은 Quest를 포함한 숫자다. Aria만 보면 136 시퀀스, 9명. held-out은 3명 51 시퀀스. AUC에 부트스트랩 신뢰구간이 더 중요해졌다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">VRS 329 GB는 필요 없다</span></div>
+        <div class="rowbody"><code>preview_rgb.mp4</code>가 원본 그대로다. 1408x1408, 30fps, 똑바로 선 방향.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">장갑 손 미검출은 좌우 라벨 문제가 아니다</span></div>
+        <div class="rowbody">손을 아예 놓친 것이다. 거울 반전 설정은 맞다 (양손 검출 7,101프레임 전부 좌우 일치). 베이지 벽 앞 스프레이병 장면이 가장 나쁘고 그 장면이 데이터의 약 20%다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">HOT3D URL은 11/10까지 유효하다</span></div>
+        <div class="rowbody">마감(11/04) 이후까지 살아 있다. 급하게 전부 받을 필요는 없다.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>MediaPipe 검출률 (에피소드별, 한 손이라도 검출)</h2>
+    <div class="card">
+      <div class="chart" id="mpchart"></div>
+      <p class="small" style="margin:14px 0 0">
+        배경이 결정한다. ep48은 베이지 장갑 + 베이지 벽에 손이 화면 밖으로 잘린다.
+        ep66은 어두운 매트 위라 100%. 영향: 리타게팅 복원성 항목이 동작이 아니라 장갑 때문에
+        낮게 나온다. 숫자 2는 맨손 HOT3D에서 돌리므로 영향이 없고, 숫자 1은 MediaPipe가 아니라
+        SAM 3.1을 쓴다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>다음 할 일</h2>
+    <ol class="steps">
+      <li class="hot">
+        <div class="rowhead"><span class="name">Meta API 스모크 테스트</span><span class="pill wait">사용자 승인 필요</span></div>
+        <div class="rowbody">
+          Muse Spark(<code>muse-spark-1.3</code>, 이미지 1장, <code>reasoning_effort="low"</code>)와
+          SAM 3.1(<code>sam-3.1</code>, 짧은 mp4, 텍스트 프롬프트 <code>"hand"</code>, stream)을 각각 1회 호출한다.
+          확인할 것: 실제 응답 형식이 기존 파서와 맞는지, 토큰과 비용, 걸린 시간.
+          이 결과로 에피소드 1개 전체 비용을 추정한다. 크레딧 $150을 쓰기 때문에 승인 없이 호출하지 않는다.
+        </div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">Day 3~4: OpenGraph 접촉 자르기 (숫자 1)</span></div>
+        <div class="rowbody">SAM 박스 겹침으로 접촉 신호 → Muse Spark로 경계 확정 → ffmpeg 자르기. 보이는 접촉과 장갑 압력 사이 시간차를 측정해 보정한다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">Day 5: HOT3D 카메라 보정 방향 확인, 그다음 copyable 라벨</span></div>
+        <div class="rowbody">미해결 1번을 먼저 푼다. 그다음 copyable 비율이 20~80% 안에 들어오는지 본다. 이것이 가장 큰 위험이다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">남은 HOT3D 영상 다운로드</span></div>
+        <div class="rowbody">정답 있는 136 시퀀스의 <code>preview_rgb.mp4</code>. 실행 전 JSON의 그룹 이름을 확인한다.</div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>미해결</h2>
+    <ul class="rows">
+      <li>
+        <div class="rowhead"><span class="name">HOT3D 카메라 보정의 기준 방향</span><span class="pill open">막힘</span></div>
+        <div class="rowbody"><code>camera_models.json</code>(FISHEYE624)이 똑바로 선 preview 기준인지, 90도 돌아간 Aria 원본 기준인지 모른다. MANO 손을 영상에 투영하기 전에 반드시 정해야 한다. 확인 방법: <code>box2d_hands.csv</code>(스트림 214-1)의 정답 박스와 투영한 손을 겹쳐 본다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">HOT3D 툴킷 / projectaria_tools / MANO 등록</span><span class="pill wait">대기</span></div>
+        <div class="rowbody">아직 설치와 등록을 하지 않았다. MANO는 별도 등록(mano.is.tue.mpg.de)이 필요할 수 있다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">환경과 무관한 할 일</span><span class="pill plain">보류</span></div>
+        <div class="rowbody">Official Rules 확인(사전 코드 허용 여부, 팀 규모), 제안서에 "기존 필터의 보완재" 프레이밍 반영, one-pager 이름 변경, 이인석 지원서, 한국 체류 일정(10/25~12/02) 확인.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>파이프라인</h2>
+    <div class="card">
+      <ol class="steps" style="counter-reset: s">
+        <li><div class="rowhead"><span class="name">SAM 3.1</span></div><div class="rowbody">영상 전체에서 프레임별 손/물체 박스와 마스크를 받는다. 깊이 손실을 줄이기 위해 마스크도 저장한다.</div></li>
+        <li><div class="rowhead"><span class="name">접촉 신호</span></div><div class="rowbody">프레임마다 박스 겹침과 동반 이동으로 0~1 신호를 만든다.</div></li>
+        <li><div class="rowhead"><span class="name">Muse Spark 경계 확정</span></div><div class="rowbody">각 접촉의 시작과 끝 주변 약 7프레임만 보낸다. 이유와 confidence도 저장한다.</div></li>
+        <li><div class="rowhead"><span class="name">ffmpeg 자르기</span></div><div class="rowbody">앞뒤 여유를 두고 클립을 만든다.</div></li>
+      </ol>
+      <h3>7개 채점 항목</h3>
+      <div class="chips">
+        <span class="chip">가시성</span>
+        <span class="chip">카메라 안정성</span>
+        <span class="chip">접촉 명확성</span>
+        <span class="chip">동작 완결성</span>
+        <span class="chip">손가락 가림 (Muse Spark)</span>
+        <span class="chip">물체 성질 (Muse Spark)</span>
+        <span class="chip">리타게팅 복원성 (MediaPipe + Allegro)</span>
+      </div>
+      <p class="small" style="margin:12px 0 0">
+        게이트: 장면 전환이 있거나 접촉이 없으면 0점.
+        등급을 high=1 / mid=0.5 / low=0으로 바꿔 7개 숫자로 만들고,
+        로지스틱 회귀로 모캡 정답을 학습한다. 확률 x 100이 점수다. 결정 트리는 쓰지 않는다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>두 개의 정답</h2>
+    <div class="card scroll">
+      <table>
+        <thead><tr><th>#</th><th>질문</th><th>정답</th><th>지표</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>영상만으로 접촉 시작과 끝을 찾는가</td>
+            <td>OpenGraph 촉각 장갑</td>
+            <td>boundary F1 (허용창 2개), contact IoU</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>우리 점수가 로봇이 따라할 수 있는 클립을 고르는가</td>
+            <td>HOT3D 모캡 → dex-retargeting → Allegro 기하 체크</td>
+            <td>AUC (부트스트랩 CI), 상위 20% 양성 비율 vs base rate</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin:12px 0 0">
+        baseline은 숫자 1은 Muse Spark 단독 / SAM 규칙 / SAM + Muse Spark,
+        숫자 2는 체크리스트 없이 같은 질문을 받은 Muse Spark다.
+        우리 방법은 기존 필터를 대체하지 않고 그 위에 얹는 plug-in layer다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>데이터</h2>
+    <div class="card">
+      <h3 style="margin-top:0">OpenGraph Ego-Tactile <span class="pill done">받음</span></h3>
+      <dl class="kv">
+        <div><dt>용도</dt><dd>숫자 1 (접촉 시점)</dd></div>
+        <div><dt>크기</dt><dd>5.9 GB + 자른 영상 511 MB</dd></div>
+        <div><dt>에피소드</dt><dd>72개, 138,629 프레임, 1.28시간</dd></div>
+        <div><dt>영상</dt><dd>1920x1080 AV1, 30fps, 23개 mp4에 묶여 있음</dd></div>
+        <div><dt>촉각</dt><dd>베이지 장갑 양손, 손당 80 택셀, 프레임마다 정렬</dd></div>
+        <div><dt>라이선스</dt><dd>CC-BY-4.0, 승인 불필요</dd></div>
+      </dl>
+      <h3>HOT3D (Aria) <span class="pill wait">영상 1개만</span></h3>
+      <dl class="kv">
+        <div><dt>용도</dt><dd>숫자 2 (로봇 복제 가능성)</dd></div>
+        <div><dt>받은 크기</dt><dd>7.3 GB</dd></div>
+        <div><dt>정답 있는 시퀀스</dt><dd>136개, 9명, RGB 480,375 프레임</dd></div>
+        <div><dt>정답 없음</dt><dd>62 시퀀스 (P0004, P0005, P0008, P0016, P0020) 제외</dd></div>
+        <div><dt>영상</dt><dd>1408x1408 어안, 30fps, 손은 맨손</dd></div>
+        <div><dt>물체</dt><dd>단단한 물체 33종, 3D 모델 포함</dd></div>
+        <div><dt>URL 유효</dt><dd>약 2026-11-10까지</dd></div>
+      </dl>
+      <p class="small" style="margin:14px 0 0">쓰지 않는 데이터: EgoDex (NC-ND라서 결과 공개 불가), RoCo, FreeTacMan.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>분할 (고정, 다시 뽑지 않는다)</h2>
+    <div class="card">
+      <h3 style="margin-top:0">OpenGraph: 튜닝 50 / held-out 22</h3>
+      <div class="chips" id="ogchips"></div>
+      <h3>HOT3D: 사람 단위</h3>
+      <p class="small" style="margin:0 0 6px">튜닝 6명 (85 시퀀스)</p>
+      <div class="chips">
+        <span class="chip">P0002</span><span class="chip">P0003</span><span class="chip">P0009</span>
+        <span class="chip">P0011</span><span class="chip">P0014</span><span class="chip">P0015</span>
+      </div>
+      <p class="small" style="margin:12px 0 6px">held-out 3명 (51 시퀀스, 37.5%)</p>
+      <div class="chips">
+        <span class="chip">P0001</span><span class="chip">P0010</span><span class="chip">P0012</span>
+      </div>
+      <p class="small" style="margin:14px 0 0">held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>가장 큰 위험</h2>
+    <ul class="rows">
+      <li>
+        <div class="rowhead"><span class="name">HOT3D copyable 라벨이 한쪽으로 쏠린다</span><span class="pill open">1순위</span></div>
+        <div class="rowbody">Allegro 손이 사람 손보다 커서, 기준이 엄격하면 거의 전부 "불가", 느슨하면 거의 전부 "가능"이 된다. 손목 위치를 몇 cm 범위에서 최적화한 뒤 판정한다. 튜닝 세트에서 가능 비율이 20~80% 밖이면 정의를 다시 조정한다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">분산이 0인 항목</span></div>
+        <div class="rowbody">HOT3D는 단단한 물체뿐이고 실험실 고정 촬영이다. "물체 성질"과 "카메라 안정성"은 분산이 0일 수 있다. 그런 경우 회귀에서 빼고 데모에서 설명한다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">검증 세트가 3명뿐</span></div>
+        <div class="rowbody">AUC에 부트스트랩 신뢰구간을 함께 보고한다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">영상 접촉과 촉각 임계 사이 지연</span></div>
+        <div class="rowbody">체계적 지연이 ±0.167초 허용 범위를 잠식할 수 있다. Day 3~4에 측정해서 보정한다.</div>
+      </li>
+      <li>
+        <div class="rowhead"><span class="name">문제 제기는 인터넷 영상, 검증은 실험실 데이터</span></div>
+        <div class="rowbody">데모 끝에 직접 찍은 1인칭 영상 몇 개를 보여준다.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>10일 계획</h2>
+    <div class="card">
+      <dl class="kv">
+        <div><dt>Day 1~2 · 환경, 데이터, 분할, API 연결</dt><dd id="p12">진행 중</dd></div>
+        <div><dt>Day 3~4 · 접촉 자르기 (숫자 1)</dt><dd>대기</dd></div>
+        <div><dt>Day 5~6 · HOT3D 라벨링</dt><dd>대기</dd></div>
+        <div><dt>Day 7 · 7개 체크 + 가중치 학습 (숫자 2)</dt><dd>대기</dd></div>
+        <div><dt>Day 8~9 · 뷰어, 데모 영상, README</dt><dd>대기</dd></div>
+        <div><dt>Day 10 · 최종 점검, 정오 ET 제출</dt><dd>대기</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>팀과 환경</h2>
+    <div class="card">
+      <dl class="kv">
+        <div><dt>팀</dt><dd>임준세, 이인석 (2인)</dd></div>
+        <div><dt>트랙</dt><dd>Indie Dev Track, 지원서 제출 완료 (10/21)</dd></div>
+        <div><dt>테마</dt><dd>Push the Frontier (robotics)</dd></div>
+        <div><dt>크레딧</dt><dd>Meta Model API $150, 사용 $0</dd></div>
+        <div><dt>작업 장비</dt><dd>데스크톱 RTX 3070 8GB, RAM 32GB, WSL2 Ubuntu 24.04</dd></div>
+        <div><dt>디스크</dt><dd>데이터 14 GB 사용, C: 여유 170 GB에서 시작</dd></div>
+        <div><dt>이전 이름</dt><dd>TouchGrain</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    마지막 갱신: 2026-10-27. 출처: <code>docs/PROGRESS.md</code>, <code>docs/DATA_NOTES.md</code>,
+    <code>docs/ENVIRONMENT.md</code>, <code>docs/PROJECT_BRIEF.md</code>.
+    이 페이지는 비공개 공유용이다. 비밀번호는 브라우저 안에서만 확인하므로 진짜 보안이 아니다.
+  </footer>
+
+</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var PW_HASH = "e143e181975031154f953aa029ca5f443797016a811fd0f01de0673547bddc7b";
+  var KEY = "gg-ok";
+
+  var gate = document.getElementById("gate");
+  var app = document.getElementById("app");
+  var form = document.getElementById("gateform");
+  var pw = document.getElementById("pw");
+  var err = document.getElementById("err");
+
+  // SHA-256. crypto.subtle only exists in a secure context (https or
+  // localhost), so file:// and data: previews fall back to this.
+  function sha256fallback(msg) {
+    var K = [], H = [], i, j, p = 2, n;
+    for (i = 0; i < 64;) {
+      for (j = 2, n = 0; j * j <= p; j++) if (p % j === 0) { n = 1; break; }
+      if (!n) {
+        if (i < 8) H[i] = (Math.pow(p, 1 / 2) % 1 * 4294967296) | 0;
+        K[i] = (Math.pow(p, 1 / 3) % 1 * 4294967296) | 0;
+        i++;
+      }
+      p++;
+    }
+    var bytes = Array.prototype.slice.call(new TextEncoder().encode(msg));
+    var bitLen = bytes.length * 8;
+    bytes.push(0x80);
+    while (bytes.length % 64 !== 56) bytes.push(0);
+    for (i = 7; i >= 0; i--) bytes.push((bitLen / Math.pow(2, i * 8)) & 0xff);
+
+    function rr(x, c) { return (x >>> c) | (x << (32 - c)); }
+    var w = new Int32Array(64);
+    for (var b = 0; b < bytes.length; b += 64) {
+      for (i = 0; i < 16; i++) {
+        w[i] = (bytes[b + i * 4] << 24) | (bytes[b + i * 4 + 1] << 16) |
+               (bytes[b + i * 4 + 2] << 8) | bytes[b + i * 4 + 3];
+      }
+      for (i = 16; i < 64; i++) {
+        var s0 = rr(w[i - 15], 7) ^ rr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+        var s1 = rr(w[i - 2], 17) ^ rr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+        w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+      }
+      var a = H[0], bb = H[1], c = H[2], d = H[3],
+          e = H[4], f = H[5], g = H[6], h = H[7];
+      for (i = 0; i < 64; i++) {
+        var S1 = rr(e, 6) ^ rr(e, 11) ^ rr(e, 25);
+        var ch = (e & f) ^ (~e & g);
+        var t1 = (h + S1 + ch + K[i] + w[i]) | 0;
+        var S0 = rr(a, 2) ^ rr(a, 13) ^ rr(a, 22);
+        var mj = (a & bb) ^ (a & c) ^ (bb & c);
+        var t2 = (S0 + mj) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0;
+        d = c; c = bb; bb = a; a = (t1 + t2) | 0;
+      }
+      H[0] = (H[0] + a) | 0; H[1] = (H[1] + bb) | 0;
+      H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+      H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0;
+      H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+    }
+    return H.map(function (x) {
+      return (x >>> 0).toString(16).padStart(8, "0");
+    }).join("");
+  }
+
+  function sha256hex(s) {
+    if (window.crypto && crypto.subtle) {
+      var bytes = new TextEncoder().encode(s);
+      return crypto.subtle.digest("SHA-256", bytes).then(function (buf) {
+        return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+          return b.toString(16).padStart(2, "0");
+        }).join("");
+      });
+    }
+    return Promise.resolve(sha256fallback(s));
+  }
+
+  function open() {
+    gate.remove();
+    app.hidden = false;
+    render();
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    err.textContent = "";
+    sha256hex(pw.value).then(function (h) {
+      if (h === PW_HASH) {
+        try { sessionStorage.setItem(KEY, "1"); } catch (_) {}
+        open();
+      } else {
+        err.textContent = "비밀번호가 틀렸다.";
+        pw.value = "";
+        pw.focus();
+      }
+    });
+  });
+
+  var unlocked = false;
+  try { unlocked = sessionStorage.getItem(KEY) === "1"; } catch (_) {}
+  if (unlocked) { open(); } else { pw.focus(); }
+
+  // ---------- content that depends on today ----------
+
+  var MP = [
+    { ep: "ep0 용기", v: 98.3 },
+    { ep: "ep1 용기", v: 96.1 },
+    { ep: "ep6 금속", v: 96.0 },
+    { ep: "ep18 스펀지", v: 92.1 },
+    { ep: "ep30 종이상자", v: 61.0 },
+    { ep: "ep42 지우개", v: 93.5 },
+    { ep: "ep48 스프레이병", v: 14.3 },
+    { ep: "ep66 케첩", v: 100.0 }
+  ];
+
+  var HELD_OUT = [7, 14, 18, 24, 27, 34, 36, 37, 39, 40, 41, 42, 43, 45, 48, 49, 52, 57, 58, 64, 66, 67];
+
+  var START = Date.UTC(2026, 9, 26, 4, 0, 0);          // 10/26 00:00 ET
+  var DEADLINE = Date.UTC(2026, 10, 4, 17, 0, 0);      // 11/04 12:00 ET (EST, UTC-5)
+
+  function renderChart() {
+    var host = document.getElementById("mpchart");
+    if (!host) return;
+    host.innerHTML = "";
+    MP.forEach(function (d) {
+      var cls = d.v < 50 ? "low" : (d.v < 85 ? "mid" : "");
+      var row = document.createElement("div");
+      row.className = "barrow";
+      row.innerHTML =
+        '<div class="lbl"></div>' +
+        '<div class="track"><div class="fill ' + cls + '" style="width:' + d.v + '%"></div></div>' +
+        '<div class="val">' + d.v.toFixed(0) + "%</div>";
+      row.firstChild.textContent = d.ep;
+      host.appendChild(row);
+    });
+  }
+
+  function renderChips() {
+    var host = document.getElementById("ogchips");
+    if (!host) return;
+    host.innerHTML = "";
+    HELD_OUT.forEach(function (n) {
+      var s = document.createElement("span");
+      s.className = "chip";
+      s.textContent = n;
+      host.appendChild(s);
+    });
+    var note = document.createElement("span");
+    note.className = "chip";
+    note.textContent = "위 22개가 held-out";
+    host.appendChild(note);
+  }
+
+  function dayIndex() {
+    var d = Math.floor((Date.now() - START) / 86400000) + 1;
+    return Math.min(10, Math.max(1, d));
+  }
+
+  function renderDays() {
+    var day = dayIndex();
+    document.getElementById("dayno").textContent = "Day " + day;
+    var bar = document.getElementById("daybar");
+    bar.innerHTML = "";
+    for (var i = 1; i <= 10; i++) {
+      var s = document.createElement("span");
+      s.className = i < day ? "past" : (i === day ? "now" : "");
+      s.title = "Day " + i;
+      bar.appendChild(s);
+    }
+    var p12 = document.getElementById("p12");
+    if (p12) p12.textContent = day > 2 ? "마감 넘김" : "진행 중";
+  }
+
+  function tick() {
+    var ms = DEADLINE - Date.now();
+    var el = document.getElementById("cd");
+    if (!el) return;
+    if (ms <= 0) { el.textContent = "마감"; return; }
+    var d = Math.floor(ms / 86400000);
+    var h = Math.floor(ms / 3600000) % 24;
+    var m = Math.floor(ms / 60000) % 60;
+    el.textContent = d + "일 " + h + "시간 " + m + "분";
+  }
+
+  function render() {
+    renderChart();
+    renderChips();
+    renderDays();
+    tick();
+    setInterval(tick, 30000);
+  }
+
+  // ---------- theme ----------
+  var btn = document.getElementById("themebtn");
+  try {
+    var saved = localStorage.getItem("gg-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (_) {}
+  btn.addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    var isDark = cur ? cur === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = isDark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("gg-theme", next); } catch (_) {}
+  });
+})();
+</script>
+</body>
+</html>
