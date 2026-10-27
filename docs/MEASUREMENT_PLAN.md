@@ -186,6 +186,13 @@ The v2 label replaces the EXP-10 label for number 2. EXP-12 and EXP-13 are
 to be recomputed on it (tuning), then the held-out v2 labels are computed
 with the same fixed thresholds.
 
+Result (EXP-17, tuning, leave one person out): object-only reference 0.741,
+three free checks 0.529, video hand shape 0.521 (its EXP-13 signal came from
+the retargeting side effect), video hand shape plus object 0.751, mocap hand
+shape upper bound 0.617. The checklist as designed measures video quality,
+while the v2 label is mostly about the object. This is the open problem for
+number 2 before any paid call.
+
 ### Final clip sets
 
 | Use | Clips | Copyable |

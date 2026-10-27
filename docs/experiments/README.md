@@ -27,5 +27,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-14](exp14_sam_rule_pilot.md) | 2026-10-27 | Arm B (SAM rule) and reference rows, pilot | $0 | Code check on 3 tuning episodes: arm B IoU 0.75 vs 0.67 for always-in-contact, but it finds only 52 of 190 to 248 boundaries. The raw glove flickers under 0.1 s, so the cleaned glove is now the main ground truth. |
 | [EXP-15](exp15_label_methods.md) | 2026-10-27 | Copyable label methods: robot or retargeting? | $0 | The EXP-10 label mostly measures a retargeting side effect (fingertips 31 mm off the human ones). Faithful retargeting calls 94% to 96% copyable. No method passes the pre-set criteria. The label is on hold. |
 | [EXP-16](exp16_copyable_v2.md) | 2026-10-27 | Copyable label v2: position retargeting, mesh collision, contact reach | $0 | Passes the checks set in advance: 47% copyable, hand size correlation +0.04. Failures are mostly collisions (25.5%) and reach (10.9%). The share depends strongly on the depth limit. |
+| [EXP-17](exp17_v2_signal.md) | 2026-10-27 | What predicts the v2 label (EXP-12 and EXP-13 again) | $0 | Object identity alone 0.74. Video hand shape lost its signal (0.52, it had learned the retargeting side effect). Our video checks add about 0.01 on top of the object. |
 
 Total Meta API spend so far: about $1.53 of $150.
