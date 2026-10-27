@@ -49,6 +49,17 @@ N1 = ROOT / "out" / "number1"
 CUTS = ROOT / "data" / "episodes_720p"
 PROMPTS = Path(__file__).resolve().parent / "prompts"
 A_STEP, A_BATCH = 6, 10
+A_VERSION = 1  # arm A prompt version for held-out, picked by the rule in the plan (EXP-30)
+
+
+def a_dir(version=None):
+    v = version or A_VERSION
+    return N1 / ("muse_a" if v == 1 else f"muse_a_v{v}")
+
+
+def a_prompt(version=None):
+    v = version or A_VERSION
+    return PROMPTS / ("number1_arm_a.txt" if v == 1 else f"number1_arm_a_v{v}.txt")
 C_OFFSETS = (-15, -10, -5, 0, 5, 10, 15)
 JOIN, MIN_LEN = 6, 6  # 30 fps frames, the 0.2 s rules of arm B
 PRICE_IN, PRICE_OUT = 1.25 / 1e6, 4.25 / 1e6
@@ -119,10 +130,10 @@ def cmd_a(args):
     jobs = []
     for ep, g in gt.items():
         for b in a_batches(len(g["label"]["left"])):
-            if not (N1 / "muse_a" / f"episode_{ep:06d}" / f"{b[0]:05d}.json").exists():
+            if not (a_dir() / f"episode_{ep:06d}" / f"{b[0]:05d}.json").exists():
                 jobs.append((ep, b))
     frames = sum(len(b) for _, b in jobs)
-    text_tok = len((PROMPTS / "number1_arm_a.txt").read_text()) // 4
+    text_tok = len(a_prompt().read_text()) // 4
     est = (frames * TOKENS_PER_FRAME + len(jobs) * text_tok) * PRICE_IN + len(jobs) * TOKENS_OUT * PRICE_OUT
     print(f"arm A: {len(gt)} episodes, {len(jobs)} calls, {frames} frames, about ${est:.2f}", flush=True)
     if not args.send or not jobs:
@@ -131,7 +142,7 @@ def cmd_a(args):
 
     def run(ep, b):
         jpg = read_frames(ep, b)
-        text = (PROMPTS / "number1_arm_a.txt").read_text().replace("{n}", str(len(b)))
+        text = a_prompt().read_text().replace("{n}", str(len(b)))
         reply, usage, cost = ask(client, text, [jpg[k] for k in b])
         d = first_json(reply)
         ans = {}
@@ -143,7 +154,7 @@ def cmd_a(args):
                     pass
         rec = {"episode": ep, "frames": b, "reply": reply, "answers": {str(b[i - 1]): v for i, v in ans.items()
                                                                      if 1 <= i <= len(b)}, "usage": usage, "cost_usd": cost}
-        p = N1 / "muse_a" / f"episode_{ep:06d}" / f"{b[0]:05d}.json"
+        p = a_dir() / f"episode_{ep:06d}" / f"{b[0]:05d}.json"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(json.dumps(rec))
         return cost
@@ -361,10 +372,10 @@ def estimate_shifts(eps, a_answers, c_picks, segs):
     return a_shift, c_shift
 
 
-def load_a(eps):
+def load_a(eps, version=None):
     out = {}
     for ep in eps:
-        for f in (N1 / "muse_a" / f"episode_{ep:06d}").glob("*.json"):
+        for f in (a_dir(version) / f"episode_{ep:06d}").glob("*.json"):
             out.setdefault(ep, {}).update(json.loads(f.read_text())["answers"])
     return out
 
@@ -510,7 +521,11 @@ def main():
     ap.add_argument("--shift-segments", default=str(ROOT / "out" / "contact" / "rule_segments.json"),
                     help="score: arm B segments of the shift episodes")
     ap.add_argument("--lag", type=int, default=0, help="selftest: the oracle sees changes this many frames early")
+    ap.add_argument("--a-version", type=int, help="arm A prompt version (default: A_VERSION)")
     args = ap.parse_args()
+    if args.a_version:
+        global A_VERSION
+        A_VERSION = args.a_version
     {"a": cmd_a, "c": cmd_c, "score": cmd_score, "selftest": cmd_selftest}[args.cmd](args)
 
 

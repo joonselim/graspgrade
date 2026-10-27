@@ -64,6 +64,7 @@ STANDIN = {"object_size": "item_size", "object_shape": "item_shape", "object_thi
 OBJECT_ITEMS = list(STANDIN)  # the six object items, finger occlusion is not one of them
 HAND_SHAPE_ROLE = "item_train"
 GATE_PASS, GATE_STOP = 0.65, 0.60
+CHECKLIST_TASK = "checklist"  # the checklist version for held-out, picked by the rule in the plan (EXP-30)
 
 
 def terciles(train_scores):
@@ -103,9 +104,9 @@ def standins(d):
     return d.merge(st, on=KEY, how="left").rename(columns={v: k for k, v in STANDIN.items()})
 
 
-def muse_items(d):
+def muse_items(d, task=None):
     rows = []
-    for f in (N2 / "muse" / "checklist").glob("*.json"):
+    for f in (N2 / "muse" / (task or CHECKLIST_TASK)).glob("*.json"):
         r = json.loads(f.read_text())
         if r["parsed"]:
             rows.append({"clip_id": r["clip_id"], **{k: r["parsed"][k] for k in MUSE_ITEMS}})

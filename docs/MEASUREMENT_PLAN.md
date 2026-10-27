@@ -498,6 +498,9 @@ data, and the version for held-out is picked by a rule fixed here.
   is that it does not know which objects fail, not a wording problem. This
   is reported as a limit: the checklist got one revision on tuning, R1 none.
 - No further revision after this one. Both versions are reported on tuning.
+- Result (EXP-30): checklist version 2 R3 0.625 against 0.638, arm A version
+  2 F1 0.120 against 0.132. Both prompts stay at version 1 for held-out.
+  The arm A shift for held-out is +7 at the start and -7 at the end.
 
 ## Release: the ground truth as a reusable benchmark (written 2026-10-28)
 
@@ -530,7 +533,7 @@ Estimates at measured prices, $150 in total.
 
 | Item | Cost |
 | --- | --- |
-| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a) | $12.35 |
+| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a, one prompt revision on tuning) | $19.06 |
 | Number 1, SAM: remaining 47 tuning episodes / 22 held-out episodes | $11.89 / $5.45 |
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
 | Number 1, Muse arm C: held-out boundaries (the EXP-24 arm B finds about 120 per episode, so about 2,600) plus 200 tuning boundaries for the arm C shift. Depends on the arm B chosen on 50 episodes | about $37 |

@@ -398,7 +398,7 @@
   <section>
     <h2><span class="no">2</span>요약</h2>
     <ul class="summary">
-      <li><b>첫 실제 Muse Spark 결과(튜닝, EXP-29).</b> 평가 2에서 Muse Spark에게 "로봇 손이 따라할 수 있나"를 직접 물으면 AUC 0.52로 동전 던지기에 가깝고, 같은 Muse Spark에게 체크리스트 항목별로 물으면 0.63~0.65로 오름(+0.11, 구간이 0 위). 라벨로 가중치를 배우는 이득은 +0.019로 잡음 안. 학습에서 뺀 처음 보는 물체에서도 0.607을 지킴. 아는 물체에서는 물체 이름만으로 0.688이라 여전히 이 기준선이 나음. 평가 1에서는 Muse Spark가 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝내며, 장갑으로 배운 보정이 경계 F1을 두 배로 만듦.</li>
+      <li><b>첫 실제 Muse Spark 결과(튜닝, EXP-29).</b> 평가 2에서 Muse Spark에게 "로봇 손이 따라할 수 있나"를 직접 물으면 AUC 0.52로 동전 던지기에 가깝고, 같은 Muse Spark에게 체크리스트 항목별로 물으면 0.63~0.65로 오름(+0.11, 구간이 0 위). 라벨로 가중치를 배우는 이득은 +0.019로 잡음 안. 학습에서 뺀 처음 보는 물체에서도 0.607을 지킴. 아는 물체에서는 물체 이름만으로 0.688이라 여전히 이 기준선이 나음. 평가 1에서는 Muse Spark가 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝내며, 장갑으로 배운 보정이 경계 F1을 두 배로 만듦. 오류를 보면 Muse Spark는 물체를 실제보다 작고 좁게 보고, 1초보다 짧게 손을 놓는 순간을 거의 못 봄. 프롬프트를 한 번 고쳐 봤지만 점수가 오르지 않아 미리 정한 규칙대로 1판을 씀(EXP-30).</li>
       <li>데이터 준비, 평가 분할 고정, Meta API(SAM 3.1, Muse Spark) 연결 완료. 현재 평가 1(접촉 구간 검출) 진행 중. 접촉 추정과 채점 코드는 준비됐고, 에피소드 전체를 SAM에 넣는 파일럿 3개가 끝남.</li>
       <li>파일럿 3개 첫 결과: 접촉 구간 IoU 0.64, 경계 F1 0.31(±15프레임), 0.18(±5프레임). 마스크만으로는 ±5프레임 경계가 안 나와 Muse Spark 경계 확인이 필요함. 튜닝 50개로 다시 재기 전의 초기 수치.</li>
       <li>보이는 접촉이 장갑 압력보다 약 0.2초 먼저 시작함. 끝은 지연 없음.</li>
@@ -516,6 +516,7 @@
             <tr><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력</td><td>배운 시점 보정이 6프레임 지연을 되돌림(C 0.149 → 0.307). 튜닝에서 학습 가중치가 단순 평균보다 +0.067. 사람 3명 검증 세트로 95%(등급 오류가 있으면 77%) 잡아냄.</td></tr>
             <tr><td class="first"><a href="#exp-28">EXP-28</a></td><td class="wrap-ok">정답을 다시 쓸 수 있는 벤치마크로</td><td>두 정답을 라벨 파일과 독립 채점 코드로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현. 평가 1은 CC BY 4.0, 평가 2는 CC BY-NC-SA 4.0.</td></tr>
             <tr><td class="first"><a href="#exp-29">EXP-29</a></td><td class="wrap-ok">튜닝 데이터에서 받은 첫 실제 Muse Spark 답</td><td>Muse Spark는 접촉을 약 7프레임 일찍 보고 보정이 F1을 두 배로 만듦. 직접 물은 Muse Spark는 0.52, 체크리스트로 물으면 0.63~0.65. 가중치 학습의 이득(+0.019)은 잡음 안. 처음 보는 물체에서 0.607.</td></tr>
+            <tr><td class="first"><a href="#exp-30">EXP-30</a></td><td class="wrap-ok">Muse Spark가 튜닝에서 틀리는 곳과 프롬프트 한 번 수정</td><td>Muse Spark는 물체를 실제보다 작고 좁게 보고 1초 미만의 놓음을 거의 못 봄. 프롬프트를 한 번 고쳐도 점수가 오르지 않아 두 프롬프트 모두 1판 유지.</td></tr>
           </tbody>
         </table>
       </div>
@@ -549,7 +550,7 @@
             <tr>
               <td class="first">Muse Spark가 물체 크기를 읽는가</td>
               <td>튜닝 400개에서 대리 등급과 같은 비율: 크기 75%, 모양 83%, 두께 78%, 감쌀 폭 49%, 손잡이 90%, 빈 공간 62% (EXP-29). 파일럿의 27/30은 낙관적이었음. 감쌀 폭은 거의 찍기 수준</td>
-              <td>그래도 체크리스트로 물으면 직접 묻는 것보다 AUC +0.11. 검증 실행에서 같은 비교로 확인</td>
+              <td>cm로 묻는 2판으로 크기·모양·두께 등급은 2~6%p 나아졌지만 학습된 점수는 0.625로 1판(0.638)보다 낮아 1판 유지 (EXP-30). 체크리스트로 물으면 직접 묻는 것보다 AUC +0.11이라는 점은 그대로. 검증 실행에서 같은 비교로 확인</td>
             </tr>
             <tr>
               <td class="first">v2 라벨의 깊이 민감도</td>
@@ -632,7 +633,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2846,6 +2847,110 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>모두 튜닝 수치. 보고할 수치는 검증 실행이 정하고, 비교는 측정 계획에 이미 고정돼 있음.</li>
       </ul>
     </article>
+
+    <!-- EXP-30 -->
+    <article class="exp" id="exp-30">
+      <div class="exp-h"><span class="id">EXP-30</span><span class="t">Muse Spark가 튜닝에서 틀리는 곳과 프롬프트 한 번 수정</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>첫 실제 Muse Spark 답(EXP-29) 뒤, 검증 클립에 보내기 전에는 아직 프롬프트를 바꿀 수 있다. Muse Spark는 어디서 틀리고, 프롬프트를 한 번 고치면 나아지는가. 검증에 쓸 판을 고르는 규칙은 고친 프롬프트를 보내기 전에 측정 계획에 적었다.</dd>
+        <dt>입력</dt><dd>튜닝만. 평가 2는 점수 학습용 클립 400개, 평가 1은 튜닝 에피소드 0, 30, 53. 검증 데이터는 보내지도 채점하지도 않음.</dd>
+        <dt>방법</dt><dd>1판 답의 오류를 무료로 분석한 뒤, 프롬프트마다 2판을 한 번 써서 같은 튜닝 데이터에 보냄. 2판이 1판보다 높을 때만 검증에 2판을 씀(같으면 1판).</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">1판의 오류 (평가 2, 3D 모델 등급과 비교)</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>크기: 중간 크기(15~25cm) 물체 103개 중 72개를 작다고 봄</li>
+            <li>감쌀 폭: 14cm보다 넓은 물체 133개 중 56개를 "8cm 이하"로 봄. 물체 전체가 아니라 손에 쥔 부분을 보는 것으로 보임</li>
+            <li>두께: 4cm 이상 물체 323개 중 54개를 얇다고 봄</li>
+            <li>손잡이는 좋음(90% 일치), 빈 공간은 잡음이 큼(62%)</li>
+            <li>Muse Spark 단독: 답의 72%가 0.85 이상, 27%가 0.25 이하. 물체별 평균 답과 물체별 "따라할 수 있음" 비율의 순위 상관이 0.09. 키보드, 그릇, 주스 팩(따라할 수 있음 0~8%)을 될 것 같다고 봄. 어떤 물체가 실패하는지 모름</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">고친 2판</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>체크리스트 2판: 물체 전체의 세 변을 cm로 답하게 함. 자는 손(손 길이 19cm, 손바닥 폭 8.5cm, 손가락 두께 2cm)만, 물체 예시는 없음. 크기·모양·두께·폭 등급은 코드가 EXP-19 기준으로 매김. 손잡이, 빈 공간, 손가락 가림은 그대로</li>
+            <li>방법 A 2판: 두 잡기 사이에 잠깐 놓는 손도 비접촉이라고 알리고, 프레임마다 손가락과 물체 사이 틈을 보게 함</li>
+            <li>Muse Spark 단독 질문은 지원서가 정한 비교라 그대로. 체크리스트만 튜닝에서 한 번 고쳐졌다는 점은 비교의 한계로 보고</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">평가 1 방법 A 1판: 장갑 기준 놓음을 "비접촉"으로 한 번이라도 표시한 비율</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>놓은 길이</th><th class="n">놓음 수</th><th class="n">비접촉으로 표시</th></tr></thead>
+            <tbody>
+              <tr><td class="first">0.2초 이하 (5fps 샘플보다 짧음)</td><td class="n">5</td><td class="n">0%</td></tr>
+              <tr><td class="first">0.2~0.5초</td><td class="n">27</td><td class="n">4%</td></tr>
+              <tr><td class="first">0.5~1초</td><td class="n">27</td><td class="n">15%</td></tr>
+              <tr><td class="first">1~2초</td><td class="n">12</td><td class="n">83%</td></tr>
+              <tr><td class="first">2초 넘음</td><td class="n">18</td><td class="n">94%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">장갑 접촉 프레임은 77~100% 잘 덮는다. 1초보다 짧게 떨어졌다 다시 잡는 것을 거의 못 봐서, 경계를 190개 중 68개만 찾는다.</p>
+
+      <div class="tbl">
+        <p class="cap">평가 2: 1판 대 2판 (400개, 사람 하나씩 빼기)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">1판</th><th class="n">2판</th></tr></thead>
+            <tbody>
+              <tr><td class="first">크기 등급이 3D 모델과 같음</td><td class="n">75%</td><td class="n">79%</td></tr>
+              <tr><td class="first">모양</td><td class="n">83%</td><td class="n">85%</td></tr>
+              <tr><td class="first">두께</td><td class="n">78%</td><td class="n">84%</td></tr>
+              <tr><td class="first">감쌀 폭</td><td class="n">49%</td><td class="n">52%</td></tr>
+              <tr><td class="first">손잡이 / 빈 공간</td><td class="n">90% / 62%</td><td class="n">90% / 61%</td></tr>
+              <tr><td class="first">R2 단순 평균, 합침 / 사람별 평균</td><td class="n">0.627 / 0.597</td><td class="n">0.632 / 0.623</td></tr>
+              <tr><td class="first"><b>R3 학습, 합침 / 사람별 평균</b></td><td class="n">0.646 / <b>0.638</b></td><td class="n">0.611 / <b>0.625</b></td></tr>
+              <tr><td class="first">R3, 처음 보는 물체</td><td class="n">0.607</td><td class="n">0.596</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">2판의 cm 추정을 3D 모델 상자와 비교한 비율(중앙값, 가운데 절반): 가장 긴 변 0.97(0.86~1.04), 중간 변 0.86(0.72~1.03), 가장 짧은 변 0.85(0.65~0.99). 가장 긴 변은 잘 읽고 나머지 둘은 작게 본다. 그래서 감쌀 폭이 여전히 가장 약한 항목이다.</p>
+
+      <figure>
+        <img src="assets/exp30_grade_tables.png" loading="lazy" width="1680" height="408" alt="크기와 감쌀 폭의 Muse Spark 등급 대 3D 모델 등급 표, 1판과 2판">
+        <div class="keys"><span class="key"><i style="--c:#08306b"></i>칸에 든 클립이 많음</span><span class="key"><i class="box" style="--c:#bfd8ec"></i>적음</span></div>
+        <figcaption>크기와 감쌀 폭에서 Muse Spark 등급(가로) 대 3D 모델 등급(세로), 1판과 2판. 상은 "로봇 손에 쉬움", 즉 작거나 좁음. 2판은 중간 크기 물체 일부를 "작음"에서 빼내지만, 넓은 물체 다수를 여전히 좁다고 본다.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">평가 1 방법 A: 1판 대 2판 (튜닝 에피소드 3개, 다른 두 에피소드에서 배운 보정)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">1판</th><th class="n">2판</th></tr></thead>
+            <tbody>
+              <tr><td class="first">경계 F1 ±5, 보정 후</td><td class="n"><b>0.132</b></td><td class="n">0.120</td></tr>
+              <tr><td class="first">경계 F1 ±15, 보정 후</td><td class="n">0.240</td><td class="n">0.248</td></tr>
+              <tr><td class="first">IoU, 보정 후</td><td class="n">0.824</td><td class="n">0.826</td></tr>
+              <tr><td class="first">찾은 경계 (190개 중)</td><td class="n">68</td><td class="n">76</td></tr>
+              <tr><td class="first">배운 보정 (시작, 끝)</td><td class="n">+7, −7</td><td class="n">+7, −6</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">2판은 프레임 답 1,442개 중 29개(2%)만 바꿨다. 새로 잡은 놓음과 새로 놓친 놓음이 서로 상쇄돼 놓음 표는 그대로다.</p>
+
+      <figure>
+        <img src="assets/exp30_releases.png" loading="lazy" width="840" height="408" alt="놓은 길이별로 Muse Spark가 비접촉으로 표시한 비율, 1판과 2판" style="max-width:640px">
+        <div class="keys"><span class="key"><i style="--c:#1971c2"></i>1판</span><span class="key"><i style="--c:#e8590c"></i>2판</span></div>
+        <figcaption>장갑 기준 두 접촉 사이의 놓음을 Muse Spark가 "비접촉"으로 표시한 비율, 놓은 길이별.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>판정(보내기 전에 고정한 규칙): 체크리스트 2판 R3 0.625가 1판 0.638보다 높지 않아 1판 유지. 방법 A 2판 F1 0.120이 1판 0.132보다 높지 않아 1판 유지. 검증용 보정은 +7, −7. 더는 고치지 않음.</li>
+        <li>Muse Spark의 물체 오류는 일관됨: 물체를 실제보다 작고 좁게 봄. cm로 물으면 등급은 더 정확해지지만(크기·모양·두께 2~6%p) 학습된 점수는 나아지지 않음. 400개에서 0.013 차이는 어느 쪽이든 잡음 안.</li>
+        <li>Muse Spark 단독은 로봇 손이 어떤 물체에서 실패하는지 모름. 이건 센서 기반 라벨만 아는 지식이고, 체크리스트가 메우는 틈(EXP-29: 0.52 → 0.63 이상).</li>
+        <li>방법 A는 약 1초보다 짧은 놓음을 보지 못하고, 프롬프트로는 바뀌지 않음. 5fps에서 0.5초 놓음은 2~3프레임이고 그동안 손은 물체 바로 옆에 있음. 이것이 A의 경계 F1을 묶는 한계이고, 프레임 수가 아님(완벽한 답의 최고 점수 0.956).</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -2906,7 +3011,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>게이트와 처음 보는 물체 비교의 코드를 대리 등급으로 점검(<a href="#exp-26">EXP-26</a>). 게이트는 완벽한 등급으로도 0.657로 겨우 통과해, 실제 Muse Spark 등급이면 "약함"이 나올 가능성이 큼.</li>
       <li>정답을 벤치마크로 묶음(<a href="#exp-28">EXP-28</a>). 평가 1은 에피소드 72개의 정리한 장갑 접촉 구간, 평가 2는 클립 3,811개의 v2 라벨과 처음 실패하는 조건, 2mm와 10mm 라벨. 우리가 만든 라벨만 넣고 원본 영상·센서·모션캡처는 넣지 않음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현함. 평가 1은 CC BY 4.0, 평가 2는 HOT3D 손 데이터 때문에 CC BY-NC-SA 4.0.</li>
       <li>Muse Spark 튜닝 400개 실행 완료(<a href="#exp-29">EXP-29</a>). 직접 묻기 0.52, 체크리스트 0.63~0.65, 학습 이득은 잡음 안, 처음 보는 물체 0.607. 게이트는 "약함"이라 미리 정한 대로 검증 클립으로 진행.</li>
-      <li>프롬프트를 튜닝에서 한 번만 고침(보내기 전에 규칙 고정). 평가 2 체크리스트 2판은 물체의 세 변을 cm로 추정하게 하고 등급은 코드가 같은 기준으로 매김(1판은 중간 크기 물체 103개 중 72개를 작다고, 넓은 물체 133개 중 56개를 좁다고 봄). 평가 1 방법 A 2판은 잠깐 놓는 순간도 비접촉으로 보고 손가락과 물체 사이 틈을 프레임마다 보게 함(1판은 0.2~1초 놓음을 약 10%만 잡음). 같은 튜닝 데이터에서 2판이 1판(체크리스트 0.638, A의 F1 0.132)보다 높을 때만 검증에 2판을 씀. Muse Spark 단독 질문은 지원서의 비교라 그대로 두고, 이 차이는 한계로 보고.</li>
+      <li>프롬프트를 튜닝에서 한 번만 고쳐 봄(<a href="#exp-30">EXP-30</a>). 체크리스트 2판(물체 세 변을 cm로)은 등급은 더 정확했지만 학습된 점수가 0.625로 1판 0.638보다 낮았고, 방법 A 2판(잠깐 놓음도 비접촉)은 답의 2%만 바꾸고 F1이 0.120으로 1판 0.132보다 낮았음. 미리 정한 규칙대로 검증에는 두 프롬프트 모두 1판을 씀. 검증용 A 보정은 시작 +7, 끝 −7프레임.</li>
       <li>다음: 평가 2 SAM 전체, Muse Spark 검증 1,426개, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
@@ -3000,7 +3105,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 06:52 KST
+    마지막 갱신 2026-10-28 06:56 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3054,6 +3159,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "B에 유지 선택지 추가: IoU 0.72, F1은 조금 내려감 (EXP-24)"],
         ["done", "A·C 시점 보정 코드 점검: 6프레임 지연을 되돌림 (EXP-27)"],
         ["done", "A 튜닝 3개 실제 호출: Muse Spark가 7프레임 일찍, 보정으로 F1 두 배 (EXP-29)"],
+        ["done", "A 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
         ["todo", "튜닝 나머지 47개 SAM 실행 (유료 호출 보류)"],
         ["todo", "B SAM 규칙 기준값과 시작 지연 정하기 (튜닝 50개)"],
         ["todo", "A Muse Spark 단독 (5fps)"],
@@ -3103,6 +3209,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "체크리스트 대 학습 코드와 검정력 점검 (EXP-27)"],
         ["todo", "SAM 전체 (점수 학습 400개, 검증 1,426개)"],
         ["done", "Muse Spark 튜닝 400개 → 게이트 약함(0.636, 0.601), 검증 진행 (EXP-29)"],
+        ["done", "체크리스트 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
         ["todo", "게이트가 멈춤이 아니면 Muse Spark 검증 1,426개"],
         ["todo", "Muse Spark 항목 2개와 Muse Spark 단독 (유료 호출 보류)"],
         ["todo", "분산 없는 항목 점검"],

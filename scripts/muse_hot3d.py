@@ -2,6 +2,7 @@
 
     python scripts/muse_hot3d.py --task checklist --role held_out              # plan and cost only
     python scripts/muse_hot3d.py --task baseline --role score_train --limit 5 --send   # paid
+    python scripts/muse_hot3d.py --task checklist_v2 --role score_train --send      # checklist version 2 (cm sides), paid
 
 Without --send nothing is sent. Inputs: out/number2/clips_final.csv and the
 six 720 px frames per clip from hot3d_number2_inputs.py. Prompts:
@@ -40,6 +41,16 @@ def load_env():
             os.environ.setdefault(k.strip(), v.strip())
 
 
+def side_grades(longest, middle, shortest, hand_cm=19.0):
+    """Checklist version 2: the four box items from three sides in cm, with the EXP-19 anchors."""
+    size = longest / hand_cm
+    ratio = middle / longest
+    return {"object_size": 1.0 if size <= 0.8 else (0.5 if size <= 1.3 else 0.0),
+            "object_shape": 1.0 if ratio >= 0.6 else (0.5 if ratio >= 0.3 else 0.0),
+            "object_thickness": 1.0 if shortest >= 4.0 else (0.5 if shortest >= 2.0 else 0.0),
+            "object_width": 1.0 if middle <= 8.0 else (0.5 if middle <= 14.0 else 0.0)}
+
+
 def prompt(task, hand):
     return (PROMPTS / f"number2_{task}.txt").read_text().replace("{hand}", hand)
 
@@ -57,6 +68,17 @@ def parse(task, text):
         if not all(str(d.get(k, "")).lower() in GRADES for k in CHECKLIST_KEYS):
             return None
         return {**{k: GRADES[str(d[k]).lower()] for k in CHECKLIST_KEYS},
+                "object_name": d.get("object_name"), "reason": d.get("reason")}
+    if task == "checklist_v2":
+        graded = ["finger_occlusion", "object_handle", "free_space"]
+        try:
+            sides = sorted((float(d["longest_cm"]), float(d["middle_cm"]), float(d["shortest_cm"])), reverse=True)
+        except (KeyError, TypeError, ValueError):
+            return None
+        if not all(str(d.get(k, "")).lower() in GRADES for k in graded) or sides[2] <= 0:
+            return None
+        return {**{k: GRADES[str(d[k]).lower()] for k in graded}, **side_grades(*sides),
+                "longest_cm": sides[0], "middle_cm": sides[1], "shortest_cm": sides[2],
                 "object_name": d.get("object_name"), "reason": d.get("reason")}
     try:
         p = float(d.get("copyable_probability"))
@@ -87,7 +109,7 @@ def call(client, task, r):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task", required=True, choices=["checklist", "baseline"])
+    ap.add_argument("--task", required=True, choices=["checklist", "checklist_v2", "baseline"])
     ap.add_argument("--role", required=True, choices=["held_out", "score_train"])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--send", action="store_true", help="really call the API (costs credit)")
