@@ -353,7 +353,9 @@
     position: fixed; z-index: 30; right: 12px; bottom: 12px;
     height: calc(var(--row) * 7); overflow: hidden;
     --row: 21px;
-    background: var(--sheet); border: 1px solid var(--rule); border-radius: 2px;
+    background: color-mix(in srgb, var(--sheet) 68%, transparent);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, var(--rule) 80%, transparent); border-radius: 2px;
     font-family: var(--mono); font-size: 12px; line-height: var(--row);
     opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s;
   }
@@ -371,6 +373,9 @@
   }
   .near a:hover { color: var(--ink); text-decoration: none; }
   .near a.on { color: var(--ink); font-weight: 700; border-left-color: var(--ink); }
+  /* key experiments page */
+  .ch { margin-top: 26px; }
+  .ch h3 { margin: 0 0 8px; }
 </style>
 </head>
 <body>
@@ -381,6 +386,7 @@
   <nav class="topnav" aria-label="페이지">
     <span class="brand">GraspGrade</span>
     <a href="#summary" data-nav="summary">요약</a>
+    <a href="#story" data-nav="story">핵심 실험</a>
     <a href="#detail" data-nav="detail">실험 상세</a>
   </nav>
 
@@ -533,7 +539,7 @@
         </table>
       </div>
     </div>
-    <p class="more"><a href="#detail">실험 상세 보기 →</a> &nbsp; <a href="#s-now">진행 중인 작업 →</a></p>
+    <p class="more"><a href="#story">핵심 실험만 읽기 →</a> &nbsp; <a href="#detail">실험 상세 보기 →</a> &nbsp; <a href="#s-now">진행 중인 작업 →</a></p>
   </section>
 
   <!-- 5 -->
@@ -639,6 +645,136 @@
     </div>
   </section>
 
+  </div>
+
+  <div class="page" data-page="story" hidden>
+  <header class="doc-head">
+    <h1 class="doc-title">핵심 실험</h1>
+    <p class="doc-sub">실험 30개 가운데 결론을 바꾼 것만 순서대로 모았다. 위에서 아래로 읽으면 두 평가가 어디까지 왔고 무엇을 알게 됐는지 이어서 볼 수 있다. 수치의 출처는 괄호 안의 실험 번호다.</p>
+  </header>
+
+  <section id="k-intro">
+    <h2><span class="no">1</span>두 가지 질문</h2>
+    <ul class="plain">
+      <li><b>평가 1, 접촉 시점.</b> 1인칭 영상만 보고 손이 물체에 닿는 순간과 떨어지는 순간을 찾는다. 정답은 손바닥 압력을 재는 촉각 장갑(OpenGraph).</li>
+      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 잡기 클립마다 로봇 손이 그 잡기를 따라할 수 있는지 점수를 매긴다. 정답은 모션캡처로 기록한 사람 손과 물체를 Allegro 로봇 손에 옮겨 판정한 라벨(HOT3D).</li>
+      <li>두 평가 모두 영상에는 SAM 3.1과 Muse Spark만 쓰고, 센서 데이터는 채점에만 쓴다. 방법은 튜닝 데이터에서 정하고, 검증 데이터는 마지막에 한 번만 본다.</li>
+    </ul>
+  </section>
+
+  <section id="k-n1">
+    <h2><span class="no">2</span>평가 1: 언제 닿고 언제 떨어지는가</h2>
+
+    <div class="ch">
+      <h3>정답부터 확인: 촉각 장갑을 믿어도 되는가</h3>
+      <ul class="plain">
+        <li>데이터셋의 접촉 라벨과 장갑 압력은 프레임 기준 97~99% 일치한다(EXP-04). 장갑을 정답으로 써도 된다.</li>
+        <li>다만 장갑 압력은 임계값 근처에서 깜빡여 0.1초짜리 끊김과 조각이 생긴다. 영상으로는 볼 수 없는 경계라서, 0.1초 이하 끊김은 잇고 짧은 조각은 버린 "정리한 장갑"을 주 정답으로 정했다(EXP-14).</li>
+        <li>영상에 보이는 접촉은 장갑 압력보다 먼저 시작한다(EXP-06). 그래서 모든 방법에 장갑으로 배운 시점 보정을 붙이고, 보정 전후를 둘 다 보고하기로 했다(EXP-27).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>SAM 규칙: 마스크만으로는 연이은 접촉을 나누지 못한다</h3>
+      <ul class="plain">
+        <li>손과 물체 마스크가 겹치고 함께 움직이면 접촉으로 보는 규칙(방법 B). 접촉 구간 IoU는 0.75로 "항상 접촉"(0.67)보다 낫지만, 손이 늘 어떤 물체 곁에 있어서 연이은 접촉을 하나로 묶는다. 실제 경계 190개 중 52개만 찾았다(EXP-14).</li>
+        <li>가장 가까운 물체가 바뀌면 끊게 하자 경계 F1이 두 배가 됐지만, 이번에는 경계를 392개나 찾아 너무 많이 끊었다(EXP-22). 새 물체가 3프레임 이어질 때만 끊으면 IoU가 0.72로 오르고 F1은 0.145다(EXP-24).</li>
+        <li>경계 개수를 실제와 비슷하게 맞춰도 F1은 0.09였다. 문제는 경계의 개수보다 위치다. 최종 규칙은 튜닝 50개에서 고른다.</li>
+      </ul>
+      <figure>
+        <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙 (유지 3프레임)</span></div>
+        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜하다.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>Muse Spark 단독: 일찍 보고, 짧게 놓는 순간을 못 본다</h3>
+      <ul class="plain">
+        <li>영상을 초당 5장씩 보여 주고 프레임마다 접촉 여부를 물어도, 답이 완벽하면 경계 F1 0.96까지 갈 수 있다(EXP-21). 프레임 수는 한계가 아니다.</li>
+        <li>실제 Muse Spark는 접촉 시작을 장갑보다 약 7프레임(0.23초) 일찍, 끝을 7프레임 늦게 본다. 장갑으로 배운 보정을 붙이면 경계 F1이 0.06에서 0.13으로 두 배가 된다(EXP-29).</li>
+        <li>1초보다 짧게 손을 놓았다 다시 잡는 순간은 거의 못 본다. 0.5~1초 놓음도 15%만 잡는다. 프롬프트를 한 번 고쳐도 답의 2%만 바뀌었다(EXP-30). 그래서 IoU는 0.82로 가장 높지만 경계 F1은 낮다.</li>
+      </ul>
+      <figure>
+        <img src="assets/exp29_arm_a_timelines.png" loading="lazy" width="1320" height="759" alt="에피소드 0, 30, 53의 손별 접촉: 장갑 정답, Muse Spark 단독, 보정한 Muse Spark">
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#1971c2"></i>Muse Spark 단독</span><span class="key"><i style="--c:#e8590c"></i>다른 두 에피소드에서 배운 보정을 적용</span></div>
+        <figcaption>에피소드 0의 오른손처럼 짧은 접촉이 이어지는 곳을 Muse Spark는 긴 접촉 하나로 본다.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>평가 1에서 지금 말할 수 있는 것</h3>
+      <ul class="plain">
+        <li>영상 기반 방법은 접촉이 "있는 동안"은 잘 잡지만(IoU 0.72~0.82), 시작과 끝을 ±5프레임 안으로 맞추기는 어렵다(F1 0.13~0.15, 튜닝).</li>
+        <li>센서로 배운 시점 보정은 Meta 모델의 출력 위에 분명한 값을 더한다(F1 두 배).</li>
+        <li>남은 것: 튜닝 50개로 SAM 규칙 확정, 검증 22개에서 세 방법 비교(유료).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="k-n2">
+    <h2><span class="no">3</span>평가 2: 로봇 손이 따라할 수 있는 잡기인가</h2>
+
+    <div class="ch">
+      <h3>정답 라벨: 처음 라벨은 로봇이 아니라 옮기는 방식을 쟀다</h3>
+      <ul class="plain">
+        <li>모션캡처 손 모델로 손가락 끝의 3D 위치를 계산하니, 잡는 동안 물체 표면에서 2.3mm였다(EXP-09). 정답을 만들 재료는 충분히 정확하다.</li>
+        <li>첫 라벨은 사람 손을 손 크기 비율만큼 늘려 Allegro 손에 옮겼다. 그러자 꽉 쥔 캔에서도 로봇 손가락 끝이 25mm 떠서 "따라할 수 없음"이 됐다. 라벨이 로봇이 아니라 옮기는 방식의 부작용을 재고 있었다(EXP-10, EXP-15).</li>
+        <li>손가락 위치를 직접 맞추고, 로봇 손 표면 전체로 충돌을, 사람이 닿은 손가락마다 도달을 검사하는 v2 라벨을 계산 전에 정의했다. 튜닝 47%, 손 크기와 관계없음(+0.04), 검증 46.4%(EXP-16, EXP-20).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp16_examples.jpg" loading="lazy" width="990" height="660" alt="결과별 튜닝 클립 두 개씩: 따라할 수 있음, 충돌, 도달 실패" style="max-width:720px">
+        <div class="keys"><span class="key"><i style="--c:#10cc10"></i>물체 모델</span><span class="key"><i class="dot light" style="--c:#ffffff"></i>사람 손 지점</span><span class="key"><i class="dot" style="--c:#ffa500"></i>Allegro 메쉬 점</span><span class="key"><i class="dot" style="--c:#ff0000"></i>물체 안 5mm보다 깊은 메쉬 점</span></div>
+        <figcaption>결과별 튜닝 클립 두 개씩. 왼쪽: 따라할 수 있음(지우개, 파마산 캔). 가운데: 충돌, 더 큰 Allegro 손가락이 키보드와 뒤집개 안으로 들어감. 오른쪽: 도달 실패, 넓은 그릇과 접시에서 Allegro 손이 사람처럼 손가락 끝을 벌려 놓지 못함.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>무엇이 가르는가: 영상 품질이 아니라 물체</h3>
+      <ul class="plain">
+        <li>v2 라벨은 물체 종류만으로 AUC 0.74를 맞힌다. 원래 체크리스트의 영상 항목(카메라 흔들림, 손 모양 등)은 그 위에 0.01만 더했다(EXP-17).</li>
+        <li>그래서 "물체 성질"을 구체적인 항목으로 늘렸다. 3D 모델의 크기와 모양 숫자만으로 0.695이고, 학습에 없던 물체에서도 0.673이다. 물체 이름은 처음 보는 물체를 맞힐 수 없다(0.5, EXP-18).</li>
+        <li>손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목을 상·중·하로 거칠게 매겨도 0.683이다. 대부분은 손 대비 크기가 설명한다(EXP-19).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp18_object_geometry.png" loading="lazy" width="1625" height="550" alt="왼쪽은 물체 종류와 물체 형상의 AUC 막대, 오른쪽은 물체별 가장 긴 변과 가장 짧은 변 산점도">
+        <div class="keys"><span class="key"><i style="--c:#868e96"></i>물체 종류</span><span class="key"><i style="--c:#1c7ed6"></i>물체 형상</span><span class="key"><i class="dash" style="--c:#479957"></i>통과선 0.65</span><span class="key"><i class="dash" style="--c:#d04646"></i>실패선 0.60</span><span class="key"><i class="dot" style="--c:#b71126"></i>따라할 수 있음 0%</span><span class="key"><i class="dot" style="--c:#fafdb8"></i>50%</span><span class="key"><i class="dot" style="--c:#036e3a"></i>100%</span></div>
+        <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있다.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>실제 Muse Spark: 직접 물으면 모르고, 항목별로 물으면 안다</h3>
+      <ul class="plain">
+        <li>"로봇 손이 이 잡기를 따라할 수 있나"를 직접 물으면 AUC 0.52다. 키보드나 그릇처럼 거의 실패하는 물체도 될 것 같다고 답한다(EXP-29, EXP-30).</li>
+        <li>같은 Muse Spark에게 체크리스트 항목별로 물으면 0.63~0.65로 오른다(+0.11, 구간이 0 위). 라벨로 가중치를 배우는 이득은 +0.019로 잡음 안이다(EXP-29).</li>
+        <li>학습에서 뺀 처음 보는 물체에서도 0.607을 지킨다. 아는 물체에서는 물체 이름만으로 0.688이라 이 기준선이 여전히 낫다.</li>
+        <li>Muse Spark는 물체를 실제보다 작고 좁게 본다. cm로 묻게 고쳐도 점수는 오르지 않았다(EXP-30).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp29_number2_rows.png" loading="lazy" width="1020" height="432" alt="행별 사람 하나씩 빼기 AUC 막대와 처음 보는 물체 점">
+        <div class="keys"><span class="key"><i style="--c:#1971c2"></i>합친 AUC</span><span class="key"><i style="--c:#74c0fc"></i>사람별 평균</span><span class="key"><i class="dot" style="--c:#e8590c"></i>학습 가중치, 처음 보는 물체 (0.607)</span></div>
+        <figcaption>행별 사람 하나씩 빼기 AUC. 가로선이 0.5.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>평가 2에서 지금 말할 수 있는 것</h3>
+      <ul class="plain">
+        <li>센서로 만든 정답이 Muse Spark가 모르는 것, 곧 어떤 물체에서 로봇 손이 실패하는지를 드러낸다. 체크리스트는 그 지식을 질문으로 바꿔 Muse Spark의 답을 동전 던지기에서 0.65로 올린다.</li>
+        <li>처음 보는 물체에도 통한다. 물체 이름만 쓰는 방법은 할 수 없는 일이다.</li>
+        <li>남은 것: 검증 1,426개에서 같은 비교(유료). 위 수치는 모두 튜닝이라 확정이 아니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="k-bench">
+    <h2><span class="no">4</span>남는 결과물: 정답 벤치마크</h2>
+    <ul class="plain">
+      <li>두 정답을 라벨 파일과 채점 코드로 묶었다. 평가 1은 에피소드 72개의 접촉 구간, 평가 2는 클립 3,811개의 라벨과 처음 실패하는 조건이다. 공개용 채점 코드가 프로젝트 수치를 그대로 재현한다(EXP-28).</li>
+      <li>최종 점수가 어떻게 나오든, 다른 팀이 자기 영상 필터를 센서 기준으로 채점할 수 있게 남는다. 원본 영상과 센서 값은 넣지 않았다.</li>
+    </ul>
+  </section>
   </div>
 
   <div class="page" data-page="detail" hidden>
@@ -3117,7 +3253,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 07:25 KST
+    마지막 갱신 2026-10-28 07:28 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3421,8 +3557,10 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     var target = null;
     var page = "summary";
     var el = h && /^[\w-]+$/.test(h) ? document.getElementById(h) : null;
-    if (h === "detail") page = "detail";
-    else if (el && el.closest('.page[data-page="detail"]')) { page = "detail"; target = h; }
+    if (h === "detail" || h === "story") page = h;
+    else if (el && el.closest(".page") && el.closest(".page").dataset.page !== "summary") {
+      page = el.closest(".page").dataset.page; target = h;
+    }
 
     var changed = false;
     document.querySelectorAll(".page").forEach(function (p) {
@@ -3433,13 +3571,13 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     document.querySelectorAll(".topnav a").forEach(function (a) {
       a.classList.toggle("on", a.dataset.nav === page);
     });
-    document.title = page === "detail" ? "GraspGrade 실험 상세" : "GraspGrade 진행";
+    document.title = { detail: "GraspGrade 실험 상세", story: "GraspGrade 핵심 실험" }[page] || "GraspGrade 진행";
     document.body.dataset.page = page;
 
     // instant, or the page-wide smooth scrolling animates across the whole page
     if (target) {
       document.getElementById(target).scrollIntoView({ behavior: "instant", block: "start" });
-    } else if (changed || h === "summary" || h === "detail") {
+    } else if (changed || h === "summary" || h === "detail" || h === "story") {
       window.scrollTo({ top: 0, behavior: "instant" });
     }
   }
