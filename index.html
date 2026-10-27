@@ -388,6 +388,7 @@
       <li>v2 라벨에서는 물체 종류만으로 AUC 0.74. 영상 손 모양 항목은 0.52로 신호를 잃었고(이전 라벨의 0.63은 리타게팅 부작용을 배운 것), 영상 항목을 다 합쳐도 물체 위에 약 0.01만 더함. 체크리스트는 영상 품질을 재는데 정답은 주로 물체의 성질.</li>
       <li>평가 2 방향 결정: 질문과 v2 라벨은 그대로 두고 "물체 성질" 항목을 구체적인 물체 항목(손 대비 크기, 길이, 납작함, 폭, 손잡이, 주변 물체)으로 늘림. 물체 3D 모델의 크기·모양 숫자 7개만으로 0.695(물체 이름 0.742), 처음 보는 물체에서도 0.673이 나와 미리 정한 기준을 통과함.</li>
       <li>물체 항목 6개(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간)를 상·중·하 기준과 함께 고정. 정답에서 낸 대리 등급으로 0.683, 처음 보는 물체 0.666으로 통과. 손 대비 크기가 대부분을 설명함. Muse Spark가 영상에서 이 등급을 읽는지는 짧은 유료 파일럿으로 먼저 확인.</li>
+      <li>평가 2 첫 유료 파일럿(튜닝 클립 5개): SAM은 붐비는 HOT3D 탁자에서도 잡은 물체를 접촉 프레임 99%에서 찾고, 우리 코드가 92%에서 그것을 손에 가장 가까운 물체로 고름. Muse Spark의 물체 등급은 3D 모델 대리 등급과 30개 중 27개 일치.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
     </ul>
 
@@ -473,6 +474,7 @@
             <tr><td class="first"><a href="#exp-20">EXP-20</a></td><td class="wrap-ok">검증 클립 v2 라벨</td><td>고정한 기준으로 검증 46.4%(튜닝 47.0%), 사람별 43~51%. 물체별 비율이 튜닝과 순위 상관 0.85. 라벨만 냈고 채점은 아직.</td></tr>
             <tr><td class="first"><a href="#exp-21">EXP-21</a></td><td class="wrap-ok">평가 1 각 방법의 최고 점수</td><td>완벽한 답이면 A(5fps)는 경계 F1 ±5에서 0.96이라 5fps는 걸림돌이 아님. C는 B가 찾은 경계에 묶여 최고 0.15.</td></tr>
             <tr><td class="first"><a href="#exp-22">EXP-22</a></td><td class="wrap-ok">물체 바뀜으로 끊는 방법 B</td><td>경계 F1이 두 배(±5 0.15, ±15 0.32), C 최고 점수도 0.32. 하지만 경계 392개(실제 190)로 너무 많이 끊고 IoU 0.66.</td></tr>
+            <tr><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">평가 2 유료 파일럿</td><td>SAM이 접촉 프레임 99%에서 잡은 물체를 찾고 우리 코드가 92%에서 그것을 고름. Muse Spark 물체 등급은 대리 등급과 30개 중 27개 일치. 계획 변경 없음.</td></tr>
           </tbody>
         </table>
       </div>
@@ -500,8 +502,8 @@
             </tr>
             <tr>
               <td class="first">Muse Spark가 물체 크기를 읽는가</td>
-              <td>물체 항목 6개는 정답에서 낸 등급으로 0.683, 처음 보는 물체 0.666(EXP-19). 하지만 그 등급은 3D 모델과 모션캡처에서 나온 것. Muse Spark가 어안 영상에서 같은 등급을 읽는지, 그냥 물어본 Muse Spark가 똑같이 잘하는지는 모름</td>
-              <td>전체 실행 전에 튜닝 클립 몇 개로 Muse Spark 등급을 대리 등급과 비교하는 짧은 파일럿</td>
+              <td>파일럿 5클립에서 Muse Spark 등급이 대리 등급과 30개 중 27개 일치(EXP-23). 틀린 것은 감쌀 폭 8cm 근처 경계값과, 물체가 화면 밖에 있던 클립의 손잡이. 단독 질문의 이유도 물체 크기를 말해, 그냥 물어본 Muse Spark도 물체를 읽음. 표본이 작고 3개가 같은 물체</td>
+              <td>전체 실행에서 등급과 AUC로 확인. 주 비교 옆에 물체 기준선을 같이 둠</td>
             </tr>
             <tr>
               <td class="first">v2 라벨의 깊이 민감도</td>
@@ -584,7 +586,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2250,6 +2252,94 @@ video:  에피소드 하나 전체, 10fps
         <li>에피소드 세 개로는 이 균형을 정할 수 없음. 튜닝 50개의 SAM 결과가 생기면 같은 격자로 정함. 새 물체가 몇 프레임 동안 가장 가까워야 끊는 선택지를 다음 후보로 격자에 넣음.</li>
       </ul>
     </article>
+
+    <!-- EXP-23 -->
+    <article class="exp" id="exp-23">
+      <div class="exp-h"><span class="id">EXP-23</span><span class="t">평가 2 유료 파일럿: HOT3D에서 SAM과 Muse Spark</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 2 전체 실행 전에 호출이 HOT3D에서 제대로 되고 답이 말이 되는지 본다. SAM 3.1이 붐비는 HOT3D 탁자에서 잡은 물체를 찾고, 우리 코드가 그것을 손에 가장 가까운 물체로 고르는가. Muse Spark의 물체 등급이 EXP-19의 3D 모델 대리 등급과 맞는가.</dd>
+        <dt>입력</dt><dd>점수 학습용 튜닝 클립에서만 뽑음(seed 20261026). SAM은 구간 3개(10fps 500프레임, 안에 클립 5개), Muse Spark는 클립 5개. 검증 클립은 보내지도 채점하지도 않음.</dd>
+        <dt>방법</dt><dd>SAM 프롬프트는 <code>hand</code>와 <code>small object</code>. 모션캡처 접촉 프레임마다 데이터셋의 잡은 물체 2D 박스와 (가) SAM 물체 박스 전체, (나) 우리 코드가 손에 가장 가깝다고 고른 SAM 물체를 비교(박스 IoU 0.5 이상이면 일치). Muse Spark에는 체크리스트 질문과 단독 질문을 각각 보냄(클립당 720px 프레임 6장).</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">보낸 요청 (체크리스트, 줄임)</div>
+          <pre style="font-size:12px;white-space:pre-wrap;margin:0">You see 6 frames from one first-person video clip of a person grasping an object. ...
+Rate each item below as "high", "mid" or "low" ... Use the visible human hand as a ruler: from the wrist to the tip of the middle finger is about 19 cm.
+finger_occlusion, object_size, object_shape, object_thickness, object_width, object_handle, free_space
+Answer with JSON only.</pre>
+        </div>
+        <div>
+          <div class="k">받은 원문 (퍼즐 장난감 클립)</div>
+          <pre style="font-size:12px;white-space:pre-wrap;margin:0">{"object_name": "rubik's cube", "finger_occlusion": "high", "object_size": "high", "object_shape": "high", "object_thickness": "high", "object_width": "high", "object_handle": "low", "free_space": "high", "reason": "Small cube held in air with right fingertips visible and clear of table objects."}</pre>
+        </div>
+      </div>
+
+      <p class="note">고친 버그: 공용 코드가 마스크를 OpenGraph 크기(1280×720) 프레임에 놓고 있었는데 HOT3D 구간은 1408×1408이라 첫 구간에서 멈춤. 프레임 크기를 넘기도록 고쳤고 OpenGraph 쪽 결과는 그대로.</p>
+
+      <div class="tbl">
+        <p class="cap">SAM, 클립 5개의 접촉 프레임 169개</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>물체</th><th class="n">접촉 프레임</th><th class="n">프레임당 SAM 물체</th><th class="n">잡은 물체 찾음</th><th class="n">가장 가까운 물체 = 잡은 물체</th></tr></thead>
+            <tbody>
+              <tr><td class="first">무늬 머그 (왼손)</td><td class="n">23</td><td class="n">8.2</td><td class="n">100%</td><td class="n">100%</td></tr>
+              <tr><td class="first">오렌지주스 팩 (왼손)</td><td class="n">87</td><td class="n">13.3</td><td class="n">100%</td><td class="n">100%</td></tr>
+              <tr><td class="first">오렌지주스 팩 (오른손)</td><td class="n">27</td><td class="n">8.7</td><td class="n">100%</td><td class="n">63%</td></tr>
+              <tr><td class="first">바비큐 소스 병 (왼손)</td><td class="n">23</td><td class="n">7.9</td><td class="n">100%</td><td class="n">100%</td></tr>
+              <tr><td class="first">토마토소스 캔 (왼손)</td><td class="n">9</td><td class="n">11.9</td><td class="n">78%</td><td class="n">67%</td></tr>
+              <tr><td class="first"><b>전체</b></td><td class="n">169</td><td class="n"></td><td class="n"><b>98.8%</b></td><td class="n"><b>92.3%</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note"><code>hand</code>는 모든 프레임에서 두 손을 안정된 id 두 개로 찾음. <code>small object</code>는 HOT3D 탁자가 붐벼서 프레임당 8~13개를 찾음. 가시성은 다섯 클립 모두 1.0이라 여기서는 아무것도 가르지 못하고, 접촉 명확성은 0.0~0.57.</p>
+
+      <figure>
+        <img src="assets/exp23_sam_chosen_object.png" loading="lazy" width="2310" height="506" alt="클립마다 접촉 프레임 한 장: 잡은 물체 박스, 우리 코드가 고른 물체, 다른 SAM 물체">
+        <div class="keys"><span class="key"><i class="box" style="--c:#00dc00"></i>데이터셋의 잡은 물체 박스</span><span class="key"><i style="--c:#ff8c1a"></i>우리 코드가 손에 가장 가깝다고 고른 물체</span><span class="key"><i style="--c:#7a7ae6"></i>다른 SAM 물체</span></div>
+        <figcaption>클립마다 접촉 프레임 한 장.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">Muse Spark 물체 등급 대 3D 모델 대리 등급 (클립 5개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>항목</th><th class="n">일치</th></tr></thead>
+            <tbody>
+              <tr><td class="first">손 대비 크기</td><td class="n">5 / 5</td></tr>
+              <tr><td class="first">모양</td><td class="n">5 / 5</td></tr>
+              <tr><td class="first">두께</td><td class="n">5 / 5</td></tr>
+              <tr><td class="first">감쌀 폭</td><td class="n">3 / 5</td></tr>
+              <tr><td class="first">손잡이</td><td class="n">4 / 5</td></tr>
+              <tr><td class="first">빈 공간</td><td class="n">5 / 5</td></tr>
+              <tr><td class="first"><b>전체</b></td><td class="n"><b>27 / 30</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp23_muse_items.png" loading="lazy" width="990" height="456" alt="클립과 항목별 Muse Spark 등급과 대리 등급 표" style="max-width:640px">
+        <div class="keys"><span class="key"><i style="--c:#006837"></i>같음</span><span class="key"><i style="--c:#a50026"></i>다름</span></div>
+        <figcaption>칸마다 Muse Spark 등급 / 대리 등급. 행 이름의 label은 정답, base는 단독 질문의 확률.</figcaption>
+      </figure>
+      <ul class="plain" style="font-size:13.5px">
+        <li>감쌀 폭: 흰 머그와 토마토 캔을 Muse Spark는 "8cm 이하"로 봄. 3D 모델의 중간 변은 8cm를 조금 넘음. 틀린 답이라기보다 경계값 문제.</li>
+        <li>손잡이: 머그 손잡이를 놓침. 이 클립에서는 잡는 동안 고개를 돌려 프레임 2~5에 머그가 아예 안 보임. 같은 클립의 손가락 가림은 "하"로 맞게 답함.</li>
+        <li>물체 이름은 맞음(퍼즐 장난감을 "rubik's cube", 머그를 "cup", 캔).</li>
+        <li>단독 질문: 머그와 캔(둘 다 따라할 수 있음)은 0.85, 퍼즐 장난감 세 클립(하나만 따라할 수 있음)은 0.10~0.20. 단독 질문의 이유도 로봇 손가락에 비한 물체 크기를 말함. 즉 단독 질문도 물체를 읽음.</li>
+      </ul>
+
+      <ul class="plain concl">
+        <li>SAM은 HOT3D에서 동작함. 접촉 프레임의 99%에서 잡은 물체를 찾고, "가장 가까운 물체" 규칙이 92%에서 그것을 고름. 틀린 경우는 몇 프레임 동안 화면에서 더 가까운 옆 물체.</li>
+        <li>Muse Spark 물체 등급이 대리 등급과 30개 중 27개 일치. 틀린 것은 8cm 근처의 경계값과 물체가 화면 밖에 있던 클립. EXP-19가 대리 등급으로 보인 신호를 Muse Spark 등급으로 쓸 근거가 됨.</li>
+        <li>가시성은 SAM 다섯 클립 모두 1.0. 값이 충분히 달라지지 않을 수 있고, 전체 실행에서 확인.</li>
+        <li>계획은 바뀌지 않음. 평가 2 전체 SAM과 Muse Spark 실행을 계획대로 진행할 수 있음.</li>
+        <li>한계: 점검당 클립 5개, 그중 3개가 같은 물체. 호출이 되는지 보는 점검이지 측정이 아님.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -2302,7 +2392,8 @@ video:  에피소드 하나 전체, 10fps
       <li>무료 점검 통과: 정답에서 낸 대리 등급으로 사람 하나씩 빼기 0.683, 물체 하나씩 빼기 0.666 (정확한 크기 0.695, 0.673). 손 대비 크기가 대부분을 설명하고, 손잡이와 감쌀 폭은 크기를 알면 뜻과 반대 방향으로 학습됨 (<a href="#exp-19">EXP-19</a>).</li>
       <li>검증 클립 v2 라벨 완료: 46.4%, 사람별 43~51%, 물체별 비율이 튜닝과 순위 상관 0.85. 라벨만 냈고 채점은 아직 (<a href="#exp-20">EXP-20</a>).</li>
       <li>평가 2 유료 실행 준비 완료(무료). 클립 세트: 점수 가중치 학습 400개, 항목 학습 1,985개(나머지 튜닝), 검증 1,426개. 겹치는 클립을 합친 SAM 구간 513개를 10fps로 잘라 두고, Muse Spark용 프레임을 클립당 6장(10,956장) 뽑음. SAM 결과에서 가시성과 접촉 명확성을 내는 코드와 전체 채점 경로를 튜닝 대리 등급으로 점검함(결과 아님).</li>
-      <li>다음(유료 호출 보류 중): SAM 파일럿 3구간 → Muse Spark 체크리스트와 단독 질문 파일럿 각 5클립 → 대리 등급과 비교 → 전체 실행.</li>
+      <li>유료 파일럿 완료: SAM이 잡은 물체를 접촉 프레임 99%에서 찾고 92%에서 가장 가까운 물체로 고름. Muse Spark 물체 등급은 대리 등급과 27/30 일치. HOT3D 프레임 크기 버그를 고침 (<a href="#exp-23">EXP-23</a>).</li>
+      <li>다음: 평가 2 전체 SAM과 Muse Spark 실행, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
 
@@ -2395,7 +2486,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 04:09 KST
+    마지막 갱신 2026-10-28 04:31 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2490,7 +2581,8 @@ video:  에피소드 하나 전체, 10fps
         ["done", "Muse Spark 물체 항목 6개와 상·중·하 기준 작성"],
         ["done", "물체 항목 무료 점검 통과: 0.683, 처음 보는 물체 0.666 (EXP-19)"],
         ["done", "유료 실행 준비: 클립 세트, SAM 구간 513개, 프레임, 채점 코드 점검"],
-        ["todo", "SAM·Muse Spark 파일럿, 대리 등급과 비교 (유료 호출 보류)"],
+        ["done", "SAM·Muse Spark 파일럿: 잡은 물체 99%, 등급 일치 27/30 (EXP-23)"],
+        ["todo", "평가 2 전체 SAM과 Muse Spark 실행"],
         ["todo", "Muse Spark 항목 2개와 Muse Spark 단독 (유료 호출 보류)"],
         ["todo", "분산 없는 항목 점검"],
         ["todo", "로지스틱 회귀 학습 (튜닝 400개)"],

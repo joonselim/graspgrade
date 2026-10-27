@@ -97,16 +97,17 @@ def ground_truth(episodes):
 
 # ---------------------------------------------------------------- features
 
-def _half(obj):
-    """Object mask placed in a half resolution frame (360 x 640)."""
-    full = np.zeros((H, W), bool)
+def _half(obj, size=(W, H)):
+    """Object mask placed in a half resolution frame (360 x 640 for OpenGraph)."""
+    fw, fh = size
+    full = np.zeros((fh, fw), bool)
     m = obj.mask()
-    h, w = min(m.shape[0], H - obj.y0), min(m.shape[1], W - obj.x0)
+    h, w = min(m.shape[0], fh - obj.y0), min(m.shape[1], fw - obj.x0)
     full[obj.y0:obj.y0 + h, obj.x0:obj.x0 + w] = m[:h, :w]
     return full[::2, ::2]
 
 
-def hand_sides(boxes):
+def hand_sides(boxes, width=W):
     """Left or right for each hand id.
 
     Hands cross the image centre often, so the side comes from frames that show
@@ -122,15 +123,15 @@ def hand_sides(boxes):
             if others:
                 seen[i] = seen.get(i, 0) + 1
                 left[i] = left.get(i, 0) + (x < min(others))
-    return {i: ("left" if (left[i] / seen[i] > 0.5 if seen.get(i) else np.median(v) < W / 2) else "right")
+    return {i: ("left" if (left[i] / seen[i] > 0.5 if seen.get(i) else np.median(v) < width / 2) else "right")
             for i, v in xs.items()}
 
 
-def frame_table(folder, suffix, n10):
-    """Per 10 fps frame and side: hand and nearest object measurements."""
+def frame_table(folder, suffix, n10, size=(W, H)):
+    """Per 10 fps frame and side: hand and nearest object measurements. size is (width, height) in pixels."""
     hands = dict(sam_fast.read_frames(folder / f"sam_hand{suffix}"))
     objs = dict(sam_fast.read_frames(folder / f"sam_small_object{suffix}"))
-    side_of = hand_sides({f: {o.id: o.box for o in hs} for f, hs in hands.items()})
+    side_of = hand_sides({f: {o.id: o.box for o in hs} for f, hs in hands.items()}, size[0])
 
     rec = {s: {k: np.full(n10, np.nan) for k in
                ("hx", "hy", "harea", "gap", "near", "ox", "oy", "oarea", "oid")} for s in SIDES}
@@ -138,7 +139,7 @@ def frame_table(folder, suffix, n10):
     for k in range(n10):
         obj_masks = []
         for o in objs.get(k, []):
-            m = _half(o)
+            m = _half(o, size)
             a = m.sum()
             if a == 0:
                 continue
@@ -153,7 +154,7 @@ def frame_table(folder, suffix, n10):
             if s not in best or area > best[s][0]:
                 best[s] = (area, o)
         for s, (_, o) in best.items():
-            hm = _half(o)
+            hm = _half(o, size)
             if not hm.any():
                 continue
             r = rec[s]
@@ -485,11 +486,37 @@ def cmd_smoke(args):
 # ---------------------------------------------------------------- arm B: SAM rule (measurement plan)
 
 RULE_GRID = {"gap_px": (2, 4, 8, 12), "move": (0.05, 0.1, 0.2), "comove": (0.5, 0.7),
-             "fill": (0, 1, 2), "split_object": (False, True)}  # last two added in EXP-22
+             "fill": (0, 1, 2), "split_object": (False, True),  # fill and split_object added in EXP-22
+             "persist": (1, 3, 5)}  # added in EXP-24, only matters with split_object
 FILL, MIN_LEN = 2, 2  # 10 fps frames: join near-runs split by up to 0.2 s, drop contacts under 0.2 s
 
 
-def rule_segments(base, gap, gap_px, move, comove, fill=FILL, split_object=False, oid=None):
+def stable_ids(oid, persist):
+    """Nearest object id per frame, where a new id counts only after it stays for `persist` frames.
+
+    Shorter switches to another object are read as the object held before. Frames
+    with no id stay unknown and do not break a run.
+    """
+    s = np.array(oid, float)
+    if persist <= 1:
+        return s
+    cur, k, n = np.nan, 0, len(s)
+    while k < n:
+        if not np.isfinite(oid[k]):
+            k += 1
+            continue
+        e = k
+        while e < n and (oid[e] == oid[k] or not np.isfinite(oid[e])):
+            e += 1
+        if np.isfinite(cur) and oid[k] != cur and np.isfinite(oid[k:e]).sum() < persist:
+            s[k:e] = np.where(np.isfinite(oid[k:e]), cur, np.nan)
+        else:
+            cur = oid[k]
+        k = e
+    return s
+
+
+def rule_segments(base, gap, gap_px, move, comove, fill=FILL, split_object=False, oid=None, persist=1):
     """Arm B, per hand at 10 fps.
 
     near: the hand mask is within gap_px of an object mask.
@@ -498,7 +525,11 @@ def rule_segments(base, gap, gap_px, move, comove, fill=FILL, split_object=False
     A contact is a near-run that contains at least one co-moving frame, from the
     start of the run to its end. So a touch counts once the object moved with
     the hand, and it lasts while the hand stays at the object.
+    With split_object, a change of nearest object starts a new contact, once the
+    new object stays nearest for `persist` frames.
     """
+    if split_object and oid is not None:
+        oid = stable_ids(oid, persist)
     b = dict(zip(BASE, base.T))
     near = np.nan_to_num(gap, nan=1e9) <= gap_px
     obj_move = np.maximum(b["obj_move_future"], b["obj_move_past"])
@@ -597,10 +628,11 @@ def cmd_rule(args):
         print("  per episode", r["arm_B_per_episode"])
         print("  chosen", r["arm_B_chosen_on_other_episodes"])
     if args.plot:
-        plot_rule([int(e) for e in args.plot.split(",")], data, report["glove_clean"]["arm_B_chosen_on_other_episodes"])
+        plot_rule([int(e) for e in args.plot.split(",")], data, report["glove_clean"]["arm_B_chosen_on_other_episodes"],
+                  args.fig)
 
 
-def plot_rule(eps, data, chosen):
+def plot_rule(eps, data, chosen, name="exp22_sam_rule_split.png"):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -627,7 +659,7 @@ def plot_rule(eps, data, chosen):
         ax.grid(axis="x", alpha=0.3)
     axes[-1, 0].set_xlabel("seconds")
     fig.tight_layout()
-    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp22_sam_rule_split.png", dpi=120)  # the EXP-14 figure is kept as it was
+    fig.savefig(ROOT / "docs" / "experiments" / "img" / name, dpi=120)  # earlier figures are kept as they were
 
 
 def cmd_rule_apply(args):
@@ -670,6 +702,7 @@ def main():
     c.add_argument("--plot", help="comma list of episodes to draw")
     r = sub.add_parser("rule")
     r.add_argument("--plot", help="comma list of episodes to draw")
+    r.add_argument("--fig", default="exp22_sam_rule_split.png", help="figure name in docs/experiments/img")
     a = sub.add_parser("rule-apply")
     a.add_argument("--train", default="tune", help="split name or comma list")
     a.add_argument("--apply", default="held_out", help="split name or comma list")

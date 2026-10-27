@@ -27,6 +27,7 @@ from contact_cut import frame_table  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 N2 = ROOT / "out" / "number2"
 STEP, NEAR_PX = 3, 3
+SIZE = 1408  # HOT3D preview frames are 1408 x 1408
 
 
 def clip_values(rec, start, clips):
@@ -66,7 +67,7 @@ def main():
         d = N2 / "sam" / r.window_id
         if not all((d / f"sam_{p}_events.jsonl.gz").exists() for p in ("hand", "small_object")):
             continue
-        rec, _ = frame_table(d, "_events.jsonl.gz", int(r.frames_10fps))
+        rec, _ = frame_table(d, "_events.jsonl.gz", int(r.frames_10fps), (SIZE, SIZE))
         rows += clip_values(rec, int(r.start), clips.loc[json.loads(r.clips)].reset_index())
     v = pd.DataFrame(rows).merge(clips[["role"]], left_on="clip_id", right_index=True)
     tr = v[v.role == "score_train"]
