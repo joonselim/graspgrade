@@ -339,6 +339,10 @@ same signal on tuning clips.
   per person, and how often each Muse Spark item equals its stand-in.
 - P7b: the checklist call and the baseline call on all 1,426 held-out clips.
   About $27.6.
+- Code check (EXP-26, stand-in grades, no Muse): perfect grades on these
+  400 clips give 0.657 and 0.666, so the gate passes by a small margin. With
+  random grade errors at the P1 agreement level (about 90%) the expected
+  verdict is "weak". The rule above is unchanged.
 
 ### Leave one object out on held-out (written 2026-10-28, before computing)
 

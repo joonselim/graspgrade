@@ -401,6 +401,7 @@
       <li>v2 라벨에서는 물체 종류만으로 AUC 0.74. 영상 손 모양 항목은 0.52로 신호를 잃었고(이전 라벨의 0.63은 리타게팅 부작용을 배운 것), 영상 항목을 다 합쳐도 물체 위에 약 0.01만 더함. 체크리스트는 영상 품질을 재는데 정답은 주로 물체의 성질.</li>
       <li>평가 2 방향 결정: 질문과 v2 라벨은 그대로 두고 "물체 성질" 항목을 구체적인 물체 항목(손 대비 크기, 길이, 납작함, 폭, 손잡이, 주변 물체)으로 늘림. 물체 3D 모델의 크기·모양 숫자 7개만으로 0.695(물체 이름 0.742), 처음 보는 물체에서도 0.673이 나와 미리 정한 기준을 통과함.</li>
       <li>물체 항목 6개(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간)를 상·중·하 기준과 함께 고정. 정답에서 낸 대리 등급으로 0.683, 처음 보는 물체 0.666으로 통과. 손 대비 크기가 대부분을 설명함. Muse Spark가 영상에서 이 등급을 읽는지는 짧은 유료 파일럿으로 먼저 확인.</li>
+      <li>Muse Spark 게이트(튜닝 400개)는 빡빡함. 완벽한 대리 등급으로도 사람 하나씩 빼기 0.657로 기준 0.65를 겨우 넘고, 파일럿 수준의 일치율(90%)이면 "약함"이 예상돼 검증 클립에 보내기 전에 결정이 필요할 수 있음. 튜닝에서는 물체 기준선이 우리 점수를 이기지만(0.776 대 0.721), 처음 보는 물체에서는 우리 점수가 0.675를 지키고 물체 기준선은 0.5.</li>
       <li>HOT3D 어안 영상은 왜곡을 풀지 않음. 풀면 MediaPipe가 손을 10%p 덜 찾아 미리 정한 기준을 통과하지 못함. 원본을 쓰고 한계로 보고.</li>
       <li>평가 2 첫 유료 파일럿(튜닝 클립 5개): SAM은 붐비는 HOT3D 탁자에서도 잡은 물체를 접촉 프레임 99%에서 찾고, 우리 코드가 92%에서 그것을 손에 가장 가까운 물체로 고름. Muse Spark의 물체 등급은 3D 모델 대리 등급과 30개 중 27개 일치.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
@@ -492,6 +493,7 @@
             <tr><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">평가 2 유료 파일럿</td><td>SAM이 접촉 프레임 99%에서 잡은 물체를 찾고 우리 코드가 92%에서 그것을 고름. Muse Spark 물체 등급은 대리 등급과 30개 중 27개 일치. 계획 변경 없음.</td></tr>
             <tr><td class="first"><a href="#exp-24">EXP-24</a></td><td class="wrap-ok">새 물체가 유지될 때만 끊는 방법 B</td><td>3프레임 기다리면 IoU 0.66 → 0.72지만 F1 ±5는 0.151 → 0.145. 경계 수를 맞춰도 F1 0.09라 자리가 틀린 게 문제. 선택지는 튜닝 50개 격자에 남김.</td></tr>
             <tr><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">어안 왜곡을 풀면 MediaPipe가 나아지는가</td><td>아님. 왜곡을 풀면 손을 10%p 덜 찾고(70.6% → 60.3%) 2D 지점도 나빠짐. 원본을 쓰고 어안은 한계로 보고.</td></tr>
+            <tr><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</td><td>코드는 계획대로 동작. 게이트가 빡빡해 완벽한 등급으로도 0.657로 겨우 통과, 파일럿 일치율이면 "약함" 예상. 처음 보는 물체에서 우리 점수 0.675, 물체 기준선 0.5.</td></tr>
           </tbody>
         </table>
       </div>
@@ -516,6 +518,11 @@
               <td class="first">작은 물체를 빠르게 집는 동작</td>
               <td>용기 옆에서 원판을 집는 손은 프레임 AUC 0.59. 손이 늘 물체 옆에 있어 닿음과 안 닿음을 못 가름</td>
               <td>튜닝 50개 결과로 다시 확인</td>
+            </tr>
+            <tr>
+              <td class="first">Muse Spark 게이트가 빡빡함</td>
+              <td>완벽한 대리 등급으로도 사람 하나씩 빼기 0.657(기준 0.65). 등급 일치율 90%면 대부분 "약함", 87% 아래면 대부분 "멈춤" (EXP-26). 400개를 6명이 나눠 사람당 약 67개뿐</td>
+              <td>기준은 계산 전에 고정했으므로 그대로 둠. 바꿀지는 튜닝 400개 실행 전에 사용자가 정함</td>
             </tr>
             <tr>
               <td class="first">Muse Spark가 물체 크기를 읽는가</td>
@@ -568,8 +575,8 @@
             </tr>
             <tr>
               <td class="first">평가 2 주 비교</td>
-              <td>v2 라벨에서 물체 종류만으로 AUC 0.74. Muse Spark가 물체를 알아보고 큰 로봇 손이 어떤 물체에 약한지 안다면 그 근처가 나오고, 지금의 체크리스트는 주 비교에서 짐. 보완재 비교에서도 약 0.01만 더함 (EXP-17)</td>
-              <td>"물체 성질"을 구체적인 물체 항목으로 늘림(EXP-18에서 형상만으로 0.695, 처음 보는 물체 0.673). 처음 보는 물체 비교를 주 결과 옆에 냄. 보완재 비교와 사람별 AUC는 계속 같이 보고</td>
+              <td>v2 라벨에서 물체 종류만으로 AUC 0.74. Muse Spark가 물체를 알아보고 큰 로봇 손이 어떤 물체에 약한지 안다면 그 근처가 나오고, 지금의 체크리스트는 주 비교에서 짐. 보완재 비교에서도 약 0.01만 더함 (EXP-17). 대리 등급으로 돌린 튜닝 점검에서도 물체 기준선 0.776이 우리 점수 0.721을 이김 (EXP-26)</td>
+              <td>"물체 성질"을 구체적인 물체 항목으로 늘림(EXP-18에서 형상만으로 0.695, 처음 보는 물체 0.673). 처음 보는 물체 비교를 주 결과 옆에 냄(튜닝에서 우리 점수 0.675, 물체 기준선 0.5, EXP-26). 보완재 비교와 사람별 AUC는 계속 같이 보고</td>
             </tr>
             <tr>
               <td class="first">동반 이동 신호 품질</td>
@@ -603,7 +610,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2480,6 +2487,92 @@ Answer with JSON only.</pre>
         <li>한계: 클립마다 프레임 한 장, MediaPipe만, 정답은 모션캡처 손(잡는 동안 물체 표면에서 약 2mm, EXP-09).</li>
       </ul>
     </article>
+
+    <!-- EXP-26 -->
+    <article class="exp" id="exp-26">
+      <div class="exp-h"><span class="id">EXP-26</span><span class="t">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>측정 계획은 평가 2의 Muse Spark 실행을 튜닝 400개와 검증 클립 두 단계로 나누고 그 사이에 게이트를 두었다. 처음 보는 물체 비교도 더했다. 둘 다 계산 전에 적었다. 코드가 계획대로 동작하는가, 게이트는 통과하기 얼마나 어려운가.</dd>
+        <dt>입력</dt><dd>튜닝 사람만. Muse Spark 대신 대리 등급(EXP-19)을 씀. 검증 클립은 쓰지 않음.</dd>
+        <dt>방법</dt><dd>게이트: 점수 학습용 400개의 물체 항목 등급 6개로 로지스틱 회귀, v2 라벨. 사람 하나씩 빼기(6명 평균 AUC)와 물체 하나씩 빼기(합친 AUC, 시퀀스 재추출 95% 구간). 둘 다 0.65 이상이면 통과, 하나라도 0.60 미만이면 멈춤, 그 사이면 약함. 400개 모두 Muse Spark 등급이 있어야 돎. 처음 보는 물체 비교: 시험 물체마다 손 모양 적합도 모델, 그 구간 기준, 점수 가중치를 그 물체 없이 다시 학습.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">코드 점검</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>점검</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td class="first">기존 점검 결과(가중치, 우리 점수, 물체 기준선)</td><td>그대로</td></tr>
+              <tr><td class="first">400개 중 5개만 등급이 있을 때 게이트</td><td>거부: 395개에 Muse Spark 등급이 아직 없음</td></tr>
+              <tr><td class="first">가짜 Muse Spark 등급(대리 등급의 10%를 무작위로 바꿈)</td><td>끝까지 돎. 항목 일치율 91~96%로 예상대로</td></tr>
+              <tr><td class="first">흰 머그를 빼고 손 모양 적합도 다시 학습</td><td>클립 등급 3,811개 중 592개가 바뀜. 다시 학습이 실제로 일어남</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">대리 등급(완벽한 채점)으로 본 게이트, 400개</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>시험</th><th class="n">AUC</th><th class="n">통과 기준</th></tr></thead>
+            <tbody>
+              <tr><td class="first">사람 하나씩 빼기, 6명 평균</td><td class="n">0.657 (사람별 0.484~0.794)</td><td class="n">0.65</td></tr>
+              <tr><td class="first">물체 하나씩 빼기, 합침</td><td class="n">0.666 (0.608~0.723)</td><td class="n">0.65</td></tr>
+              <tr><td class="first">판정</td><td class="n">통과</td><td class="n"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">대리 등급 점검(EXP-19)은 튜닝 2,385개 전체에서 0.683과 0.666이었다. 400개에서는 사람 하나씩 빼기가 0.657로 떨어져 기준을 겨우 넘는다.</p>
+
+      <div class="tbl">
+        <p class="cap">채점 오류가 늘면 게이트는</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>무작위로 바꾼 등급</th><th class="n">대리 등급과 같은 비율</th><th class="n">사람 빼기</th><th class="n">물체 빼기</th><th>10번 중 판정</th></tr></thead>
+            <tbody>
+              <tr><td class="first">0%</td><td class="n">100%</td><td class="n">0.657</td><td class="n">0.666</td><td>통과</td></tr>
+              <tr><td class="first">5%</td><td class="n">97%</td><td class="n">0.643</td><td class="n">0.650</td><td>통과 2, 약함 8</td></tr>
+              <tr><td class="first">10%</td><td class="n">93%</td><td class="n">0.640</td><td class="n">0.637</td><td>통과 1, 약함 8, 멈춤 1</td></tr>
+              <tr><td class="first">20%</td><td class="n">87%</td><td class="n">0.608</td><td class="n">0.600</td><td>약함 4, 멈춤 6</td></tr>
+              <tr><td class="first">30%</td><td class="n">80%</td><td class="n">0.594</td><td class="n">0.578</td><td>약함 2, 멈춤 8</td></tr>
+              <tr><td class="first">40%</td><td class="n">73%</td><td class="n">0.566</td><td class="n">0.544</td><td>멈춤 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">무작위 등급은 세 번에 한 번 원래 등급과 같아서, 비율 r을 바꾸면 약 1 − 2r/3이 대리 등급과 같게 남는다.</p>
+
+      <figure>
+        <img src="assets/exp26_gate_noise.png" loading="lazy" width="840" height="456" alt="무작위로 바꾼 등급 비율에 따른 게이트 두 시험의 AUC" style="max-width:640px">
+        <div class="keys"><span class="key"><i class="ln" style="--c:#1971c2"></i>사람 하나씩 빼기, 6명 평균</span><span class="key"><i class="ln" style="--c:#e8590c"></i>물체 하나씩 빼기, 합침</span><span class="key"><i class="dash" style="--c:#4e9d5e"></i>통과 0.65</span><span class="key"><i class="dash" style="--c:#cc4646"></i>멈춤 0.60 미만</span></div>
+        <figcaption>선은 10번 뽑은 평균, 띠는 가장 낮은 값부터 가장 높은 값까지.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">처음 보는 물체 비교 (튜닝, 대리 등급)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">주 비교</th><th class="n">처음 보는 물체</th></tr></thead>
+            <tbody>
+              <tr><td class="first">우리 점수</td><td class="n">0.721 (0.668~0.775)</td><td class="n"><b>0.675</b> (0.618~0.731)</td></tr>
+              <tr><td class="first">물체 기준선</td><td class="n"><b>0.776</b> (0.731~0.819)</td><td class="n">0.5 (구조상)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ul class="plain concl">
+        <li>코드는 계획대로 동작함. 기존 결과는 바뀌지 않았고, 게이트는 Muse Spark 등급이 일부만 있으면 돌지 않음.</li>
+        <li>게이트가 빡빡함. 완벽한 등급으로도 0.007 차이로 통과. 파일럿 일치율(30개 중 27개, 90%)이면 예상 판정은 "약함"이라 검증 클립에 보내기 전에 사용자와 정해야 함. 일치율이 약 87% 아래면 "멈춤"일 가능성이 큼.</li>
+        <li>표본 탓도 있음: 400개를 6명이 나눠 사람당 약 67개이고, 두 사람은 완벽한 등급으로도 0.5 근처.</li>
+        <li>튜닝에서는 주 비교에서 물체 기준선이 우리 점수를 이김(0.776 대 0.721). 처음 보는 물체에서는 우리 점수가 0.675를 지키고 물체 기준선은 0.5로 떨어짐. 처음 보는 물체 비교를 더한 이유이고, 검증에서도 같은 모양일 가능성이 큼.</li>
+        <li>게이트와 규칙은 여기서 바꾸지 않음. 400개의 Muse Spark 등급이 생기기 전에 고정한 것이고, 바꾸는 것은 튜닝 400개 실행 전에 사용자가 정할 일.</li>
+        <li>한계: 무작위 교체는 단순한 오류 모델. 실제 Muse Spark 오류는 몰려 있을 가능성이 큼(예: 파일럿의 8cm 근처 폭).</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -2536,6 +2629,7 @@ Answer with JSON only.</pre>
       <li>어안 왜곡은 풀지 않기로 함. 풀면 MediaPipe 손 찾음이 70.6% → 60.3% (<a href="#exp-25">EXP-25</a>).</li>
       <li>Muse Spark 전체 실행은 두 단계로 나눔(계산 전에 고정). 먼저 점수 학습용 튜닝 클립 400개에만 보내고, Muse Spark 물체 등급 6개로 사람 하나씩 빼기와 물체 하나씩 빼기 AUC를 냄. 둘 다 0.65 이상이면 검증 1,426개에 보냄. 하나라도 0.60 미만이거나 그 사이면 검증 클립에 보내기 전에 다시 정함.</li>
       <li>최종 보고에 "처음 보는 물체" 비교를 더함: 검증 물체마다 우리 점수를 그 물체 없이 다시 학습해 채점하고, Muse Spark 단독, 같은 방식으로 다시 맞춘 Muse Spark + 우리 항목, 물체 기준선(0.5)과 나란히 둠.</li>
+      <li>게이트와 처음 보는 물체 비교의 코드를 대리 등급으로 점검(<a href="#exp-26">EXP-26</a>). 게이트는 완벽한 등급으로도 0.657로 겨우 통과해, 실제 Muse Spark 등급이면 "약함"이 나올 가능성이 큼.</li>
       <li>다음: 평가 2 SAM 전체, Muse Spark 튜닝 400개와 게이트, 통과하면 검증 클립, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
@@ -2629,7 +2723,7 @@ Answer with JSON only.</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 05:29 KST
+    마지막 갱신 2026-10-28 05:35 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2726,6 +2820,7 @@ Answer with JSON only.</pre>
         ["done", "물체 항목 무료 점검 통과: 0.683, 처음 보는 물체 0.666 (EXP-19)"],
         ["done", "유료 실행 준비: 클립 세트, SAM 구간 513개, 프레임, 채점 코드 점검"],
         ["done", "SAM·Muse Spark 파일럿: 잡은 물체 99%, 등급 일치 27/30 (EXP-23)"],
+        ["done", "게이트와 처음 보는 물체 비교 코드 점검 (EXP-26)"],
         ["todo", "SAM 전체 (점수 학습 400개, 검증 1,426개)"],
         ["todo", "Muse Spark 튜닝 400개 → 게이트 (물체 등급 AUC 둘 다 0.65 이상)"],
         ["todo", "게이트 통과 시 Muse Spark 검증 1,426개"],
