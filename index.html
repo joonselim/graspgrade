@@ -382,7 +382,7 @@
       <li>측정 계획을 지원서의 비교 구조로 다시 맞춤. 평가 1은 촉각 장갑을 정답으로 세 방법을 비교하고, 평가 2는 검증 클립 1,426개에서 우리 점수를 Muse Spark 단독과 비교함. 유료 호출은 지금 보류 중.</li>
       <li>평가 1의 방법 B(SAM 규칙) 코드 완성. 파일럿에서 접촉 구간 IoU는 0.75로 "항상 접촉"보다 낫지만, 연이은 접촉을 하나로 묶어 경계를 잘 못 찾음.</li>
       <li>평가 1의 A(Muse Spark 단독)와 C(B + Muse Spark 경계 확인) 코드 완성. 정답을 그대로 답으로 줘 최고 점수를 재니 A는 5fps에서도 경계 F1(±5) 0.96, C는 B가 찾은 경계 190개 중 52개에 묶여 0.15. 유료 실행 전에 C를 공정한 비교로 만드는 방법을 정해야 함.</li>
-      <li>가장 가까운 물체가 바뀌면 B가 접촉을 끊게 하니 파일럿에서 B의 경계 F1과 C의 최고 점수가 두 배(0.32)가 됨. 대신 긴 쥐기를 잘게 쪼개 경계가 실제의 두 배. 튜닝 50개에서 정함.</li>
+      <li>가장 가까운 물체가 바뀌면 B가 접촉을 끊게 하니 파일럿에서 B의 경계 F1과 C의 최고 점수가 두 배(0.32)가 됨. 대신 긴 쥐기를 잘게 쪼개 경계가 실제의 두 배. 새 물체가 몇 프레임 유지될 때만 끊게 하면 IoU는 오르지만 F1은 조금 내려가는 맞바꿈이고, 경계 수를 맞춰도 자리가 틀린 경우가 많음(EXP-24). 튜닝 50개에서 정함.</li>
       <li>평가 2 클립 완성. 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
       <li>평가 2 정답 라벨을 다시 만듦. 처음 라벨은 손 크기 비율로 늘린 리타게팅 탓에 Allegro 손가락 끝이 사람 손가락 끝에서 31mm 떨어져, 로봇 손보다 리타게팅의 부작용을 쟀음. 새 라벨 v2는 손가락 위치를 맞춘 뒤 메쉬 충돌과 접촉점 도달을 검사함. 튜닝 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(+0.04). 다만 허용 깊이에 민감함(2mm 18%, 10mm 66%). 같은 기준으로 검증 클립 1,426개는 46.4%, 사람별 43~51%.</li>
       <li>v2 라벨에서는 물체 종류만으로 AUC 0.74. 영상 손 모양 항목은 0.52로 신호를 잃었고(이전 라벨의 0.63은 리타게팅 부작용을 배운 것), 영상 항목을 다 합쳐도 물체 위에 약 0.01만 더함. 체크리스트는 영상 품질을 재는데 정답은 주로 물체의 성질.</li>
@@ -475,6 +475,7 @@
             <tr><td class="first"><a href="#exp-21">EXP-21</a></td><td class="wrap-ok">평가 1 각 방법의 최고 점수</td><td>완벽한 답이면 A(5fps)는 경계 F1 ±5에서 0.96이라 5fps는 걸림돌이 아님. C는 B가 찾은 경계에 묶여 최고 0.15.</td></tr>
             <tr><td class="first"><a href="#exp-22">EXP-22</a></td><td class="wrap-ok">물체 바뀜으로 끊는 방법 B</td><td>경계 F1이 두 배(±5 0.15, ±15 0.32), C 최고 점수도 0.32. 하지만 경계 392개(실제 190)로 너무 많이 끊고 IoU 0.66.</td></tr>
             <tr><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">평가 2 유료 파일럿</td><td>SAM이 접촉 프레임 99%에서 잡은 물체를 찾고 우리 코드가 92%에서 그것을 고름. Muse Spark 물체 등급은 대리 등급과 30개 중 27개 일치. 계획 변경 없음.</td></tr>
+            <tr><td class="first"><a href="#exp-24">EXP-24</a></td><td class="wrap-ok">새 물체가 유지될 때만 끊는 방법 B</td><td>3프레임 기다리면 IoU 0.66 → 0.72지만 F1 ±5는 0.151 → 0.145. 경계 수를 맞춰도 F1 0.09라 자리가 틀린 게 문제. 선택지는 튜닝 50개 격자에 남김.</td></tr>
           </tbody>
         </table>
       </div>
@@ -513,12 +514,12 @@
             <tr>
               <td class="first">방법 B가 연이은 접촉을 묶음</td>
               <td>손이 늘 어떤 물체 곁에 있어 접촉 여러 개가 한 구간이 됨. 경계 190~248개 중 52개만 찾음 (EXP-14). C는 B의 경계만 옮길 수 있어 완벽한 답으로도 0.15가 최고라, 계획대로의 A 대 C 비교는 구조 때문에 A에 유리함 (EXP-21)</td>
-              <td>물체 바뀜으로 끊는 선택지를 격자에 넣음. 파일럿에서 B 경계 F1과 C 최고 점수가 두 배(0.32)지만 경계 392개로 너무 많이 끊음 (EXP-22). 결정: 튜닝 50개로 B 격자를 확정해 재현율을 올림(과분할을 막는 선택지 포함). C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않음</td>
+              <td>물체 바뀜으로 끊는 선택지를 격자에 넣음. 파일럿에서 B 경계 F1과 C 최고 점수가 두 배(0.32)지만 경계 392개로 너무 많이 끊음 (EXP-22). 결정: 튜닝 50개로 B 격자를 확정해 재현율을 올림. 과분할을 막는 "유지" 선택지는 IoU와 F1을 맞바꾸고, 경계 자리가 틀리는 문제는 남음(EXP-24). C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않음</td>
             </tr>
             <tr>
               <td class="first">HOT3D 어안 왜곡</td>
               <td>HOT3D 클립에서 MediaPipe가 왜곡을 풀지 않은 원본 어안 영상 위에서 돎</td>
-              <td>왜곡을 풀거나 한계로 보고</td>
+              <td>무료 점검(EXP-25, 기준은 계산 전에 고정): 튜닝 접촉 프레임에서 원본과 렌즈 모델로 편 영상에 MediaPipe를 돌려 모션캡처 손과 비교. 손 검출이 5%p 이상 늘거나, 2D 오차나 손 모양 특징 오차가 20% 이상 줄 때만 왜곡을 풂. 아니면 원본을 쓰고 한계로 보고. Muse Spark 프레임은 어느 쪽이든 원본</td>
             </tr>
             <tr>
               <td class="first">왼손 접촉 시작 오차</td>
@@ -586,7 +587,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2340,12 +2341,68 @@ Answer with JSON only.</pre>
         <li>한계: 점검당 클립 5개, 그중 3개가 같은 물체. 호출이 되는지 보는 점검이지 측정이 아님.</li>
       </ul>
     </article>
+
+    <!-- EXP-24 -->
+    <article class="exp" id="exp-24">
+      <div class="exp-h"><span class="id">EXP-24</span><span class="t">새 물체가 몇 프레임 유지될 때만 끊는 방법 B</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>EXP-22에서 B는 가장 가까운 물체가 바뀌면 새 접촉을 시작했다. 경계 F1은 두 배가 됐지만, 쥔 물체와 옆 물체 사이에서 가장 가까운 물체가 깜빡여 경계를 실제 190개에 392개나 찾았다. 새 물체가 몇 프레임 동안 계속 가장 가까울 때만 바뀐 것으로 세면 나아지는가. 튜닝 50개 전에 하는 코드 점검이고, 세 에피소드로는 어느 값이 좋은지 정할 수 없음.</dd>
+        <dt>입력</dt><dd>튜닝 파일럿 에피소드 0, 30, 53. 주 정답은 정리한 촉각 장갑.</dd>
+        <dt>방법</dt><dd>B 격자에 "유지" 선택지 추가: 10fps에서 1, 3, 5프레임. 이보다 짧게 바뀐 가장 가까운 물체는 직전에 쥐던 물체로 봄(1은 EXP-22 규칙). 격자는 432가지, EXP-14·22와 같은 에피소드 하나씩 빼기 탐색. 추가로 EXP-22에서 고른 규칙에 유지만 1, 2, 3, 5, 8로 바꿔 봄.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">정리한 장갑 기준, 에피소드 하나씩 빼기</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">EXP-22 B</th><th class="n">EXP-24 B</th><th class="n">항상 접촉</th></tr></thead>
+            <tbody>
+              <tr><td class="first">경계 F1 ±5</td><td class="n"><b>0.151</b></td><td class="n">0.145</td><td class="n">0.02</td></tr>
+              <tr><td class="first">경계 F1 ±15</td><td class="n"><b>0.323</b></td><td class="n">0.291</td><td class="n">0.02</td></tr>
+              <tr><td class="first">접촉 IoU</td><td class="n">0.663</td><td class="n"><b>0.718</b></td><td class="n">0.669</td></tr>
+              <tr><td class="first">찾은 경계 / 실제</td><td class="n">392 / 190</td><td class="n">360 / 190</td><td class="n">12 / 190</td></tr>
+              <tr><td class="first">C 최고 점수, 경계 F1 ±5</td><td class="n"><b>0.315</b></td><td class="n">0.297</td><td class="n"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">빼고 채점한 세 에피소드 모두 유지 3프레임을 골랐다. 장갑 원신호 기준으로도 같은 그림이다(F1 0.164, 0.299, IoU 0.717).</p>
+
+      <div class="tbl">
+        <p class="cap">유지 프레임만 바꾸면 (나머지는 EXP-22에서 고른 그대로)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>유지</th><th class="n">F1 ±5</th><th class="n">F1 ±15</th><th class="n">IoU</th><th class="n">찾은 경계 / 실제</th></tr></thead>
+            <tbody>
+              <tr><td class="first">1 (EXP-22)</td><td class="n">0.151</td><td class="n">0.323</td><td class="n">0.663</td><td class="n">392 / 190</td></tr>
+              <tr><td class="first">2</td><td class="n">0.145</td><td class="n">0.287</td><td class="n">0.691</td><td class="n">388 / 190</td></tr>
+              <tr><td class="first">3</td><td class="n">0.124</td><td class="n">0.288</td><td class="n">0.702</td><td class="n">344 / 190</td></tr>
+              <tr><td class="first">5</td><td class="n">0.109</td><td class="n">0.243</td><td class="n">0.717</td><td class="n">270 / 190</td></tr>
+              <tr><td class="first">8</td><td class="n">0.087</td><td class="n">0.214</td><td class="n">0.730</td><td class="n">202 / 190</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙 (유지 3프레임)</span></div>
+        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 EXP-22보다 덜하다.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>새 물체가 유지될 때까지 기다리는 것은 해결이 아니라 맞바꿈. 잘못 끊은 것을 없애면서(IoU 0.66 → 0.72, 이제 "항상 접촉"보다 높음) 제대로 끊은 것도 없앰(F1 ±5 0.151 → 0.145, C 최고 0.315 → 0.297).</li>
+        <li>8프레임으로 경계 수가 실제와 비슷해져도(202 대 190) F1 ±5는 0.087. 찾은 경계 대부분이 너무 많은 게 아니라 자리가 틀림. B의 약점은 물체 깜빡임만이 아니라 가까움 구간이 시작하고 끝나는 위치.</li>
+        <li>이 선택지는 격자에 남겨 두고, 튜닝 50개에서 같은 탐색으로 1, 3, 5 중에 고름(결정 D1대로).</li>
+        <li>한계: 에피소드 3개. 탐색 점수(F1 ±15 + IoU)가 IoU 쪽을 더 쳐서 유지 1보다 3을 골랐음.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
     <h2><span class="no">2</span>진행 중인 작업</h2>
     <h3 style="margin-top:0">접촉 구간 검출</h3>
-    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). A와 C도 코드를 끝냈고, 완벽한 답으로 잰 최고 점수는 A 0.96, C 0.15다(<a href="#exp-21">EXP-21</a>). C가 B의 경계에 묶이는 문제는 B가 물체 바뀜으로 접촉을 끊게 해서 줄였지만(C 최고 0.32), 대신 너무 많이 끊는다(<a href="#exp-22">EXP-22</a>). 튜닝 50개로 B 격자를 확정해 재현율을 올리기로 했고, C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않는다. 유료 호출이 풀리면 파일럿부터 돌린다. 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
+    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). A와 C도 코드를 끝냈고, 완벽한 답으로 잰 최고 점수는 A 0.96, C 0.15다(<a href="#exp-21">EXP-21</a>). C가 B의 경계에 묶이는 문제는 B가 물체 바뀜으로 접촉을 끊게 해서 줄였지만(C 최고 0.32), 대신 너무 많이 끊는다(<a href="#exp-22">EXP-22</a>). 튜닝 50개로 B 격자를 확정해 재현율을 올리기로 했고, C가 B의 긴 접촉 안을 훑는 방식은 쓰지 않는다. 너무 많이 끊는 것을 줄이는 "유지" 선택지도 격자에 넣었다(<a href="#exp-24">EXP-24</a>). 유료 호출이 풀리면 파일럿부터 돌린다. 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
 
     <h3>비교 대상</h3>
     <ol class="flow">
@@ -2486,7 +2543,7 @@ Answer with JSON only.</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 04:31 KST
+    마지막 갱신 2026-10-28 04:33 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2537,6 +2594,7 @@ Answer with JSON only.</pre>
         ["done", "A·C 코드 완성, 최고 점수 측정: A 0.96, C 0.15 (EXP-21)"],
         ["done", "B에 물체 바뀜 끊기 선택지 추가: 파일럿 F1 두 배, 과분할 (EXP-22)"],
         ["done", "결정: 튜닝 50개로 B 재현율을 올림, C는 B 경계만 확인"],
+        ["done", "B에 유지 선택지 추가: IoU 0.72, F1은 조금 내려감 (EXP-24)"],
         ["todo", "튜닝 나머지 47개 SAM 실행 (유료 호출 보류)"],
         ["todo", "B SAM 규칙 기준값과 시작 지연 정하기 (튜닝 50개)"],
         ["todo", "A Muse Spark 단독 (5fps)"],

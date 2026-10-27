@@ -34,5 +34,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-21](exp21_number1_arm_ceilings.md) | 2026-10-27 | Number 1 arms: code check and best possible scores | $0 | A perfect Muse Spark at 5 fps would reach 0.96 boundary F1 at ±5 frames, so 5 fps is not the limit. Arm C is capped at 0.15 by the boundaries arm B finds. |
 | [EXP-22](exp22_arm_b_split.md) | 2026-10-27 | Arm B splits contacts when the nearest object changes | $0 | Boundary F1 doubles (0.15 at ±5, 0.32 at ±15) and so does the arm C ceiling (0.32), but arm B now overshoots (392 boundaries for 190) and IoU falls to 0.66. |
 | [EXP-23](exp23_number2_pilot.md) | 2026-10-28 | Number 2 paid pilot (P1): SAM and Muse on HOT3D | $0.20 | SAM finds the grasped object in 99% of contact frames and our code picks it as nearest in 92%. Muse object grades match the 3D model stand-ins in 27 of 30. Muse costs $0.0097 per call, so P7 drops to about $35. |
+| [EXP-24](exp24_arm_b_persist.md) | 2026-10-28 | Arm B splits only when the new object stays nearest | $0 | Waiting 3 frames lifts IoU from 0.66 to 0.72 but lowers boundary F1 at ±5 from 0.151 to 0.145. Even with the right number of boundaries, F1 is 0.09. The option stays in the grid for the 50 episodes. |
 
 Total Meta API spend so far: about $1.73 of $150.

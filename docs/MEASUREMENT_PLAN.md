@@ -338,6 +338,17 @@ tuning clips compares its grades with these stand-ins.
 
 - Fisheye: the plan said to undistort before MediaPipe. MediaPipe now runs
   on the raw fisheye preview. Either we undistort, or we report it as a limit.
+- Fisheye check (EXP-25, written before computing). Free, tuning persons
+  only. Contact frames of tuning clips, MediaPipe on the raw preview and on
+  the same frame turned into a pinhole image with the dataset lens model.
+  Measured against the mocap hand (UmeTrack landmarks projected with the
+  dataset lens model): hand found, 2D point error over hand size, and the
+  error of the ten hand shape features from MediaPipe 3D points. We
+  undistort only if undistortion raises the share of frames with the hand
+  found by 5 points or more, or lowers the median 2D error by 20% or more,
+  or lowers the median hand shape feature error by 20% or more. Otherwise
+  we keep the raw preview and report fisheye as a limit. Muse frames stay
+  raw in both cases, because testing Muse on undistorted frames costs credit.
 
 ## Budget
 
