@@ -3,6 +3,7 @@
     python scripts/meta_smoke.py --muse --sam
     python scripts/meta_smoke.py --sam --sam-prompt "small object" \
         --episode 53 --start 136 --out out/meta_smoke/ep53
+    python scripts/meta_smoke.py --sam --step 3 --out out/meta_smoke/fps10/ep1
 
 Default input is OpenGraph episode 1 (tuning split), frames 270 to 419. The right hand
 reaches an object and touches it at frame 321 (tactile label). The image is
@@ -30,6 +31,7 @@ SRC = ROOT / "data" / "episodes_720p" / "episode_000001.mp4"
 OUT = ROOT / "out" / "meta_smoke"
 START, N_FRAMES, IMAGE_FRAME = 270, 150, 330
 FPS = 30
+STEP = 1  # keep every STEP-th frame, 3 gives a 10 fps clip of the same 5 s
 
 MUSE_PRICE_IN, MUSE_PRICE_OUT = 1.25 / 1e6, 4.25 / 1e6
 SAM_PRICE_FRAME, SAM_MIN_FRAMES = 0.20 / 1000, 50
@@ -54,8 +56,10 @@ def prepare_inputs():
     clip, image = OUT / "clip.mp4", OUT / "frame.jpg"
     # -ss before -i seeks to the frame exactly when re-encoding, so the clip
     # holds source frames START .. START+N_FRAMES-1
+    # (every STEP-th one, so clip frame k is source frame START + STEP*k)
+    vf = ["-vf", f"select='not(mod(n,{STEP}))',setpts=N/({FPS // STEP}*TB)", "-r", str(FPS // STEP)] if STEP > 1 else []
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{START / FPS:.4f}", "-i", str(SRC),
-                    "-frames:v", str(N_FRAMES), "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+                    "-frames:v", str(N_FRAMES // STEP), *vf, "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
                     "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(clip)], check=True)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{IMAGE_FRAME / FPS:.4f}", "-i", str(SRC),
                     "-frames:v", "1", "-q:v", "3", str(image)], check=True)
@@ -172,7 +176,7 @@ def run_sam(client, clip, prompt):
         types[e["type"]] = types.get(e["type"], 0) + 1
     return {
         "prompt": prompt,
-        "clip_frames": N_FRAMES,
+        "clip_frames": N_FRAMES // STEP,
         "clip_bytes": clip.stat().st_size,
         "upload_seconds": round(t_upload, 2),
         "first_delta_seconds": round(t_first, 2) if t_first is not None else None,
@@ -181,13 +185,13 @@ def run_sam(client, clip, prompt):
         "raw_chars": len(raw),
         "final_status": final.get("status") if final else None,
         "final_usage": final.get("usage") if final else None,
-        "cost_usd_by_price_table": round(max(N_FRAMES, SAM_MIN_FRAMES) * SAM_PRICE_FRAME, 6),
+        "cost_usd_by_price_table": round(max(N_FRAMES // STEP, SAM_MIN_FRAMES) * SAM_PRICE_FRAME, 6),
         "parsed": parse_sam(events),
     }
 
 
 def main():
-    global SRC, OUT, START, IMAGE_FRAME
+    global SRC, OUT, START, IMAGE_FRAME, STEP
     ap = argparse.ArgumentParser()
     ap.add_argument("--muse", action="store_true")
     ap.add_argument("--sam", action="store_true")
@@ -195,11 +199,12 @@ def main():
     ap.add_argument("--episode", type=int, default=1)
     ap.add_argument("--start", type=int, default=START, help="first source frame of the 5 s clip")
     ap.add_argument("--image-frame", type=int, default=IMAGE_FRAME)
+    ap.add_argument("--step", type=int, default=STEP, help="3 sends a 10 fps clip")
     ap.add_argument("--out", default=str(OUT))
     args = ap.parse_args()
 
-    SRC =ROOT / "data" / "episodes_720p" / f"episode_{args.episode:06d}.mp4"
-    OUT, START, IMAGE_FRAME = Path(args.out), args.start, args.image_frame
+    SRC = ROOT / "data" / "episodes_720p" / f"episode_{args.episode:06d}.mp4"
+    OUT, START, IMAGE_FRAME, STEP = Path(args.out), args.start, args.image_frame, args.step
 
     load_env()
     client = OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MODEL_API_KEY"])

@@ -4,64 +4,54 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0b0d10">
-<title>GraspGrade 진행 상황</title>
+<title>GraspGrade 진행 보고</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --surface-2: #f0f2f5;
-    --line: #e2e5ea;
-    --text: #15181d;
-    --muted: #666e7a;
-    --faint: #98a0ab;
-    --accent: #2b6cff;
-    --ok: #0f8a4f;
-    --warn: #b06a00;
-    --stop: #c23b3b;
-    --radius: 14px;
-    --pad: 16px;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --page: #eef0f3;
+    --sheet: #ffffff;
+    --ink: #1a1d23;
+    --ink-2: #3b4250;
+    --muted: #6a7382;
+    --faint: #9aa2ae;
+    --rule: #dde1e7;
+    --rule-strong: #1a1d23;
+    --tint: #f5f6f8;
+    --done: #2350c9;
+    --doing: #d08a00;
+    --todo: #d5dae1;
+    --today: #d0342c;
+    --sheet-pad: 48px;
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0b0d10;
-      --surface: #14171c;
-      --surface-2: #1c2026;
-      --line: #272c34;
-      --text: #e8ebef;
-      --muted: #9aa3af;
-      --faint: #6b7380;
-      --accent: #6b9bff;
-      --ok: #45c17e;
-      --warn: #e0a033;
-      --stop: #ef6b6b;
+    :root {
+      --page: #0d0f12;
+      --sheet: #16191e;
+      --ink: #e7eaee;
+      --ink-2: #c3c9d2;
+      --muted: #96a0ad;
+      --faint: #6c7581;
+      --rule: #2a3038;
+      --rule-strong: #e7eaee;
+      --tint: #1d2127;
+      --done: #6f95ff;
+      --doing: #e6a52a;
+      --todo: #333a44;
+      --today: #ff6b62;
     }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0b0d10;
-    --surface: #14171c;
-    --surface-2: #1c2026;
-    --line: #272c34;
-    --text: #e8ebef;
-    --muted: #9aa3af;
-    --faint: #6b7380;
-    --accent: #6b9bff;
-    --ok: #45c17e;
-    --warn: #e0a033;
-    --stop: #ef6b6b;
   }
 
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
-      "Malgun Gothic", "Noto Sans KR", Roboto, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+      "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    font-size: 15.5px;
+    line-height: 1.7;
+    letter-spacing: -0.005em;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
@@ -70,219 +60,236 @@
   #gate {
     position: fixed; inset: 0; z-index: 100;
     display: flex; align-items: center; justify-content: center;
-    padding: 24px; background: var(--bg);
+    padding: 24px; background: var(--page);
   }
-  #gate .box { width: 100%; max-width: 340px; text-align: center; }
-  #gate h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
-  #gate p { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+  #gate .box {
+    width: 100%; max-width: 360px; background: var(--sheet);
+    border: 1px solid var(--rule); padding: 32px 28px;
+  }
+  #gate .label { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; margin: 0 0 6px; }
+  #gate h1 { font-size: 21px; margin: 0 0 20px; font-weight: 700; }
   #gate form { display: flex; flex-direction: column; gap: 10px; }
   #pw {
-    width: 100%; padding: 14px; font-size: 16px;
-    border: 1px solid var(--line); border-radius: 10px;
-    background: var(--surface); color: var(--text);
+    width: 100%; padding: 12px 14px; font: inherit; font-size: 16px;
+    border: 1px solid var(--rule); border-radius: 0;
+    background: var(--sheet); color: var(--ink);
   }
-  #pw:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  #pw:focus { outline: 2px solid var(--done); outline-offset: -1px; }
   #gate button {
-    padding: 14px; font-size: 16px; font-weight: 600;
-    border: 0; border-radius: 10px; cursor: pointer;
-    background: var(--accent); color: #fff;
+    padding: 12px; font: inherit; font-size: 15px; font-weight: 600;
+    border: 0; cursor: pointer; background: var(--ink); color: var(--sheet);
   }
-  #err { color: var(--stop); font-size: 14px; min-height: 20px; margin: 0; }
+  #err { color: var(--today); font-size: 13px; min-height: 18px; margin: 0; }
   #app[hidden] { display: none; }
 
-  /* ---------- layout ---------- */
-  .wrap { max-width: 860px; margin: 0 auto; padding: 20px var(--pad) 72px; }
-  header.top { padding-top: 8px; }
-  .eyebrow {
-    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--faint); margin: 0 0 6px;
+  /* ---------- sheet ---------- */
+  .sheet {
+    max-width: 920px; margin: 28px auto 56px;
+    background: var(--sheet); border: 1px solid var(--rule);
+    padding: var(--sheet-pad);
   }
-  h1.title { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.02em; }
-  .lede { color: var(--muted); font-size: 15px; margin: 0 0 18px; }
+  @media (max-width: 720px) {
+    :root { --sheet-pad: 20px; }
+    .sheet { margin: 0; border: 0; }
+  }
 
-  section { margin-top: 32px; }
+  /* ---------- document head ---------- */
+  .doc-head { border-bottom: 2px solid var(--rule-strong); padding-bottom: 20px; }
+  .doc-kicker { font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em; margin: 0 0 6px; }
+  .doc-title { font-size: 30px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; margin: 0 0 6px; }
+  .doc-sub { font-size: 15px; color: var(--ink-2); margin: 0 0 20px; }
+  .meta {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--rule); margin: 0;
+  }
+  .meta > div { padding: 10px 12px 0 0; }
+  .meta dt { font-size: 12px; color: var(--muted); margin: 0; }
+  .meta dd { margin: 2px 0 0; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .meta dd small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  @media (max-width: 720px) {
+    .doc-title { font-size: 25px; }
+    .meta { grid-template-columns: 1fr 1fr; row-gap: 6px; }
+  }
+
+  /* ---------- sections ---------- */
+  section { margin-top: 44px; }
   h2 {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--faint);
-    margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; gap: 10px; align-items: baseline;
+    font-size: 20px; font-weight: 750; letter-spacing: -0.02em;
+    margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--rule);
   }
-  h3 { font-size: 16px; margin: 20px 0 8px; }
-  p { margin: 0 0 12px; }
+  h2 .no { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  h3 { font-size: 16px; font-weight: 700; margin: 26px 0 10px; }
+  p { margin: 0 0 12px; color: var(--ink-2); }
+  .note { font-size: 13.5px; color: var(--muted); }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: var(--pad);
-  }
-  .card + .card { margin-top: 12px; }
+  ul.plain { margin: 0 0 12px; padding-left: 1.1em; color: var(--ink-2); }
+  ul.plain li { margin: 3px 0; }
+  ul.plain li::marker { color: var(--faint); }
 
-  /* ---------- countdown + day bar ---------- */
-  .clock { display: grid; grid-template-columns: 1fr; gap: 14px; }
-  @media (min-width: 520px) { .clock { grid-template-columns: 1.6fr 1fr; } }
-  .big {
-    font-size: clamp(24px, 7.4vw, 32px); font-weight: 700;
-    line-height: 1.15; letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums; white-space: nowrap;
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em; background: var(--tint); padding: 1px 5px; border-radius: 3px;
   }
-  .small { font-size: 13px; color: var(--muted); }
-  .daybar { display: flex; gap: 3px; margin-top: 14px; }
-  .daybar span {
-    flex: 1; height: 8px; border-radius: 3px; background: var(--surface-2);
-    border: 1px solid var(--line);
-  }
-  .daybar span.past { background: var(--accent); border-color: var(--accent); }
-  .daybar span.now { background: var(--warn); border-color: var(--warn); }
 
-  /* ---------- tiles ---------- */
-  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  @media (min-width: 620px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
-  .tile {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 14px;
+  /* ---------- tables ---------- */
+  .tbl { margin: 0 0 8px; }
+  .tbl .cap { font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--ink); }
+  .tbl .wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  thead th {
+    text-align: left; font-weight: 600; font-size: 12.5px; color: var(--muted);
+    border-top: 1.5px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong);
+    padding: 8px 10px; white-space: nowrap;
   }
-  .tile .n { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .tile .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-  /* ---------- status line ---------- */
-  .status {
-    border-left: 3px solid var(--warn); background: var(--surface);
-    border-radius: 0 var(--radius) var(--radius) 0;
-    padding: 14px var(--pad);
-  }
-  .status strong { display: block; font-size: 17px; margin-bottom: 4px; }
-
-  /* ---------- rows ---------- */
-  ul.rows { list-style: none; margin: 0; padding: 0; }
-  ul.rows > li {
-    border: 1px solid var(--line); background: var(--surface);
-    border-radius: var(--radius); padding: 13px var(--pad);
-  }
-  ul.rows > li + li { margin-top: 8px; }
-  .rowhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .rowhead .name { font-weight: 600; }
-  .rowbody { font-size: 14px; color: var(--muted); margin-top: 3px; }
-  .rowbody code, code { font-family: var(--mono); font-size: 0.9em; background: var(--surface-2);
-    padding: 1px 5px; border-radius: 5px; }
-
-  .pill {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
-    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
-    border: 1px solid transparent;
-  }
-  .pill.done { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
-  .pill.wait { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
-  .pill.open { color: var(--stop); background: color-mix(in srgb, var(--stop) 14%, transparent); }
-  .pill.plain { color: var(--muted); background: var(--surface-2); }
-
-  ol.steps { margin: 0; padding-left: 0; list-style: none; counter-reset: s; }
-  ol.steps > li {
-    counter-increment: s;
-    position: relative; padding: 13px var(--pad) 13px 46px;
-    border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius);
-  }
-  ol.steps > li + li { margin-top: 8px; }
-  ol.steps > li::before {
-    content: counter(s);
-    position: absolute; left: 14px; top: 13px;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: var(--surface-2); color: var(--muted);
-    font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
-  }
-  ol.steps > li.hot { border-color: var(--warn); }
-  ol.steps > li.hot::before { background: var(--warn); color: #fff; }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+  tbody tr:last-child td { border-bottom: 1.5px solid var(--rule-strong); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.first { color: var(--ink); white-space: nowrap; }
+  .min { min-width: 520px; }
+  .zero { color: var(--faint); }
 
   /* ---------- figures ---------- */
-  figure { margin: 0; }
+  figure { margin: 0 0 22px; }
   figure img, figure video {
     display: block; width: 100%; height: auto;
-    border: 1px solid var(--line); border-radius: 10px;
-    background: var(--surface-2);
+    border: 1px solid var(--rule); background: var(--tint);
   }
-  figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; }
-  figcaption b { color: var(--text); font-weight: 600; }
-  .figs { display: grid; gap: 18px; }
-  @media (min-width: 620px) { .figs.two { grid-template-columns: 1fr 1fr; } }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+  figcaption .fn { color: var(--ink); font-weight: 700; margin-right: 4px; }
+  .two { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .two { grid-template-columns: 1fr 1fr; } }
+
+  /* ---------- summary ---------- */
+  .summary {
+    background: var(--tint); border-left: 3px solid var(--ink);
+    padding: 14px 18px; margin-bottom: 22px;
+  }
+  .summary ul { margin: 0; padding-left: 1.1em; }
+  .summary li { margin: 4px 0; color: var(--ink); }
+
+  /* ---------- gantt ---------- */
+  .gantt { margin-bottom: 8px; }
+  .g-row {
+    display: grid; grid-template-columns: 190px 1fr; align-items: center;
+    column-gap: 14px; padding: 5px 0; cursor: pointer;
+  }
+  .g-row.axis { cursor: default; padding-bottom: 2px; }
+  .g-label { font-size: 13.5px; line-height: 1.35; }
+  .g-label .ph { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
+  .g-label .st { display: block; font-size: 11.5px; color: var(--muted); }
+  .g-track {
+    position: relative; display: grid; grid-template-columns: repeat(10, 1fr);
+    height: 22px;
+  }
+  .g-cell { grid-row: 1; border-left: 1px solid var(--rule); }
+  .g-cell:last-child { border-right: 1px solid var(--rule); }
+  .g-cell.today { background: color-mix(in srgb, var(--today) 9%, transparent); }
+  .g-bar {
+    grid-row: 1; height: 14px; margin: 0 2px; align-self: center; border-radius: 2px;
+    background: var(--todo);
+  }
+  .g-bar.done { background: var(--done); }
+  .g-bar.doing {
+    background: repeating-linear-gradient(-45deg, var(--doing) 0 6px,
+      color-mix(in srgb, var(--doing) 70%, var(--sheet)) 6px 12px);
+  }
+  .g-row:hover .g-bar { filter: brightness(1.08); }
+  .g-row.sel .g-label { font-weight: 700; }
+  .axis .g-track { height: auto; }
+  .axis .g-day {
+    grid-row: 1; text-align: center; font-size: 11.5px; color: var(--muted);
+    font-variant-numeric: tabular-nums; line-height: 1.3;
+  }
+  .axis .g-day.today { color: var(--today); font-weight: 700; }
+  .axis .g-day small { display: block; font-size: 10px; color: var(--faint); }
+  .axis .g-day.today small { color: var(--today); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .legend i { display: inline-block; width: 14px; height: 9px; margin-right: 5px; vertical-align: 0; border-radius: 1px; }
+  @media (max-width: 720px) {
+    .g-row { grid-template-columns: 1fr; row-gap: 3px; padding: 6px 0; }
+    .g-label .st { display: inline; margin-left: 6px; }
+    .g-row.axis .g-label { display: none; }
+  }
+
+  /* ---------- phase cards ---------- */
+  .phases-wrap { position: relative; margin-top: 18px; }
+  .phases {
+    display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; padding: 2px 2px 12px; scroll-padding-left: 2px;
+  }
+  .phase {
+    flex: 0 0 min(310px, 84%); scroll-snap-align: start;
+    border: 1px solid var(--rule); background: var(--sheet); padding: 16px 16px 14px;
+    border-top: 3px solid var(--todo);
+  }
+  .phase.done { border-top-color: var(--done); }
+  .phase.doing { border-top-color: var(--doing); }
+  .phase.sel { box-shadow: 0 0 0 1.5px var(--ink); }
+  .phase .ph-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .phase .ph-title { font-size: 16px; font-weight: 700; margin: 4px 0 2px; line-height: 1.35; }
+  .phase .ph-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .phase .ph-h { font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; margin: 12px 0 4px; }
+  .phase ul { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+  .phase .req li { position: relative; padding-left: 12px; margin: 3px 0; color: var(--ink-2); line-height: 1.5; }
+  .phase .req li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 4px; height: 4px; background: var(--faint); }
+  .phase .chk li { display: grid; grid-template-columns: 18px 1fr; gap: 4px; margin: 4px 0; line-height: 1.5; color: var(--ink-2); }
+  .phase .chk li .bx {
+    width: 13px; height: 13px; margin-top: 0.25em; border: 1.5px solid var(--faint); border-radius: 2px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; color: #fff;
+  }
+  .phase .chk li.done .bx { background: var(--done); border-color: var(--done); }
+  .phase .chk li.done .tx { color: var(--muted); }
+  .phase .chk li.doing .bx { border-color: var(--doing); background: color-mix(in srgb, var(--doing) 30%, transparent); }
+  .scroll-hint { font-size: 12px; color: var(--faint); margin-top: 2px; }
 
   /* ---------- bar chart ---------- */
-  .chart { display: grid; gap: 7px; }
-  .barrow { display: grid; grid-template-columns: 94px 1fr 44px; gap: 8px; align-items: center; font-size: 13px; }
-  .barrow.wide { grid-template-columns: 112px 1fr 52px; }
-  @media (max-width: 520px) {
-    .barrow.wide {
-      grid-template-columns: 1fr auto;
-      grid-template-areas: "lbl val" "track track";
-      row-gap: 4px;
-    }
-    .barrow.wide .lbl { grid-area: lbl; white-space: normal; overflow: visible; }
-    .barrow.wide .val { grid-area: val; }
-    .barrow.wide .track { grid-area: track; }
-  }
-  .barrow .lbl { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .track { height: 18px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
-  .fill { height: 100%; border-radius: 5px; background: var(--accent); }
-  .fill.low { background: var(--stop); }
-  .fill.mid { background: var(--warn); }
-  .fill.good { background: var(--ok); }
-  .barrow .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+  .chart { display: grid; gap: 6px; margin: 4px 0 10px; }
+  .barrow { display: grid; grid-template-columns: 120px 1fr 44px; gap: 10px; align-items: center; font-size: 13px; }
+  .barrow .lbl { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track { height: 12px; background: var(--tint); }
+  .fill { height: 100%; background: var(--ink-2); }
+  .fill.low { background: var(--today); }
+  .barrow .val { text-align: right; font-variant-numeric: tabular-nums; }
 
-  /* ---------- per episode spark ---------- */
-  .spark { display: flex; align-items: flex-end; gap: 1px; height: 84px; }
-  .spark i {
-    display: block; flex: 1 1 0; min-width: 2px;
-    background: var(--accent); border-radius: 2px 2px 0 0;
+  /* ---------- pipeline ---------- */
+  ol.flow { counter-reset: f; list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 0; }
+  ol.flow li {
+    counter-increment: f; position: relative; padding: 9px 0 9px 34px;
+    border-bottom: 1px solid var(--rule); color: var(--ink-2); font-size: 14.5px;
   }
-  .spark i.hi { background: var(--warn); }
-  .sparkaxis {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--faint); margin-top: 6px;
+  ol.flow li:first-child { border-top: 1px solid var(--rule); }
+  ol.flow li::before {
+    content: counter(f); position: absolute; left: 4px; top: 9px;
+    font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums;
   }
+  ol.flow b { color: var(--ink); font-weight: 600; }
 
-  /* ---------- key-value table ---------- */
-  dl.kv { margin: 0; display: grid; grid-template-columns: 1fr; gap: 0; }
-  dl.kv > div {
-    display: flex; justify-content: space-between; gap: 12px;
-    padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px;
-  }
-  dl.kv > div:last-child { border-bottom: 0; }
-  dl.kv dt { color: var(--muted); margin: 0; }
-  dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
-
-  /* ---------- chips ---------- */
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    font-size: 12px; font-family: var(--mono);
-    padding: 3px 8px; border-radius: 6px;
-    background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
-  }
-
-  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 440px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-size: 12px; color: var(--faint); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .zero { color: var(--stop); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+  .tag { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--rule); color: var(--ink-2); background: var(--tint); }
 
   footer {
-    margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line);
-    font-size: 13px; color: var(--faint);
+    margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--rule);
+    font-size: 12.5px; color: var(--muted);
   }
-  .themebtn {
-    position: fixed; right: 12px; bottom: 12px; z-index: 50;
-    width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
-    font-size: 16px; cursor: pointer;
+
+  @media print {
+    body { background: #fff; }
+    .sheet { border: 0; margin: 0; max-width: none; }
+    .phases { flex-wrap: wrap; overflow: visible; }
+    .phase { flex: 1 1 260px; break-inside: avoid; }
+    figure, .tbl { break-inside: avoid; }
   }
-  a { color: var(--accent); }
 </style>
 </head>
 <body>
 
 <div id="gate">
   <div class="box">
-    <h1>GraspGrade</h1>
-    <p>진행 상황 보기. 비밀번호가 필요하다.</p>
+    <p class="label">GRASPGRADE</p>
+    <h1>진행 보고</h1>
     <form id="gateform">
-      <input id="pw" type="password" inputmode="text" autocomplete="current-password"
-             placeholder="비밀번호" aria-label="비밀번호">
+      <input id="pw" type="password" autocomplete="current-password" placeholder="비밀번호" aria-label="비밀번호">
       <button type="submit">열기</button>
       <p id="err" role="alert"></p>
     </form>
@@ -290,637 +297,394 @@
 </div>
 
 <div id="app" hidden>
-<button class="themebtn" id="themebtn" title="밝기 전환" aria-label="밝기 전환">◐</button>
-<div class="wrap">
+<main class="sheet">
 
-  <header class="top">
-    <p class="eyebrow">Meta Global AI Developer Hackathon · Indie Dev Track</p>
-    <h1 class="title">GraspGrade</h1>
-    <p class="lede">
-      1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 클립에
-      "로봇 손이 따라할 수 있는가" 점수(0~100)를 매긴다. 자르기는 촉각 장갑
-      데이터로, 점수는 모션캡처 데이터로 검증한다.
-    </p>
+  <header class="doc-head">
+    <p class="doc-kicker">Meta Global AI Developer Hackathon · Indie Dev Track</p>
+    <h1 class="doc-title">GraspGrade 진행 보고</h1>
+    <p class="doc-sub">1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 구간에 로봇 손이 따라할 수 있는 정도를 0~100점으로 매긴다.</p>
+    <dl class="meta">
+      <div><dt>보고 시점</dt><dd>2026-10-27<small>Day 2 / 10</small></dd></div>
+      <div><dt>제출 마감</dt><dd>11/04 12:00 ET<small>11/05 02:00 KST</small></dd></div>
+      <div><dt>남은 기간</dt><dd id="dday">—<small id="dleft">&nbsp;</small></dd></div>
+      <div><dt>팀</dt><dd>임준세, 이인석<small>2인</small></dd></div>
+    </dl>
   </header>
 
-  <section>
-    <div class="card">
-      <div class="clock">
-        <div>
-          <div class="big" id="cd">—</div>
-          <div class="small">제출 마감까지 (11/04 12:00 ET = 11/05 02:00 KST)</div>
-        </div>
-        <div>
-          <div class="big" id="dayno">—</div>
-          <div class="small">10일 중 (10/26 ~ 11/04)</div>
-        </div>
-      </div>
-      <div class="daybar" id="daybar"></div>
+  <!-- 1 -->
+  <section id="s-plan">
+    <h2><span class="no">1</span>일정</h2>
+    <div class="gantt" id="gantt"></div>
+    <div class="legend">
+      <span><i style="background:var(--done)"></i>완료</span>
+      <span><i style="background:var(--doing)"></i>진행 중</span>
+      <span><i style="background:var(--todo)"></i>예정</span>
+      <span><i style="background:color-mix(in srgb, var(--today) 30%, transparent)"></i>오늘</span>
+    </div>
+
+    <div class="phases-wrap">
+      <div class="phases" id="phases"></div>
+      <div class="scroll-hint">단계별 요구사항과 체크리스트. 옆으로 넘겨서 본다. 위 막대를 누르면 해당 단계로 이동한다.</div>
     </div>
   </section>
 
+  <!-- 2 -->
   <section>
-    <h2>한 줄 상태</h2>
-    <div class="status">
-      <strong>Day 1~2 목표가 전부 끝났다. 정답 검증까지 했다.</strong>
-      환경 구축, 두 데이터셋 다운로드, 에피소드 자르기, 분할 고정, Meta API 스모크 테스트,
-      SAM 물체 프롬프트 비교(에피소드 2개), OpenGraph 전체 138,629 프레임 정답 검증까지 마쳤다.
-      쓴 크레딧은 약 $0.34다. 물체 프롬프트는 <code>small object</code>, 촉각 임계값은 800으로 정했다.
-      다음은 10fps 테스트와 Day 3~4의 OpenGraph 접촉 자르기다.
-    </div>
-  </section>
-
-  <section>
-    <h2>숫자</h2>
-    <div class="tiles">
-      <div class="tile"><div class="n">$0.34</div><div class="k">쓴 크레딧 / $150</div></div>
-      <div class="tile"><div class="n">261</div><div class="k">접촉 구간 (138,629 프레임)</div></div>
-      <div class="tile"><div class="n">97~99%</div><div class="k">라벨 vs 촉각 프레임 일치</div></div>
-      <div class="tile"><div class="n">93.5%</div><div class="k">오른손 접촉 시작 ±5프레임 이내</div></div>
-    </div>
-  </section>
-
-  <section>
-    <h2>실험 기록</h2>
-    <p class="small">
-      실험마다 설정, 수치, 비용, 이미지, 결론을 남긴다. 기록 원문은 제출용 영어로
-      <code>docs/experiments/</code>에 있다.
-    </p>
-    <div class="card scroll">
-      <table>
-        <thead><tr><th>#</th><th>내용</th><th class="num">비용</th><th>결론</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>EXP-01</td><td>Meta Model API 스모크 테스트</td><td class="num">$0.035</td>
-            <td>Muse Spark와 SAM 3.1 둘 다 우리 클립에서 동작한다. SAM은 5초 클립당 $0.03이고 장갑 낀 양손을 모든 프레임에서 찾는다.</td>
-          </tr>
-          <tr>
-            <td>EXP-02</td><td>SAM 물체 프롬프트, 작은 용기 클립</td><td class="num">$0.15</td>
-            <td>일반 프롬프트 중에서는 <code>small object</code>만 동작한다. 2D 겹침은 접촉을 보여주지 못한다.</td>
-          </tr>
-          <tr>
-            <td>EXP-03</td><td>SAM 물체 프롬프트, 스프레이병 클립</td><td class="num">$0.15</td>
-            <td><code>small object</code>는 큰 스프레이병도 모든 프레임에서 찾는다. 이것을 물체 프롬프트로 쓴다.</td>
-          </tr>
-          <tr>
-            <td>EXP-04</td><td>API 없이 OpenGraph 점검</td><td class="num">$0</td>
-            <td>라벨은 임계값 800에서 촉각과 맞고 0에서는 안 맞는다. 머리 IMU로 카메라 흔들림을 공짜로 얻는다.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
-    <h2>영상에서 실제로 나온 것</h2>
-
-    <div class="figs">
-      <figure>
-        <img src="assets/compare_small_object.jpg" loading="lazy" width="1280" height="720"
-             alt="SAM 3.1이 5초 클립의 네 프레임에서 두 손과 작은 용기에 박스와 마스크를 붙인 결과">
-        <figcaption>
-          <b>SAM 3.1 출력, 같은 5초 클립의 f0 / f50 / f100 / f140.</b>
-          파란 박스는 프롬프트 <code>hand</code>, 노랑과 분홍 마스크는 프롬프트 <code>small object</code>다.
-          150프레임 내내 id가 유지됐다. 오른손 마스크는 장갑 손가락만 덮고 손목 센서 박스는 빼먹었다.
-          생성: <code>scripts/sam_prompt_compare.py</code>
-        </figcaption>
-      </figure>
-
-      <div class="figs two">
-        <figure>
-          <video src="assets/clip.mp4" muted loop playsinline controls preload="metadata"
-                 width="1280" height="720"></video>
-          <figcaption>
-            <b>API에 넣은 입력 클립.</b> 에피소드 1(튜닝 split) 프레임 270~419, 720p 5초, 407 KB.
-            촉각 라벨 기준 오른손이 프레임 321에 매트에 닿는다.
-          </figcaption>
-        </figure>
-        <figure>
-          <img src="assets/frame.jpg" loading="lazy" width="1280" height="720"
-               alt="촉각 장갑을 낀 양손이 어두운 매트 위에 있는 1인칭 프레임">
-          <figcaption>
-            <b>Muse Spark에 보낸 한 장 (프레임 330).</b> 답: 오른손 접촉 true, 왼손 false, 물체 "mat".
-            촉각 라벨과 일치했다. 6.0초, $0.0049.
-          </figcaption>
-        </figure>
-      </div>
-
-      <figure>
-        <img src="assets/ep53_frame.jpg" loading="lazy" width="1280" height="720"
-             alt="베이지 책상과 나무 벽 앞에서 베이지 장갑을 낀 손이 파란 스프레이병을 잡는 1인칭 프레임">
-        <figcaption>
-          <b>어려운 쪽. 스프레이병 에피소드.</b> 베이지 장갑이 베이지 책상과 나무 벽에 묻힌다.
-          MediaPipe 검출률이 14%까지 떨어지는 장면이 이것이고, 이런 장면이 데이터의 약 20%다.
-        </figcaption>
-      </figure>
-
-      <figure>
-        <img src="assets/ep53_compare.jpg" loading="lazy" width="1280" height="720"
-             alt="같은 스프레이병 장면의 네 프레임에서 SAM이 두 손과 스프레이병에 박스와 마스크를 붙인 결과">
-        <figcaption>
-          <b>같은 장면에 SAM 3.1을 돌린 결과.</b> MediaPipe가 14%를 내는 바로 그 배경에서
-          150프레임 전부 두 손을 잡았고 스프레이병도 끝까지 따라갔다.
-          장갑 때문에 생기는 손실은 MediaPipe 쪽 문제이지 파이프라인 전체의 문제가 아니라는 뜻이다.
-        </figcaption>
-      </figure>
-    </div>
-
-    <p class="small" style="margin-top:14px">
-      영상과 프레임 출처: OpenGraph Ego-Tactile, CC-BY-4.0.
-    </p>
-  </section>
-
-  <section>
-    <h2>접촉 정답 검증 (전체 138,629 프레임)</h2>
-    <p class="small">
-      숫자 1의 정답을 그대로 믿어도 되는지 먼저 봤다. 데이터셋이 준 anchor 라벨과,
-      촉각 신호에 임계값 800을 직접 걸어 만든 접촉을 전체 프레임에서 비교했다.
-      출처 <code>scripts/refine_check.py</code>, <code>out/refine_check/summary.json</code>
-    </p>
-
-    <div class="card">
-      <dl class="kv">
-        <div><dt>라벨 vs 촉각, 프레임 일치 (왼손)</dt><dd>98.66%</dd></div>
-        <div><dt>라벨 vs 촉각, 프레임 일치 (오른손)</dt><dd>97.15%</dd></div>
-        <div><dt>접촉 구간</dt><dd>261개</dd></div>
-        <div><dt>5프레임보다 짧은 구간</dt><dd>0개</dd></div>
-        <div><dt>5프레임보다 짧은 간격</dt><dd>0개</dd></div>
-        <div><dt>구간 길이 p10 / p50 / p90</dt><dd>24 / 246 / 978 프레임</dd></div>
-      </dl>
-    </div>
-
-    <h3>접촉 시작 시점이 얼마나 어긋나나</h3>
-    <div class="card scroll">
-      <table>
-        <thead>
-          <tr><th></th><th class="num">건수</th><th class="num">중앙값</th><th class="num">정확히 0</th><th class="num">±5프레임 이내</th><th class="num">p90 |차이|</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>오른손</td><td class="num">660</td><td class="num">0</td><td class="num">51.5%</td><td class="num">93.5%</td><td class="num">4</td></tr>
-          <tr><td>왼손</td><td class="num">280</td><td class="num">-1</td><td class="num">29.6%</td><td class="num">79.6%</td><td class="num">9</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <p style="margin:0 0 10px"><b>읽은 것</b></p>
-      <ul class="rows">
-        <li>
-          <div class="rowhead"><span class="name">±5프레임 허용창은 오른손에서는 쓸 수 있다</span><span class="pill done">확인</span></div>
-          <div class="rowbody">오른손은 93.5%가 ±5프레임 안에 들어오고 중앙값이 0이다. 계획했던 허용창을 그대로 쓸 수 있다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">왼손은 더 넓은 창이 필요하다</span><span class="pill wait">조정</span></div>
-          <div class="rowbody">왼손은 ±5프레임 안이 79.6%, p90이 9프레임이다. 왼손 건수가 오른손의 절반도 안 되는(280 vs 660) 점과 함께, 허용창을 넓히거나 손별로 따로 보고해야 한다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">라벨과 촉각 중 무엇을 써도 결론이 같다</span></div>
-          <div class="rowbody">프레임 일치가 97~99%다. 정답 정의 때문에 숫자 1이 흔들릴 걱정은 접었다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">후처리 규칙이 필요 없다</span></div>
-          <div class="rowbody">5프레임보다 짧은 구간과 간격이 둘 다 0개다. 잘게 쪼개진 접촉을 병합하거나 버리는 규칙을 넣지 않아도 된다.</div>
-        </li>
+    <h2><span class="no">2</span>요약</h2>
+    <div class="summary">
+      <ul>
+        <li>데이터 준비, 평가 분할 고정, Meta API(SAM 3.1, Muse Spark) 연결 완료. 현재 평가 1(접촉 구간 검출) 단계 진행 중.</li>
+        <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치함. 평가 1의 정답으로 그대로 사용 가능.</li>
+        <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출함.</li>
+        <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 쓰기로 함.</li>
+        <li>입력을 10fps로 낮춰도 손 추적이 유지됨을 두 에피소드에서 확인.</li>
       </ul>
     </div>
 
-    <h3>임계값과 카메라 흔들림</h3>
+    <div class="tbl">
+      <p class="cap">표 1. 주요 지표</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>지표</th><th class="n">값</th><th>기준</th></tr></thead>
+          <tbody>
+            <tr><td class="first">접촉 라벨과 촉각 신호 일치 (왼손 / 오른손)</td><td class="n">98.7% / 97.2%</td><td>전체 138,629 프레임, 촉각 임계값 800</td></tr>
+            <tr><td class="first">접촉 시작 시점 ±5프레임 이내 (오른손 / 왼손)</td><td class="n">93.5% / 79.6%</td><td>±5프레임 = ±0.167초</td></tr>
+            <tr><td class="first">접촉 구간</td><td class="n">261개</td><td>72개 에피소드</td></tr>
+            <tr><td class="first">SAM 3.1 손 검출 (스프레이병 장면)</td><td class="n">150 / 150 프레임</td><td>같은 장면 MediaPipe 14%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="no">3</span>실행 예시</h2>
+    <p>OpenGraph 에피소드 두 개에서 5초씩 잘라 SAM 3.1과 Muse Spark에 넣은 결과다. 에피소드 1은 어두운 매트 위의 작은 용기, 에피소드 53은 밝은 책상 위의 스프레이병이다.</p>
+
+    <div class="two">
+      <figure>
+        <video src="assets/clip.mp4" muted loop playsinline controls preload="metadata" width="1280" height="720"></video>
+        <figcaption><span class="fn">그림 1.</span>입력 영상. 에피소드 1, 프레임 270~419 (5초, 720p). 촉각 기준으로 오른손이 프레임 321에서 매트에 닿는다.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/frame.jpg" loading="lazy" width="1280" height="720" alt="촉각 장갑을 낀 양손이 어두운 매트 위에 있는 1인칭 프레임">
+        <figcaption><span class="fn">그림 2.</span>Muse Spark 입력 (프레임 330). 응답은 오른손 접촉, 왼손 비접촉, 물체 "mat"으로 촉각 라벨과 일치.</figcaption>
+      </figure>
+    </div>
+
     <figure>
-      <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462"
-           alt="왼쪽은 촉각 임계값에 따른 라벨 일치율 그래프, 오른쪽은 에피소드별 머리 각속도 막대 그래프">
-      <figcaption>
-        <b>왼쪽: 촉각 임계값은 800으로 정했다.</b> 800 위로는 일치율이 평평하다.
-        임계값을 0으로 두면 에피소드 63~71이 72~74%까지 떨어진다. 그 에피소드들은 가만히 있어도
-        장갑이 약한 압력을 읽기 때문이다. 800에서는 전체가 왼손 98.7%, 오른손 97.2%다.<br>
-        <b>오른쪽: 카메라 안정성 항목은 살아 있다.</b> 빨간 막대가 스프레이병 작업(에피소드 48~62)이고
-        나머지보다 50~100배 흔들린다. p95 최소 0.004, 중앙값 0.0105, 최대 0.827 rad/s.
-        생성: <code>scripts/refine_plots.py</code>
-      </figcaption>
+      <img src="assets/compare_small_object.jpg" loading="lazy" width="1280" height="720" alt="SAM 3.1이 네 프레임에서 두 손과 작은 용기에 박스와 마스크를 붙인 결과">
+      <figcaption><span class="fn">그림 3.</span>SAM 3.1 분할 결과, 에피소드 1의 프레임 0, 50, 100, 140. 파란 박스는 손(프롬프트 <code>hand</code>), 노랑과 분홍은 물체(프롬프트 <code>small object</code>). 150프레임 동안 손 id 2개가 바뀌지 않음.</figcaption>
     </figure>
-  </section>
 
-  <section>
-    <h2>Meta API 측정 (10/27)</h2>
-    <div class="card scroll">
-      <table>
-        <thead>
-          <tr><th></th><th>Muse Spark <code>muse-spark-1.3</code></th><th>SAM 3.1 <code>sam-3.1</code></th></tr>
-        </thead>
-        <tbody>
-          <tr><td>입력</td><td>이미지 1장 (720p)</td><td>mp4 5초, 150프레임, 프롬프트 <code>hand</code></td></tr>
-          <tr><td>시간</td><td>6.0초</td><td>업로드 3.2초 + 첫 프레임 3.0초 + 끝까지 22.4초 (약 6.7 프레임/초)</td></tr>
-          <tr><td>사용량</td><td>입력 1,261 토큰, 출력 780 토큰 (reasoning 714)</td><td>150프레임 처리, 토큰 0</td></tr>
-          <tr><td>비용</td><td class="num">$0.0049</td><td class="num">$0.03 ($0.20 / 1,000프레임)</td></tr>
-          <tr><td>결과</td><td>접촉 판정이 촉각 라벨과 일치</td><td>150프레임 전부 손 2개, id 유지</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card">
-      <h3 style="margin-top:0">응답 형식은 계획과 맞았다</h3>
-      <ul class="rows" style="margin-top:8px">
-        <li>
-          <div class="rowbody" style="margin:0">
-            프레임마다 <code>response.output_text.delta</code> 이벤트 1개.
-            한 줄 = <code>&lt;Nf&gt;</code> + <code>id&lt;|box;...|&gt;&lt;|mask;...|&gt;</code> 반복.
-            좌표는 720p 원본 픽셀. 마스크는 박스 내부 래스터.
-            파싱은 Meta 공식 <code>meta-sam-parser</code> 0.1.0으로 한다.
-          </div>
-        </li>
-        <li>
-          <div class="rowbody" style="margin:0">
-            원문 출력이 150프레임에 2.28 MB다. 프레임당 약 15 KB이므로 OpenGraph 전체면 약 2 GB가 된다.
-            저장 방식을 미리 정해야 한다.
-          </div>
-        </li>
-      </ul>
+    <div class="two">
+      <figure>
+        <img src="assets/ep53_frame.jpg" loading="lazy" width="1280" height="720" alt="밝은 책상 앞에서 베이지 장갑을 낀 손이 파란 스프레이병을 잡는 1인칭 프레임">
+        <figcaption><span class="fn">그림 4.</span>에피소드 53 원본. 베이지 장갑과 밝은 책상, 나무 벽의 색이 비슷해 MediaPipe 검출률이 14%까지 떨어지는 유형의 장면.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/ep53_compare.jpg" loading="lazy" width="1280" height="720" alt="같은 스프레이병 장면에서 SAM이 두 손과 스프레이병을 분할한 결과">
+        <figcaption><span class="fn">그림 5.</span>같은 장면의 SAM 3.1 결과. 150프레임 전부에서 양손과 스프레이병을 검출.</figcaption>
+      </figure>
     </div>
   </section>
 
+  <!-- 4 -->
   <section>
-    <h2>크레딧 $150을 어디에 쓸 수 있나</h2>
-    <div class="card">
-      <div class="chart" id="budget"></div>
-      <p class="small" style="margin:14px 0 0">
-        측정 단가로 계산한 추정이다. 10fps로 줄이면 OpenGraph 전체가 $9.24로 떨어진다.
-        접촉 구간 길이 중앙값이 246프레임(8.2초)이라 10fps로도 경계를 놓칠 가능성은 낮아 보인다.
-        HOT3D 정답 시퀀스 전체를 SAM에 넣으면 프롬프트 하나에 약 $96이라 크레딧 안에 들어가지 않는다.
-        숫자 2용 클립 구간만 넣어야 한다.
-        속도는 순차로 에피소드당 약 5분이고, 분당 3,000 요청 제한이 있으니 병렬로 돌린다.
-      </p>
-    </div>
-  </section>
+    <h2><span class="no">4</span>평가 1 정답 검증</h2>
+    <p>평가 1은 영상만으로 찾은 접촉 구간을 촉각 장갑 기록과 비교한다. 데이터셋이 제공하는 접촉 라벨을 정답으로 쓰기 전에, 촉각 센서 값(손당 80개 합)에 임계값을 직접 걸어 만든 접촉과 전체 프레임에서 대조했다.</p>
 
-  <section>
-    <h2>SAM 물체 프롬프트 비교</h2>
-    <h3 style="margin-top:0">에피소드 1, 매트 위의 둥근 용기</h3>
-    <div class="card scroll">
-      <table>
-        <thead>
-          <tr><th>프롬프트</th><th class="num">물체 잡은 프레임</th><th class="num">프레임당 물체</th><th>id (프레임 수)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>object</code></td><td class="num zero">0%</td><td class="num">0</td><td>—</td></tr>
-          <tr><td><code>held object</code></td><td class="num zero">0%</td><td class="num">0</td><td>—</td></tr>
-          <tr><td><code>item</code></td><td class="num zero">0%</td><td class="num">0</td><td>—</td></tr>
-          <tr><td><code>small object</code></td><td class="num">100%</td><td class="num">1.45</td><td>0 (150), 1 (56), 2 (11)</td></tr>
-          <tr><td><code>round container</code> (기준용)</td><td class="num">100%</td><td class="num">1.37</td><td>0 (150), 1 (56)</td></tr>
-        </tbody>
-      </table>
+    <div class="tbl">
+      <p class="cap">표 2. 접촉 라벨과 촉각 신호 대조</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>항목</th><th class="n">값</th></tr></thead>
+          <tbody>
+            <tr><td class="first">프레임 일치율, 왼손</td><td class="n">98.66%</td></tr>
+            <tr><td class="first">프레임 일치율, 오른손</td><td class="n">97.15%</td></tr>
+            <tr><td class="first">접촉 구간 수</td><td class="n">261</td></tr>
+            <tr><td class="first">5프레임 미만 구간 / 간격</td><td class="n">0 / 0</td></tr>
+            <tr><td class="first">구간 길이 p10 / p50 / p90</td><td class="n">24 / 246 / 978 프레임</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <h3>에피소드 53, 베이지 책상 위의 스프레이병 (프레임 136~285)</h3>
-    <div class="card scroll">
-      <table>
-        <thead>
-          <tr><th>프롬프트</th><th class="num">잡은 프레임</th><th class="num">프레임당 개수</th><th>id</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>hand</code></td><td class="num">100%</td><td class="num">2.00</td><td>0, 1 (양손)</td></tr>
-          <tr><td><code>small object</code></td><td class="num">100%</td><td class="num">1.44</td><td>0, 1</td></tr>
-          <tr><td><code>handheld object</code></td><td class="num zero">0%</td><td class="num">0</td><td>—</td></tr>
-          <tr><td><code>bottle</code></td><td class="num">100%</td><td class="num">1.00</td><td>0</td></tr>
-          <tr><td><code>spray bottle</code></td><td class="num">100%</td><td class="num">1.00</td><td>0</td></tr>
-        </tbody>
-      </table>
+    <div class="tbl" style="margin-top:18px">
+      <p class="cap">표 3. 접촉 시작 시점 차이 (라벨 − 촉각, 프레임)</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th></th><th class="n">건수</th><th class="n">중앙값</th><th class="n">0 일치</th><th class="n">±5 이내</th><th class="n">p90 |차이|</th></tr></thead>
+          <tbody>
+            <tr><td class="first">오른손</td><td class="n">660</td><td class="n">0</td><td class="n">51.5%</td><td class="n">93.5%</td><td class="n">4</td></tr>
+            <tr><td class="first">왼손</td><td class="n">280</td><td class="n">−1</td><td class="n">29.6%</td><td class="n">79.6%</td><td class="n">9</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="card">
-      <p style="margin:0 0 10px"><b>읽은 것</b></p>
-      <ul class="rows">
-        <li>
-          <div class="rowhead"><span class="name">SAM은 MediaPipe가 포기한 장면에서도 손을 잡는다</span><span class="pill done">중요</span></div>
-          <div class="rowbody">에피소드 53은 MediaPipe 검출률이 14%인 베이지 장갑 + 베이지 배경 장면이다. 그런데 <code>hand</code> 프롬프트는 150프레임 전부에서 양손을 잡았다. 장갑 문제는 MediaPipe를 쓰는 항목에만 남는다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">일반적인 단어는 아무것도 못 잡는다</span></div>
-          <div class="rowbody"><code>object</code>, <code>item</code>, <code>handheld object</code>는 전부 0%다. 에피소드가 달라도 같았다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">물체 프롬프트는 <code>small object</code>로 정했다</span><span class="pill done">결정</span></div>
-          <div class="rowbody"><code>small object</code>가 작은 용기뿐 아니라 큰 스프레이병도 150프레임 전부 잡았다. 마스크는 이름을 직접 부른 <code>spray bottle</code>과 같고, 배경 물체 하나를 66프레임 더 잡는 차이뿐이다. 에피소드마다 <code>target_object</code> 이름을 넣지 않아도 되므로 파이프라인이 단순해진다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">2D 겹침만으로는 접촉을 못 가린다</span><span class="pill open">설계 수정</span></div>
-          <div class="rowbody">오른손 마스크와 물체 마스크의 간격이 3px 이하인 프레임 비율이, 에피소드 1에서는 접촉 전 98~100% / 접촉 후 100%로 아예 구분이 안 됐다. 에피소드 53은 접촉 전 76~80% / 접촉 후 100%로 조금 벌어지지만 이것만으로 자를 수는 없다. 1인칭이라 손이 물체 위를 가리기 때문이다. 접촉 신호에 "동반 이동"(손과 물체가 같이 움직이는지)이 반드시 필요하다.</div>
-        </li>
-        <li>
-          <div class="rowhead"><span class="name">빈 결과도 돈이 나간다</span></div>
-          <div class="rowbody">프롬프트마다 150프레임이 과금됐다. 0%가 나온 프롬프트도 $0.03이다. 두 에피소드 10번 호출에 합계 $0.30을 썼다.</div>
-        </li>
-      </ul>
-    </div>
-  </section>
+    <figure style="margin-top:20px">
+      <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462" alt="왼쪽은 촉각 임계값별 라벨 일치율, 오른쪽은 에피소드별 머리 각속도">
+      <figcaption><span class="fn">그림 6.</span>왼쪽: 촉각 임계값별 라벨 일치율. 800 이상에서 평탄하다. 임계값 0에서는 에피소드 63~71이 72~74%로 떨어지는데, 이 에피소드들은 손을 쉬고 있을 때도 장갑이 약한 압력을 기록한다. 오른쪽: 에피소드별 머리 각속도 p95. 빨간 막대는 스프레이병 작업(에피소드 48~62).</figcaption>
+    </figure>
 
-  <section>
-    <h2>끝난 것</h2>
-    <ul class="rows">
-      <li>
-        <div class="rowhead"><span class="name">WSL2 + 시스템 패키지</span><span class="pill done">완료</span></div>
-        <div class="rowbody">Ubuntu-24.04, ffmpeg 6.1.1 (libdav1d 포함). Windows 네이티브는 불가능하다 (pinocchio 휠 없음).</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">venv + 패키지 버전 고정</span><span class="pill done">완료</span></div>
-        <div class="rowbody">dex_retargeting 0.4.6, mediapipe 0.10.21, numpy 1.26.4, torch 2.14.1+cpu, openai 3.39.0, pin 2.7.0.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">환경 검증</span><span class="pill done">완료</span></div>
-        <div class="rowbody">dex-retargeting 샘플 621프레임, Allegro 오른손. 검출률 1.000, jitter 1.23 mm/frame, 리타게팅 오차 중앙값 17.0%. <code>scripts/verify_env.py</code></div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">OpenGraph 다운로드와 자르기</span><span class="pill done">완료</span></div>
-        <div class="rowbody">72 에피소드 138,629 프레임 5.9 GB. 전부 720p H.264로 재인코딩, 프레임 수 일치와 시작 프레임 정렬 확인.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">MediaPipe 검출률 측정</span><span class="pill done">완료</span></div>
-        <div class="rowbody">8 에피소드 19,363프레임. 평균 82.3%, 배경에 따라 14%~100%.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">HOT3D 다운로드</span><span class="pill wait">부분</span></div>
-        <div class="rowbody">198 시퀀스 전부 ground_truth + hand_data + 물체 3D 모델 (7.3 GB). 영상은 P0001_10a27bf7 1개만 받았다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">분할 고정</span><span class="pill done">완료</span></div>
-        <div class="rowbody">seed 20261026. 다시 뽑지 않는다. <code>scripts/make_splits.py</code></div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">Meta API 스모크 테스트</span><span class="pill done">완료</span></div>
-        <div class="rowbody">Muse Spark와 SAM 3.1 둘 다 응답 파싱 성공. <code>scripts/meta_smoke.py</code>, <code>out/meta_smoke/report.json</code></div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">SAM 물체 프롬프트 비교</span><span class="pill done">완료</span></div>
-        <div class="rowbody">에피소드 2개(용기, 스프레이병)에 프롬프트 10번, 합계 $0.30. <code>scripts/sam_prompt_compare.py</code></div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">접촉 정답 전수 검증</span><span class="pill done">완료</span></div>
-        <div class="rowbody">138,629 프레임 전부에서 라벨과 촉각을 비교하고, 접촉 구간과 카메라 흔들림을 집계했다. <code>scripts/refine_check.py</code>, <code>out/refine_check/</code></div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">git 저장소와 이 페이지</span><span class="pill done">완료</span></div>
-        <div class="rowbody">private repo <code>joonselim/graspgrade</code>, Vercel 정적 배포. <code>.env</code>, <code>data/</code>, <code>out/</code>은 제외했다.</div>
-      </li>
-    </ul>
-    <p class="small" style="margin-top:12px">브리프 1-7 설치 확인 순서 기준: 1~5번 완료. 6번(HOT3D 좌표 정렬)은 미완.</p>
-  </section>
-
-  <section>
-    <h2>MediaPipe 검출률 (에피소드별, 한 손이라도 검출)</h2>
-    <div class="card">
-      <div class="chart" id="mpchart"></div>
-      <p class="small" style="margin:14px 0 0">
-        배경이 결정한다. ep48은 베이지 장갑 + 베이지 벽에 손이 화면 밖으로 잘린다 (위 스프레이병 사진).
-        ep66은 어두운 매트 위라 100%. 영향: 리타게팅 복원성 항목이 동작이 아니라 장갑 때문에
-        낮게 나온다. 숫자 2는 맨손 HOT3D에서 돌리므로 영향이 없고, 숫자 1은 MediaPipe가 아니라
-        SAM 3.1을 쓴다.
-      </p>
-    </div>
-  </section>
-
-  <section>
-    <h2>계획과 달랐던 사실</h2>
-    <p class="small">다운로드한 파일과 실제 API 응답으로 확인한 값. 계획서와 다르면 이쪽이 맞다.</p>
-    <ul class="rows">
-      <li>
-        <div class="rowhead"><span class="name">2D 겹침만으로는 접촉을 못 가린다</span><span class="pill open">가장 중요</span></div>
-        <div class="rowbody">1인칭에서는 손이 물체 위를 가려서, 닿기 전에도 마스크 간격이 3px 이하다. 동반 이동 계산이 선택이 아니라 필수가 됐다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">OpenGraph 영상은 AV1이다</span></div>
-        <div class="rowbody">OpenCV pip 휠은 AV1을 못 읽는다. 항상 <code>data/episodes_720p</code>의 H.264를 쓴다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">라벨은 사람이 달지 않았다</span></div>
-        <div class="rowbody">촉각과 그립 힘에서 자동 생성됐다. 접촉 = <code>annotation.anchor != "transition"</code>.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">±5프레임 = ±0.167초</span></div>
-        <div class="rowbody">30fps, 타임스탬프 간격이 정확히 1/30초.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">HOT3D 정답 있는 사람은 19명이 아니라 9명</span></div>
-        <div class="rowbody">19명은 Quest를 포함한 숫자다. Aria만 보면 136 시퀀스, 9명. held-out은 3명 51 시퀀스. AUC에 부트스트랩 신뢰구간이 더 중요해졌다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">VRS 329 GB는 필요 없다</span></div>
-        <div class="rowbody"><code>preview_rgb.mp4</code>가 원본 그대로다. 1408x1408, 30fps, 똑바로 선 방향.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">장갑 손 미검출은 좌우 라벨 문제가 아니다</span></div>
-        <div class="rowbody">손을 아예 놓친 것이다. 거울 반전 설정은 맞다 (양손 검출 7,101프레임 전부 좌우 일치).</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">HOT3D URL은 11/10까지 유효하다</span></div>
-        <div class="rowbody">마감(11/04) 이후까지 살아 있다. 급하게 전부 받을 필요는 없다.</div>
-      </li>
+    <h3>소견</h3>
+    <ul class="plain">
+      <li>촉각 임계값 800 채택. 라벨과 촉각 중 어느 쪽을 정답으로 써도 결과가 거의 같음.</li>
+      <li>오른손은 계획한 ±5프레임 허용 범위 사용 가능. 왼손은 범위를 넓히거나 손별로 따로 보고 필요.</li>
+      <li>짧은 구간과 간격이 없어 접촉 구간을 합치거나 버리는 후처리 불필요.</li>
+      <li>카메라 흔들림이 에피소드에 따라 50~100배 차이 남. "카메라 안정성" 항목은 OpenGraph에서 변별력이 있음.</li>
     </ul>
   </section>
 
+  <!-- 5 -->
   <section>
-    <h2>다음 할 일</h2>
-    <ol class="steps">
-      <li class="hot">
-        <div class="rowhead"><span class="name">10fps 테스트</span><span class="pill wait">승인 필요</span></div>
-        <div class="rowbody">같은 5초 클립을 10fps로 보내 추적과 경계가 유지되는지 본다. 유지되면 OpenGraph 전체 SAM 비용이 프롬프트당 $27.7에서 $9.2로 떨어진다. 크레딧을 쓰므로 승인이 필요하다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">Day 3~4: OpenGraph 접촉 자르기 (숫자 1)</span></div>
-        <div class="rowbody">SAM 박스 겹침 + 동반 이동으로 접촉 신호 → Muse Spark로 경계 확정 → ffmpeg 자르기. 보이는 접촉과 장갑 압력 사이 시간차를 측정해 보정한다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">Day 5: HOT3D 카메라 보정 방향 확인, 그다음 copyable 라벨</span></div>
-        <div class="rowbody">미해결 1번을 먼저 푼다. 그다음 copyable 비율이 20~80% 안에 들어오는지 본다. 이것이 가장 큰 위험이다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">남은 HOT3D 영상 다운로드</span></div>
-        <div class="rowbody">정답 있는 136 시퀀스의 <code>preview_rgb.mp4</code>. 실행 전 JSON의 그룹 이름을 확인한다.</div>
-      </li>
+    <h2><span class="no">5</span>SAM 3.1 설정</h2>
+
+    <h3>5.1 물체 프롬프트</h3>
+    <p>SAM 3.1은 텍스트 프롬프트로만 대상을 지정한다. 에피소드마다 물체 이름을 넣지 않고 한 단어로 모든 물체를 잡을 수 있는지 확인했다.</p>
+    <div class="tbl">
+      <p class="cap">표 4. 프롬프트별 물체 검출 (프레임 비율, 괄호는 프레임당 검출 수)</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>프롬프트</th><th class="n">에피소드 1 (용기)</th><th class="n">에피소드 53 (스프레이병)</th></tr></thead>
+          <tbody>
+            <tr><td class="first"><code>object</code></td><td class="n zero">0%</td><td class="n zero">—</td></tr>
+            <tr><td class="first"><code>item</code></td><td class="n zero">0%</td><td class="n zero">—</td></tr>
+            <tr><td class="first"><code>held object</code></td><td class="n zero">0%</td><td class="n zero">—</td></tr>
+            <tr><td class="first"><code>handheld object</code></td><td class="n zero">—</td><td class="n zero">0%</td></tr>
+            <tr><td class="first"><code>small object</code></td><td class="n">100% (1.45)</td><td class="n">100% (1.44)</td></tr>
+            <tr><td class="first"><code>round container</code></td><td class="n">100% (1.37)</td><td class="n zero">—</td></tr>
+            <tr><td class="first"><code>bottle</code></td><td class="n zero">—</td><td class="n">100% (1.00)</td></tr>
+            <tr><td class="first"><code>spray bottle</code></td><td class="n zero">—</td><td class="n">100% (1.00)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <ul class="plain">
+      <li><code>small object</code> 채택. 작은 용기와 큰 스프레이병 모두 전 프레임 검출.</li>
+      <li>스프레이병에서 <code>small object</code>의 마스크는 <code>spray bottle</code>과 같고, 배경 물체 하나를 66프레임 더 잡는 차이만 있음.</li>
+      <li><code>object</code>, <code>item</code>처럼 일반적인 단어는 아무것도 검출하지 못함.</li>
+    </ul>
+
+    <h3>5.2 입력 프레임 수</h3>
+    <p>같은 5초 클립을 10fps(50프레임)로 낮춰 다시 넣었다.</p>
+    <div class="tbl">
+      <p class="cap">표 5. 30fps와 10fps 비교</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>에피소드 · 대상</th><th class="n">30fps</th><th class="n">10fps</th></tr></thead>
+          <tbody>
+            <tr><td class="first">1 · 손</td><td class="n">150/150 프레임, id 2개</td><td class="n">50/50 프레임, id 2개</td></tr>
+            <tr><td class="first">1 · 물체</td><td class="n">100%, id 3개</td><td class="n">100%, id 4개</td></tr>
+            <tr><td class="first">53 · 손</td><td class="n">150/150 프레임, id 2개</td><td class="n">50/50 프레임, id 2개</td></tr>
+            <tr><td class="first">53 · 물체</td><td class="n">100%, id 2개</td><td class="n">100%, id 2개</td></tr>
+            <tr><td class="first">처리 시간 (손, 스트림)</td><td class="n">22.4초</td><td class="n">9.5초</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>손 추적은 10fps에서도 유지됨. 접촉 구간 길이 중앙값이 246프레임(8.2초)이라 경계 손실 가능성은 낮음.</li>
+      <li>에피소드 1의 물체 id가 3개에서 4개로 늘어남. 물체 id 안정성은 추가 확인 필요.</li>
+    </ul>
+
+    <h3>5.3 2D 겹침의 한계</h3>
+    <p>오른손과 물체 마스크 사이 거리가 3px 이하인 프레임 비율을 촉각 접촉 전후로 나눠 봤다.</p>
+    <div class="tbl">
+      <p class="cap">표 6. 손과 물체가 붙어 보이는 프레임 비율</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th></th><th class="n">접촉 전</th><th class="n">접촉 후</th></tr></thead>
+          <tbody>
+            <tr><td class="first">에피소드 1</td><td class="n">98~100%</td><td class="n">100%</td></tr>
+            <tr><td class="first">에피소드 53</td><td class="n">76~80%</td><td class="n">100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p>1인칭 시점에서는 손이 물체 위를 가리기 때문에 닿기 전부터 붙어 보인다. 겹침만으로는 접촉을 구분할 수 없어, 손과 물체가 함께 움직이는지를 접촉 신호에 반드시 넣는다.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2><span class="no">6</span>장갑 낀 손 검출</h2>
+    <p>OpenGraph는 촉각 장갑을 낀 손이라 MediaPipe 손 관절 검출이 불안정하다. 8개 에피소드 19,363프레임에서 한 손 이상 검출된 비율은 다음과 같다.</p>
+    <p class="tbl cap" style="margin-bottom:6px">그림 7. 에피소드별 MediaPipe 검출률</p>
+    <div class="chart" id="mpchart"></div>
+    <ul class="plain">
+      <li>평균 82.3%. 배경이 장갑과 비슷한 색일수록 낮음 (에피소드 48 스프레이병 14%, 에피소드 66 어두운 매트 100%).</li>
+      <li>미검출은 좌우 라벨 오류가 아니라 손 자체를 놓친 것. 양손이 잡힌 7,101프레임에서 좌우 판정은 모두 맞음.</li>
+      <li>영향 범위는 MediaPipe를 쓰는 "리타게팅 복원성" 항목에 한정. 평가 1은 SAM 3.1을 쓰고(그림 5), 평가 2는 맨손인 HOT3D에서 진행.</li>
+    </ul>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2><span class="no">7</span>열린 문제</h2>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>문제</th><th>현재 상태</th><th>해결 방법</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">HOT3D 카메라 보정 기준 방향</td>
+              <td>보정 값이 똑바로 선 영상 기준인지, 90도 돌아간 원본 기준인지 미확인</td>
+              <td>정답 2D 손 박스와 투영한 3D 손을 겹쳐 확인</td>
+            </tr>
+            <tr>
+              <td class="first">HOT3D 도구 준비</td>
+              <td>툴킷과 MANO 손 모델 미설치</td>
+              <td>평가 2 착수 전 설치, MANO 등록</td>
+            </tr>
+            <tr>
+              <td class="first">왼손 접촉 시작 오차</td>
+              <td>±5프레임 이내 79.6%</td>
+              <td>허용 범위 확대 또는 손별 보고</td>
+            </tr>
+            <tr>
+              <td class="first">10fps 물체 id 안정성</td>
+              <td>에피소드 1에서 id 3 → 4개</td>
+              <td>추가 클립으로 확인 후 프레임 수 결정</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2><span class="no">8</span>방법 개요</h2>
+    <h3 style="margin-top:0">처리 흐름</h3>
+    <ol class="flow">
+      <li><b>분할.</b> SAM 3.1로 프레임마다 손과 물체의 박스와 마스크를 얻음.</li>
+      <li><b>접촉 신호.</b> 손과 물체의 겹침, 동반 이동으로 프레임별 0~1 신호 생성.</li>
+      <li><b>경계 확정.</b> 접촉 시작과 끝 주변 약 7프레임만 Muse Spark에 보내 경계와 근거를 받음.</li>
+      <li><b>자르기.</b> 경계 앞뒤에 여유를 두고 구간을 잘라냄.</li>
+      <li><b>채점.</b> 구간마다 7개 항목을 등급으로 매기고 로지스틱 회귀로 0~100점 산출.</li>
     </ol>
-  </section>
 
-  <section>
-    <h2>미해결</h2>
-    <ul class="rows">
-      <li>
-        <div class="rowhead"><span class="name">HOT3D 카메라 보정의 기준 방향</span><span class="pill open">막힘</span></div>
-        <div class="rowbody"><code>camera_models.json</code>(FISHEYE624)이 똑바로 선 preview 기준인지, 90도 돌아간 Aria 원본 기준인지 모른다. MANO 손을 영상에 투영하기 전에 반드시 정해야 한다. 확인 방법: <code>box2d_hands.csv</code>(스트림 214-1)의 정답 박스와 투영한 손을 겹쳐 본다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">HOT3D 툴킷 / projectaria_tools / MANO 등록</span><span class="pill wait">대기</span></div>
-        <div class="rowbody">아직 설치와 등록을 하지 않았다. MANO는 별도 등록(mano.is.tue.mpg.de)이 필요할 수 있다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">SAM 원문 저장 방식</span><span class="pill wait">대기</span></div>
-        <div class="rowbody">프레임당 약 15 KB라 OpenGraph 전체면 약 2 GB다. 마스크를 one_bit로 받거나 필요한 구간만 남기는 방식을 정해야 한다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">환경과 무관한 할 일</span><span class="pill plain">보류</span></div>
-        <div class="rowbody">Official Rules 확인, 제안서에 "기존 필터의 보완재" 프레이밍 반영, one-pager 이름 변경, 이인석 지원서, 한국 체류 일정(10/25~12/02) 확인.</div>
-      </li>
-    </ul>
-  </section>
+    <h3>채점 항목</h3>
+    <div class="tags">
+      <span class="tag">가시성</span><span class="tag">카메라 안정성</span><span class="tag">접촉 명확성</span>
+      <span class="tag">동작 완결성</span><span class="tag">손가락 가림</span><span class="tag">물체 성질</span>
+      <span class="tag">리타게팅 복원성</span>
+    </div>
+    <p class="note">장면 전환이 있거나 접촉이 없으면 0점. 등급(상 1, 중 0.5, 하 0)을 입력으로 로지스틱 회귀를 학습하고, 확률에 100을 곱해 점수로 씀. 가중치를 그대로 읽을 수 있어 점수의 근거를 설명할 수 있음.</p>
 
-  <section>
-    <h2>파이프라인</h2>
-    <div class="card">
-      <ol class="steps" style="counter-reset: s">
-        <li><div class="rowhead"><span class="name">SAM 3.1</span></div><div class="rowbody">영상 전체에서 프레임별 손/물체 박스와 마스크를 받는다. 깊이 손실을 줄이기 위해 마스크도 저장한다.</div></li>
-        <li><div class="rowhead"><span class="name">접촉 신호</span></div><div class="rowbody">프레임마다 박스 겹침과 동반 이동으로 0~1 신호를 만든다. 겹침만으로는 안 된다는 것이 측정으로 확인됐다.</div></li>
-        <li><div class="rowhead"><span class="name">Muse Spark 경계 확정</span></div><div class="rowbody">각 접촉의 시작과 끝 주변 약 7프레임만 보낸다. 이유와 confidence도 저장한다.</div></li>
-        <li><div class="rowhead"><span class="name">ffmpeg 자르기</span></div><div class="rowbody">앞뒤 여유를 두고 클립을 만든다.</div></li>
-      </ol>
-      <h3>7개 채점 항목</h3>
-      <div class="chips">
-        <span class="chip">가시성</span>
-        <span class="chip">카메라 안정성</span>
-        <span class="chip">접촉 명확성</span>
-        <span class="chip">동작 완결성</span>
-        <span class="chip">손가락 가림 (Muse Spark)</span>
-        <span class="chip">물체 성질 (Muse Spark)</span>
-        <span class="chip">리타게팅 복원성 (MediaPipe + Allegro)</span>
+    <div class="tbl" style="margin-top:18px">
+      <p class="cap">표 7. 두 가지 평가</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th></th><th>질문</th><th>정답</th><th>지표</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">평가 1</td>
+              <td>영상만으로 접촉 시작과 끝을 찾는가</td>
+              <td>OpenGraph 촉각 장갑</td>
+              <td>boundary F1, contact IoU</td>
+            </tr>
+            <tr>
+              <td class="first">평가 2</td>
+              <td>점수가 로봇이 따라할 수 있는 구간을 고르는가</td>
+              <td>HOT3D 모션캡처 → Allegro 로봇 손 기하 판정</td>
+              <td>AUC (부트스트랩 신뢰구간), 상위 20% 양성 비율</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <p class="small" style="margin:12px 0 0">
-        게이트: 장면 전환이 있거나 접촉이 없으면 0점.
-        등급을 high=1 / mid=0.5 / low=0으로 바꿔 7개 숫자로 만들고,
-        로지스틱 회귀로 모캡 정답을 학습한다. 확률 x 100이 점수다. 결정 트리는 쓰지 않는다.
-      </p>
     </div>
+    <p class="note">비교군: 평가 1은 Muse Spark 단독, SAM 규칙, SAM + Muse Spark. 평가 2는 체크리스트 없이 같은 질문을 받은 Muse Spark. GraspGrade는 기존 데이터 필터를 대체하지 않고 그 위에 더하는 층으로 설계함.</p>
   </section>
 
+  <!-- 9 -->
   <section>
-    <h2>두 개의 정답</h2>
-    <div class="card scroll">
-      <table>
-        <thead><tr><th>#</th><th>질문</th><th>정답</th><th>지표</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>영상만으로 접촉 시작과 끝을 찾는가</td>
-            <td>OpenGraph 촉각 장갑</td>
-            <td>boundary F1 (허용창 2개), contact IoU</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>우리 점수가 로봇이 따라할 수 있는 클립을 고르는가</td>
-            <td>HOT3D 모캡 → dex-retargeting → Allegro 기하 체크</td>
-            <td>AUC (부트스트랩 CI), 상위 20% 양성 비율 vs base rate</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="small" style="margin:12px 0 0">
-        baseline은 숫자 1은 Muse Spark 단독 / SAM 규칙 / SAM + Muse Spark,
-        숫자 2는 체크리스트 없이 같은 질문을 받은 Muse Spark다.
-        우리 방법은 기존 필터를 대체하지 않고 그 위에 얹는 plug-in layer다.
-      </p>
-    </div>
-  </section>
-
-  <section>
-    <h2>데이터</h2>
-    <div class="card">
-      <h3 style="margin-top:0">OpenGraph Ego-Tactile <span class="pill done">받음</span></h3>
-      <dl class="kv">
-        <div><dt>용도</dt><dd>숫자 1 (접촉 시점)</dd></div>
-        <div><dt>크기</dt><dd>5.9 GB + 자른 영상 511 MB</dd></div>
-        <div><dt>에피소드</dt><dd>72개, 138,629 프레임, 1.28시간</dd></div>
-        <div><dt>영상</dt><dd>1920x1080 AV1, 30fps</dd></div>
-        <div><dt>촉각</dt><dd>베이지 장갑 양손, 손당 80 택셀, 프레임마다 정렬</dd></div>
-        <div><dt>라이선스</dt><dd>CC-BY-4.0, 승인 불필요</dd></div>
-      </dl>
-      <h3>HOT3D (Aria) <span class="pill wait">영상 1개만</span></h3>
-      <dl class="kv">
-        <div><dt>용도</dt><dd>숫자 2 (로봇 복제 가능성)</dd></div>
-        <div><dt>받은 크기</dt><dd>7.3 GB</dd></div>
-        <div><dt>정답 있는 시퀀스</dt><dd>136개, 9명, RGB 480,375 프레임</dd></div>
-        <div><dt>정답 없음</dt><dd>62 시퀀스 (P0004, P0005, P0008, P0016, P0020) 제외</dd></div>
-        <div><dt>영상</dt><dd>1408x1408 어안, 30fps, 손은 맨손</dd></div>
-        <div><dt>물체</dt><dd>단단한 물체 33종, 3D 모델 포함</dd></div>
-        <div><dt>URL 유효</dt><dd>약 2026-11-10까지</dd></div>
-      </dl>
-      <p class="small" style="margin:14px 0 0">쓰지 않는 데이터: EgoDex (NC-ND라서 결과 공개 불가), RoCo, FreeTacMan.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>분할 (고정, 다시 뽑지 않는다)</h2>
-    <div class="card">
-      <h3 style="margin-top:0">OpenGraph: 튜닝 50 / held-out 22</h3>
-      <div class="chips" id="ogchips"></div>
-      <h3>HOT3D: 사람 단위</h3>
-      <p class="small" style="margin:0 0 6px">튜닝 6명 (85 시퀀스)</p>
-      <div class="chips">
-        <span class="chip">P0002</span><span class="chip">P0003</span><span class="chip">P0009</span>
-        <span class="chip">P0011</span><span class="chip">P0014</span><span class="chip">P0015</span>
+    <h2><span class="no">9</span>데이터와 분할</h2>
+    <div class="tbl">
+      <p class="cap">표 8. 사용 데이터</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th></th><th>OpenGraph Ego-Tactile</th><th>HOT3D (Aria)</th></tr></thead>
+          <tbody>
+            <tr><td class="first">용도</td><td>평가 1 (접촉 시점)</td><td>평가 2 (로봇 재현 가능성)</td></tr>
+            <tr><td class="first">규모</td><td>72 에피소드, 138,629 프레임, 1.28시간</td><td>정답 있는 136 시퀀스, 9명, 480,375 프레임</td></tr>
+            <tr><td class="first">영상</td><td>1인칭 1080p 30fps</td><td>1인칭 어안 1408×1408 30fps</td></tr>
+            <tr><td class="first">정답 신호</td><td>양손 촉각 장갑 (손당 80 센서)</td><td>모션캡처 손·물체 3D 포즈, 물체 3D 모델 33종</td></tr>
+            <tr><td class="first">손</td><td>베이지 장갑</td><td>맨손</td></tr>
+            <tr><td class="first">튜닝 / 검증</td><td>50 / 22 에피소드</td><td>6명 85 시퀀스 / 3명 51 시퀀스</td></tr>
+          </tbody>
+        </table>
       </div>
-      <p class="small" style="margin:12px 0 6px">held-out 3명 (51 시퀀스, 37.5%)</p>
-      <div class="chips">
-        <span class="chip">P0001</span><span class="chip">P0010</span><span class="chip">P0012</span>
+    </div>
+    <p class="note">분할은 seed 20261026으로 고정했고 다시 뽑지 않는다. 검증 세트는 최종 측정 전까지 쓰지 않는다. HOT3D는 사람 단위로 나눠 같은 사람이 양쪽에 섞이지 않게 했다.</p>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <h2><span class="no">10</span>위험 요소</h2>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>위험</th><th>내용</th><th>대응</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">평가 2 정답 쏠림</td>
+              <td>Allegro 손이 사람 손보다 커서 기준에 따라 거의 전부 가능 또는 불가로 쏠릴 수 있음</td>
+              <td>손목 위치를 수 cm 범위에서 최적화한 뒤 판정. 튜닝 세트 가능 비율이 20~80% 밖이면 기준 재조정</td>
+            </tr>
+            <tr>
+              <td class="first">동반 이동 신호 품질</td>
+              <td>겹침만으로는 접촉 구분이 안 되어 동반 이동 계산에 의존</td>
+              <td>튜닝 에피소드에서 촉각 정답으로 먼저 검증</td>
+            </tr>
+            <tr>
+              <td class="first">HOT3D 항목 변별력</td>
+              <td>단단한 물체만 있고 고정 촬영이라 물체 성질, 카메라 안정성의 분산이 0일 수 있음</td>
+              <td>분산이 없으면 회귀에서 제외하고 OpenGraph 결과로 설명</td>
+            </tr>
+            <tr>
+              <td class="first">작은 검증 세트</td>
+              <td>HOT3D 검증 인원 3명</td>
+              <td>AUC에 부트스트랩 신뢰구간 함께 보고</td>
+            </tr>
+            <tr>
+              <td class="first">실험실 데이터 한계</td>
+              <td>문제는 일반 영상인데 검증은 실험실 데이터</td>
+              <td>직접 촬영한 1인칭 영상 적용 예시를 데모에 포함</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <p class="small" style="margin:14px 0 0">held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.</p>
     </div>
   </section>
 
+  <!-- appendix -->
   <section>
-    <h2>가장 큰 위험</h2>
-    <ul class="rows">
-      <li>
-        <div class="rowhead"><span class="name">HOT3D copyable 라벨이 한쪽으로 쏠린다</span><span class="pill open">1순위</span></div>
-        <div class="rowbody">Allegro 손이 사람 손보다 커서, 기준이 엄격하면 거의 전부 "불가", 느슨하면 거의 전부 "가능"이 된다. 손목 위치를 몇 cm 범위에서 최적화한 뒤 판정한다. 튜닝 세트에서 가능 비율이 20~80% 밖이면 정의를 다시 조정한다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">접촉 신호가 동반 이동에 달렸다</span><span class="pill open">신규</span></div>
-        <div class="rowbody">겹침만으로는 분리가 안 되는 것이 확인됐다. 동반 이동 계산이 잘 안 되면 숫자 1이 통째로 흔들린다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">분산이 0인 항목</span><span class="pill done">일부 해소</span></div>
-        <div class="rowbody">OpenGraph는 카메라 흔들림에 50~100배 차이가 있어서 "카메라 안정성"이 살아 있다. HOT3D는 단단한 물체뿐이고 고정 촬영이라 "물체 성질"과 "카메라 안정성"이 여전히 분산 0일 수 있다. 그런 경우 회귀에서 빼고 데모에서 설명한다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">검증 세트가 3명뿐</span></div>
-        <div class="rowbody">AUC에 부트스트랩 신뢰구간을 함께 보고한다.</div>
-      </li>
-      <li>
-        <div class="rowhead"><span class="name">문제 제기는 인터넷 영상, 검증은 실험실 데이터</span></div>
-        <div class="rowbody">데모 끝에 직접 찍은 1인칭 영상 몇 개를 보여준다.</div>
-      </li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>10일 계획</h2>
-    <div class="card">
-      <dl class="kv">
-        <div><dt>Day 1~2 · 환경, 데이터, 분할, API 연결</dt><dd>완료</dd></div>
-        <div><dt>Day 3~4 · 접촉 자르기 (숫자 1)</dt><dd id="p34">다음</dd></div>
-        <div><dt>Day 5~6 · HOT3D 라벨링</dt><dd>대기</dd></div>
-        <div><dt>Day 7 · 7개 체크 + 가중치 학습 (숫자 2)</dt><dd>대기</dd></div>
-        <div><dt>Day 8~9 · 뷰어, 데모 영상, README</dt><dd>대기</dd></div>
-        <div><dt>Day 10 · 최종 점검, 정오 ET 제출</dt><dd>대기</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <section>
-    <h2>팀과 환경</h2>
-    <div class="card">
-      <dl class="kv">
-        <div><dt>팀</dt><dd>임준세, 이인석 (2인)</dd></div>
-        <div><dt>트랙</dt><dd>Indie Dev Track, 지원서 제출 완료 (10/21)</dd></div>
-        <div><dt>테마</dt><dd>Push the Frontier (robotics)</dd></div>
-        <div><dt>크레딧</dt><dd>$150 중 약 $0.34 사용</dd></div>
-        <div><dt>작업 장비</dt><dd>데스크톱 RTX 3070 8GB, RAM 32GB, WSL2 Ubuntu 24.04</dd></div>
-        <div><dt>디스크</dt><dd>데이터 14 GB 사용, C: 여유 170 GB에서 시작</dd></div>
-        <div><dt>이전 이름</dt><dd>TouchGrain</dd></div>
-      </dl>
+    <h2><span class="no">부록</span>실험 기록</h2>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>번호</th><th>내용</th><th>결론</th></tr></thead>
+          <tbody>
+            <tr><td class="first">EXP-01</td><td>Meta API 연결 확인</td><td>SAM 3.1, Muse Spark 모두 OpenGraph 영상에서 동작. SAM은 장갑 낀 양손을 전 프레임 검출.</td></tr>
+            <tr><td class="first">EXP-02</td><td>물체 프롬프트, 용기 클립</td><td>일반 프롬프트 중 <code>small object</code>만 동작. 2D 겹침으로는 접촉 구분 불가.</td></tr>
+            <tr><td class="first">EXP-03</td><td>물체 프롬프트, 스프레이병 클립</td><td><code>small object</code>가 큰 물체도 전 프레임 검출. 물체 프롬프트로 채택.</td></tr>
+            <tr><td class="first">EXP-04</td><td>OpenGraph 데이터 점검</td><td>라벨은 촉각 임계값 800에서 일치. 머리 IMU로 카메라 흔들림 측정 가능.</td></tr>
+            <tr><td class="first">진행 중</td><td>10fps 입력</td><td>손 추적 유지 확인. 물체 id 안정성 확인 중.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
   <footer>
-    마지막 갱신: 2026-10-27. 출처: <code>docs/PROGRESS.md</code>, <code>docs/DATA_NOTES.md</code>,
-    <code>docs/ENVIRONMENT.md</code>, <code>docs/PROJECT_BRIEF.md</code>.
-    이미지와 영상은 OpenGraph Ego-Tactile (CC-BY-4.0)에서 나온 것이다.
-    이 페이지는 비공개 공유용이다. 비밀번호는 브라우저 안에서만 확인하므로 진짜 보안이 아니다.
+    자료: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta). 그림 1~5는 OpenGraph 영상에서 가져옴.<br>
+    마지막 갱신 2026-10-27 16:50 KST
   </footer>
 
-</div>
+</main>
 </div>
 
 <script>
@@ -1015,152 +779,279 @@
         try { sessionStorage.setItem(KEY, "1"); } catch (_) {}
         open();
       } else {
-        err.textContent = "비밀번호가 틀렸다.";
+        err.textContent = "비밀번호가 맞지 않습니다.";
         pw.value = "";
         pw.focus();
       }
     });
   });
 
-  var unlocked = false;
-  try { unlocked = sessionStorage.getItem(KEY) === "1"; } catch (_) {}
-  if (unlocked) { open(); } else { pw.focus(); }
+  // ---------- schedule ----------
+  // status: done | doing | todo. Edit here as work moves.
 
-  // ---------- data ----------
+  var DAYS = ["10/26", "10/27", "10/28", "10/29", "10/30", "10/31", "11/01", "11/02", "11/03", "11/04"];
 
-  var MP = [
-    { ep: "ep0 용기", v: 98.3 },
-    { ep: "ep1 용기", v: 96.1 },
-    { ep: "ep6 금속", v: 96.0 },
-    { ep: "ep18 스펀지", v: 92.1 },
-    { ep: "ep30 종이상자", v: 61.0 },
-    { ep: "ep42 지우개", v: 93.5 },
-    { ep: "ep48 스프레이병", v: 14.3 },
-    { ep: "ep66 케첩", v: 100.0 }
+  var PHASES = [
+    {
+      title: "데이터·환경 준비", from: 1, to: 2, status: "done",
+      req: [
+        "OpenGraph, HOT3D 정답 데이터 확보",
+        "튜닝 / 검증 분할 고정",
+        "SAM 3.1, Muse Spark 호출과 응답 해석 확인"
+      ],
+      chk: [
+        ["done", "작업 환경 구축, 로봇 손 리타게팅 동작 확인"],
+        ["done", "OpenGraph 72개 에피소드 수집, 에피소드 단위로 분리"],
+        ["done", "HOT3D 정답(손·물체 포즈, 물체 3D 모델) 수집"],
+        ["done", "분할 고정 (OpenGraph 50/22, HOT3D 6명/3명)"],
+        ["done", "SAM 3.1, Muse Spark 응답 확인"],
+        ["done", "접촉 라벨 신뢰도 확인 (촉각 임계값 800)"],
+        ["done", "SAM 물체 프롬프트 선정 (small object)"]
+      ]
+    },
+    {
+      title: "접촉 구간 검출 · 평가 1", from: 3, to: 4, status: "doing",
+      req: [
+        "영상만으로 접촉 시작과 끝 검출",
+        "촉각 장갑 기준 boundary F1, contact IoU 산출",
+        "비교군 3종(Muse Spark 단독, SAM 규칙, SAM + Muse Spark) 대비 결과"
+      ],
+      chk: [
+        ["done", "10fps 입력 테스트 (손 추적 유지)"],
+        ["doing", "10fps 물체 id 안정성 확인"],
+        ["todo", "전체 에피소드 SAM 분할 (손, 물체)"],
+        ["todo", "겹침 + 동반 이동 기반 접촉 신호"],
+        ["todo", "Muse Spark로 접촉 경계 확정"],
+        ["todo", "영상 접촉과 촉각 압력 사이 시간차 보정"],
+        ["todo", "비교군 대비 boundary F1, contact IoU 측정"]
+      ]
+    },
+    {
+      title: "HOT3D 정답 라벨링", from: 5, to: 6, status: "todo",
+      req: [
+        "모캡 손을 Allegro 로봇 손으로 옮겨 구간마다 재현 가능 여부 판정",
+        "튜닝 세트의 재현 가능 비율 20~80%",
+        "양손 모두 처리"
+      ],
+      chk: [
+        ["todo", "카메라 보정 기준 방향 확인"],
+        ["todo", "HOT3D 툴킷, MANO 손 모델 준비"],
+        ["todo", "정답 있는 136개 시퀀스 영상 수집"],
+        ["todo", "손가락 끝과 물체 표면 거리 기준 설정"],
+        ["todo", "재현 가능 비율 점검 후 기준 고정"]
+      ]
+    },
+    {
+      title: "점수 학습 · 평가 2", from: 7, to: 7, status: "todo",
+      req: [
+        "구간마다 7개 항목 등급과 0~100점",
+        "로지스틱 회귀 가중치 공개",
+        "체크리스트 없는 Muse Spark 대비 AUC"
+      ],
+      chk: [
+        ["todo", "HOT3D 구간에 7개 항목 채점"],
+        ["todo", "분산 없는 항목 점검"],
+        ["todo", "로지스틱 회귀 학습"],
+        ["todo", "비교군 실행"],
+        ["todo", "AUC(부트스트랩 신뢰구간), 상위 20% 양성 비율"]
+      ]
+    },
+    {
+      title: "뷰어 · 데모", from: 8, to: 9, status: "todo",
+      req: [
+        "점수순 구간 목록, 영상 위 박스, 접촉 신호 차트를 보여주는 뷰어",
+        "데모 영상과 README"
+      ],
+      chk: [
+        ["todo", "뷰어 (구간 목록, 오버레이, 접촉 차트, 항목별 등급)"],
+        ["todo", "프리셋 3종 (엄격, 균형, 물량)"],
+        ["todo", "직접 촬영한 1인칭 영상 적용 예시"],
+        ["todo", "데모 영상"],
+        ["todo", "README"]
+      ]
+    },
+    {
+      title: "최종 측정 · 제출", from: 10, to: 10, status: "todo",
+      req: [
+        "검증 세트로 최종 수치 1회 측정",
+        "11/04 12:00 ET 전 제출"
+      ],
+      chk: [
+        ["todo", "검증 세트 최종 측정"],
+        ["todo", "수치 반영, 최종 점검"],
+        ["todo", "제출"]
+      ]
+    }
   ];
 
-  var BUDGET = [
-    { k: "지금까지 쓴 것", v: 0.34, tone: "good" },
-    { k: "Muse Spark 경계", v: 8, tone: "" },
-    { k: "SAM, OpenGraph 10fps", v: 9.24, tone: "good" },
-    { k: "SAM, OpenGraph 30fps", v: 27.73, tone: "" },
-    { k: "SAM, OpenGraph 30fps 2프롬프트", v: 55, tone: "mid" },
-    { k: "SAM, HOT3D 전체", v: 96, tone: "low" }
-  ];
-  var CAP = 150;
+  var STATUS_TXT = { done: "완료", doing: "진행 중", todo: "예정" };
 
-  var HELD_OUT = [7, 14, 18, 24, 27, 34, 36, 37, 39, 40, 41, 42, 43, 45, 48, 49, 52, 57, 58, 64, 66, 67];
-
-  var START = Date.UTC(2026, 9, 26, 4, 0, 0);          // 10/26 00:00 ET
-  var DEADLINE = Date.UTC(2026, 10, 4, 17, 0, 0);      // 11/04 12:00 ET (EST, UTC-5)
-
-  function bar(host, label, pct, tone, value, wide) {
-    var row = document.createElement("div");
-    row.className = "barrow" + (wide ? " wide" : "");
-    row.innerHTML =
-      '<div class="lbl"></div>' +
-      '<div class="track"><div class="fill ' + tone + '" style="width:' +
-        Math.max(0.6, pct) + '%"></div></div>' +
-      '<div class="val"></div>';
-    row.children[0].textContent = label;
-    row.children[2].textContent = value;
-    host.appendChild(row);
-  }
-
-  function renderChart() {
-    var host = document.getElementById("mpchart");
-    if (!host) return;
-    host.innerHTML = "";
-    MP.forEach(function (d) {
-      bar(host, d.ep, d.v, d.v < 50 ? "low" : (d.v < 85 ? "mid" : ""),
-          d.v.toFixed(0) + "%", false);
-    });
-  }
-
-  function renderBudget() {
-    var host = document.getElementById("budget");
-    if (!host) return;
-    host.innerHTML = "";
-    BUDGET.forEach(function (d) {
-      bar(host, d.k, (d.v / CAP) * 100, d.tone,
-          "$" + (d.v < 1 ? d.v.toFixed(2) : Math.round(d.v)), true);
-    });
-    bar(host, "크레딧 한도", 100, "plainbar", "$150", true);
-    var last = host.lastChild.querySelector(".fill");
-    last.style.background = "transparent";
-    last.style.border = "1px dashed var(--faint)";
-  }
-
-  function renderChips() {
-    var host = document.getElementById("ogchips");
-    if (!host) return;
-    host.innerHTML = "";
-    HELD_OUT.forEach(function (n) {
-      var s = document.createElement("span");
-      s.className = "chip";
-      s.textContent = n;
-      host.appendChild(s);
-    });
-    var note = document.createElement("span");
-    note.className = "chip";
-    note.textContent = "위 22개가 held-out";
-    host.appendChild(note);
-  }
+  var START = Date.UTC(2026, 9, 26, 4, 0, 0);      // 10/26 00:00 ET (EDT)
+  var DEADLINE = Date.UTC(2026, 10, 4, 17, 0, 0);  // 11/04 12:00 ET (EST)
 
   function dayIndex() {
     var d = Math.floor((Date.now() - START) / 86400000) + 1;
     return Math.min(10, Math.max(1, d));
   }
 
-  function renderDays() {
-    var day = dayIndex();
-    document.getElementById("dayno").textContent = "Day " + day;
-    var bar = document.getElementById("daybar");
-    bar.innerHTML = "";
-    for (var i = 1; i <= 10; i++) {
-      var s = document.createElement("span");
-      s.className = i < day ? "past" : (i === day ? "now" : "");
-      s.title = "Day " + i;
-      bar.appendChild(s);
-    }
-    var p34 = document.getElementById("p34");
-    if (p34) p34.textContent = day >= 3 ? "진행 중" : "다음";
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
   }
 
-  function tick() {
+  function dayRange(p) {
+    return p.from === p.to ? "Day " + p.from + " · " + DAYS[p.from - 1]
+      : "Day " + p.from + "–" + p.to + " · " + DAYS[p.from - 1] + "–" + DAYS[p.to - 1];
+  }
+
+  function select(i, scroll) {
+    var rows = document.querySelectorAll(".g-row[data-i]");
+    var cards = document.querySelectorAll(".phase");
+    rows.forEach(function (r) { r.classList.toggle("sel", +r.dataset.i === i); });
+    cards.forEach(function (c, k) { c.classList.toggle("sel", k === i); });
+    if (scroll && cards[i]) {
+      var wrap = document.getElementById("phases");
+      wrap.scrollTo({ left: cards[i].offsetLeft - wrap.offsetLeft, behavior: "smooth" });
+    }
+  }
+
+  function renderGantt() {
+    var host = document.getElementById("gantt");
+    host.innerHTML = "";
+    var today = dayIndex();
+
+    var axis = el("div", "g-row axis");
+    axis.appendChild(el("div", "g-label"));
+    var at = el("div", "g-track");
+    DAYS.forEach(function (d, k) {
+      var c = el("div", "g-day" + (k + 1 === today ? " today" : ""));
+      c.style.gridColumn = (k + 1) + " / " + (k + 2);
+      var parts = d.split("/");
+      c.textContent = +parts[1];
+      c.appendChild(el("small", null, k === 0 || parts[1] === "01" ? +parts[0] + "월" : "D" + (k + 1)));
+      at.appendChild(c);
+    });
+    axis.appendChild(at);
+    host.appendChild(axis);
+
+    PHASES.forEach(function (p, i) {
+      var row = el("div", "g-row");
+      row.dataset.i = i;
+      var lab = el("div", "g-label");
+      lab.appendChild(el("span", "ph", String(i + 1)));
+      lab.appendChild(document.createTextNode(p.title));
+      lab.appendChild(el("span", "st", STATUS_TXT[p.status]));
+      row.appendChild(lab);
+
+      var tr = el("div", "g-track");
+      for (var k = 1; k <= 10; k++) {
+        var cell = el("div", "g-cell" + (k === today ? " today" : ""));
+        cell.style.gridColumn = k + " / " + (k + 1);
+        tr.appendChild(cell);
+      }
+      var bar = el("div", "g-bar " + p.status);
+      bar.style.gridColumn = p.from + " / " + (p.to + 1);
+      bar.title = dayRange(p);
+      tr.appendChild(bar);
+      row.appendChild(tr);
+
+      row.addEventListener("click", function () { select(i, true); });
+      host.appendChild(row);
+    });
+  }
+
+  function renderPhases() {
+    var host = document.getElementById("phases");
+    host.innerHTML = "";
+    PHASES.forEach(function (p, i) {
+      var c = el("article", "phase " + p.status);
+      var top = el("div", "ph-top");
+      top.appendChild(el("span", null, "단계 " + (i + 1) + " · " + dayRange(p).replace(/^Day [^·]+· /, "")));
+      top.appendChild(el("span", null, STATUS_TXT[p.status]));
+      c.appendChild(top);
+      c.appendChild(el("div", "ph-title", p.title));
+      var done = p.chk.filter(function (x) { return x[0] === "done"; }).length;
+      c.appendChild(el("div", "ph-count", "체크리스트 " + done + " / " + p.chk.length));
+
+      c.appendChild(el("div", "ph-h", "요구사항"));
+      var rq = el("ul", "req");
+      p.req.forEach(function (t) { rq.appendChild(el("li", null, t)); });
+      c.appendChild(rq);
+
+      c.appendChild(el("div", "ph-h", "체크리스트"));
+      var ck = el("ul", "chk");
+      p.chk.forEach(function (x) {
+        var li = el("li", x[0]);
+        li.appendChild(el("span", "bx", x[0] === "done" ? "✓" : ""));
+        li.appendChild(el("span", "tx", x[1]));
+        ck.appendChild(li);
+      });
+      c.appendChild(ck);
+      host.appendChild(c);
+    });
+
+    var cur = PHASES.findIndex(function (p) { return p.status === "doing"; });
+    if (cur < 0) cur = 0;
+    select(cur, false);
+    requestAnimationFrame(function () {
+      var cards = host.querySelectorAll(".phase");
+      if (cards[cur]) host.scrollLeft = cards[cur].offsetLeft - host.offsetLeft;
+    });
+  }
+
+  // ---------- MediaPipe chart ----------
+  var MP = [
+    { ep: "ep0 용기", v: 98.3 },
+    { ep: "ep1 용기", v: 96.1 },
+    { ep: "ep6 금속 물체", v: 96.0 },
+    { ep: "ep18 스펀지", v: 92.1 },
+    { ep: "ep30 종이 상자", v: 61.0 },
+    { ep: "ep42 지우개", v: 93.5 },
+    { ep: "ep48 스프레이병", v: 14.3 },
+    { ep: "ep66 케첩 병", v: 100.0 }
+  ];
+
+  function renderChart() {
+    var host = document.getElementById("mpchart");
+    host.innerHTML = "";
+    MP.forEach(function (d) {
+      var row = el("div", "barrow");
+      row.appendChild(el("div", "lbl", d.ep));
+      var tr = el("div", "track");
+      var f = el("div", "fill" + (d.v < 50 ? " low" : ""));
+      f.style.width = d.v + "%";
+      tr.appendChild(f);
+      row.appendChild(tr);
+      row.appendChild(el("div", "val", d.v.toFixed(1) + "%"));
+      host.appendChild(row);
+    });
+  }
+
+  function renderClock() {
     var ms = DEADLINE - Date.now();
-    var el = document.getElementById("cd");
-    if (!el) return;
-    if (ms <= 0) { el.textContent = "마감"; return; }
+    var dd = document.getElementById("dday");
+    var dl = document.getElementById("dleft");
+    if (ms <= 0) { dd.firstChild.nodeValue = "마감"; dl.textContent = ""; return; }
     var d = Math.floor(ms / 86400000);
     var h = Math.floor(ms / 3600000) % 24;
-    var m = Math.floor(ms / 60000) % 60;
-    el.textContent = d + "일 " + h + "시간 " + m + "분";
+    dd.firstChild.nodeValue = "D-" + d;
+    dl.textContent = d + "일 " + h + "시간 남음";
   }
 
   function render() {
+    renderGantt();
+    renderPhases();
     renderChart();
-    renderBudget();
-    renderChips();
-    renderDays();
-    tick();
-    setInterval(tick, 30000);
+    renderClock();
+    setInterval(renderClock, 60000);
   }
 
-  // ---------- theme ----------
-  var btn = document.getElementById("themebtn");
-  try {
-    var saved = localStorage.getItem("gg-theme");
-    if (saved) document.documentElement.setAttribute("data-theme", saved);
-  } catch (_) {}
-  btn.addEventListener("click", function () {
-    var cur = document.documentElement.getAttribute("data-theme");
-    var isDark = cur ? cur === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    var next = isDark ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try { localStorage.setItem("gg-theme", next); } catch (_) {}
-  });
+  // Runs last so the data above is defined when a returning visitor skips the gate.
+  var unlocked = false;
+  try { unlocked = sessionStorage.getItem(KEY) === "1"; } catch (_) {}
+  if (unlocked) { open(); } else { pw.focus(); }
 })();
 </script>
 </body>
