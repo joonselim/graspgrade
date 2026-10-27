@@ -28,5 +28,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-15](exp15_label_methods.md) | 2026-10-27 | Copyable label methods: robot or retargeting? | $0 | The EXP-10 label mostly measures a retargeting side effect (fingertips 31 mm off the human ones). Faithful retargeting calls 94% to 96% copyable. No method passes the pre-set criteria. The label is on hold. |
 | [EXP-16](exp16_copyable_v2.md) | 2026-10-27 | Copyable label v2: position retargeting, mesh collision, contact reach | $0 | Passes the checks set in advance: 47% copyable, hand size correlation +0.04. Failures are mostly collisions (25.5%) and reach (10.9%). The share depends strongly on the depth limit. |
 | [EXP-17](exp17_v2_signal.md) | 2026-10-27 | What predicts the v2 label (EXP-12 and EXP-13 again) | $0 | Object identity alone 0.74. Video hand shape lost its signal (0.52, it had learned the retargeting side effect). Our video checks add about 0.01 on top of the object. |
+| [EXP-18](exp18_object_geometry.md) | 2026-10-27 | Option A check: object geometry vs object identity | $0 | Seven size and shape numbers from the 3D models reach 0.695 (identity 0.742) and still 0.673 on unseen objects, where identity is 0.5. Option A passes. |
 
 Total Meta API spend so far: about $1.53 of $150.

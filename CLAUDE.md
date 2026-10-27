@@ -69,5 +69,6 @@ Windows 사본을 WSL로 동기화:
 | `scripts/hot3d_label_compare.py` | copyable 라벨 방식 비교 (ratio / scale1 / position): 충실도, 손 크기 상관, 비율, 캔 잡기 그림 |
 | `scripts/hot3d_copyable_v2.py` | copyable 라벨 v2 (position + 링크 메쉬 충돌 + 접촉점 도달), `run` / `report` / `figures`. 숫자 2의 현재 정답 |
 | `scripts/hot3d_v2_signal.py` | v2 라벨로 무료 항목, 물체 기준선, 손 모양(영상/모캡) AUC를 튜닝에서 계산, 깊이 2/5/10 mm |
+| `scripts/hot3d_object_geometry.py` | A안 확인: 3D 모델 기하 속성으로 v2 라벨 AUC (사람 하나씩 빼기, 물체 하나씩 빼기), 물체별 그림 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
