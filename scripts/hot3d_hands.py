@@ -77,6 +77,25 @@ class HandModel:
                     pts[i] += w * (fr[b][:3, :3] @ p + fr[b][:3, 3])
         return pts * self.scale
 
+    def landmarks_batch(self, angles):
+        """Same as landmarks for N frames at once: angles N x 22 -> N x 21 x 3 (mm)."""
+        n = len(angles)
+        g = [None] * len(self.parent)
+        fr = [np.broadcast_to(np.eye(4), (n, 4, 4)) for _ in range(self.n_frames)]
+        for j in range(len(self.parent)):
+            local = np.tile(np.eye(4), (n, 1, 1))
+            local[:, :3, :3] = Rotation.from_rotvec(self.axes[j][None, :] * angles[:, j:j + 1]).as_matrix()
+            local[:, :3, 3] = self.rest[j] - local[:, :3, :3] @ self.rest[j]
+            g[j] = local if self.parent[j] == 255 else g[self.parent[j]] @ local
+            if self.frame_of[j] != 255:
+                fr[self.frame_of[j]] = g[j]
+        pts = np.zeros((n, len(self.lm_rest), 3))
+        for i, p in enumerate(self.lm_rest):
+            for b, w in zip(self.lm_bone[i], self.lm_w[i]):
+                if w:
+                    pts[:, i] += w * (fr[b][:, :3, :3] @ p + fr[b][:, :3, 3])
+        return pts * self.scale
+
     def world(self, hand_pose, flip):
         """21 landmarks in the world frame (m)."""
         p = self.landmarks(np.array(hand_pose["joint_angles"])) * FLIPS[flip] / 1000.0

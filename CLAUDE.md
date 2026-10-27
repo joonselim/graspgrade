@@ -60,6 +60,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/hot3d_clip_count.py` | 모캡 물체 이동으로 HOT3D 잡기 클립 수와 길이를 세고 숫자 2 SAM 비용 계산 (API 호출 없음) |
 | `scripts/hot3d_calib_check.py` | HOT3D 보정 방향 확인: 물체 모델 투영 vs 2D 박스, MediaPipe 손 vs 2D 손 박스 (방향, 프레임 밀림) |
 | `scripts/hot3d_hands.py` | UmeTrack 프로필 순운동학으로 HOT3D 손 랜드마크 21개(손가락 끝 포함) 계산, 손 박스/영상/물체 거리로 검증 |
-| `scripts/hot3d_copyable.py` | copyable 라벨: UmeTrack 손 → dex-retargeting Allegro → 표면 부호거리, 손목 이동 격자. `run` / `report` / `figures` |
+| `scripts/hot3d_copyable.py` | copyable 라벨: UmeTrack 손 → dex-retargeting Allegro → 표면 부호거리, 손목 이동 격자. `run` / `report` / `figures`, `--source clips`면 hot3d_clips.py 클립에 라벨 |
+| `scripts/hot3d_clips.py` | 숫자 2 클립: 모캡 손가락 끝-물체 거리로 접촉 구간을 찾아 클립 생성 (전 프레임, 병렬). `--plot SEQ OBJECT` 그림 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

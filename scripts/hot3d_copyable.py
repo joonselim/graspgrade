@@ -143,11 +143,22 @@ class Surface:
         return d * np.where(s == 0, 1, s)
 
 
-def run(split_name):
+def run(split_name, source="events"):
+    """source "events": EXP-07 object moves, contact frame = middle of the move, hand = closest.
+    source "clips": hot3d_clips.py clips, contact frame and hand given by the clip."""
     split = json.loads((ROOT / "splits" / "hot3d_aria.json").read_text())
     seqs = set(split[split_name])
-    ev = pd.read_csv(ROOT / "out" / "hot3d_clips" / "events.csv")
-    ev = ev[ev.sequence.isin(seqs) & (ev.wrist_min_dist_m <= 0.25) & (ev.clip_qa_pass_pct >= 90)]
+    if source == "events":
+        ev = pd.read_csv(ROOT / "out" / "hot3d_clips" / "events.csv")
+        ev = ev[ev.sequence.isin(seqs) & (ev.wrist_min_dist_m <= 0.25) & (ev.clip_qa_pass_pct >= 90)].copy()
+        ev["frame"] = ev.move_start + ev.move_frames // 2
+        ev["hand_given"] = None
+    else:
+        ev = pd.read_csv(ROOT / "out" / "hot3d_clips" / "clips.csv")
+        ev = ev[ev.sequence.isin(seqs) & ev.moved & (ev.clip_qa_pass_pct >= 90)].copy()
+        ev["frame"] = ev.contact_frame
+        ev["hand_given"] = ev.hand.map({v: k for k, v in SIDE.items()})
+    tag = split_name if source == "events" else f"{split_name}_clips"
     OUT.mkdir(parents=True, exist_ok=True)
     rows, sd_store = [], []
     surfaces = {}
@@ -161,7 +172,7 @@ def run(split_name):
         model = HandModel(seq)
         human_len = float(np.linalg.norm(model.lm_rest[1] - model.lm_rest[5])) / 1000.0
         hands = {}
-        frames = [int(e.move_start + e.move_frames // 2) for e in g.itertuples()]
+        frames = [int(f) for f in g.frame]
         poses = load_poses(seq, ts[frames])
         for e, k in zip(g.itertuples(), frames):
             uid = int(uid_of[e.object])
@@ -179,12 +190,14 @@ def run(split_name):
 
             best = None
             for hid, hp in poses[ts[k]].items():
-                if hid not in SIDE:
+                if hid not in SIDE or (e.hand_given is not None and hid != e.hand_given):
                     continue
                 kp = mediapipe_points(model, hp, FLIP[hid])
                 tips_sd = surf.signed(to_obj(kp[[4, 8, 12, 16, 20]]))
                 if best is None or np.abs(tips_sd).min() < np.abs(best[2]).min():
                     best = (hid, kp, tips_sd)
+            if best is None:
+                continue
             hid, kp, human_sd = best
             side = SIDE[hid]
             if (side, seq) not in hands:
@@ -198,15 +211,16 @@ def run(split_name):
             sd = surf.signed((p_obj[None, :, :] + shifts[:, None, :]).reshape(-1, 3)).reshape(len(GRID), len(pts))
             tips = sd[:, [robot.thumb] + robot.others]
             sd_store.append(np.c_[tips, sd.min(1)].astype(np.float32))
-            rows.append({"sequence": seq, "person": seq.split("_")[0], "object": e.object, "hand": side,
+            rows.append({**({"clip_start": int(e.clip_start), "clip_frames": int(e.clip_frames)} if source == "clips" else {}),
+                         "sequence": seq, "person": seq.split("_")[0], "object": e.object, "hand": side,
                          "frame": k, "scale": round(robot.scale, 3), "retarget_vector_error": round(err, 3),
                          "human_thumb_sd_mm": round(1000 * human_sd[0], 1),
                          "human_closest_tip_mm": round(1000 * np.abs(human_sd).min(), 1),
                          "human_tips_within_15mm": int((np.abs(human_sd) < 0.015).sum())})
         print(f"{seq}: {len(g)} events", flush=True)
     df = pd.DataFrame(rows)
-    df.to_csv(OUT / f"{split_name}_events.csv", index=False)
-    np.save(OUT / f"{split_name}_sd.npy", np.stack(sd_store))
+    df.to_csv(OUT / f"{tag}_events.csv", index=False)
+    np.save(OUT / f"{tag}_sd.npy", np.stack(sd_store))
     print(f"{len(df)} events, scale median {df.scale.median():.2f}, retarget error median {df.retarget_vector_error.median():.3f}")
 
 
@@ -322,8 +336,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["run", "report", "figures"])
     ap.add_argument("--split", default="tune", choices=["tune", "held_out"])
+    ap.add_argument("--source", default="events", choices=["events", "clips"])
     a = ap.parse_args()
-    {"run": run, "report": report, "figures": figures}[a.cmd](a.split)
+    if a.cmd == "run":
+        run(a.split, a.source)
+    else:
+        {"report": report, "figures": figures}[a.cmd](a.split if a.source == "events" else f"{a.split}_clips")
 
 
 if __name__ == "__main__":

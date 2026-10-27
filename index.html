@@ -351,7 +351,7 @@
       <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치. 평가 1의 정답으로 그대로 사용 가능.</li>
       <li>SAM 3.1 설정 확정. 물체 프롬프트는 <code>small object</code>, 입력은 10fps. 10fps 결과는 30fps와 마스크 IoU 0.97 이상으로 같음.</li>
       <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
-      <li>평가 2 정답 라벨 완성. HOT3D 잡기를 Allegro 로봇 손으로 옮겨 판정하면 튜닝 세트 54%가 "따라할 수 있음". 가장 큰 위험이던 라벨 쏠림은 없음.</li>
+      <li>평가 2 정답 라벨과 클립 완성. HOT3D 잡기를 Allegro 로봇 손으로 옮겨 판정하면 튜닝 54%, 검증 53%가 "따라할 수 있음". 가장 큰 위험이던 라벨 쏠림은 없음. 클립은 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
     </ul>
 
@@ -389,6 +389,7 @@
             <tr><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
             <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. 계획한 20~80% 안이라 가장 큰 위험이었던 쏠림 해소.</td></tr>
+            <tr><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
           </tbody>
         </table>
       </div>
@@ -440,8 +441,8 @@
             </tr>
             <tr>
               <td class="first">검증 세트 라벨 비율</td>
-              <td>"따라할 수 있음" 비율이 사람별로 29~76%로 달라, 검증 3명의 비율은 튜닝과 다를 수 있음</td>
-              <td>AUC는 비율에 좌우되지 않음. 검증 세트 비율도 함께 보고</td>
+              <td>검증 세트 비율은 52.6%로 튜닝(54.4%)과 비슷함. 다만 사람별 차이가 30~73%로 큼 (EXP-11)</td>
+              <td>AUC는 비율에 좌우되지 않음. 사람별 비율도 함께 보고</td>
             </tr>
             <tr>
               <td class="first">동반 이동 신호 품질</td>
@@ -475,7 +476,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -1253,6 +1254,83 @@ video:  에피소드 하나 전체, 10fps
         <li>한계: Allegro 점은 손가락 표면이 아니라 링크 위치임. 안쪽·바깥쪽 부호는 가장 가까운 표면 점의 법선으로 정해서 얇은 모서리에서 틀릴 수 있음. 잡기마다 한 프레임만 봄.</li>
       </ul>
     </article>
+
+    <!-- EXP-11 -->
+    <article class="exp" id="exp-11">
+      <div class="exp-h"><span class="id">EXP-11</span><span class="t">평가 2 클립과 검증 세트 라벨</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>튜닝 세트에서 고정한 기준(EXP-10)으로 검증 세트에서도 "따라할 수 있음" 비율이 비슷하게 나오는가. 그리고 계획대로 우리 영상 파이프라인이 아니라 모션캡처 손–물체 거리로 평가 2 클립을 자르면 어떤 클립과 라벨이 나오는가.</dd>
+        <dt>입력</dt><dd>정답이 있는 HOT3D 136개 시퀀스 전체, 30fps RGB 프레임 전부.</dd>
+        <dt>방법</dt><dd>EXP-10의 규칙(near 1.5cm, deep 1cm, 손목 최대 2cm 이동)을 바꾸지 않고 검증 세트 잡기에 적용. 클립은 손가락 끝과 물체 표면 거리로 새로 자름. API 호출 없음.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">클립을 자르는 규칙</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>손과 물체 쌍마다, UmeTrack 손가락 끝 2개 이상이 물체 표면 15mm 안이면 그 프레임은 접촉</li>
+            <li>0.5초보다 짧은 틈은 이어 붙이고, 0.3초 이상 이어진 접촉만 남김</li>
+            <li>클립 = 접촉 앞 1초(손 뻗기) + 접촉 + 뒤 1초(놓기)</li>
+            <li>물체가 3cm 이상 움직이고(스친 것이 아니라 실제로 집은 것), 클립 프레임 90% 이상이 품질 검사를 통과한 것만 남김</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">라벨을 붙이는 방법</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>접촉 구간의 한가운데 프레임에서, 그 클립의 손을 Allegro 로봇 손으로 옮겨 판정</li>
+            <li>클립은 손 하나 단위. 양손으로 들면 클립이 두 개, 내려놨다 다시 잡아도 두 개</li>
+            <li>136개 시퀀스 전 프레임의 손가락 끝 거리를 한 번에 계산 (12개 프로세스로 17초)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">고정한 기준을 검증 세트에 적용 (EXP-07의 잡기 기준)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">잡기</th><th class="n">따라할 수 있음</th><th class="n">사람 손 기준 확인</th><th>사람별</th></tr></thead>
+            <tbody>
+              <tr><td class="first">튜닝</td><td class="n">1,422</td><td class="n">54.4%</td><td class="n">89.5%</td><td>29~76%</td></tr>
+              <tr><td class="first">검증</td><td class="n">707</td><td class="n"><b>52.6%</b></td><td class="n">90.0%</td><td>P0001 30%, P0010 47%, P0012 73%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">모션캡처 손–물체 거리로 자른 평가 2 클립</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">튜닝</th><th class="n">검증</th></tr></thead>
+            <tbody>
+              <tr><td class="first">접촉 (손 단위)</td><td class="n">2,987</td><td class="n">1,858</td></tr>
+              <tr><td class="first">물체가 3cm 이상 움직임</td><td class="n">2,656</td><td class="n">1,750</td></tr>
+              <tr><td class="first">거기에 품질 검사 통과</td><td class="n">2,433</td><td class="n">1,449</td></tr>
+              <tr><td class="first">라벨 붙음 (접촉 프레임에 손 자세 있음)</td><td class="n">2,385</td><td class="n">1,426</td></tr>
+              <tr><td class="first">접촉 길이 중앙값</td><td class="n">2.2초</td><td class="n">2.2초</td></tr>
+              <tr><td class="first">클립 길이 중앙값 / p90</td><td class="n">4.2 / 9.7초</td><td class="n">4.2 / 8.9초</td></tr>
+              <tr><td class="first">접촉 대부분 동안 양손이 물체에</td><td class="n">29.5%</td><td class="n">33.5%</td></tr>
+              <tr><td class="first">따라할 수 있음</td><td class="n"><b>53.3%</b></td><td class="n"><b>51.7%</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">클립 40개 이상인 물체 중 가장 낮은 쪽은 파마산 캔 27%, 수프 캔 29%, 감자 으깨개 32%, 토마토소스 캔 33%, 우유팩 34%. 가장 높은 쪽은 무늬 머그 73%, 그릇 75%, 흰 머그 75%, 대나무 접시 77%, 공룡 장난감 79%.</p>
+
+      <figure>
+        <img src="assets/exp11_clips_timeline.png" loading="lazy" width="1440" height="624" alt="한 시퀀스에서 감자 으깨개와 양손 손가락 끝 거리, 그리고 잘린 클립과 라벨을 시간축에 그린 그림">
+        <figcaption>P0002_016222d1(튜닝). 위: 감자 으깨개에서 각 손의 두 번째로 가까운 손가락 끝까지의 거리. 점선 15mm 아래가 접촉. 아래: 이 시퀀스에서 잘린 모든 클립, "따라할 수 있음" 라벨로 색을 칠함.</figcaption>
+      </figure>
+
+      <p>같은 시퀀스 안에서 겹치는 클립은 하나의 SAM 요청으로 묶어 보낸다. SAM이 그 구간의 모든 손과 물체를 추적하고, 클립마다 자기 프레임만 꺼내 쓴다. 이렇게 하면 처리할 프레임이 절반 정도로 준다.</p>
+
+      <ul class="plain concl">
+        <li>평가 2의 클립 목록과 정답이 모션캡처만으로 준비됨. 튜닝 2,385개, 검증 1,426개, 두 세트 모두 52~53%가 "따라할 수 있음".</li>
+        <li>검증 세트 비율(잡기 기준 52.6%, 클립 기준 51.7%)이 튜닝과 비슷해서, 고정한 기준이 그대로 통함. 사람별 차이는 검증 세트에서도 큼(30~73%).</li>
+        <li>클립의 약 3분의 1은 양손 잡기. 라벨은 손 단위.</li>
+        <li>평가 2에 쓸 클립은 검증 1,426개 전부와 튜닝 무작위 400개(seed 20261026).</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -1298,7 +1376,7 @@ video:  에피소드 하나 전체, 10fps
       <li>카메라 보정 방향 확정. 보정값과 2D 박스는 원본 기준이고 영상에 쓸 때 시계 방향 90도 회전 (<a href="#exp-08">EXP-08</a>).</li>
       <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>).</li>
       <li>Allegro 로봇 손 기준 정답 라벨 기준 고정, 튜닝 54% (<a href="#exp-10">EXP-10</a>). 다음은 검증 세트 라벨 생성, 평가 2 클립 자르기, 무료로 계산되는 채점 항목(카메라 안정성, 리타게팅 복원성) 실행.</li>
-      <li>평가 2 클립을 모션캡처로 자름. 한 손의 손가락 끝 2개 이상이 물체 표면 15mm 안에 들어온 구간을 접촉으로 보고 앞뒤 1초를 붙임. 우리 접촉 검출 결과는 쓰지 않음(자르기 오류가 점수 검증에 섞이지 않게). 물체가 3cm 이상 움직이고 품질 검사 90% 이상인 클립은 튜닝 2,433개, 검증 1,449개. 클립 길이 중앙값 4.2초, 양손이 함께 닿은 경우 30% 안팎.</li>
+      <li>평가 2 클립과 검증 세트 라벨 완성. 모션캡처 손–물체 거리로 잘라 튜닝 2,385개, 검증 1,426개, 두 세트 모두 52~53%가 "따라할 수 있음" (<a href="#exp-11">EXP-11</a>).</li>
     </ul>
   </section>
 
@@ -1387,7 +1465,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 19:45 KST
+    마지막 갱신 2026-10-27 20:01 KST
     <p class="demo-link"><a href="demo.html">15초 데모 보기 →</a></p>
   </footer>
 
@@ -1441,7 +1519,7 @@ video:  에피소드 하나 전체, 10fps
       ]
     },
     {
-      title: "HOT3D 정답 라벨링", from: 5, to: 6, status: "doing",
+      title: "HOT3D 정답 라벨링", from: 5, to: 6, status: "done",
       req: [
         "모캡 손을 Allegro 로봇 손으로 옮겨 구간마다 재현 가능 여부 판정",
         "튜닝 세트의 재현 가능 비율 20~80%",
@@ -1454,8 +1532,8 @@ video:  에피소드 하나 전체, 10fps
         ["done", "정답 있는 136개 시퀀스 영상 수집"],
         ["done", "Allegro 로봇 손으로 옮긴 손가락 끝과 물체 표면 거리 기준 설정"],
         ["done", "재현 가능 비율 점검 후 기준 고정 (튜닝 54%)"],
-        ["doing", "검증 세트에 같은 기준으로 라벨 생성"],
-        ["doing", "평가 2 클립 자르기 (튜닝 2,433, 검증 1,449)"]
+        ["done", "검증 세트에 같은 기준으로 라벨 생성 (52.6%)"],
+        ["done", "평가 2 클립 자르기와 라벨 (튜닝 2,385, 검증 1,426)"]
       ]
     },
     {

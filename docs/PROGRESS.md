@@ -124,6 +124,13 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - 물체별 26% (캔) ~ 94% (플라스크), 사람별 29% ~ 76%. held-out 사람의 비율은 다를 수 있다 (AUC는 영향 없음).
 - dex-retargeting 함정: `robot.link_names`에는 관절 프레임도 섞여 있다. `get_link_index`는 BODY로만 찾으므로 관절 이름을 넣으면 잘못된 id로 segfault가 난다. BODY 프레임만 쓴다.
 
+## 숫자 2 클립과 held-out 라벨 (EXP-11, $0)
+
+- 고정 기준으로 held-out EXP-07 잡기 707개 중 52.6% copyable (튜닝 54.4%). 사람별 P0001 30%, P0010 47%, P0012 73%.
+- 클립: 손별로 손가락 끝 2개 이상이 물체 표면 15 mm 이내면 접촉, 0.5초 이하 끊김은 합치고 0.3초 이상만, 앞뒤 1초 붙임, 물체 3 cm 이상 이동 + QA 90% 이상. 튜닝 2,385개, held-out 1,426개 (라벨 있는 것), copyable 53.3% / 51.7%. 약 3분의 1은 양손.
+- `out/hot3d_clips/clips_labeled.csv`가 숫자 2의 클립 목록 + 정답이다.
+- SAM 비용 다시 계산: held-out 전부 + 튜닝 400개, 겹치는 클립을 한 요청으로 합치면 $17.76 + $8.82 = 약 $27. Muse는 클립마다 약 $0.024라 전부면 약 $44, held-out 절반이면 약 $27.
+
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
 1. OpenGraph 영상은 AV1이다. OpenCV는 못 읽는다. 항상 `data/episodes_720p`의 H.264를 쓴다.
@@ -148,7 +155,7 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 1. Day 3~4 (진행 중, 위 "접촉 자르기" 절): OpenGraph 접촉 자르기 (SAM 10fps `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
    - 2D 겹침만으로는 접촉 전에도 76~100% 프레임이 붙어 보인다. 동반 이동이 필수다 (EXP-02, 03).
    - 촉각 독립 정답은 임계값 800(80 택셀 합)으로 만든다. 0으로 하면 에피소드 63~71이 틀린다 (EXP-04).
-2. copyable 라벨 완료 (EXP-10): 기준 near 1.5 cm, deep 1 cm, 손목 이동 2 cm 이내로 고정, 튜닝 54.4%. 다음 무료 작업: 같은 기준으로 held-out 라벨 계산 (`hot3d_copyable.py run --split held_out`), 숫자 2 클립 자르기, 로컬 채점 항목(카메라 안정성, MediaPipe 리타게팅) 계산.
+2. copyable 라벨 (EXP-10), held-out 라벨과 숫자 2 클립 (EXP-11) 완료. 클립 목록과 라벨은 `out/hot3d_clips/clips_labeled.csv`. 다음 무료 작업: 로컬 채점 항목(카메라 안정성, MediaPipe 리타게팅, 동작 완결성)을 클립에 계산, 숫자 1 Muse 경계 확인 코드 준비, 뷰어 뼈대.
 3. (완료, 136개 sha1 통과) 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
 
 ## 미해결
