@@ -420,6 +420,7 @@
             <tr><td class="first"><a href="#exp-04">EXP-04</a></td><td class="wrap-ok">API 없이 데이터 점검</td><td>라벨은 촉각 임계값 800에서 일치. 머리 IMU로 카메라 흔들림 측정 가능.</td></tr>
             <tr><td class="first"><a href="#exp-05">EXP-05</a></td><td class="wrap-ok">입력 30fps 대 10fps</td><td>손과 잡는 물체 마스크가 같음. 10fps로 결정.</td></tr>
             <tr><td class="first"><a href="#exp-06">EXP-06</a></td><td class="wrap-ok">접촉 구간 검출 파일럿</td><td>에피소드 전체에서 손 추적 유지. 경계 F1 0.18(±5)로 마스크만으로는 부족, Muse Spark 경계 확인 필요.</td></tr>
+            <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 평가 2는 검증 713개 전부와 튜닝 400개를 사용.</td></tr>
           </tbody>
         </table>
       </div>
@@ -511,7 +512,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -959,6 +960,81 @@ video:  에피소드 하나 전체, 10fps
         <li>두 임계값을 채점한 것과 같은 확률에서 골랐기 때문에 위 수치는 약간 낙관적임.</li>
       </ul>
     </article>
+
+    <!-- EXP-07 -->
+    <article class="exp" id="exp-07">
+      <div class="exp-h"><span class="id">EXP-07</span><span class="t">HOT3D 잡기 클립 수</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 2는 HOT3D의 잡기 장면을 클립으로 잘라 SAM 3.1과 Muse Spark에 넣는다. 시퀀스 전체를 넣지 않고 잡기 주변만 넣으려면, 클립이 몇 개이고 얼마나 긴가.</dd>
+        <dt>입력</dt><dd>정답이 있는 HOT3D Aria 136개 시퀀스(튜닝 85, 검증 51, RGB 480,375 프레임)의 모션캡처. 영상은 쓰지 않음.</dd>
+        <dt>방법</dt><dd>HOT3D의 물체는 손이 옮길 때만 움직인다. 물체가 움직인 구간 하나를 잡기 한 번으로 보고 앞뒤 1초를 붙여 클립으로 만든다. API 호출 없음.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">잡기 구간을 찾는 규칙 (30fps)</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>속도 = 0.2초 동안의 위치 변화. 가만히 있는 물체는 약 0.0003 m/s, 들고 가는 물체는 0.2~1 m/s. 0.03 m/s를 넘으면 움직임</li>
+            <li>0.5초보다 가깝게 떨어진 움직임은 하나로 합침</li>
+            <li>0.3초보다 짧거나, 시작점에서 3cm도 못 간 움직임은 버림</li>
+            <li>클립 = 움직임 + 앞 1초(손 뻗기) + 뒤 1초(놓기)</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">클립마다 확인한 것</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>모션캡처 손목이 물체에서 25cm 안으로 들어오는가</li>
+            <li>클립 프레임의 90% 이상이 데이터셋 품질 검사를 통과하는가</li>
+            <li>이 집계는 클립 수를 가늠하기 위한 것. 평가 2의 실제 클립은 손과 물체 사이 거리로 다시 자름</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">모션캡처로 센 잡기 클립</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">튜닝</th><th class="n">검증</th><th class="n">전체</th></tr></thead>
+            <tbody>
+              <tr><td class="first">시퀀스</td><td class="n">85</td><td class="n">51</td><td class="n">136</td></tr>
+              <tr><td class="first">잡기 구간 (물체 이동)</td><td class="n">1,709</td><td class="n">915</td><td class="n">2,624</td></tr>
+              <tr><td class="first">손목 25cm 이내</td><td class="n">1,581</td><td class="n">871</td><td class="n">2,452</td></tr>
+              <tr><td class="first">손목 조건 + 품질 검사 통과</td><td class="n">1,439</td><td class="n">713</td><td class="n">2,152</td></tr>
+              <tr><td class="first">움직임 길이 중앙값</td><td class="n">2.3초</td><td class="n">3.5초</td><td class="n">2.7초</td></tr>
+              <tr><td class="first">클립 길이 중앙값 / p90</td><td class="n">4.3 / 10.3초</td><td class="n">5.5 / 11.7초</td><td class="n">4.6 / 10.9초</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp07_hot3d_clips.png" loading="lazy" width="1320" height="432" alt="왼쪽은 HOT3D 잡기 클립 길이 분포, 오른쪽은 시퀀스당 클립 수 분포">
+        <figcaption>왼쪽: 클립 길이. 53%가 5초보다 짧다. 점선은 SAM 요청 최소 길이(10fps로 50프레임). 오른쪽: 시퀀스당 클립 수. 쓸 만한 클립이 하나도 없는 시퀀스가 2개.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">SAM에 보낼 방식별 요청 수와 프레임 수 (프롬프트 2개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>방식</th><th class="n">요청</th><th class="n">처리 프레임</th></tr></thead>
+            <tbody>
+              <tr><td class="first">136개 시퀀스 전체, 30fps</td><td class="n">272</td><td class="n">960,750</td></tr>
+              <tr><td class="first">클립마다 요청, 30fps</td><td class="n">4,304</td><td class="n">766,080</td></tr>
+              <tr><td class="first">클립마다 요청, 10fps</td><td class="n">4,304</td><td class="n">293,156</td></tr>
+              <tr><td class="first">겹치는 클립을 합쳐서, 10fps</td><td class="n">1,452</td><td class="n">220,812</td></tr>
+              <tr><td class="first">검증 713개 전부 + 튜닝 무작위 400개, 10fps</td><td class="n">2,226</td><td class="n">158,070</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ul class="plain concl">
+        <li>HOT3D에서 쓸 만한 잡기 클립은 약 2,150개, 길이 중앙값 4.6초.</li>
+        <li>움직인 물체의 93%에 손목이 25cm 안으로 들어옴. 물체 움직임만으로도 잡기를 잘 찾아냄.</li>
+        <li>튜닝 클립을 전부 쓸 필요는 없음. 점수는 입력 7개짜리 로지스틱 회귀라 튜닝 클립 수백 개면 충분하고, AUC와 신뢰구간은 검증 클립에서 나옴.</li>
+        <li>결정: 검증 클립 713개 전부와 튜닝 클립 무작위 400개(seed 20261026), 모두 1,113개를 사용.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -997,31 +1073,10 @@ video:  에피소드 하나 전체, 10fps
     </div>
     <p class="note">파일럿에서 마스크만으로는 ±5프레임 경계가 나오지 않았다. Muse Spark 경계 확인과 Muse Spark 단독 비교군은 튜닝 전체 결과를 본 뒤 진행한다.</p>
 
-    <h3>다음 단계 준비: HOT3D 잡기 클립</h3>
-    <p>평가 2에 쓸 HOT3D 클립이 몇 개 나오는지 모션캡처만으로 미리 셌다. HOT3D에서는 손이 옮길 때만 물체가 움직이므로, 물체가 움직인 구간 하나를 잡기 한 번으로 보고 앞뒤 1초를 붙여 클립으로 잡았다. 실제 평가 2 클립은 손과 물체 사이 거리로 다시 자른다.</p>
-    <div class="tbl">
-      <p class="cap">모션캡처로 센 잡기 클립</p>
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th></th><th class="n">튜닝</th><th class="n">검증</th><th class="n">전체</th></tr></thead>
-          <tbody>
-            <tr><td class="first">시퀀스</td><td class="n">85</td><td class="n">51</td><td class="n">136</td></tr>
-            <tr><td class="first">물체가 움직인 구간</td><td class="n">1,709</td><td class="n">915</td><td class="n">2,624</td></tr>
-            <tr><td class="first">그중 손목이 25cm 안에 온 것</td><td class="n">1,581</td><td class="n">871</td><td class="n">2,452</td></tr>
-            <tr><td class="first">거기에 데이터셋 품질 검사 90% 이상 통과</td><td class="n">1,439</td><td class="n">713</td><td class="n">2,152</td></tr>
-            <tr><td class="first">클립 길이 중앙값 (p90)</td><td class="n">4.3초 (10.3초)</td><td class="n">5.5초 (11.7초)</td><td class="n">4.6초 (10.9초)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <figure>
-      <img src="assets/exp07_hot3d_clips.png" loading="lazy" width="1320" height="432" alt="왼쪽은 HOT3D 잡기 클립 길이 분포, 오른쪽은 시퀀스당 클립 수 분포">
-      <figcaption>왼쪽: 클립 길이 분포. 점선은 SAM 요청 최소 길이(10fps로 50프레임, 5초). 오른쪽: 시퀀스당 클립 수, 튜닝과 검증.</figcaption>
-    </figure>
+    <h3>HOT3D 준비</h3>
     <ul class="plain">
-      <li>쓸 수 있는 잡기 클립은 2,152개. 가장 많이 잡힌 물체는 흰 머그(164), 퍼즐 장난감(127), 커피포트(126), 휴대폰(123).</li>
-      <li>절반 이상이 5초보다 짧아 SAM 요청 최소 길이에 못 미침. 같은 시퀀스 안에서 가까운 클립을 묶으면 726개 구간이 됨.</li>
-      <li>정답이 있는 136개 시퀀스의 HOT3D 영상을 받는 중. 106개 완료.</li>
+      <li>모션캡처로 센 잡기 클립 2,152개 중 검증 713개 전부와 튜닝 무작위 400개를 평가 2에 쓰기로 함 (<a href="#exp-07">EXP-07</a>).</li>
+      <li>정답이 있는 136개 시퀀스의 HOT3D 영상을 모두 받음.</li>
     </ul>
   </section>
 
@@ -1110,7 +1165,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 18:34 KST
+    마지막 갱신 2026-10-27 18:36 KST
   </footer>
 
 </main>
@@ -1267,8 +1322,8 @@ video:  에피소드 하나 전체, 10fps
       chk: [
         ["todo", "카메라 보정 기준 방향 확인"],
         ["todo", "HOT3D 툴킷, MANO 손 모델 준비"],
-        ["done", "모션캡처로 잡기 클립 수 집계 (2,152개)"],
-        ["doing", "정답 있는 136개 시퀀스 영상 수집 (106개 완료)"],
+        ["done", "모션캡처로 잡기 클립 수 집계 (2,152개), 사용할 1,113개 결정"],
+        ["done", "정답 있는 136개 시퀀스 영상 수집"],
         ["todo", "손가락 끝과 물체 표면 거리 기준 설정"],
         ["todo", "재현 가능 비율 점검 후 기준 고정"]
       ]
