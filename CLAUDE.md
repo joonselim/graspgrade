@@ -50,7 +50,8 @@ Windows 사본을 WSL로 동기화:
 | `scripts/mediapipe_check.py` | 장갑 손 MediaPipe 검출률 측정 |
 | `scripts/hot3d_download.py` | HOT3D 서명 URL로 다운로드 + sha1 검증 |
 | `scripts/make_splits.py` | 튜닝 / held-out 분할 생성 (seed 20261026) |
-| `scripts/meta_smoke.py` | Meta API 스모크 테스트 (Muse Spark 이미지 1장, SAM 3.1 5초 클립). 크레딧 사용 |
+| `scripts/meta_smoke.py` | Meta API 스모크 테스트 (Muse Spark 이미지 1장, SAM 3.1 5초 클립). `--step 3`이면 10fps 클립. 크레딧 사용 |
 | `scripts/sam_prompt_compare.py` | 같은 클립에서 SAM 물체 프롬프트별 검출, id 안정성, 손과의 겹침 비교 (API 호출 없음) |
+| `scripts/sam_fps_compare.py` | 같은 클립의 SAM 10fps 결과와 30fps 결과 비교, 그림 저장 (API 호출 없음) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

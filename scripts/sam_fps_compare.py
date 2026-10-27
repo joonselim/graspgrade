@@ -179,13 +179,13 @@ def main():
     for ax, name in zip(axes, CLIPS):
         for p, ls in [("hand", "-"), ("small object", "--")]:
             for row in curves[(name, p)]:
-                if "iou_by_frame" not in row:
-                    continue
+                if row.get("frames_10fps") != N10 or "iou_by_frame" not in row:
+                    continue  # short side tracks are in the JSON, lines across their gaps mislead
                 ks = sorted(row["iou_by_frame"])
                 ax.plot([STEP * k for k in ks], [row["iou_by_frame"][k] for k in ks], ls, marker=".",
                         label=f"{p} id {row['id_10fps']}")
         ax.axvline(CLIPS[name][2], color="grey", lw=1, ls=":")
-        ax.set_title(f"{name}: 10 fps mask vs 30 fps mask, same frame")
+        ax.set_title(f"{name}: 10 fps mask vs 30 fps mask, same frame, full-clip tracks")
         ax.set_xlabel("frame (30 fps index), dotted line = tactile contact")
         ax.set_ylim(0, 1.02)
         ax.grid(alpha=0.3)

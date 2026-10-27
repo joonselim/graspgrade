@@ -4,8 +4,8 @@
 
 ## 한 줄 상태
 
-Day 1~2 목표가 전부 끝났다. Meta API 스모크 테스트, SAM 물체 프롬프트 비교(작은 용기, 스프레이병), API 없는 데이터 점검까지 마쳤다. 쓴 크레딧은 약 $0.34다.
-SAM 물체 프롬프트는 `small object`로 정했다. 다음은 Day 3~4의 OpenGraph 접촉 자르기다.
+Day 1~2 목표가 전부 끝났다. Meta API 스모크 테스트, SAM 물체 프롬프트 비교(작은 용기, 스프레이병), API 없는 데이터 점검, SAM 10fps 비교까지 마쳤다. 쓴 크레딧은 약 $0.38이다.
+SAM 물체 프롬프트는 `small object`, SAM 입력은 10fps(3프레임마다 1장)로 정했다. 다음은 Day 3~4의 OpenGraph 접촉 자르기다.
 
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
 git 저장소는 `~/graspgrade`에 init만 했고 커밋은 0개다.
@@ -70,6 +70,14 @@ SAM 3.1 응답 형식 (브리프 1-5와 일치):
 - 스프레이병 클립(ep53 프레임 136~285)에서도 `small object`가 병을 150프레임 전부 잡았다. 마스크는 `spray bottle`과 같고, 배경 물체 1개(66프레임)를 더 잡았다. `handheld object`는 0. 상세는 EXP-03.
 - 도구: `scripts/sam_prompt_compare.py`, 결과 `out/meta_smoke/prompt_compare.json`, 오버레이 `out/meta_smoke/compare_*.jpg`.
 
+### SAM 10fps 비교 (EXP-05, $0.04)
+
+같은 두 클립을 3프레임마다 1장(50프레임)으로 보내 30fps 결과의 같은 프레임과 비교했다.
+- 손 2개와 잡은 물체는 두 클립 모두 50프레임 전부 같은 id, 마스크 IoU 평균 0.97~0.99.
+- 손에 약 3초 가려졌다 다시 나온 물체(ep1 두 번째 용기)는 30fps에선 원래 id, 10fps에선 새 id를 받았다. 접촉은 손과 같이 움직이는 물체만 보므로 영향 없다.
+- 스트림 시간 2~3배 빠름, 원문 출력 1/3. 접촉 신호의 시간 간격은 3프레임(0.1초)이므로 경계는 30fps 프레임으로 다시 본다.
+- 도구: `meta_smoke.py --step 3`, `scripts/sam_fps_compare.py`, 결과 `out/meta_smoke/fps10/fps_compare.json`.
+
 `.env` 문제: MODEL_API_KEY 줄이 `MODEL_API_KEY=MODEL_API_KEY=...`로 이름이 두 번 들어가 있어 401이 났다. 중복된 부분을 지워 고쳤다(Windows와 WSL 둘 다).
 
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
@@ -93,12 +101,11 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 
 ## 다음 할 일 (순서대로)
 
-1. 10fps 테스트 (유료, 승인 필요): 같은 5초 클립을 10fps로 보내 추적과 경계가 유지되는지 확인한다. 유지되면 OpenGraph 전체 SAM 비용이 프롬프트당 $27.7에서 $9.2로 준다 (EXP-04).
-2. Day 3~4: OpenGraph 접촉 자르기 (SAM `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
+1. Day 3~4: OpenGraph 접촉 자르기 (SAM 10fps `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
    - 2D 겹침만으로는 접촉 전에도 76~100% 프레임이 붙어 보인다. 동반 이동이 필수다 (EXP-02, 03).
    - 촉각 독립 정답은 임계값 800(80 택셀 합)으로 만든다. 0으로 하면 에피소드 63~71이 틀린다 (EXP-04).
-3. Day 5 첫 작업: HOT3D 카메라 보정 방향 확인 (아래 미해결 1). 그다음 copyable 라벨 쏠림 확인 (브리프 8-1).
-4. 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
+2. Day 5 첫 작업: HOT3D 카메라 보정 방향 확인 (아래 미해결 1). 그다음 copyable 라벨 쏠림 확인 (브리프 8-1).
+3. 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
 
 ## 미해결
 
