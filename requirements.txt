@@ -1,0 +1,11 @@
+# Pinned for a reason. See docs/ENVIRONMENT.md before changing anything here.
+# torch is installed separately from the CPU index URL (see scripts/setup_wsl.sh).
+mediapipe==0.10.21
+dex_retargeting>=0.4,<0.5
+numpy==1.26.4
+pandas<3
+pyarrow<20
+opencv-python
+scikit-learn
+openai
+huggingface_hub
