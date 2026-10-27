@@ -84,26 +84,41 @@ def wrist_frame(kp):
 
 
 class Allegro:
-    def __init__(self, side, scale):
+    def __init__(self, side, scale, kind="vector"):
         from dex_retargeting.constants import HandType, RetargetingType, RobotName, get_default_config_path
         from dex_retargeting.retargeting_config import RetargetingConfig
         RetargetingConfig.set_default_urdf_dir(str(DEX / "assets" / "robots" / "hands"))
-        path = get_default_config_path(RobotName.allegro, RetargetingType.vector,
-                                       HandType.right if side == "right" else HandType.left)
-        self.ret = RetargetingConfig.load_from_file(path, override={"low_pass_alpha": 1.0,
-                                                                   "scaling_factor": float(scale)}).build()
+        hand = HandType.right if side == "right" else HandType.left
+        self.kind = kind
+        if kind == "position":
+            # offline config: fingertips and finger bases matched in position, free 6-DoF hand base
+            path = get_default_config_path(RobotName.allegro, RetargetingType.position, hand)
+            override = {"low_pass_alpha": 1.0}
+        else:
+            path = get_default_config_path(RobotName.allegro, RetargetingType.vector, hand)
+            override = {"low_pass_alpha": 1.0, "scaling_factor": float(scale)}
+        self.ret = RetargetingConfig.load_from_file(path, override=override).build()
         opt = self.ret.optimizer
         self.robot = opt.robot
-        self.idx = opt.target_link_human_indices
-        self.task_links = list(opt.task_link_names)
+        if kind == "position":
+            self.idx = np.asarray(opt.target_link_human_indices)
+            self.task_links = list(opt.body_names)
+            human_index_of_link = dict(zip(self.task_links, self.idx))
+        else:
+            self.idx = opt.target_link_human_indices
+            self.task_links = list(opt.task_link_names)
+            human_index_of_link = dict(zip(self.task_links, self.idx[1]))
         import pinocchio as pin
-        # BODY frames only: get_link_index looks names up as BODY, a joint frame name gives an invalid id
-        self.links = [f.name for f in self.robot.model.frames if f.type == pin.FrameType.BODY]
+        # BODY frames only: get_link_index looks names up as BODY, a joint frame name gives an invalid id.
+        # The dummy links of the free base are not part of the hand.
+        self.links = [f.name for f in self.robot.model.frames
+                      if f.type == pin.FrameType.BODY and not f.name.startswith("dummy")]
         self.link_idx = [self.robot.get_link_index(n) for n in self.links]
-        human_index_of_link = dict(zip(self.task_links, self.idx[1]))
         # thumb tip is human index 4, the other fingertips 8, 12, 16
         self.thumb = self.links.index(next(n for n, h in human_index_of_link.items() if h == 4))
-        self.others = [self.links.index(n) for n, h in human_index_of_link.items() if h != 4]
+        self.others = [self.links.index(n) for n, h in human_index_of_link.items() if h in (8, 12, 16)]
+        self.others_human = [h for n, h in human_index_of_link.items() if h in (8, 12, 16)]
+        self.wrist = self.links.index("wrist")
         self.side, self.scale = side, scale
 
     def index_length(self):
@@ -113,17 +128,27 @@ class Allegro:
         return float(np.linalg.norm(p[link] - p["wrist"]))
 
     def fit(self, kp_world):
-        """Retarget one frame. Returns all link points in the world (m) and the vector error."""
+        """Retarget one frame. Returns all link points in the world (m) and the retargeting error:
+        vector kind, median relative vector error; position kind, median position error in m."""
         w = kp_world[0]
         kp = kp_world - w
         M = wrist_frame(kp) @ OP2MANO[self.side]
         joint_pos = kp @ M
-        ref = joint_pos[self.idx[1]] - joint_pos[self.idx[0]]
         self.ret.reset()
+        if self.kind == "position":
+            ref = joint_pos[self.idx]
+            qpos = self.ret.retarget(ref)
+            self.robot.compute_forward_kinematics(qpos)
+            pb = np.array([self.robot.get_link_pose(i)[:3, 3] for i in self.link_idx])
+            got = np.array([pb[self.links.index(t)] for t in self.task_links])
+            err = float(np.median(np.linalg.norm(got - ref, axis=1)))
+            # the free base already places the hand, the points are in the wrist frame of the input
+            return w + pb @ M.T, err
+        ref = joint_pos[self.idx[1]] - joint_pos[self.idx[0]]
         qpos = self.ret.retarget(ref)
         self.robot.compute_forward_kinematics(qpos)
         pb = np.array([self.robot.get_link_pose(i)[:3, 3] for i in self.link_idx])
-        wb = self.robot.get_link_pose(self.robot.get_link_index("wrist"))[:3, 3]
+        wb = pb[self.wrist]
         got = np.array([pb[self.links.index(t)] - wb for t in self.task_links])
         err = float(np.median(np.linalg.norm(got - ref * self.scale, axis=1) / np.linalg.norm(ref * self.scale, axis=1)))
         return w + (pb - wb) @ M.T, err
@@ -143,9 +168,11 @@ class Surface:
         return d * np.where(s == 0, 1, s)
 
 
-def run(split_name, source="events"):
+def run(split_name, source="events", method="ratio"):
     """source "events": EXP-07 object moves, contact frame = middle of the move, hand = closest.
-    source "clips": hot3d_clips.py clips, contact frame and hand given by the clip."""
+    source "clips": hot3d_clips.py clips, contact frame and hand given by the clip.
+    method "ratio": vector retargeting scaled by Allegro length / person length (EXP-10),
+    "scale1": vector retargeting, scale 1.0, "position": position retargeting with a free base (EXP-15)."""
     split = json.loads((ROOT / "splits" / "hot3d_aria.json").read_text())
     seqs = set(split[split_name])
     if source == "events":
@@ -159,6 +186,8 @@ def run(split_name, source="events"):
         ev["frame"] = ev.contact_frame
         ev["hand_given"] = ev.hand.map({v: k for k, v in SIDE.items()})
     tag = split_name if source == "events" else f"{split_name}_clips"
+    if method != "ratio":
+        tag = f"{tag}_{method}"
     OUT.mkdir(parents=True, exist_ok=True)
     rows, sd_store = [], []
     surfaces = {}
@@ -201,8 +230,11 @@ def run(split_name, source="events"):
             hid, kp, human_sd = best
             side = SIDE[hid]
             if (side, seq) not in hands:
-                a = Allegro(side, 1.0)
-                hands[(side, seq)] = Allegro(side, a.index_length() / human_len)
+                if method == "ratio":
+                    a = Allegro(side, 1.0)
+                    hands[(side, seq)] = Allegro(side, a.index_length() / human_len)
+                else:
+                    hands[(side, seq)] = Allegro(side, 1.0, kind="position" if method == "position" else "vector")
             robot = hands[(side, seq)]
             pts, err = robot.fit(kp)
             p_obj = to_obj(pts)
@@ -210,10 +242,16 @@ def run(split_name, source="events"):
             shifts = (T_ow[:3, :3] @ GRID.T).T
             sd = surf.signed((p_obj[None, :, :] + shifts[:, None, :]).reshape(-1, 3)).reshape(len(GRID), len(pts))
             tips = sd[:, [robot.thumb] + robot.others]
+            # fidelity: Allegro fingertip to the matching human fingertip, and Allegro wrist to human wrist
+            fid = np.linalg.norm(pts[[robot.thumb] + robot.others] - kp[[4] + robot.others_human], axis=1)
             sd_store.append(np.c_[tips, sd.min(1)].astype(np.float32))
             rows.append({**({"clip_start": int(e.clip_start), "clip_frames": int(e.clip_frames)} if source == "clips" else {}),
                          "sequence": seq, "person": seq.split("_")[0], "object": e.object, "hand": side,
                          "frame": k, "scale": round(robot.scale, 3), "retarget_vector_error": round(err, 3),
+                         "human_hand_len_mm": round(1000 * human_len, 1),
+                         "tip_to_human_tip_mm_median": round(1000 * float(np.median(fid)), 1),
+                         "thumb_to_human_thumb_mm": round(1000 * float(fid[0]), 1),
+                         "wrist_to_human_wrist_mm": round(1000 * float(np.linalg.norm(pts[robot.wrist] - kp[0])), 1),
                          "human_thumb_sd_mm": round(1000 * human_sd[0], 1),
                          "human_closest_tip_mm": round(1000 * np.abs(human_sd).min(), 1),
                          "human_tips_within_15mm": int((np.abs(human_sd) < 0.015).sum())})
@@ -337,9 +375,10 @@ def main():
     ap.add_argument("cmd", choices=["run", "report", "figures"])
     ap.add_argument("--split", default="tune", choices=["tune", "held_out"])
     ap.add_argument("--source", default="events", choices=["events", "clips"])
+    ap.add_argument("--method", default="ratio", choices=["ratio", "scale1", "position"])
     a = ap.parse_args()
     if a.cmd == "run":
-        run(a.split, a.source)
+        run(a.split, a.source, a.method)
     else:
         {"report": report, "figures": figures}[a.cmd](a.split if a.source == "events" else f"{a.split}_clips")
 

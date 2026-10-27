@@ -105,6 +105,34 @@ comparison between arms, and we report ±5 frames as it comes out.
 - EXP-07 (2,152 object moves) was only for pricing. It is not used for any
   reported number.
 
+### Label method check (written 2026-10-27, before computing)
+
+Feedback on EXP-10 showed that the current label may measure a retargeting
+side effect. With wrist-to-fingertip vectors scaled by the hand size ratio,
+Allegro fingertips float about 25 mm off cans that the person holds firmly.
+The copyable share per person also falls as the scale factor rises
+(r = -0.78 over 9 people). Three label methods are compared on tuning clips
+only, with the EXP-10 thresholds unchanged (near 1.5 cm, deep 1 cm, wrist
+shift up to 2 cm):
+
+1. vector retargeting, scale = Allegro length / person length (current),
+2. vector retargeting, scale 1.0,
+3. position retargeting: Allegro fingertips and finger bases are fitted to
+   the human positions, with a free hand base.
+
+How we choose, fixed before looking at the results:
+
+- Fidelity: on clips where the human grasp is solid (thumb and one more
+  human fingertip within 15 mm of the surface), the median distance from each
+  Allegro fingertip to the matching human fingertip. Lower is better.
+- Hand size: the rank correlation between the hand length of the person and
+  the label, inside each object (weighted mean). It should be near 0.
+- The copyable share must stay between 20% and 80%.
+- Rule: among methods with an absolute hand size correlation of 0.1 or less
+  and a share inside the band, take the one with the best fidelity. If none
+  passes, we report that and revisit the definition.
+- Copyable share per object is reported, but it is not used to choose.
+
 ### Final clip sets
 
 | Use | Clips | Copyable |
