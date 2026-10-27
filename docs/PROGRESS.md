@@ -4,7 +4,8 @@
 
 ## 한 줄 상태
 
-Meta API 호출 직전까지 끝났다. Meta API는 아직 한 번도 호출하지 않았다.
+Day 1~2 목표가 전부 끝났다. Meta API 스모크 테스트와 SAM 물체 프롬프트 비교까지 마쳤고, 쓴 크레딧은 약 $0.19다.
+다음은 Day 3~4의 OpenGraph 접촉 자르기다.
 git 저장소는 `~/graspgrade`에 init만 했고 커밋은 0개다.
 
 ## 끝난 것
@@ -20,8 +21,54 @@ git 저장소는 `~/graspgrade`에 init만 했고 커밋은 0개다.
 | MediaPipe 검출률 | 8 에피소드 평균 82.3%, 배경에 따라 14%~100% | `out/mediapipe_check/summary.json` |
 | HOT3D | 198 시퀀스 전부 ground_truth + hand_data, 물체 3D 모델, 영상은 P0001_10a27bf7 1개 | `data/hot3d` (7.3 GB) |
 | 분할 고정 | OpenGraph 50/22, HOT3D 사람 6/3 | `splits/*.json` |
+| Meta API 스모크 테스트 | Muse Spark 6.0초 $0.0049, SAM 3.1 150프레임 25.6초 $0.03, 응답 파싱 성공 | `scripts/meta_smoke.py`, `out/meta_smoke/report.json` |
 
-브리프 1-7 설치 확인 순서 기준: 1, 2, 5번 완료. 3, 4번(Meta API)은 대기. 6번(HOT3D 좌표 정렬)은 미완.
+브리프 1-7 설치 확인 순서 기준: 1~5번 완료. 6번(HOT3D 좌표 정렬)은 미완.
+
+## Meta API 측정 (2026-10-27)
+
+입력: 에피소드 1(튜닝 split) 프레임 270~419, 720p H.264 5초(407 KB). 오른손이 프레임 321에 매트에 닿는다(촉각 라벨). 이미지는 프레임 330.
+
+| | Muse Spark (`muse-spark-1.3`, `reasoning_effort="low"`) | SAM 3.1 (`sam-3.1`, 프롬프트 `"hand"`) |
+| --- | --- | --- |
+| 시간 | 6.0초 | 업로드 3.2초 + 첫 프레임 3.0초 + 스트림 끝까지 22.4초 (약 6.7 프레임/초) |
+| 사용량 | 입력 1,261 토큰(720p 이미지 약 1,100), 출력 780 토큰 중 reasoning 714 | `video_frames_processed: 150`, 토큰 0 |
+| 비용 | $0.0049 (reasoning을 출력 단가로 계산) | $0.03 ($0.20 / 1,000 프레임) |
+| 결과 | 오른손 접촉 true, 왼손 false, 물체 "mat". 촉각 라벨과 일치 | 150프레임 전부 손 2개(id 0 왼손, id 1 오른손), id가 5초 동안 유지됨 |
+
+SAM 3.1 응답 형식 (브리프 1-5와 일치):
+- 프레임마다 `response.output_text.delta` 이벤트 1개, 마지막에 `response.completed`.
+- 한 줄 = `<Nf>` + `id<|box;x1;y1;x2;y2;w;h|><|mask;x;y;data=H,W,~payload|>` 반복. 좌표는 원본 픽셀(720p).
+- 마스크는 박스 크기의 박스 내부 래스터. `~` = lossless(기본), `!` = one_bit(`metadata.mask_encoding`으로 지정, 더 작음).
+- 파싱은 Meta 공식 `meta-sam-parser`(0.1.0, 순수 파이썬)로 한다. `parse_responses_stream` + `video_segmentation_format`, 마스크는 `decode_mask_to_raster`(행 우선 0/1 바이트).
+- 원문 출력은 150프레임에 2.28 MB(프레임당 약 15 KB). OpenGraph 전체면 약 2 GB.
+- 검증 오버레이에서 박스와 마스크가 두 손에 맞게 붙는 것을 눈으로 확인했다. 오른손 마스크는 장갑 손가락 부분만 덮고 손목 센서 박스는 빼먹었다.
+
+예산 추정 (측정 단가 기준):
+- SAM 3.1, OpenGraph 전체 138,629 프레임 x 프롬프트 1개 = 약 $27.7. 물체 프롬프트를 더하면 약 $55.
+- Muse Spark 경계 확인: 접촉 구간 261개 → 경계 522개. 경계당 7프레임이면 호출당 약 $0.015로 약 $8.
+- HOT3D 정답 시퀀스 전체(480,375 프레임)를 SAM에 넣으면 프롬프트당 약 $96. 크레딧 $150 안에 못 들어가므로 숫자 2용 클립 구간만 넣어야 한다.
+- 속도: 순차로는 에피소드당 약 5분. 분당 3,000 요청 제한이므로 병렬로 돌린다.
+
+### SAM 물체 프롬프트 비교 (같은 5초 클립)
+
+클립 속 물체는 매트 위의 작은 둥근 용기 2개이고, 오른손이 그중 하나를 집는다. 프롬프트마다 150프레임이 과금됐다(빈 결과도 $0.03). 합계 $0.15.
+
+| 프롬프트 | 물체 잡은 프레임 | 프레임당 물체 | id (프레임 수) | 손을 물체로 잡음 |
+| --- | --- | --- | --- | --- |
+| `object` | 0% | 0 | | |
+| `held object` | 0% | 0 | | |
+| `item` | 0% | 0 | | |
+| `small object` | 100% | 1.45 | 0 (150), 1 (56), 2 (11) | 0% |
+| `round container` (기준용 구체 이름) | 100% | 1.37 | 0 (150), 1 (56) | 0% |
+
+- `small object`는 구체 이름과 거의 같은 결과를 냈다. 추가된 id 2는 프레임 7~17에 오른손 손목 근처에 생긴 작은 오검출(12x24 px)이다.
+- `object`, `item` 같은 너무 일반적인 단어는 아무것도 잡지 못한다.
+- 2D 겹침만으로는 접촉을 구분하지 못했다. 오른손 마스크와 물체 마스크의 간격이 3px 이하인 프레임이 촉각 접촉 전(클립 0~50)에도 97~100%였다. 1인칭 시점에서 손이 물체 위를 가리기 때문이다. 접촉 신호에는 브리프의 "동반 이동"(손과 물체가 같이 움직이는지)이 꼭 필요하다.
+- `small object`가 큰 물체(예: 스프레이병)도 잡는지는 확인하지 않았다.
+- 도구: `scripts/sam_prompt_compare.py`, 결과 `out/meta_smoke/prompt_compare.json`, 오버레이 `out/meta_smoke/compare_*.jpg`.
+
+`.env` 문제: MODEL_API_KEY 줄이 `MODEL_API_KEY=MODEL_API_KEY=...`로 이름이 두 번 들어가 있어 401이 났다. 중복된 부분을 지워 고쳤다(Windows와 WSL 둘 다).
 
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
@@ -44,13 +91,7 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 
 ## 다음 할 일 (순서대로)
 
-1. **Meta API 스모크 테스트 (사용자 승인 필요)**
-   - Muse Spark: chat completions, `muse-spark-1.3`, 이미지 1장, `reasoning_effort="low"` (`"none"`은 400 에러).
-   - SAM 3.1: Files API로 짧은 mp4 업로드(`purpose="user_data"`), responses API `sam-3.1`, 텍스트 프롬프트 `"hand"`, `stream=True`.
-   - 클라이언트: `OpenAI(base_url="https://api.meta.ai/v1", api_key=MODEL_API_KEY)`.
-   - 입력 후보: 튜닝 split의 `data/episodes_720p` 에피소드 일부를 몇 초로 자른 것.
-   - 확인할 것: 실제 응답 형식(브리프 1-5의 `<Nf>` 박스/마스크 형식과 대조), 토큰/비용, 걸린 시간.
-   - 결과를 바탕으로 에피소드 1개 전체 비용과 시간을 추정한다 (Day 1~2 목표).
+1. SAM 물체 프롬프트 확정: 1차 후보는 `small object`다. 다른 물체(특히 스프레이병 에피소드)의 5초 클립에서 `small object`와 `handheld object` 같은 대안을 확인한다(클립당 약 $0.03). 크레딧이 드니 사용자 승인 후 진행.
 2. Day 3~4: OpenGraph 접촉 자르기 (SAM 박스 겹침 → 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
 3. Day 5 첫 작업: HOT3D 카메라 보정 방향 확인 (아래 미해결 1). 그다음 copyable 라벨 쏠림 확인 (브리프 8-1).
 4. 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).

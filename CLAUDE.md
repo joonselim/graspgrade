@@ -49,3 +49,5 @@ Windows 사본을 WSL로 동기화:
 | `scripts/mediapipe_check.py` | 장갑 손 MediaPipe 검출률 측정 |
 | `scripts/hot3d_download.py` | HOT3D 서명 URL로 다운로드 + sha1 검증 |
 | `scripts/make_splits.py` | 튜닝 / held-out 분할 생성 (seed 20261026) |
+| `scripts/meta_smoke.py` | Meta API 스모크 테스트 (Muse Spark 이미지 1장, SAM 3.1 5초 클립). 크레딧 사용 |
+| `scripts/sam_prompt_compare.py` | 같은 클립에서 SAM 물체 프롬프트별 검출, id 안정성, 손과의 겹침 비교 (API 호출 없음) |
