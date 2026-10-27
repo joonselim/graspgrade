@@ -382,7 +382,7 @@
       <li>측정 계획을 지원서의 비교 구조로 다시 맞춤. 평가 1은 촉각 장갑을 정답으로 세 방법을 비교하고, 평가 2는 검증 클립 1,426개에서 우리 점수를 Muse Spark 단독과 비교함. 유료 호출은 지금 보류 중.</li>
       <li>평가 1의 방법 B(SAM 규칙) 코드 완성. 파일럿에서 접촉 구간 IoU는 0.75로 "항상 접촉"보다 낫지만, 연이은 접촉을 하나로 묶어 경계를 잘 못 찾음.</li>
       <li>평가 2 클립 완성. 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
-      <li>평가 2 정답 라벨은 보류. 손 크기 비율로 늘린 리타게팅이 Allegro 손가락 끝을 사람 손가락 끝에서 31mm 떨어뜨려, 라벨이 로봇 손보다 리타게팅의 부작용을 잼. 손가락 끝을 충실하게 옮기면 94~96%가 "따라할 수 있음"이라 잡기를 가르지 못함. 미리 정한 기준을 통과한 방식이 없어 정의를 다시 세움. 이 라벨 위의 항목 점검(물체 기준선, 손 모양 항목)도 보류.</li>
+      <li>평가 2 정답 라벨을 다시 만듦. 처음 라벨은 손 크기 비율로 늘린 리타게팅 탓에 Allegro 손가락 끝이 사람 손가락 끝에서 31mm 떨어져, 로봇 손보다 리타게팅의 부작용을 쟀음. 새 라벨 v2는 손가락 위치를 맞춘 뒤 메쉬 충돌과 접촉점 도달을 검사함. 튜닝 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(+0.04). 다만 허용 깊이에 민감함(2mm 18%, 10mm 66%).</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
     </ul>
 
@@ -430,13 +430,13 @@
           <thead><tr><th>비교</th><th>이유</th></tr></thead>
           <tbody>
             <tr><td class="first">우리 점수 대 Muse Spark 단독</td><td>체크리스트 없이 같은 질문을 받은 Muse Spark와의 비교. 지원서의 주 비교</td></tr>
-            <tr><td class="first">물체 기준선</td><td>튜닝 클립에서 잰 물체별 "따라할 수 있음" 비율만으로 예측. 물체 종류만으로 얼마나 맞히는지 보여주는 참고값</td></tr>
+            <tr><td class="first">물체 기준선</td><td>튜닝 클립에서 잰 물체별 "따라할 수 있음" 비율만으로 예측. 물체 종류만으로 얼마나 맞히는지 보여주는 참고값(v2 라벨에서 물체별 1~96%)</td></tr>
             <tr><td class="first">Muse Spark 대 Muse Spark + 7개 항목</td><td>GraspGrade가 기존 필터를 대체하지 않고 그 위에 더하는 구조인지 확인</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음". EXP-10 정의는 리타게팅 부작용을 주로 재서 보류했다(EXP-15). 새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 실패해도 기준값은 옮기지 않는다. 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
+    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음". EXP-10 정의는 리타게팅 부작용을 주로 재서 보류했다(EXP-15). 새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 튜닝에서 47%, +0.04로 받아들여짐(EXP-16). 깊이 한도별 곡선을 항상 같이 보고한다. 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
   </section>
 
   <section>
@@ -455,12 +455,13 @@
             <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 규모 가늠용이고 실제 클립 세트는 EXP-11.</td></tr>
             <tr><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
-            <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. EXP-15에서 이 라벨이 리타게팅 부작용을 주로 잰다고 확인돼 보류.</td></tr>
+            <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. EXP-15에서 이 라벨이 리타게팅 부작용을 주로 잰다고 확인돼 v2로 교체.</td></tr>
             <tr><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
             <tr><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">무료 채점 항목의 신호와 물체 기준선</td><td>무료 항목 3개는 측정은 정확하지만 "따라할 수 있음" 예측력 없음(AUC 0.49~0.53). 물체만으로 0.70.</td></tr>
             <tr><td class="first"><a href="#exp-13">EXP-13</a></td><td class="wrap-ok">손 모양으로 바꾼 리타게팅 항목</td><td>영상 손 모양 0.63, 물체와 합치면 0.72(물체만 0.69). 리타게팅 항목을 "손 모양 적합도"로 교체.</td></tr>
             <tr><td class="first"><a href="#exp-14">EXP-14</a></td><td class="wrap-ok">방법 B(SAM 규칙) 파일럿</td><td>코드는 완성. IoU 0.75로 "항상 접촉"(0.67)보다 낫지만 연이은 접촉을 묶어 경계를 52개만 찾음.</td></tr>
-            <tr><td class="first"><a href="#exp-15">EXP-15</a></td><td class="wrap-ok">정답 라벨 방식 점검</td><td>EXP-10 라벨은 주로 리타게팅 부작용을 잼(손가락 끝 31mm 어긋남). 충실하게 옮기면 94~96%가 "따라할 수 있음". 미리 정한 기준을 통과한 방식 없음. 라벨 보류.</td></tr>
+            <tr><td class="first"><a href="#exp-15">EXP-15</a></td><td class="wrap-ok">정답 라벨 방식 점검</td><td>EXP-10 라벨은 주로 리타게팅 부작용을 잼(손가락 끝 31mm 어긋남). 충실하게 옮기면 94~96%가 "따라할 수 있음". 미리 정한 기준을 통과한 방식 없음. v2로 교체(EXP-16).</td></tr>
+            <tr><td class="first"><a href="#exp-16">EXP-16</a></td><td class="wrap-ok">정답 라벨 v2 (메쉬 충돌, 접촉점 도달)</td><td>미리 정한 규칙 통과: 47%가 "따라할 수 있음", 손 크기 상관 +0.04. 실패는 주로 충돌(25.5%)과 도달(10.9%). 깊이 한도에 민감함.</td></tr>
           </tbody>
         </table>
       </div>
@@ -487,9 +488,9 @@
               <td>튜닝 50개 결과로 다시 확인</td>
             </tr>
             <tr>
-              <td class="first">평가 2 정답 라벨의 방식</td>
-              <td>세 방식 모두 미리 정한 기준 실패(EXP-15). 지금 방식은 손가락 끝이 31mm 어긋나고 손 크기에 따라 달라짐. 충실한 방식은 94~96%가 "따라할 수 있음". 충돌을 링크 원점 약 20개에서만 검사해 손가락 몸통과 손바닥이 물체를 파고드는 것을 놓침</td>
-              <td>위치 맞춤 리타게팅 + 실제 링크 메쉬로 충돌 검사 + 사람 접촉점 도달 검사. 기준을 먼저 측정 계획에 적고 튜닝에서만 고름</td>
+              <td class="first">v2 라벨의 깊이 민감도</td>
+              <td>허용 깊이 5mm는 모션캡처와 모델 오차 크기. 2mm면 18%, 10mm면 66%로 비율이 크게 달라짐. 아령 10%, 보온병 14%처럼 이유가 덜 분명한 물체도 있음 (EXP-16)</td>
+              <td>기준값은 계산 전에 고정했으므로 옮기지 않음. 깊이·도달별 표를 결과와 항상 같이 보고. 낮은 물체는 그림으로 확인</td>
             </tr>
             <tr>
               <td class="first">방법 B가 연이은 접촉을 묶음</td>
@@ -522,8 +523,8 @@
           <tbody>
             <tr>
               <td class="first">평가 2 정답 쏠림</td>
-              <td>다시 나타남. EXP-10의 54%는 리타게팅 왜곡에서 나온 값이고, 손가락 끝을 충실하게 옮기면 94~96%가 "따라할 수 있음" (EXP-15)</td>
-              <td>링크 메쉬 충돌과 접촉점 도달로 규칙을 다시 정의. 비율 20~80%와 손 크기 상관 0 근처를 튜닝에서 확인</td>
+              <td>처음 라벨의 54%는 리타게팅 왜곡에서 나온 값이었음(EXP-15). v2 라벨은 튜닝 47%, 손 크기 상관 +0.04로 통과했지만 허용 깊이에 민감함 (EXP-16)</td>
+              <td>v2 기준값 고정. 깊이·도달별 곡선을 함께 보고. 검증 라벨은 같은 기준값으로 냄</td>
             </tr>
             <tr>
               <td class="first">검증 세트 라벨 비율</td>
@@ -532,8 +533,8 @@
             </tr>
             <tr>
               <td class="first">평가 2 주 비교</td>
-              <td>물체 종류만으로 많이 맞힐 수 있으면 Muse Spark가 물체를 알아보는 것만으로 주 비교에서 이길 수 있음. 이전 라벨에서 잰 물체 기준선과 손 모양 항목 수치는 보류 (EXP-15)</td>
-              <td>새 라벨에서 물체 기준선과 손 모양 항목을 다시 잼. 보완재 비교(Muse Spark 단독 대 Muse Spark + 우리 항목)를 주 비교 옆에 보고</td>
+              <td>v2 라벨도 물체마다 1~96%로 크게 달라, Muse Spark가 물체를 알아보는 것만으로 주 비교에서 이길 수 있음. 이전 라벨에서 잰 물체 기준선과 손 모양 항목 수치는 다시 재야 함</td>
+              <td>v2 라벨로 물체 기준선과 손 모양 항목을 다시 잼. 보완재 비교(Muse Spark 단독 대 Muse Spark + 우리 항목)를 주 비교 옆에 보고</td>
             </tr>
             <tr>
               <td class="first">동반 이동 신호 품질</td>
@@ -567,7 +568,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -1245,7 +1246,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-10 -->
     <article class="exp" id="exp-10">
       <div class="exp-h"><span class="id">EXP-10</span><span class="t">로봇 재현 정답 라벨과 쏠림 점검</span><span class="d">10/27</span></div>
-      <p class="note">보류: 이 라벨은 주로 리타게팅의 부작용을 잰다(<a href="#exp-15">EXP-15</a>). 손 크기 비율로 늘린 리타게팅이 Allegro 손가락 끝을 사람 손가락 끝에서 31mm, 꽉 쥔 캔 표면에서 25mm 떨어뜨리고, 라벨이 손 크기에 따라 달라진다. 아래 54%가 쏠림 점검을 통과한 것도 이 왜곡 때문이다. 기록으로 남겨 둔다.</p>
+      <p class="note">이전 라벨: 이 라벨은 주로 리타게팅의 부작용을 잰다(<a href="#exp-15">EXP-15</a>). 손 크기 비율로 늘린 리타게팅이 Allegro 손가락 끝을 사람 손가락 끝에서 31mm, 꽉 쥔 캔 표면에서 25mm 떨어뜨리고, 라벨이 손 크기에 따라 달라진다. 아래 54%가 쏠림 점검을 통과한 것도 이 왜곡 때문이다. 평가 2의 정답은 v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 기록으로 남겨 둔다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>평가 2의 정답은 "로봇 손이 이 사람의 잡기를 따라할 수 있는가"이다. 가장 큰 위험은 라벨 쏠림이었다. Allegro 로봇 손이 사람 손보다 커서, 기준이 엄격하면 거의 전부 불가, 느슨하면 거의 전부 가능이 될 수 있다. 계획은 튜닝 세트에서 가능 비율이 20~80% 안에 들어올 것을 요구한다.</dd>
         <dt>입력</dt><dd>튜닝 85개 시퀀스의 잡기 1,422개(EXP-07, 접촉 프레임에 손 자세가 있는 것). 접촉 프레임은 물체 움직임의 한가운데.</dd>
@@ -1352,7 +1353,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-11 -->
     <article class="exp" id="exp-11">
       <div class="exp-h"><span class="id">EXP-11</span><span class="t">평가 2 클립과 검증 세트 라벨</span><span class="d">10/27</span></div>
-      <p class="note">보류: 이 실험이 쓴 정답 라벨(EXP-10)이 리타게팅 부작용을 주로 재는 것으로 확인돼(<a href="#exp-15">EXP-15</a>) 아래 "따라할 수 있음" 비율는 라벨을 고칠 때까지 보류한다. 클립 자체는 유효하다.</p>
+      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 "따라할 수 있음" 비율은 이전 라벨 기준이다. 클립 자체는 그대로 쓰고, 검증 클립의 v2 라벨은 아직 내지 않았다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>튜닝 세트에서 고정한 기준(EXP-10)으로 검증 세트에서도 "따라할 수 있음" 비율이 비슷하게 나오는가. 그리고 계획대로 우리 영상 파이프라인이 아니라 모션캡처 손–물체 거리로 평가 2 클립을 자르면 어떤 클립과 라벨이 나오는가.</dd>
         <dt>입력</dt><dd>정답이 있는 HOT3D 136개 시퀀스 전체, 30fps RGB 프레임 전부.</dd>
@@ -1430,7 +1431,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-12 -->
     <article class="exp" id="exp-12">
       <div class="exp-h"><span class="id">EXP-12</span><span class="t">무료 채점 항목의 신호와 물체 기준선</span><span class="d">10/27</span></div>
-      <p class="note">보류: 이 실험이 쓴 정답 라벨(EXP-10)이 리타게팅 부작용을 주로 재는 것으로 확인돼(<a href="#exp-15">EXP-15</a>) 아래 물체 기준선 수치와 항목별 AUC는 라벨을 고칠 때까지 보류한다.</p>
+      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 물체 기준선과 항목별 AUC는 이전 라벨 기준이고, v2 라벨로 다시 잰다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>평가 2의 주 비교는 우리 점수 대 체크리스트 없이 같은 질문을 받은 Muse Spark다. "따라할 수 있음" 비율이 물체마다 26~94%로 달라서, 물체만 알아봐도 꽤 맞힐 수 있다. 크레딧을 쓰기 전에, 유료 호출 없이 계산되는 채점 항목 3개에 신호가 있는지, 물체만으로는 얼마나 맞히는지 본다.</dd>
         <dt>입력</dt><dd>EXP-11의 튜닝 클립 2,385개(53.3%가 "따라할 수 있음"). 검증 클립은 보지 않음.</dd>
@@ -1512,7 +1513,7 @@ video:  에피소드 하나 전체, 10fps
     <!-- EXP-13 -->
     <article class="exp" id="exp-13">
       <div class="exp-h"><span class="id">EXP-13</span><span class="t">손 모양으로 바꾼 리타게팅 항목</span><span class="d">10/27</span></div>
-      <p class="note">보류: 이 실험이 쓴 정답 라벨(EXP-10)이 리타게팅 부작용을 주로 재는 것으로 확인돼(<a href="#exp-15">EXP-15</a>) 아래 AUC 수치는 라벨을 고칠 때까지 보류한다. 항목을 손 모양 적합도로 바꾼다는 결정은 새 라벨에서 다시 확인한다.</p>
+      <p class="note">이전 라벨: 이 실험은 EXP-10 라벨을 썼다. 이 라벨은 리타게팅 부작용을 주로 재서(<a href="#exp-15">EXP-15</a>) v2 라벨로 바뀌었다(<a href="#exp-16">EXP-16</a>). 아래 AUC는 이전 라벨 기준이고, v2 라벨로 다시 잰다. 항목을 손 모양 적합도로 바꾼다는 결정도 그때 다시 확인한다.</p>
       <dl class="spec">
         <dt>질문</dt><dd>EXP-12의 무료 항목은 영상은 잘 재지만 "따라할 수 있음"을 가르지 못했다. 지원서는 리타게팅 항목을 "손 모양이 로봇 손에 맞는가"라고 적었다. 영상에서 얻은 손 모양이 "따라할 수 있음"을 예측하는가, 물체 기준선 위에 무언가를 더하는가.</dd>
         <dt>입력</dt><dd>튜닝 클립 2,385개 중 접촉 동안 MediaPipe가 그 손을 한 번도 찾지 못한 54개를 뺀 2,331개(53.4%가 "따라할 수 있음"). 검증 클립은 쓰지 않음.</dd>
@@ -1730,6 +1731,130 @@ video:  에피소드 하나 전체, 10fps
         <li>다음 정의 후보(계산 전에 측정 계획에 고정): 위치 맞춤 리타게팅, 실제 Allegro 링크 메쉬로 충돌 검사(손가락이나 손바닥 표면이 deep보다 깊이 들어가면 불가), 물체에 닿은 사람 손가락마다 대응하는 Allegro 손가락 끝이 사람 접촉점 근처에 닿는지 확인. 그다음 같은 기준(손 크기 상관 0 근처, 비율 20~80%)으로 튜닝에서만 고름.</li>
       </ul>
     </article>
+
+    <!-- EXP-16 -->
+    <article class="exp" id="exp-16">
+      <div class="exp-h"><span class="id">EXP-16</span><span class="t">정답 라벨 v2: 메쉬 충돌과 접촉점 도달</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>EXP-15에서 EXP-10 라벨은 리타게팅 부작용을 주로 쟀고, 충실하게 옮기면 거의 모든 잡기가 "따라할 수 있음"이 됐다. 충돌을 링크 원점에서만 검사했기 때문이다. 더 엄격하고 물리적인 정의로 쓸 수 있는 라벨이 나오는가.</dd>
+        <dt>입력</dt><dd>튜닝 클립 2,385개(EXP-11), 클립마다 접촉 프레임 한 장과 그 클립의 손. 검증 클립은 쓰지 않음.</dd>
+        <dt>방법</dt><dd>정의, 기준값, 받아들이는 규칙을 계산 전에 측정 계획에 적음. 위치 맞춤 리타게팅으로 Allegro 손가락 끝과 뿌리를 사람 손에 맞추고(손 받침은 자유), 링크 21개마다 시각 메쉬에서 약 300점을 뽑아 순운동학으로 놓음. 손을 최대 2cm(1cm 격자) 옮겨 보며 세 조건을 모두 만족하는 위치가 하나라도 있으면 "따라할 수 있음".</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">세 조건</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>잡기: Allegro 엄지 끝과 다른 손가락 끝 하나가 물체 표면 1.5cm 안</li>
+            <li>도달: 물체에 닿은(끝이 15mm 안) 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2.0cm 안. 새끼손가락은 대응 손가락이 없어 보지 않음</li>
+            <li>충돌 없음: Allegro 메쉬 점이 물체 안 5mm보다 깊이 들어가지 않음</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">기준값의 근거와 받아들이는 규칙</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>1.5cm: EXP-09부터 쓴 사람 접촉 거리</li>
+            <li>2.0cm: Allegro 손가락 끝 폭 정도</li>
+            <li>5mm: 모션캡처와 모델 오차 크기(EXP-09에서 손가락 끝이 표면에서 약 2mm)</li>
+            <li>받아들임: 비율 20~80%, 같은 물체 안 손 길이와 라벨의 순위 상관 |r| ≤ 0.1. 실패해도 기준값은 옮기지 않음</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">받아들이는 규칙 (튜닝 클립 2,385개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>점검</th><th class="n">결과</th><th class="n">통과</th></tr></thead>
+            <tbody>
+              <tr><td class="first">따라할 수 있음 비율</td><td class="n"><b>47.0%</b></td><td class="n">예</td></tr>
+              <tr><td class="first">같은 물체 안 손 크기 상관</td><td class="n"><b>+0.04</b></td><td class="n">예</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">실패 원인: 어떤 손 위치로도 만족하지 못한 조건 (전체 클립 대비)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>조건</th><th class="n">비율</th></tr></thead>
+            <tbody>
+              <tr><td class="first">충돌 없음</td><td class="n">25.5%</td></tr>
+              <tr><td class="first">도달</td><td class="n">10.9%</td></tr>
+              <tr><td class="first">잡기</td><td class="n">3.9%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">손을 옮기지 않으면 가장 깊은 Allegro 메쉬 점은 물체 안 7.9mm(중앙값). Allegro 손가락 끝은 사람 손가락 끝에서 11.5mm, 자유로운 손 받침은 사람 손목에서 26mm(중앙값).</p>
+
+      <div class="tbl">
+        <p class="cap">사람별 "따라할 수 있음" 비율</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">P0002</th><th class="n">P0003</th><th class="n">P0009</th><th class="n">P0011</th><th class="n">P0014</th><th class="n">P0015</th></tr></thead>
+            <tbody>
+              <tr><td class="first">손 길이 (mm)</td><td class="n">196</td><td class="n">181</td><td class="n">211</td><td class="n">188</td><td class="n">187</td><td class="n">215</td></tr>
+              <tr><td class="first"><b>v2</b></td><td class="n"><b>48%</b></td><td class="n"><b>49%</b></td><td class="n"><b>45%</b></td><td class="n"><b>44%</b></td><td class="n"><b>45%</b></td><td class="n"><b>54%</b></td></tr>
+              <tr><td class="first">EXP-10 라벨</td><td class="n">29%</td><td class="n">33%</td><td class="n">74%</td><td class="n">45%</td><td class="n">40%</td><td class="n">56%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">물체별 비율 (클립 25개 이상)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>가장 낮은 물체</th><th class="n">비율</th><th>가장 높은 물체</th><th class="n">비율</th></tr></thead>
+            <tbody>
+              <tr><td class="first">키보드</td><td class="n">1%</td><td>검은 거치대</td><td class="n">96%</td></tr>
+              <tr><td class="first">오렌지주스 팩</td><td class="n">8%</td><td>회색 거치대</td><td class="n">91%</td></tr>
+              <tr><td class="first">5파운드 아령</td><td class="n">10%</td><td>바비큐 소스 병</td><td class="n">81%</td></tr>
+              <tr><td class="first">보온병</td><td class="n">14%</td><td>흰 머그</td><td class="n">78%</td></tr>
+              <tr><td class="first">공룡 장난감</td><td class="n">16%</td><td>화이트보드 마커</td><td class="n">74%</td></tr>
+              <tr><td class="first">우유팩</td><td class="n">19%</td><td>토마토소스 캔</td><td class="n">68%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">캔, 우유팩, 병을 합치면 49%(EXP-10 라벨은 31%).</p>
+
+      <div class="tbl">
+        <p class="cap">기준값을 바꾸면 (도달 \ 깊이)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">2mm</th><th class="n">5mm</th><th class="n">10mm</th></tr></thead>
+            <tbody>
+              <tr><td class="first">1cm</td><td class="n">2%</td><td class="n">5%</td><td class="n">8%</td></tr>
+              <tr><td class="first"><b>2cm</b></td><td class="n">18%</td><td class="n"><b>47%</b></td><td class="n">66%</td></tr>
+              <tr><td class="first">3cm</td><td class="n">29%</td><td class="n">62%</td><td class="n">80%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp16_copyable_v2.png" loading="lazy" width="1750" height="475" alt="기준값별 비율 곡선, 실패 원인 막대, 사람별 비율과 손 길이">
+        <div class="keys"><span class="key"><i class="ln" style="--c:#868e96"></i>도달 1cm</span><span class="key"><i class="ln" style="--c:#1c7ed6"></i>도달 2cm</span><span class="key"><i class="ln" style="--c:#2b8a3e"></i>도달 3cm</span><span class="key"><i class="dot" style="--c:#e8590c"></i>고정한 기준값</span><span class="key"><i style="--c:#fff3bf"></i>계획의 20~80% 범위</span><span class="key"><i style="--c:#c92a2a"></i>실패 원인</span><span class="key"><i class="dot" style="--c:#2b8a3e"></i>v2</span><span class="key"><i class="dot" style="--c:#868e96"></i>EXP-10 라벨</span></div>
+        <figcaption>왼쪽: 허용 깊이와 도달 거리에 따른 비율. 가운데: 어떤 손 위치로도 만족하지 못한 조건. 오른쪽: 튜닝 사람별 비율과 손 길이.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="assets/exp16_examples.jpg" loading="lazy" width="990" height="660" alt="결과별 튜닝 클립 두 개씩: 따라할 수 있음, 충돌, 도달 실패" style="max-width:720px">
+        <div class="keys"><span class="key"><i style="--c:#10cc10"></i>물체 모델</span><span class="key"><i class="dot light" style="--c:#ffffff"></i>사람 손 지점</span><span class="key"><i class="dot" style="--c:#ffa500"></i>Allegro 메쉬 점</span><span class="key"><i class="dot" style="--c:#ff0000"></i>물체 안 5mm보다 깊은 메쉬 점</span></div>
+        <figcaption>결과별 튜닝 클립 두 개씩. 왼쪽: 따라할 수 있음(지우개, 파마산 캔). 가운데: 충돌, 더 큰 Allegro 손가락이 키보드와 뒤집개 안으로 들어감. 오른쪽: 도달 실패, 넓은 그릇과 접시에서 Allegro 손이 사람처럼 손가락 끝을 벌려 놓지 못함.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>v2 라벨은 계산 전에 정한 규칙을 통과함. 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(물체 안 +0.04, 사람별 44~54%, EXP-10 라벨은 29~74%).</li>
+        <li>실패가 물리적으로 말이 됨. 더 큰 Allegro 손가락이 납작하거나 붐비는 물체(키보드, 뒤집개)에 부딪히고, 넓은 물체(그릇, 접시)는 사람처럼 감싸지 못함. 원통이 더는 "따라할 수 없음"으로 몰리지 않음. 아령 10%, 보온병 14%처럼 덜 분명한 것은 따로 볼 필요가 있음.</li>
+        <li>한계: 비율이 깊이 한도에 크게 좌우됨(2mm 18%, 10mm 66%). 5mm는 모션캡처와 모델 오차 크기라, 라벨은 부분적으로 "측정 오차 안에서 Allegro 손이 물체와 얼마나 겹치는가"임. 기준값은 계산 전에 고정했고 곡선을 함께 보고함.</li>
+        <li>한계: 도달 1cm면 거의 남지 않음. 맞춘 Allegro 손가락 끝이 사람 것에서 약 11mm 떨어져 있기 때문. 클립마다 한 프레임만 보고, 자유 받침이 손을 사람 손목에서 26mm 옮김. 안쪽·바깥쪽 부호는 가장 가까운 표면 점으로 정함.</li>
+        <li>다음(모두 무료): v2 라벨로 물체 기준선(EXP-12)과 손 모양 항목(EXP-13)을 튜닝에서 다시 계산하고, 같은 기준값으로 검증 클립의 v2 라벨을 냄.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -1773,8 +1898,9 @@ video:  에피소드 하나 전체, 10fps
       <li>카메라 보정 방향 확정. 보정값과 2D 박스는 원본 기준이고 영상에 쓸 때 시계 방향 90도 회전 (<a href="#exp-08">EXP-08</a>).</li>
       <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>).</li>
       <li>평가 2 클립 완성. 모션캡처 손–물체 거리로 잘라 튜닝 2,385개, 검증 1,426개 (<a href="#exp-11">EXP-11</a>).</li>
-      <li>정답 라벨 보류. 세 리타게팅 방식 모두 미리 정한 기준을 통과하지 못함. 지금 방식은 손가락 끝이 31mm 어긋나고, 충실한 방식은 94~96%가 "따라할 수 있음" (<a href="#exp-15">EXP-15</a>).</li>
-      <li>새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 실패해도 기준값은 옮기지 않는다. 튜닝 클립에 적용 중. 그 뒤 물체 기준선과 손 모양 항목(<a href="#exp-12">EXP-12</a>, <a href="#exp-13">EXP-13</a>)을 다시 잼.</li>
+      <li>처음 라벨은 리타게팅 부작용을 주로 재서 버림. 세 리타게팅 방식 모두 미리 정한 기준을 통과하지 못함 (<a href="#exp-15">EXP-15</a>).</li>
+      <li>정답 라벨 v2: 위치 맞춤 리타게팅, 메쉬 충돌, 접촉점 도달. 튜닝 47%가 "따라할 수 있음", 손 크기 상관 +0.04로 미리 정한 규칙 통과. 실패는 충돌 25.5%, 도달 10.9%, 잡기 3.9% (<a href="#exp-16">EXP-16</a>).</li>
+      <li>다음(모두 무료): v2 라벨로 물체 기준선(<a href="#exp-12">EXP-12</a>)과 손 모양 항목(<a href="#exp-13">EXP-13</a>)을 튜닝에서 다시 재고, 같은 기준값으로 검증 클립 라벨을 냄.</li>
     </ul>
   </section>
 
@@ -1863,7 +1989,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 22:23 KST
+    마지막 갱신 2026-10-27 22:27 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -1936,7 +2062,8 @@ video:  에피소드 하나 전체, 10fps
         ["done", "평가 2 클립 자르기 (튜닝 2,385, 검증 1,426)"],
         ["done", "라벨 방법 점검: 세 방식 모두 기준 실패, 라벨 보류 (EXP-15)"],
         ["done", "새 정의 고정: 위치 맞춤 + 링크 메쉬 충돌 + 접촉점 도달"],
-        ["doing", "새 정의로 튜닝·검증 라벨 다시 생성"]
+        ["done", "튜닝 v2 라벨: 47%, 손 크기 상관 +0.04로 통과 (EXP-16)"],
+        ["todo", "검증 클립 v2 라벨 (같은 기준값)"]
       ]
     },
     {
@@ -1949,7 +2076,7 @@ video:  에피소드 하나 전체, 10fps
       chk: [
         ["done", "유료 호출 없는 항목 3개의 단독 AUC 점검 (신호 없음, EXP-12)"],
         ["done", "리타게팅 항목을 손 모양 적합도로 교체 (EXP-13)"],
-        ["todo", "새 라벨로 물체 기준선과 손 모양 항목 다시 재기"],
+        ["todo", "v2 라벨로 물체 기준선과 손 모양 항목 다시 재기 (튜닝)"],
         ["todo", "Muse Spark 항목 2개와 Muse Spark 단독 (유료 호출 보류)"],
         ["todo", "분산 없는 항목 점검"],
         ["todo", "로지스틱 회귀 학습 (튜닝 400개)"],

@@ -178,6 +178,14 @@ Acceptance, fixed now:
 - If the main thresholds fail, the thresholds are not moved. We report the
   result and decide with the user how to change the number 2 question.
 
+Result (EXP-16): accepted. 47.0% copyable on 2,385 tuning clips, hand size
+correlation inside objects +0.04 (44% to 54% by person). Failures: collision
+25.5%, reach 10.9%, grip 3.9%. The share depends strongly on the depth
+limit (18% at 2 mm, 66% at 10 mm), which is reported with every result.
+The v2 label replaces the EXP-10 label for number 2. EXP-12 and EXP-13 are
+to be recomputed on it (tuning), then the held-out v2 labels are computed
+with the same fixed thresholds.
+
 ### Final clip sets
 
 | Use | Clips | Copyable |
