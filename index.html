@@ -337,7 +337,7 @@
         <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치함. 평가 1의 정답으로 그대로 사용 가능.</li>
         <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출함.</li>
         <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 쓰기로 함.</li>
-        <li>입력을 10fps로 낮춰도 손 추적이 유지됨을 두 에피소드에서 확인.</li>
+        <li>입력을 10fps로 낮춰도 손과 잡는 물체의 마스크가 30fps와 사실상 같음(IoU 0.97 이상). 처리 시간은 절반 이하.</li>
       </ul>
     </div>
 
@@ -469,25 +469,35 @@
     </ul>
 
     <h3>5.2 입력 프레임 수</h3>
-    <p>같은 5초 클립을 10fps(50프레임)로 낮춰 다시 넣었다.</p>
+    <p>같은 5초 클립을 10fps(50프레임)로 낮춰 다시 넣고, 같은 시점의 30fps 결과와 마스크를 프레임마다 비교했다.</p>
     <div class="tbl">
-      <p class="cap">표 5. 30fps와 10fps 비교</p>
+      <p class="cap">표 5. 10fps 결과와 30fps 결과의 일치도</p>
       <div class="wrap">
         <table class="min">
-          <thead><tr><th>에피소드 · 대상</th><th class="n">30fps</th><th class="n">10fps</th></tr></thead>
+          <thead><tr><th>에피소드 · 대상</th><th class="n">10fps 검출</th><th class="n">마스크 IoU 평균</th><th class="n">최소</th></tr></thead>
           <tbody>
-            <tr><td class="first">1 · 손</td><td class="n">150/150 프레임, id 2개</td><td class="n">50/50 프레임, id 2개</td></tr>
-            <tr><td class="first">1 · 물체</td><td class="n">100%, id 3개</td><td class="n">100%, id 4개</td></tr>
-            <tr><td class="first">53 · 손</td><td class="n">150/150 프레임, id 2개</td><td class="n">50/50 프레임, id 2개</td></tr>
-            <tr><td class="first">53 · 물체</td><td class="n">100%, id 2개</td><td class="n">100%, id 2개</td></tr>
-            <tr><td class="first">처리 시간 (손, 스트림)</td><td class="n">22.4초</td><td class="n">9.5초</td></tr>
+            <tr><td class="first">1 · 손 2개</td><td class="n">50 / 50</td><td class="n">0.99</td><td class="n">0.98</td></tr>
+            <tr><td class="first">1 · 잡는 물체</td><td class="n">50 / 50</td><td class="n">0.97</td><td class="n">0.94</td></tr>
+            <tr><td class="first">53 · 손 2개</td><td class="n">50 / 50</td><td class="n">0.98~0.99</td><td class="n">0.77</td></tr>
+            <tr><td class="first">53 · 잡는 물체</td><td class="n">50 / 50</td><td class="n">0.98</td><td class="n">0.97</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <figure style="margin-top:18px">
+      <img src="assets/exp05_ep53_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 53의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과를 나란히 놓은 그림">
+      <figcaption><span class="fn">그림 7.</span>에피소드 53, 같은 시점의 30fps(위)와 10fps(아래) 결과. 손(파랑)과 스프레이병(노랑) 마스크가 사실상 같다.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/exp05_mask_iou_by_frame.png" loading="lazy" width="1430" height="468" alt="두 에피소드에서 프레임별 마스크 IoU를 대상별로 그린 선 그래프">
+      <figcaption><span class="fn">그림 8.</span>프레임별 마스크 IoU (10fps 대 30fps). 손과 잡는 물체는 전 구간 0.95 안팎을 유지한다. 크게 떨어지는 선은 몇 프레임만 나타나는 보조 검출이다. 점선은 촉각 접촉 시점.</figcaption>
+    </figure>
+
     <ul class="plain">
-      <li>손 추적은 10fps에서도 유지됨. 접촉 구간 길이 중앙값이 246프레임(8.2초)이라 경계 손실 가능성은 낮음.</li>
-      <li>에피소드 1의 물체 id가 3개에서 4개로 늘어남. 물체 id 안정성은 추가 확인 필요.</li>
+      <li>손과 잡는 물체는 10fps에서도 30fps와 같은 마스크를 얻음. IoU 0.5 아래로 떨어진 프레임 없음.</li>
+      <li>에피소드 1에서 늘어난 물체 id는 4~14프레임만 나타나는 보조 검출. 30fps에서도 따로 잡히던 두 번째 용기와 손목 근처 오검출에 해당하며, 잡는 물체의 추적에는 영향 없음.</li>
+      <li>처리 시간은 손 기준 22.4초에서 9.5초로 줄어듦. 접촉 구간 길이 중앙값이 246프레임(8.2초)이라 경계를 놓칠 가능성은 낮음.</li>
     </ul>
 
     <h3>5.3 2D 겹침의 한계</h3>
@@ -511,7 +521,7 @@
   <section>
     <h2><span class="no">6</span>장갑 낀 손 검출</h2>
     <p>OpenGraph는 촉각 장갑을 낀 손이라 MediaPipe 손 관절 검출이 불안정하다. 8개 에피소드 19,363프레임에서 한 손 이상 검출된 비율은 다음과 같다.</p>
-    <p class="tbl cap" style="margin-bottom:6px">그림 7. 에피소드별 MediaPipe 검출률</p>
+    <p class="tbl cap" style="margin-bottom:6px">그림 9. 에피소드별 MediaPipe 검출률</p>
     <div class="chart" id="mpchart"></div>
     <ul class="plain">
       <li>평균 82.3%. 배경이 장갑과 비슷한 색일수록 낮음 (에피소드 48 스프레이병 14%, 에피소드 66 어두운 매트 100%).</li>
@@ -542,11 +552,6 @@
               <td class="first">왼손 접촉 시작 오차</td>
               <td>±5프레임 이내 79.6%</td>
               <td>허용 범위 확대 또는 손별 보고</td>
-            </tr>
-            <tr>
-              <td class="first">10fps 물체 id 안정성</td>
-              <td>에피소드 1에서 id 3 → 4개</td>
-              <td>추가 클립으로 확인 후 프레임 수 결정</td>
             </tr>
           </tbody>
         </table>
@@ -672,7 +677,7 @@
             <tr><td class="first">EXP-02</td><td>물체 프롬프트, 용기 클립</td><td>일반 프롬프트 중 <code>small object</code>만 동작. 2D 겹침으로는 접촉 구분 불가.</td></tr>
             <tr><td class="first">EXP-03</td><td>물체 프롬프트, 스프레이병 클립</td><td><code>small object</code>가 큰 물체도 전 프레임 검출. 물체 프롬프트로 채택.</td></tr>
             <tr><td class="first">EXP-04</td><td>OpenGraph 데이터 점검</td><td>라벨은 촉각 임계값 800에서 일치. 머리 IMU로 카메라 흔들림 측정 가능.</td></tr>
-            <tr><td class="first">진행 중</td><td>10fps 입력</td><td>손 추적 유지 확인. 물체 id 안정성 확인 중.</td></tr>
+            <tr><td class="first">EXP-05</td><td>입력 30fps 대 10fps</td><td>손과 잡는 물체 마스크 IoU 0.97 이상. 늘어난 id는 짧은 보조 검출.</td></tr>
           </tbody>
         </table>
       </div>
@@ -681,7 +686,7 @@
 
   <footer>
     자료: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta). 그림 1~5는 OpenGraph 영상에서 가져옴.<br>
-    마지막 갱신 2026-10-27 16:50 KST
+    마지막 갱신 2026-10-27 16:56 KST
   </footer>
 
 </main>
@@ -817,8 +822,7 @@
         "비교군 3종(Muse Spark 단독, SAM 규칙, SAM + Muse Spark) 대비 결과"
       ],
       chk: [
-        ["done", "10fps 입력 테스트 (손 추적 유지)"],
-        ["doing", "10fps 물체 id 안정성 확인"],
+        ["done", "10fps 입력 테스트 (30fps와 마스크 IoU 0.97 이상)"],
         ["todo", "전체 에피소드 SAM 분할 (손, 물체)"],
         ["todo", "겹침 + 동반 이동 기반 접촉 신호"],
         ["todo", "Muse Spark로 접촉 경계 확정"],
