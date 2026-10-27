@@ -15,5 +15,6 @@ Images are in `img/`. Raw outputs stay in `out/` (not committed).
 | [EXP-07](exp07_hot3d_clip_count.md) | 2026-10-27 | HOT3D grasp clip count and number 2 cost | $0 | 2,152 usable grasp clips (median 4.6 s) from mocap. SAM on all costs $59, so we keep all 713 held-out clips plus 400 tuning clips (about $32). |
 | [EXP-08](exp08_hot3d_calibration_orientation.md) | 2026-10-27 | HOT3D calibration orientation | $0 | Calibration and dataset 2D boxes are in raw Aria orientation. Preview video = raw turned 90 degrees clockwise, raw (u, v) to (1407 - v, u). Frame k = k-th RGB timestamp. |
 | [EXP-09](exp09_hot3d_fingertips_umetrack.md) | 2026-10-27 | Fingertips from UmeTrack, no MANO | $0 | Our forward kinematics puts 100% of landmarks inside the dataset hand boxes. Hand 0 = left (profile as is), hand 1 = right (x mirror). During grasps the closest fingertip is 2.3 mm from the object (median). |
+| [EXP-10](exp10_copyable_label_skew.md) | 2026-10-27 | Copyable labels (Allegro retargeting) and label skew | $0 | Chosen rule (near 1.5 cm, deep 1 cm, wrist shift up to 2 cm) gives 54% copyable on 1,422 tuning grasps. The share is set mostly by the near threshold. 26% to 94% by object. |
 
 Total Meta API spend so far: about $1.53 of $150.

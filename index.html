@@ -388,6 +388,7 @@
       <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치. 평가 1의 정답으로 그대로 사용 가능.</li>
       <li>SAM 3.1 설정 확정. 물체 프롬프트는 <code>small object</code>, 입력은 10fps. 10fps 결과는 30fps와 마스크 IoU 0.97 이상으로 같음.</li>
       <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
+      <li>평가 2 정답 라벨 완성. HOT3D 잡기를 Allegro 로봇 손으로 옮겨 판정하면 튜닝 세트 54%가 "따라할 수 있음". 가장 큰 위험이던 라벨 쏠림은 없음.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
     </ul>
 
@@ -424,6 +425,7 @@
             <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 평가 2는 검증 713개 전부와 튜닝 400개를 사용.</td></tr>
             <tr><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
+            <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. 계획한 20~80% 안이라 가장 큰 위험이었던 쏠림 해소.</td></tr>
           </tbody>
         </table>
       </div>
@@ -470,8 +472,13 @@
           <tbody>
             <tr>
               <td class="first">평가 2 정답 쏠림</td>
-              <td>Allegro 손이 사람 손보다 커서 기준에 따라 거의 전부 가능 또는 불가로 쏠릴 수 있음</td>
-              <td>손목 위치를 수 cm 범위에서 최적화한 뒤 판정. 튜닝 세트 가능 비율이 20~80% 밖이면 기준 재조정</td>
+              <td>해소됨. 손목 최대 2cm 이동, near 1.5cm 기준에서 튜닝 세트 54%가 "따라할 수 있음". 기준을 0.75~2.0cm로 바꿔도 20~80% 안 (EXP-10)</td>
+              <td>기준 고정. 기준별 곡선을 함께 보고</td>
+            </tr>
+            <tr>
+              <td class="first">검증 세트 라벨 비율</td>
+              <td>"따라할 수 있음" 비율이 사람별로 29~76%로 달라, 검증 3명의 비율은 튜닝과 다를 수 있음</td>
+              <td>AUC는 비율에 좌우되지 않음. 검증 세트 비율도 함께 보고</td>
             </tr>
             <tr>
               <td class="first">동반 이동 신호 품질</td>
@@ -505,7 +512,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -1177,6 +1184,112 @@ video:  에피소드 하나 전체, 10fps
         <li>다음: 이 지점들을 Allegro 로봇 손으로 옮겨 로봇 손가락 끝과 물체 표면을 잼. 이것으로 정답 라벨을 만들고 튜닝 세트에서 쏠림을 확인.</li>
       </ul>
     </article>
+
+    <!-- EXP-10 -->
+    <article class="exp" id="exp-10">
+      <div class="exp-h"><span class="id">EXP-10</span><span class="t">로봇 재현 정답 라벨과 쏠림 점검</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 2의 정답은 "로봇 손이 이 사람의 잡기를 따라할 수 있는가"이다. 가장 큰 위험은 라벨 쏠림이었다. Allegro 로봇 손이 사람 손보다 커서, 기준이 엄격하면 거의 전부 불가, 느슨하면 거의 전부 가능이 될 수 있다. 계획은 튜닝 세트에서 가능 비율이 20~80% 안에 들어올 것을 요구한다.</dd>
+        <dt>입력</dt><dd>튜닝 85개 시퀀스의 잡기 1,422개(EXP-07, 접촉 프레임에 손 자세가 있는 것). 접촉 프레임은 물체 움직임의 한가운데.</dd>
+        <dt>방법</dt><dd>물체에 더 가까운 손의 지점(EXP-09)을 Allegro 로봇 손으로 옮기고, 로봇 손가락 끝과 물체 표면 사이 거리로 판정. API 호출 없음.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">사람 손을 로봇 손으로 옮기는 방법</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>dex-retargeting의 Allegro 설정(왼손, 오른손 각각)으로 손목에서 손가락 끝까지의 벡터 4개를 맞춤</li>
+            <li>잡기마다 한 프레임만 보므로 평활 필터를 끄고 잡기마다 새로 풂</li>
+            <li>크기 비율 = Allegro 손목~검지 끝 길이(0.247m) / 그 사람의 길이. 중앙값 1.26</li>
+            <li>Allegro 손목을 사람 손목 자리에 같은 방향으로 놓고, 로봇 손의 모든 링크 점을 물체 좌표계로 옮김</li>
+            <li>목표 벡터와의 오차 중앙값 4.3%</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">"따라할 수 있음" 판정 규칙</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>물체 표면까지의 부호 거리: 3D 모델 표면 3만 점 중 가장 가까운 점 기준, 안쪽이면 음수</li>
+            <li>손목을 최대 R만큼(1cm 간격) 옮겨 보면서, 아래를 모두 만족하는 위치가 하나라도 있으면 가능</li>
+            <li>로봇 엄지 끝이 표면에서 near 이내</li>
+            <li>다른 로봇 손가락 끝 하나 이상도 near 이내</li>
+            <li>어떤 로봇 링크도 물체 안으로 deep보다 깊이 들어가지 않음</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">기준별 "따라할 수 있음" 비율 (튜닝, 잡기 1,422개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>near</th><th>deep</th><th class="n">손목 고정</th><th class="n">최대 2cm 이동</th><th class="n">최대 4cm 이동</th></tr></thead>
+            <tbody>
+              <tr><td class="first">1.0cm</td><td>1cm</td><td class="n">9.4%</td><td class="n">33.5%</td><td class="n">45.9%</td></tr>
+              <tr><td class="first">1.5cm</td><td>0.5cm</td><td class="n">19.7%</td><td class="n">53.3%</td><td class="n">66.8%</td></tr>
+              <tr><td class="first"><b>1.5cm</b></td><td><b>1cm</b></td><td class="n">20.7%</td><td class="n"><b>54.4%</b></td><td class="n">66.9%</td></tr>
+              <tr><td class="first">1.5cm</td><td>2cm</td><td class="n">21.6%</td><td class="n">55.2%</td><td class="n">67.1%</td></tr>
+              <tr><td class="first">2.0cm</td><td>1cm</td><td class="n">39.0%</td><td class="n">75.7%</td><td class="n">86.6%</td></tr>
+              <tr><td class="first">3.0cm</td><td>1cm</td><td class="n">69.1%</td><td class="n">94.4%</td><td class="n">97.4%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp10_copyable_rate.png" loading="lazy" width="845" height="494" alt="near 기준에 따른 따라할 수 있음 비율을 손목 이동 한계별로 그린 그래프" style="max-width:640px">
+        <figcaption>near 기준이 커질수록 올라가는 "따라할 수 있음" 비율, 손목 이동 한계 세 가지. 노란 띠가 계획의 20~80% 범위.</figcaption>
+      </figure>
+
+      <ul class="plain">
+        <li>비율은 거의 near 기준과 손목 이동 한계로 정해짐. deep 기준은 거의 영향이 없음. 손목을 고정했을 때 로봇 링크가 1cm보다 깊이 들어가는 잡기는 4.1%뿐.</li>
+        <li>손목 고정 상태에서 로봇 엄지 끝은 표면에서 중앙값 11mm, 가장 가까운 다른 손가락 끝은 19mm.</li>
+        <li>같은 프레임에서 사람 손 기준 규칙(엄지와 다른 손가락 하나가 15mm 이내)은 89.5%가 만족.</li>
+      </ul>
+
+      <h4>정한 기준</h4>
+      <p>near 1.5cm(EXP-09의 사람 손가락 기준과 같은 거리), deep 1cm, 손목 최대 2cm 이동. 이때 "따라할 수 있음"은 <b>54.4%</b>. 이 이동 한계에서는 near를 0.75cm부터 2.0cm까지 바꿔도 20~80% 범위 안에 있어서, 경계에 아슬아슬하게 걸친 값이 아니다. 이후로 이 기준은 고정한다.</p>
+
+      <div class="tbl">
+        <p class="cap">사람별 "따라할 수 있음" 비율 (정한 기준)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th></th><th class="n">P0002</th><th class="n">P0003</th><th class="n">P0009</th><th class="n">P0011</th><th class="n">P0014</th><th class="n">P0015</th></tr></thead>
+            <tbody>
+              <tr><td class="first">잡기 수</td><td class="n">147</td><td class="n">122</td><td class="n">427</td><td class="n">326</td><td class="n">147</td><td class="n">253</td></tr>
+              <tr><td class="first">따라할 수 있음</td><td class="n">29%</td><td class="n">38%</td><td class="n">76%</td><td class="n">48%</td><td class="n">35%</td><td class="n">60%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tbl">
+        <p class="cap">물체별 "따라할 수 있음" 비율 (잡기 25개 이상인 물체)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>낮은 쪽</th><th class="n">비율</th><th>높은 쪽</th><th class="n">비율</th></tr></thead>
+            <tbody>
+              <tr><td class="first">토마토소스 캔</td><td class="n">26%</td><td class="first">플라스크</td><td class="n">94%</td></tr>
+              <tr><td class="first">수프 캔</td><td class="n">27%</td><td class="first">그릇</td><td class="n">93%</td></tr>
+              <tr><td class="first">마우스</td><td class="n">28%</td><td class="first">화병</td><td class="n">84%</td></tr>
+              <tr><td class="first">랜치 소스 병</td><td class="n">31%</td><td class="first">대나무 접시</td><td class="n">82%</td></tr>
+              <tr><td class="first">감자 으깨개</td><td class="n">34%</td><td class="first">무늬 머그</td><td class="n">78%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">왼손 50%, 오른손 57%.</p>
+
+      <figure>
+        <img src="assets/exp10_examples.jpg" loading="lazy" width="1680" height="420" alt="튜닝 잡기 네 개에 물체 모델, 사람 손 지점, 로봇 손 링크를 그린 그림">
+        <figcaption>튜닝 잡기 네 개. 초록은 물체 모델, 흰 점은 사람 손 지점, 주황은 손목 이동 후 Allegro 링크, 빨강은 Allegro 손가락 끝. 왼쪽 둘은 따라할 수 있음(커피포트), 오른쪽 둘은 따라할 수 없음(보드 마커, 파마산 캔).</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>정답 라벨을 만드는 전 과정이 유료 호출 없이 돌아감: 모션캡처 손 → UmeTrack 지점 → Allegro 로봇 손 → 물체 모델까지의 부호 거리.</li>
+        <li>정한 기준에서 라벨 쏠림은 문제되지 않음. 튜닝 세트 54%가 "따라할 수 있음"이고, 기준을 넓게 바꿔도 20~80% 안에 머묾.</li>
+        <li>다만 비율은 대부분 near 기준이 정함. 라벨은 "로봇 손가락 끝이 얼마나 가까이 오는가"라는 연속값을 예/아니오로 자른 것이라, 하나의 수치가 아니라 기준별 곡선과 함께 보고함.</li>
+        <li>물체(26~94%)와 사람(29~76%)에 따라 크게 달라짐. 평가 2가 예측할 거리가 있다는 뜻이고, 검증 세트 사람들의 비율은 다를 수 있음. AUC는 비율에 좌우되지 않음.</li>
+        <li>한계: Allegro 점은 손가락 표면이 아니라 링크 위치임. 안쪽·바깥쪽 부호는 가장 가까운 표면 점의 법선으로 정해서 얇은 모서리에서 틀릴 수 있음. 잡기마다 한 프레임만 봄.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -1220,7 +1333,8 @@ video:  에피소드 하나 전체, 10fps
       <li>모션캡처로 센 잡기 클립 2,152개 중 검증 713개 전부와 튜닝 무작위 400개를 평가 2에 쓰기로 함 (<a href="#exp-07">EXP-07</a>).</li>
       <li>정답이 있는 136개 시퀀스의 HOT3D 영상을 모두 받음.</li>
       <li>카메라 보정 방향 확정. 보정값과 2D 박스는 원본 기준이고 영상에 쓸 때 시계 방향 90도 회전 (<a href="#exp-08">EXP-08</a>).</li>
-      <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>). 다음은 Allegro 로봇 손으로 옮겨 정답 라벨 만들기.</li>
+      <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>).</li>
+      <li>Allegro 로봇 손 기준 정답 라벨 기준 고정, 튜닝 54% (<a href="#exp-10">EXP-10</a>). 다음은 검증 세트 라벨 생성, 평가 2 클립 자르기, 무료로 계산되는 채점 항목(카메라 안정성, 리타게팅 복원성) 실행.</li>
     </ul>
   </section>
 
@@ -1309,7 +1423,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 18:59 KST
+    마지막 갱신 2026-10-27 19:20 KST
     <p class="demo-link"><a href="demo.html">15초 데모 보기 →</a></p>
   </footer>
 
@@ -1469,8 +1583,10 @@ video:  에피소드 하나 전체, 10fps
         ["done", "손가락 끝 3D 위치 확보 (UmeTrack, MANO 불필요)"],
         ["done", "모션캡처로 잡기 클립 수 집계 (2,152개), 사용할 1,113개 결정"],
         ["done", "정답 있는 136개 시퀀스 영상 수집"],
-        ["todo", "Allegro 로봇 손으로 옮긴 손가락 끝과 물체 표면 거리 기준 설정"],
-        ["todo", "재현 가능 비율 점검 후 기준 고정"]
+        ["done", "Allegro 로봇 손으로 옮긴 손가락 끝과 물체 표면 거리 기준 설정"],
+        ["done", "재현 가능 비율 점검 후 기준 고정 (튜닝 54%)"],
+        ["todo", "검증 세트에 같은 기준으로 라벨 생성"],
+        ["todo", "평가 2 클립 자르기"]
       ]
     },
     {

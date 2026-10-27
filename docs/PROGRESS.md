@@ -116,6 +116,14 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - Muse 추정: 클립당 2회 x 6프레임(720px로 줄임) 약 $0.024 → 1,113개 약 $27. HOT3D 해상도 토큰 수는 미측정.
 - 정답 있는 136 시퀀스 preview 영상(12.3 GB) 다운로드 완료, 136개 sha1 통과 (`out/hot3d_preview_download.log`).
 
+## copyable 라벨 (EXP-10, $0)
+
+- UmeTrack 랜드마크 → MediaPipe 순서 → dex-retargeting Allegro vector 설정 (저역 필터 끔, 이벤트마다 reset). 크기 배율 = Allegro 손목-검지 끝 길이(0.247 m) / 사람 길이, 중앙값 1.26. 리타게팅 벡터 오차 중앙값 4.3%.
+- 규칙: 손목 이동 R 이내 어떤 위치에서 Allegro 엄지 끝 + 다른 손가락 끝 1개 이상이 표면 near 이내, 어느 링크도 deep 이상 들어가지 않음.
+- 고정한 기준: near 1.5 cm, deep 1 cm, R 2 cm → 튜닝 1,422개 중 54.4% copyable. near 0.75~2.0 cm면 20~80% 안. 비율은 거의 near가 정한다 (deep 영향 1%p 안팎).
+- 물체별 26% (캔) ~ 94% (플라스크), 사람별 29% ~ 76%. held-out 사람의 비율은 다를 수 있다 (AUC는 영향 없음).
+- dex-retargeting 함정: `robot.link_names`에는 관절 프레임도 섞여 있다. `get_link_index`는 BODY로만 찾으므로 관절 이름을 넣으면 잘못된 id로 segfault가 난다. BODY 프레임만 쓴다.
+
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
 1. OpenGraph 영상은 AV1이다. OpenCV는 못 읽는다. 항상 `data/episodes_720p`의 H.264를 쓴다.
@@ -140,7 +148,7 @@ held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 1. Day 3~4 (진행 중, 위 "접촉 자르기" 절): OpenGraph 접촉 자르기 (SAM 10fps `hand` + `small object` → 겹침 + 동반 이동으로 접촉 신호 → Muse Spark 경계 확인), 보이는 접촉과 장갑 압력 사이 시간차 보정. 숫자 1.
    - 2D 겹침만으로는 접촉 전에도 76~100% 프레임이 붙어 보인다. 동반 이동이 필수다 (EXP-02, 03).
    - 촉각 독립 정답은 임계값 800(80 택셀 합)으로 만든다. 0으로 하면 에피소드 63~71이 틀린다 (EXP-04).
-2. 다음 무료 작업: UmeTrack 랜드마크 → dex-retargeting(Allegro) → Allegro 손가락 끝과 물체 표면 거리 → copyable 라벨 → 튜닝 세트 쏠림 확인 (브리프 8-1). 보정 방향(EXP-08)과 손가락 끝(EXP-09)은 해결.
+2. copyable 라벨 완료 (EXP-10): 기준 near 1.5 cm, deep 1 cm, 손목 이동 2 cm 이내로 고정, 튜닝 54.4%. 다음 무료 작업: 같은 기준으로 held-out 라벨 계산 (`hot3d_copyable.py run --split held_out`), 숫자 2 클립 자르기, 로컬 채점 항목(카메라 안정성, MediaPipe 리타게팅) 계산.
 3. (완료, 136개 sha1 통과) 남은 HOT3D 영상 다운로드: 정답 있는 136 시퀀스의 `preview_rgb.mp4`. `scripts/hot3d_download.py`에 preview 파일 그룹을 지정해서 받는다 (실행 전 JSON의 그룹 이름 확인).
 
 ## 미해결
