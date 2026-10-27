@@ -381,7 +381,7 @@
   <section>
     <h2><span class="no">2</span>요약</h2>
     <ul class="summary">
-      <li>데이터 준비, 평가 분할 고정, Meta API(SAM 3.1, Muse Spark) 연결 완료. 현재 평가 1(접촉 구간 검출) 진행 중. 접촉 추정과 채점 코드는 준비됐고, 튜닝 에피소드 전체에 SAM을 돌리는 단계가 다음.</li>
+      <li>데이터 준비, 평가 분할 고정, Meta API(SAM 3.1, Muse Spark) 연결 완료. 현재 평가 1(접촉 구간 검출) 진행 중. 접촉 추정과 채점 코드는 준비됐고, 에피소드 전체를 SAM에 넣는 파일럿 3개가 끝남.</li>
       <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치. 평가 1의 정답으로 그대로 사용 가능.</li>
       <li>SAM 3.1 설정 확정. 물체 프롬프트는 <code>small object</code>, 입력은 10fps. 10fps 결과는 30fps와 마스크 IoU 0.97 이상으로 같음.</li>
       <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
@@ -826,7 +826,7 @@ video:  clip.mp4 (150 frames)</pre>
 
   <section id="s-now">
     <h2><span class="no">2</span>진행 중: 접촉 구간 검출</h2>
-    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 코드는 준비됐고 튜닝 에피소드 전체에 SAM 3.1을 돌리기 직전이다. 결과 수치는 아직 없다.</p>
+    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 코드는 준비됐고, 에피소드 전체를 SAM 3.1에 넣는 파일럿 3개가 끝났다. 접촉 추정 결과 수치는 아직 없다.</p>
 
     <h3>준비된 것</h3>
     <ul class="plain">
@@ -857,15 +857,33 @@ video:  clip.mp4 (150 frames)</pre>
       <p class="cap">SAM 실행 계획</p>
       <div class="wrap">
         <table class="min">
-          <thead><tr><th>단계</th><th>대상</th><th class="n">프레임 (10fps)</th><th>목적</th></tr></thead>
+          <thead><tr><th>단계</th><th>대상</th><th class="n">프레임 (10fps)</th><th>목적</th><th>상태</th></tr></thead>
           <tbody>
-            <tr><td class="first">A 파일럿</td><td>튜닝 에피소드 0, 30, 53</td><td class="n">5,762</td><td>긴 영상에서 추적 유지, 처리 시간, 출력 확인</td></tr>
-            <tr><td class="first">B 튜닝 나머지</td><td>튜닝 47개</td><td class="n">59,444</td><td>교차 검증용 전체 데이터</td></tr>
-            <tr><td class="first">C 검증</td><td>검증 22개</td><td class="n">27,250</td><td>최종 측정 때만</td></tr>
+            <tr><td class="first">A 파일럿</td><td>튜닝 에피소드 0, 30, 53</td><td class="n">5,762</td><td>긴 영상에서 추적 유지, 처리 시간, 출력 확인</td><td>실행 완료</td></tr>
+            <tr><td class="first">B 튜닝 나머지</td><td>튜닝 47개</td><td class="n">59,444</td><td>교차 검증용 전체 데이터</td><td>대기</td></tr>
+            <tr><td class="first">C 검증</td><td>검증 22개</td><td class="n">27,250</td><td>최종 측정 때만</td><td>대기</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <div class="tbl">
+      <p class="cap">파일럿 실행 결과 (에피소드 하나 = 요청 하나)</p>
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>에피소드</th><th class="n">프레임 (10fps)</th><th class="n"><code>hand</code> 처리</th><th class="n"><code>small object</code> 처리</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td class="first">0 (용기)</td><td class="n">1,457</td><td class="n">76.9초</td><td class="n">82.9초</td><td>완료</td></tr>
+            <tr><td class="first">30 (종이 상자)</td><td class="n">683</td><td class="n">44.5초</td><td class="n">43.9초</td><td>완료</td></tr>
+            <tr><td class="first">53 (스프레이병)</td><td class="n">741</td><td class="n">47.6초</td><td class="n">49.0초</td><td>완료</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>가장 긴 에피소드(1,457프레임)도 요청 하나로 끝까지 처리됨. 초당 15~19프레임.</li>
+      <li>긴 영상에서 손과 물체 id가 유지되는지는 아직 분석 전.</li>
+    </ul>
     <p class="note">Muse Spark 경계 확인과 Muse Spark 단독 비교군은 SAM 결과를 본 뒤 진행한다.</p>
   </section>
 
@@ -954,7 +972,7 @@ video:  clip.mp4 (150 frames)</pre>
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 18:17 KST
+    마지막 갱신 2026-10-27 18:18 KST
   </footer>
 
 </main>
@@ -1094,7 +1112,7 @@ video:  clip.mp4 (150 frames)</pre>
         ["done", "72개 에피소드 10fps 클립 준비"],
         ["done", "SAM 출력 디코더 고속화 (공식 결과와 일치 확인)"],
         ["done", "접촉 추정·채점 코드 (13개 특징, 로지스틱 회귀, 히스테리시스)"],
-        ["doing", "튜닝 50개 에피소드 SAM 분할 (실행 승인 대기)"],
+        ["doing", "튜닝 50개 에피소드 SAM 분할 (파일럿 3개 완료)"],
         ["todo", "교차 검증으로 접촉 추정 성능 측정"],
         ["todo", "Muse Spark로 접촉 경계 확정 (경계 주변은 30fps)"],
         ["todo", "영상 접촉과 촉각 압력 사이 시간차 보정"],
