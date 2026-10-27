@@ -34,7 +34,7 @@
     opacity: 0; visibility: hidden; pointer-events: none;
     transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
   }
-  .scene.on { opacity: 1; visibility: visible; transition: opacity 0.5s var(--ease), visibility 0s; }
+  .scene.on { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.5s var(--ease), visibility 0s; }
 
   .headline { font-size: max(24px, 6.4cqmin); line-height: 1.06; font-weight: 800; letter-spacing: -0.04em; margin: 0; }
   .say { font-size: max(20px, 4.4cqmin); line-height: 1.1; font-weight: 800; letter-spacing: -0.035em; margin: 0; }
