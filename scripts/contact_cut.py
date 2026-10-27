@@ -241,7 +241,7 @@ def cache_episode(ep):
     feats, rec = unit_features(folder, "_events.jsonl.gz", n10)
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, n30=n30, **{f"x_{s}": feats[s] for s in SIDES},
-                        **{f"gap_{s}": rec[s]["gap"] for s in SIDES})
+                        **{f"gap_{s}": rec[s]["gap"] for s in SIDES}, **{f"oid_{s}": rec[s]["oid"] for s in SIDES})
     return path
 
 
@@ -344,7 +344,8 @@ def load_cached(eps, gt):
         for s in SIDES:
             y = {g: gt[ep][g][s][::STEP][:n10] for g in ("label", "tactile", "tactile_clean")}
             data[(ep, s)] = {"x": with_context(z[f"x_{s}"]), "base": z[f"x_{s}"], "y": y, "n30": n30,
-                             "gt30": {g: gt[ep][g][s] for g in ("label", "tactile", "tactile_clean")}, "gap": z[f"gap_{s}"]}
+                             "gt30": {g: gt[ep][g][s] for g in ("label", "tactile", "tactile_clean")}, "gap": z[f"gap_{s}"],
+                             "oid": z[f"oid_{s}"] if f"oid_{s}" in z.files else None}
     return data
 
 
@@ -483,11 +484,12 @@ def cmd_smoke(args):
 
 # ---------------------------------------------------------------- arm B: SAM rule (measurement plan)
 
-RULE_GRID = {"gap_px": (2, 4, 8, 12), "move": (0.05, 0.1, 0.2), "comove": (0.5, 0.7)}
+RULE_GRID = {"gap_px": (2, 4, 8, 12), "move": (0.05, 0.1, 0.2), "comove": (0.5, 0.7),
+             "fill": (0, 1, 2), "split_object": (False, True)}  # last two added in EXP-22
 FILL, MIN_LEN = 2, 2  # 10 fps frames: join near-runs split by up to 0.2 s, drop contacts under 0.2 s
 
 
-def rule_segments(base, gap, gap_px, move, comove):
+def rule_segments(base, gap, gap_px, move, comove, fill=FILL, split_object=False, oid=None):
     """Arm B, per hand at 10 fps.
 
     near: the hand mask is within gap_px of an object mask.
@@ -502,8 +504,21 @@ def rule_segments(base, gap, gap_px, move, comove):
     obj_move = np.maximum(b["obj_move_future"], b["obj_move_past"])
     moving = near & (b["hand_present"] > 0) & (obj_move >= move) & (b["comove"] <= comove)
     runs = []
+    pieces = []
     for a, e in segments(near):
-        if runs and a - runs[-1][1] <= FILL:
+        if split_object and oid is not None:
+            # a new contact when the nearest object changes inside a near-run (EXP-22)
+            cuts = [k for k in range(a + 1, e) if np.isfinite(oid[k]) and np.isfinite(oid[k - 1]) and oid[k] != oid[k - 1]]
+            bounds = [a] + cuts + [e]
+            pieces += list(zip(bounds[:-1], bounds[1:]))
+        else:
+            pieces.append((a, e))
+    for a, e in pieces:
+        same = True
+        if split_object and oid is not None and runs:
+            prev = oid[runs[-1][1] - 1]
+            same = not (np.isfinite(oid[a]) and np.isfinite(prev)) or oid[a] == prev
+        if runs and a - runs[-1][1] <= fill and same:
             runs[-1] = (runs[-1][0], e)
         else:
             runs.append((a, e))
@@ -513,21 +528,20 @@ def rule_segments(base, gap, gap_px, move, comove):
 def score_rule(units, params, target, shifts=(0, 0)):
     sc = Score()
     for u in units:
-        sc.add(to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts), u["gt30"][target])
+        sc.add(to_30fps(rule_segments(u["base"], u["gap"], oid=u.get("oid"), **params), u["n30"], 0, *shifts), u["gt30"][target])
     return sc.result()
 
 
 def pick_rule(units, target):
     """Grid search on tuning units: best F1 at 15 frames plus IoU, then the median start and end delay."""
+    from itertools import product
     best = None
-    for g in RULE_GRID["gap_px"]:
-        for m in RULE_GRID["move"]:
-            for c in RULE_GRID["comove"]:
-                p = {"gap_px": g, "move": m, "comove": c}
-                r = score_rule(units, p, target)
-                key = r["boundary_f1_15"] + r["contact_iou"]
-                if best is None or key > best[0]:
-                    best = (key, p, r)
+    for values in product(*RULE_GRID.values()):
+        p = dict(zip(RULE_GRID, values))
+        r = score_rule(units, p, target)
+        key = r["boundary_f1_15"] + r["contact_iou"]
+        if best is None or key > best[0]:
+            best = (key, p, r)
     _, p, r = best
     return p, (-int(round(r["start_error_median"] or 0)), -int(round(r["end_error_median"] or 0)))
 
@@ -555,7 +569,7 @@ def cmd_rule(args):
             chosen[ep] = {"params": params, "shift_start_end": shifts}
             one = Score()
             for side, u in test:
-                segs = to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts)
+                segs = to_30fps(rule_segments(u["base"], u["gap"], oid=u.get("oid"), **params), u["n30"], 0, *shifts)
                 if target == "tactile_clean":  # arm B output for arm C, rule chosen on the other episodes
                     segments_out.setdefault(str(ep), {"n30": u["n30"]})[side] = [[int(a), int(b)] for a, b in segs]
                 sc.add(segs, u["gt30"][target])
@@ -598,7 +612,7 @@ def plot_rule(eps, data, chosen):
             u = data[(ep, s)]
             t = np.arange(u["n30"]) / 30
             pm = np.zeros(u["n30"], bool)
-            for a, b in to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts):
+            for a, b in to_30fps(rule_segments(u["base"], u["gap"], oid=u.get("oid"), **params), u["n30"], 0, *shifts):
                 pm[a:b] = True
             for mask, c, lab in ((u["gt30"]["tactile_clean"], "#2b8a3e", f"{s}: glove (main truth)"),
                                  (pm, "#e8590c", f"{s}: arm B (SAM rule)")):

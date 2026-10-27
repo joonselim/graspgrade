@@ -165,6 +165,13 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - `out/hot3d_clips/clips_labeled.csv`가 숫자 2의 클립 목록 + 정답이다.
 - SAM 비용 다시 계산: held-out 전부 + 튜닝 400개, 겹치는 클립을 한 요청으로 합치면 $17.76 + $8.82 = 약 $27. Muse는 클립마다 약 $0.024라 전부면 약 $44, held-out 절반이면 약 $27.
 
+## 뷰어 뼈대 (2026-10-27)
+
+- `viewer/` 정적 페이지 (index.html, app.js, style.css). 탭 2개: 클립 점수 (점수순 목록, 영상, 접촉 타임라인, 등급 카드와 가중치, Muse 이유, 프리셋 엄격 70+ / 균형 50+ / 물량 30+), 접촉 시점 (에피소드별 장갑 정답 vs B 타임라인, 클릭하면 영상 이동).
+- 데이터는 `scripts/viewer_data.py`가 튜닝 데이터로만 만든다 (지금 점수는 대리 모델, 결과 아님). 영상 `viewer/media/` (18 MB)는 git에서 제외.
+- 로컬 확인: WSL에서 `cd ~/graspgrade/viewer && python3 -m http.server 8765` 후 http://localhost:8765. 두 탭 모두 동작 확인.
+- GitHub Pages 배포는 아직 안 했다 (원격 저장소 없음).
+
 ## 숫자 1 Muse 비교군 준비 (EXP-21, 무료)
 
 - `muse_contact.py`: A (Muse 단독, 5fps, 호출당 10프레임)와 C (B 경계마다 7프레임) 코드, `--send` 없으면 비용만. held-out A 약 $11.86, C 경계당 약 $0.013. 프롬프트 `scripts/prompts/number1_arm_a.txt`, `number1_arm_c.txt`.

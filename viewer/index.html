@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GraspGrade viewer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">GraspGrade</div>
+  <nav class="tabs">
+    <button data-tab="clips" class="active">Clip scores</button>
+    <button data-tab="contact">Contact timing</button>
+  </nav>
+  <div class="presets" id="presets"></div>
+</header>
+
+<main id="tab-clips">
+  <aside class="list">
+    <div class="list-head"><span id="count"></span><span class="hint">sorted by score</span></div>
+    <ol id="clip-list"></ol>
+  </aside>
+  <section class="stage">
+    <video id="clip-video" controls muted playsinline></video>
+    <div class="timeline" id="clip-timeline" aria-label="contact timeline">
+      <div class="track"><span class="label">contact (mocap)</span><div class="bar" id="clip-contact"></div></div>
+      <div class="cursor" id="clip-cursor"></div>
+    </div>
+    <p class="note" id="clip-note"></p>
+  </section>
+  <aside class="cards">
+    <div class="score-box">
+      <div class="score" id="clip-score">--</div>
+      <div class="score-label">score (0 to 100)</div>
+      <div class="truth" id="clip-truth"></div>
+    </div>
+    <ul id="grade-cards"></ul>
+    <div class="reason"><div class="reason-head">Muse Spark</div><p id="clip-reason"></p></div>
+  </aside>
+</main>
+
+<main id="tab-contact" hidden>
+  <aside class="list">
+    <div class="list-head"><span>Episodes</span></div>
+    <ol id="episode-list"></ol>
+  </aside>
+  <section class="stage wide">
+    <video id="ep-video" controls muted playsinline></video>
+    <div class="timeline tall" id="ep-timeline"></div>
+    <p class="note" id="ep-note"></p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
