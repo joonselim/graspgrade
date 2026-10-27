@@ -133,6 +133,13 @@ comparison between arms, and we report ±5 frames as it comes out.
 - If the local checks carry no signal, we strengthen retargeting
   recoverability toward what the proposal says ("whether the hand shape fits
   a robot hand") before spending credit.
+- Result (EXP-12): the three local checks give AUC 0.49 to 0.53 for
+  copyable, and add nothing to object identity, which reaches 0.70 (leave
+  one tuning person out, mean over people). So the retargeting check gets
+  hand shape features first (hand opening, finger curl, grasp type), tested
+  for free on tuning clips before any paid call.
+- Pooled AUC over people with different copyable shares ranks people
+  instead of clips (EXP-12). Per-person AUC is reported next to pooled AUC.
 
 ### Open items
 

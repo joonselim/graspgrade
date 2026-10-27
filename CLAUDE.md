@@ -63,5 +63,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/hot3d_hands.py` | UmeTrack 프로필 순운동학으로 HOT3D 손 랜드마크 21개(손가락 끝 포함) 계산, 손 박스/영상/물체 거리로 검증 |
 | `scripts/hot3d_copyable.py` | copyable 라벨: UmeTrack 손 → dex-retargeting Allegro → 표면 부호거리, 손목 이동 격자. `run` / `report` / `figures`, `--source clips`면 hot3d_clips.py 클립에 라벨 |
 | `scripts/hot3d_clips.py` | 숫자 2 클립: 모캡 손가락 끝-물체 거리로 접촉 구간을 찾아 클립 생성 (전 프레임, 병렬). `--plot SEQ OBJECT` 그림 |
+| `scripts/hot3d_local_checks.py` | 숫자 2 로컬 채점 3개 항목 (카메라 안정성, 리타게팅 복원성, 동작 완결성). `video` (시퀀스별 MediaPipe + 광학 흐름, 캐시) → `clips` |
+| `scripts/hot3d_signal_check.py` | 튜닝 클립에서 항목별 AUC, 물체 기준선 AUC (사람 하나씩 빼기), 사람별 AUC |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

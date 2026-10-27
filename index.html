@@ -352,6 +352,7 @@
       <li>SAM 3.1 설정 확정. 물체 프롬프트는 <code>small object</code>, 입력은 10fps. 10fps 결과는 30fps와 마스크 IoU 0.97 이상으로 같음.</li>
       <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
       <li>측정 계획을 지원서의 비교 구조로 다시 맞춤. 평가 1은 촉각 장갑을 정답으로 세 방법을 비교하고, 평가 2는 검증 클립 1,426개에서 우리 점수를 Muse Spark 단독과 비교함. 유료 호출은 지금 보류 중.</li>
+      <li>유료 호출 없이 계산되는 채점 항목 3개는 "따라할 수 있음"을 가르지 못함(AUC 0.49~0.53). 물체 이름만으로 0.70이 나와서, 손 모양을 재는 항목으로 보강한 뒤 유료 호출로 넘어감.</li>
       <li>평가 2 정답 라벨과 클립 완성. HOT3D 잡기를 Allegro 로봇 손으로 옮겨 판정하면 튜닝 54%, 검증 53%가 "따라할 수 있음". 가장 큰 위험이던 라벨 쏠림은 없음. 클립은 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
       <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
     </ul>
@@ -406,7 +407,7 @@
         </table>
       </div>
     </div>
-    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음"(EXP-10에서 고정). 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고.</p>
+    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음"(EXP-10에서 고정). 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
   </section>
 
   <section>
@@ -427,6 +428,7 @@
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
             <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. 계획한 20~80% 안이라 가장 큰 위험이었던 쏠림 해소.</td></tr>
             <tr><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
+            <tr><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">무료 채점 항목의 신호와 물체 기준선</td><td>무료 항목 3개는 측정은 정확하지만 "따라할 수 있음" 예측력 없음(AUC 0.49~0.53). 물체만으로 0.70.</td></tr>
           </tbody>
         </table>
       </div>
@@ -487,6 +489,11 @@
               <td>AUC는 비율에 좌우되지 않음. 사람별 비율도 함께 보고</td>
             </tr>
             <tr>
+              <td class="first">평가 2 주 비교</td>
+              <td>물체 이름만으로 AUC 0.70인데, 무료 채점 항목 3개는 신호가 없음(0.49~0.53). 이대로면 Muse Spark 단독에 질 수 있음</td>
+              <td>리타게팅 항목을 손 모양 특징으로 보강, Muse Spark 항목 2개 확인, 보완재 비교를 주 비교 옆에 보고</td>
+            </tr>
+            <tr>
               <td class="first">동반 이동 신호 품질</td>
               <td>겹침만으로는 접촉 구분이 안 되어 동반 이동 계산에 의존</td>
               <td>튜닝 에피소드에서 촉각 정답으로 먼저 검증</td>
@@ -518,7 +525,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -1375,6 +1382,87 @@ video:  에피소드 하나 전체, 10fps
         <li>평가 2에 쓸 클립은 검증 1,426개 전부와 튜닝 무작위 400개(seed 20261026).</li>
       </ul>
     </article>
+
+    <!-- EXP-12 -->
+    <article class="exp" id="exp-12">
+      <div class="exp-h"><span class="id">EXP-12</span><span class="t">무료 채점 항목의 신호와 물체 기준선</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 2의 주 비교는 우리 점수 대 체크리스트 없이 같은 질문을 받은 Muse Spark다. "따라할 수 있음" 비율이 물체마다 26~94%로 달라서, 물체만 알아봐도 꽤 맞힐 수 있다. 크레딧을 쓰기 전에, 유료 호출 없이 계산되는 채점 항목 3개에 신호가 있는지, 물체만으로는 얼마나 맞히는지 본다.</dd>
+        <dt>입력</dt><dd>EXP-11의 튜닝 클립 2,385개(53.3%가 "따라할 수 있음"). 검증 클립은 보지 않음.</dd>
+        <dt>방법</dt><dd>시퀀스마다 영상을 10fps로 한 번 훑어 카메라 움직임과 MediaPipe 손을 구하고, 클립마다 항목 3개를 상·중·하로 매김. 튜닝 6명 중 한 명씩 빼고 나머지로 학습해 뺀 사람을 채점. API 호출 없음.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">세 항목 (영상만 씀)</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>카메라 안정성: 프레임 사이 코너를 추적해 맞춘 움직임의 클립 내 90번째 백분위</li>
+            <li>리타게팅 복원성: 접촉 동안 MediaPipe 손을 Allegro로 옮겨, 손이 잡힌 비율 × (1 − 벡터 오차)</li>
+            <li>동작 완결성: 접촉 전 1초(손 뻗기)와 후 1초(놓기)에 손이 보이고 움직이는가</li>
+            <li>등급 경계는 튜닝 세트 3분위로 정하고 고정</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">비교한 모델 (사람 하나씩 빼기)</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>물체 기준선: 나머지 5명에서 잰 물체별 "따라할 수 있음" 비율을 뺀 사람의 클립에 그대로 줌</li>
+            <li>세 항목 등급만 넣은 로지스틱 회귀</li>
+            <li>물체 비율 + 세 항목</li>
+            <li>항목이 제대로 재는지는 모션캡처로 따로 확인(입력으로 쓰지 않음)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">항목이 재려는 것을 제대로 재는가</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>확인</th><th class="n">결과</th></tr></thead>
+            <tbody>
+              <tr><td class="first">카메라 움직임 대 모션캡처 머리 회전 (클립별 스피어만)</td><td class="n">0.93</td></tr>
+              <tr><td class="first">MediaPipe 왼손·오른손이 모션캡처 손과 일치</td><td class="n">1,197 / 1,241 (96.5%)</td></tr>
+              <tr><td class="first">접촉 동안 클립의 손을 MediaPipe가 찾은 비율, 중앙값</td><td class="n">87%</td></tr>
+              <tr><td class="first">리타게팅 벡터 오차, 중앙값</td><td class="n">10%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">"따라할 수 있음"을 얼마나 가르는가 (튜닝 클립, AUC)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>신호</th><th class="n">AUC</th></tr></thead>
+            <tbody>
+              <tr><td class="first">카메라 안정성 등급</td><td class="n">0.533</td></tr>
+              <tr><td class="first">리타게팅 복원성 등급</td><td class="n">0.494</td></tr>
+              <tr><td class="first">동작 완결성 등급</td><td class="n">0.515</td></tr>
+              <tr><td class="first">같은 세 항목, 물체 안에서 (가중 평균)</td><td class="n">0.517 / 0.529 / 0.530</td></tr>
+              <tr><td class="first">세 등급 로지스틱 회귀, 사람 하나씩 빼고 6명 평균</td><td class="n">0.534</td></tr>
+              <tr><td class="first"><b>물체 기준선, 사람 하나씩 빼고 6명 평균</b></td><td class="n"><b>0.698</b> (사람별 0.59~0.81)</td></tr>
+              <tr><td class="first">물체 비율 + 세 등급</td><td class="n">0.693</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp12_signal_check.png" loading="lazy" width="1040" height="442" alt="무료 항목 세 개와 물체 기준선의 AUC를 비교한 그래프" style="max-width:720px">
+        <figcaption>회색: 무료 항목 세 개, 각각과 합친 것. 파랑: 물체만, 그리고 물체 + 세 항목. 세 항목은 물체 위에 아무것도 더하지 못한다.</figcaption>
+      </figure>
+
+      <h4>사람을 합친 AUC의 함정</h4>
+      <p>빼고 채점한 6명을 하나로 합쳐 AUC를 내면 값이 떨어진다. 물체 기준선은 0.616, 세 등급은 0.365로 무작위보다도 낮다. 원인은 항목이 아니라 사람이다. 사람마다 "따라할 수 있음" 비율이 29%에서 74%까지 달라서, 비율이 높은 사람을 빼고 학습한 모델은 그 사람 클립에 낮은 점수를 준다. 합치면 클립이 아니라 사람을 줄 세우게 된다. 검증 세트도 사람별로 30%, 47%, 73%로 같은 문제가 있으므로, 검증 AUC는 합친 값과 사람별 값을 함께 보고한다.</p>
+
+      <ul class="plain concl">
+        <li>세 항목은 측정 도구로는 정확함. 카메라 움직임은 머리 회전과 0.93으로 맞고, MediaPipe는 96.5%에서 맞는 손을 찾음.</li>
+        <li>그러나 "따라할 수 있음"에 대한 정보는 없음(AUC 0.49~0.53, 물체 안에서도 같음). 세 항목은 영상이 얼마나 좋은지를 재고, 정답 라벨은 Allegro 손이 그 잡기에 맞는지를 잼. 서로 다른 질문.</li>
+        <li>물체만으로 AUC 0.70(사람별 평균). Muse Spark가 물체를 알아보면 그 근처가 나올 것이고, 지금 계획대로라면 우리 점수는 주 비교에서 질 수 있음. Muse Spark 항목 2개(손가락 가림, 물체 성질)가 이 신호를 담아야 함.</li>
+        <li>크레딧을 쓰기 전에 할 일: 리타게팅 복원성을 지원서가 말한 대로 "손 모양이 로봇 손에 맞는가"를 재도록 바꿈. 후보는 MediaPipe에서 얻는 손 벌림, 손가락 굽힘, 잡기 유형, 나중에 SAM 마스크로 물체 크기 대 손 크기. 같은 튜닝 클립에서 무료로 시험 가능.</li>
+        <li>보완재 비교(Muse Spark 단독 대 Muse Spark + 우리 항목)를 주 비교 옆에 같이 보고하고, 사람별 AUC를 합친 AUC 옆에 둠.</li>
+        <li>한계: MediaPipe가 원본 어안 영상에서 돎. 3분위 등급은 작은 효과를 가리지만 0.5에 이렇게 가까운 AUC를 가리지는 않음.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -1419,7 +1507,8 @@ video:  에피소드 하나 전체, 10fps
       <li>손가락 끝 3D 위치를 UmeTrack 손 모델로 직접 계산. 잡는 동안 손가락 끝이 물체 표면에서 중앙값 2.3mm (<a href="#exp-09">EXP-09</a>).</li>
       <li>Allegro 로봇 손 기준 정답 라벨 기준 고정, 튜닝 54% (<a href="#exp-10">EXP-10</a>).</li>
       <li>평가 2 클립과 검증 세트 라벨 완성. 모션캡처 손–물체 거리로 잘라 튜닝 2,385개, 검증 1,426개, 두 세트 모두 52~53%가 "따라할 수 있음" (<a href="#exp-11">EXP-11</a>).</li>
-      <li>유료 호출 없이 계산되는 채점 항목 3개를 튜닝 클립에서 계산 중. 항목마다 혼자서 "따라할 수 있음"을 얼마나 가르는지(AUC) 먼저 봄. 신호가 없으면 리타게팅 복원성 항목을 "손 모양이 로봇 손에 맞는가"에 더 가깝게 보강한 뒤 유료 호출로 넘어감.</li>
+      <li>유료 호출 없는 채점 항목 3개는 측정은 정확하지만 "따라할 수 있음"을 가르지 못함(AUC 0.49~0.53). 물체 이름만으로는 0.70 (<a href="#exp-12">EXP-12</a>).</li>
+      <li>다음: 리타게팅 복원성 항목을 "손 모양이 로봇 손에 맞는가"를 재도록 바꿈. MediaPipe에서 손 벌림, 손가락 굽힘, 잡기 유형을 뽑아 튜닝 클립에서 무료로 AUC를 확인하고, 물체 기준선 0.70과 비교.</li>
     </ul>
   </section>
 
@@ -1508,7 +1597,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 20:09 KST
+    마지막 갱신 2026-10-27 20:34 KST
     <p class="demo-link"><a href="demo.html">15초 데모 보기 →</a></p>
   </footer>
 
@@ -1587,8 +1676,9 @@ video:  에피소드 하나 전체, 10fps
         "검증 클립 1,426개에서 AUC: 우리 점수 대 Muse Spark 단독, 물체 기준선, Muse Spark + 7개 항목"
       ],
       chk: [
-        ["doing", "유료 호출 없는 항목 3개의 단독 AUC 점검 (튜닝)"],
-        ["todo", "물체 기준선 AUC (튜닝, 사람 하나씩 빼고)"],
+        ["done", "유료 호출 없는 항목 3개의 단독 AUC 점검 (신호 없음, EXP-12)"],
+        ["done", "물체 기준선 AUC (튜닝, 사람별 평균 0.70)"],
+        ["todo", "리타게팅 항목을 손 모양 특징으로 보강하고 튜닝에서 AUC 확인"],
         ["todo", "Muse Spark 항목 2개와 Muse Spark 단독 (유료 호출 보류)"],
         ["todo", "분산 없는 항목 점검"],
         ["todo", "로지스틱 회귀 학습 (튜닝 400개)"],
