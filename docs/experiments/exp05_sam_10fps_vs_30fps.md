@@ -56,7 +56,8 @@ rates. Id 1 (pink, left edge) is the background object seen in EXP-03.*
 ![mask IoU per frame](img/exp05_mask_iou_by_frame.png)
 
 *Mask IoU between the 10 fps and 30 fps results on the same frame, for the
-tracks that last the whole clip.*
+tracks that last the whole clip. Hand id 0 is the left hand in ep1 and the
+right hand in ep53. Small object id 0 is the grasped object in both.*
 
 ### Side tracks
 

@@ -704,14 +704,14 @@ video:  clip.mp4 (150 frames)</pre>
               <tr><td class="first">에피소드 1</td><td>왼손</td><td class="n">50 / 50</td><td class="n">0.992</td><td class="n">0.987</td></tr>
               <tr><td class="first">에피소드 1</td><td>오른손</td><td class="n">50 / 50</td><td class="n">0.991</td><td class="n">0.981</td></tr>
               <tr><td class="first">에피소드 1</td><td>잡는 용기</td><td class="n">50 / 50</td><td class="n">0.974</td><td class="n">0.940</td></tr>
-              <tr><td class="first">에피소드 53</td><td>왼손</td><td class="n">50 / 50</td><td class="n">0.978</td><td class="n">0.770</td></tr>
-              <tr><td class="first">에피소드 53</td><td>오른손</td><td class="n">50 / 50</td><td class="n">0.990</td><td class="n">0.975</td></tr>
+              <tr><td class="first">에피소드 53</td><td>왼손</td><td class="n">50 / 50</td><td class="n">0.990</td><td class="n">0.975</td></tr>
+              <tr><td class="first">에피소드 53</td><td>오른손</td><td class="n">50 / 50</td><td class="n">0.978</td><td class="n">0.770</td></tr>
               <tr><td class="first">에피소드 53</td><td>스프레이병</td><td class="n">50 / 50</td><td class="n">0.983</td><td class="n">0.968</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <p class="note">0.77은 에피소드 53 클립 프레임 15 한 장으로, 머리가 돌면서 왼손이 화면 끝에 잘린 순간이다. 다음 프레임은 0.98로 돌아온다.</p>
+      <p class="note">0.77은 에피소드 53 클립 프레임 15 한 장으로, 머리가 돌면서 오른손이 화면 오른쪽 끝에 걸린 순간이다. 다음 프레임은 0.98로 돌아온다.</p>
 
       <figure>
         <img src="assets/exp05_ep53_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 53의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과">
@@ -723,7 +723,7 @@ video:  clip.mp4 (150 frames)</pre>
       </figure>
       <figure>
         <img src="assets/exp05_mask_iou_by_frame.png" loading="lazy" width="1430" height="468" alt="두 에피소드의 프레임별 마스크 IoU 선 그래프">
-        <figcaption>프레임별 마스크 IoU. 손과 잡는 물체는 끝까지 0.95 안팎. 크게 떨어지는 선은 몇 프레임만 나타나는 보조 검출. 점선은 촉각 접촉 시점.</figcaption>
+        <figcaption>프레임별 마스크 IoU, 클립 전체에 걸친 트랙만. hand id 0은 에피소드 1에서 왼손, 에피소드 53에서 오른손이고 small object id 0은 두 클립 모두 잡는 물체. 점선은 촉각 접촉 시점.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -886,7 +886,7 @@ video:  clip.mp4 (150 frames)</pre>
 
   <footer>
     자료: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta). 영상과 프레임 그림은 OpenGraph에서 가져옴.<br>
-    마지막 갱신 2026-10-27 17:06 KST
+    마지막 갱신 2026-10-27 17:14 KST
   </footer>
 
 </main>
