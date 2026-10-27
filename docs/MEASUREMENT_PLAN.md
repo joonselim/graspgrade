@@ -86,6 +86,10 @@ Details fixed now:
   boundaries. Before the paid run, either raise arm B recall on the 50 tuning
   episodes, or let arm C also sample inside long arm B contacts. To decide
   with the user.
+- EXP-22 (pilot): letting arm B split contacts when the nearest object
+  changes doubles its boundary F1 and the arm C ceiling (0.32), but over-splits
+  long holds. The option is in the arm B grid, to be settled on the 50 tuning
+  episodes.
 
 ### What we expect
 

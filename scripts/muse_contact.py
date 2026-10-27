@@ -342,7 +342,7 @@ def plot_ceilings(res):
     ax.legend(fontsize=7)
     ax.set_title("Best possible score per arm, cleaned glove, pilot episodes 0, 30, 53", fontsize=10)
     fig.tight_layout()
-    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp21_arm_ceilings.png", dpi=125)
+    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp22_arm_ceilings_split.png", dpi=125)  # the EXP-21 figure is kept as it was
 
 
 def make_client():

@@ -39,7 +39,7 @@ Git Bash에서:
 
 Windows 사본을 WSL로 동기화:
 
-    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cp -r /mnt/c/Users/USER/Documents/works/hackathon_meta/{scripts,docs,splits,viewer,CLAUDE.md,requirements.txt} ~/graspgrade/'
+    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cp -r /mnt/c/Users/USER/Documents/works/hackathon_meta/{scripts,docs,splits,viewer,CLAUDE.md,README.md,requirements.txt} ~/graspgrade/'
 
 ## 스크립트
 

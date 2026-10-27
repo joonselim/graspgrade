@@ -32,5 +32,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-19](exp19_object_items.md) | 2026-10-27 | Six object items for the checklist, stand-in grades | $0 | Coarse three-level items keep the object signal: 0.683 leaving a person out, 0.666 leaving an object out. Size next to the hand does most of the work. |
 | [EXP-20](exp20_v2_held_out_labels.md) | 2026-10-27 | Held-out copyable v2 labels | $0 | Fixed v2 rule on held-out: 46.4% copyable (tuning 47.0%), persons 43% to 51%. Object shares agree with tuning (rank correlation 0.85). Labels only, nothing scored. |
 | [EXP-21](exp21_number1_arm_ceilings.md) | 2026-10-27 | Number 1 arms: code check and best possible scores | $0 | A perfect Muse Spark at 5 fps would reach 0.96 boundary F1 at ±5 frames, so 5 fps is not the limit. Arm C is capped at 0.15 by the boundaries arm B finds. |
+| [EXP-22](exp22_arm_b_split.md) | 2026-10-27 | Arm B splits contacts when the nearest object changes | $0 | Boundary F1 doubles (0.15 at ±5, 0.32 at ±15) and so does the arm C ceiling (0.32), but arm B now overshoots (392 boundaries for 190) and IoU falls to 0.66. |
 
 Total Meta API spend so far: about $1.53 of $150.

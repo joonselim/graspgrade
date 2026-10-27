@@ -627,7 +627,7 @@ def plot_rule(eps, data, chosen):
         ax.grid(axis="x", alpha=0.3)
     axes[-1, 0].set_xlabel("seconds")
     fig.tight_layout()
-    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp14_sam_rule_pilot.png", dpi=120)
+    fig.savefig(ROOT / "docs" / "experiments" / "img" / "exp22_sam_rule_split.png", dpi=120)  # the EXP-14 figure is kept as it was
 
 
 def main():
