@@ -691,7 +691,7 @@
       <figure>
         <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙 (유지 3프레임)</span></div>
-        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜하다.</figcaption>
+        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜함.</figcaption>
       </figure>
     </div>
 
@@ -705,7 +705,7 @@
       <figure>
         <img src="assets/exp29_arm_a_timelines.png" loading="lazy" width="1320" height="759" alt="에피소드 0, 30, 53의 손별 접촉: 장갑 정답, Muse Spark 단독, 보정한 Muse Spark">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#1971c2"></i>Muse Spark 단독</span><span class="key"><i style="--c:#e8590c"></i>다른 두 에피소드에서 배운 보정을 적용</span></div>
-        <figcaption>에피소드 0의 오른손처럼 짧은 접촉이 이어지는 곳을 Muse Spark는 긴 접촉 하나로 본다.</figcaption>
+        <figcaption>에피소드 0의 오른손처럼 짧은 접촉이 이어지는 곳을 Muse Spark는 긴 접촉 하나로 판정함.</figcaption>
       </figure>
     </div>
 
@@ -746,7 +746,7 @@
       <figure>
         <img src="assets/exp18_object_geometry.png" loading="lazy" width="1625" height="550" alt="왼쪽은 물체 종류와 물체 형상의 AUC 막대, 오른쪽은 물체별 가장 긴 변과 가장 짧은 변 산점도">
         <div class="keys"><span class="key"><i style="--c:#868e96"></i>물체 종류</span><span class="key"><i style="--c:#1c7ed6"></i>물체 형상</span><span class="key"><i class="dash" style="--c:#479957"></i>통과선 0.65</span><span class="key"><i class="dash" style="--c:#d04646"></i>실패선 0.60</span><span class="key"><i class="dot" style="--c:#b71126"></i>따라할 수 있음 0%</span><span class="key"><i class="dot" style="--c:#fafdb8"></i>50%</span><span class="key"><i class="dot" style="--c:#036e3a"></i>100%</span></div>
-        <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있다.</figcaption>
+        <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있음.</figcaption>
       </figure>
     </div>
 
@@ -867,7 +867,7 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp01_sam_hand_f330.jpg" loading="lazy" width="1280" height="720" alt="프레임 330에서 SAM이 왼손을 빨간색, 오른손을 파란색으로 분할한 결과">
-        <div class="keys"><span class="key"><i class="mask" style="--c:#e8604c"></i>왼손 (id 0)</span><span class="key"><i class="mask" style="--c:#6e6ef0"></i>오른손 (id 1)</span></div><figcaption>정리한 박스와 마스크를 프레임 330 위에 그린 것. 오른손 마스크는 장갑 손가락은 덮지만 손목의 흰 센서 박스는 뺀다.</figcaption>
+        <div class="keys"><span class="key"><i class="mask" style="--c:#e8604c"></i>왼손 (id 0)</span><span class="key"><i class="mask" style="--c:#6e6ef0"></i>오른손 (id 1)</span></div><figcaption>정리한 박스와 마스크를 프레임 330 위에 그린 것. 오른손 마스크는 장갑 손가락은 덮지만 손목의 흰 센서 박스는 제외함.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -924,7 +924,7 @@ video:  clip.mp4 (150 frames)</pre>
         </figure>
         <figure>
           <img src="assets/exp02_round_container.jpg" loading="lazy" width="1280" height="720" alt="round container 프롬프트로 같은 네 프레임을 분할한 결과">
-          <figcaption>비교용 <code>round container</code>. 잡는 용기의 마스크가 <code>small object</code>와 같다.</figcaption>
+          <figcaption>비교용 <code>round container</code>. 잡는 용기의 마스크가 <code>small object</code>와 같음.</figcaption>
         </figure>
       </div>
 
@@ -960,11 +960,11 @@ video:  clip.mp4 (150 frames)</pre>
       <div class="two">
         <figure>
           <img src="assets/ep53_frame.jpg" loading="lazy" width="1280" height="720" alt="밝은 책상 앞에서 베이지 장갑을 낀 손이 파란 스프레이병을 잡는 1인칭 프레임">
-          <figcaption>입력 클립의 한 프레임. 베이지 장갑과 밝은 책상, 나무 벽의 색이 비슷하다.</figcaption>
+          <figcaption>입력 클립의 한 프레임. 베이지 장갑과 밝은 책상, 나무 벽의 색이 비슷함.</figcaption>
         </figure>
         <figure>
           <img src="assets/ep53_compare.jpg" loading="lazy" width="1280" height="720" alt="같은 장면에서 SAM이 두 손과 스프레이병을 분할한 결과">
-          <div class="keys"><span class="key"><i class="box" style="--c:#2a2ad6"></i>손</span><span class="key"><i class="mask" style="--c:#e4c84c"></i>id 0 스프레이병</span><span class="key"><i class="mask" style="--c:#c43cc4"></i>id 1 책상 끝의 다른 물체</span></div><figcaption><code>small object</code> 결과. 스프레이병은 모든 프레임에서 같은 id를 유지한다.</figcaption>
+          <div class="keys"><span class="key"><i class="box" style="--c:#2a2ad6"></i>손</span><span class="key"><i class="mask" style="--c:#e4c84c"></i>id 0 스프레이병</span><span class="key"><i class="mask" style="--c:#c43cc4"></i>id 1 책상 끝의 다른 물체</span></div><figcaption><code>small object</code> 결과. 스프레이병은 모든 프레임에서 같은 id를 유지함.</figcaption>
         </figure>
       </div>
 
@@ -1036,7 +1036,7 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp04_tactile_and_head_motion.png" loading="lazy" width="1320" height="462" alt="왼쪽은 촉각 임계값별 라벨 일치율, 오른쪽은 에피소드별 머리 각속도">
-        <div class="keys"><span class="key"><i class="" style="--c:#e05252"></i>오른쪽 그림: 스프레이병 작업 (에피소드 48~62)</span><span class="key"><i class="" style="--c:#2f6fe0"></i>오른쪽 그림: 나머지 에피소드</span></div><figcaption>왼쪽: 임계값별 라벨 일치율. 800 이상에서 평탄하다. 임계값 0이면 에피소드 63~71이 72~74%로 떨어지는데, 이 에피소드들은 손을 쉬고 있을 때도 장갑이 약한 압력을 기록한다. 오른쪽: 에피소드별 머리 각속도.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#e05252"></i>오른쪽 그림: 스프레이병 작업 (에피소드 48~62)</span><span class="key"><i class="" style="--c:#2f6fe0"></i>오른쪽 그림: 나머지 에피소드</span></div><figcaption>왼쪽: 임계값별 라벨 일치율. 800 이상에서 평탄함. 임계값 0이면 에피소드 63~71이 72~74%로 떨어지며, 이 에피소드들은 손을 쉬고 있을 때도 장갑이 약한 압력을 기록함. 오른쪽: 에피소드별 머리 각속도.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1095,11 +1095,11 @@ video:  clip.mp4 (150 frames)</pre>
 
       <figure>
         <img src="assets/exp05_ep53_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 53의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과">
-        <div class="keys"><span class="key"><i class="mask" style="--c:#5aa0e8"></i>손</span><span class="key"><i class="mask" style="--c:#d8bd50"></i>스프레이병</span></div><figcaption>에피소드 53. 위가 30fps, 아래가 10fps, 같은 원본 프레임. 두 줄의 마스크가 같다.</figcaption>
+        <div class="keys"><span class="key"><i class="mask" style="--c:#5aa0e8"></i>손</span><span class="key"><i class="mask" style="--c:#d8bd50"></i>스프레이병</span></div><figcaption>에피소드 53. 위가 30fps, 아래가 10fps, 같은 원본 프레임. 두 줄의 마스크가 같음.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp05_ep1_30fps_vs_10fps.jpg" loading="lazy" width="1920" height="540" alt="에피소드 1의 같은 네 시점에서 30fps(위)와 10fps(아래) 분할 결과">
-        <figcaption>에피소드 1. 잡는 용기(id 0)는 같다. 프레임 147의 두 번째 용기는 30fps에서 id 1, 10fps에서 id 3으로 번호만 다르다.</figcaption>
+        <figcaption>에피소드 1. 잡는 용기(id 0)는 같음. 프레임 147의 두 번째 용기는 30fps에서 id 1, 10fps에서 id 3으로 번호만 다름.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp05_mask_iou_by_frame.png" loading="lazy" width="1430" height="468" alt="두 에피소드의 프레임별 마스크 IoU 선 그래프">
@@ -1159,7 +1159,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp06_ep0_timeline.png" loading="lazy" width="1440" height="609" alt="에피소드 0 전체에서 물체 id별 등장 구간, 손 검출, 접촉 라벨을 시간축에 그린 그림">
-        <div class="keys"><span class="key"><i class="" style="--c:#1c7ed6"></i>SAM이 손을 잡은 구간</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#e8590c"></i>물체 id별 등장 구간</span></div><figcaption>에피소드 0. 원판과 용기가 많아 물체 id가 16개, 한 프레임에 최대 12개까지 쓰인다. SAM의 한도는 16개.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#1c7ed6"></i>SAM이 손을 잡은 구간</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#e8590c"></i>물체 id별 등장 구간</span></div><figcaption>에피소드 0. 원판과 용기가 많아 물체 id가 16개, 한 프레임에 최대 12개까지 사용됨. SAM의 한도는 16개.</figcaption>
       </figure>
 
       <p>먼저 고쳐야 했던 것이 하나 있다. 처음에는 손 id마다 화면상 가운데 위치로 왼손·오른손을 정했다. 그런데 손은 화면 중앙을 자주 넘는다. 에피소드 53의 왼손은 프레임의 56%에서 화면 오른쪽에 있어서 오른손으로 잘못 붙었다. 지금은 두 손이 같이 보이는 프레임에서 더 자주 왼쪽에 있는 id를 왼손으로 정한다. 위 표는 고친 방식 기준이다.</p>
@@ -1216,16 +1216,16 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp06_ep53_contact.png" loading="lazy" width="1440" height="528" alt="에피소드 53에서 손별 접촉 확률, 예측 접촉, 라벨 접촉, 촉각 접촉을 시간축에 그린 그림">
-        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>접촉 확률</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#868e96"></i>촉각 800 초과</span><span class="key"><i class="" style="--c:#e8590c"></i>예측 접촉</span></div><figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 오래 쥐는 구간은 잡는다. 짧게 놓는 순간은 놓치고, 손이 병 옆에 남아 있는 동안 끝이 늦게 끊긴다.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#1c7ed6"></i>접촉 확률</span><span class="key"><i class="" style="--c:#2b8a3e"></i>라벨상 접촉</span><span class="key"><i class="" style="--c:#868e96"></i>촉각 800 초과</span><span class="key"><i class="" style="--c:#e8590c"></i>예측 접촉</span></div><figcaption>에피소드 53, 에피소드 0과 30으로 학습한 모델. 오래 쥐는 구간은 검출함. 짧게 놓는 순간은 놓치고, 손이 병 옆에 남아 있는 동안 끝이 늦게 끊김.</figcaption>
       </figure>
       <div class="two">
         <figure>
           <img src="assets/exp06_ep0_contact.png" loading="lazy" width="1440" height="528" alt="에피소드 0의 손별 접촉 확률과 예측, 라벨">
-          <figcaption>에피소드 0. 왼손은 용기를 여섯 번 길게 쥐고, 확률이 이를 따라간다. 오른손은 작은 원판을 48번 집는데 용기 옆을 떠나지 않아서 닿음과 안 닿음을 가르지 못한다.</figcaption>
+          <figcaption>에피소드 0. 왼손은 용기를 여섯 번 길게 쥐고, 확률이 이를 따라감. 오른손은 작은 원판을 48번 집지만 용기 옆을 떠나지 않아 닿음과 안 닿음을 구분하지 못함.</figcaption>
         </figure>
         <figure>
           <img src="assets/exp06_ep30_contact.png" loading="lazy" width="1440" height="528" alt="에피소드 30의 손별 접촉 확률과 예측, 라벨">
-          <figcaption>에피소드 30, 종이 상자. 긴 접촉은 잡는다. 손을 상자에 압력 없이 올려 둔 짧은 틈은 접촉으로 부르는 경우가 많다.</figcaption>
+          <figcaption>에피소드 30, 종이 상자. 긴 접촉은 검출함. 손을 상자에 압력 없이 올려 둔 짧은 틈은 접촉으로 판정하는 경우가 많음.</figcaption>
         </figure>
       </div>
 
@@ -1287,7 +1287,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp07_hot3d_clips.png" loading="lazy" width="1320" height="432" alt="왼쪽은 HOT3D 잡기 클립 길이 분포, 오른쪽은 시퀀스당 클립 수 분포">
-        <figcaption>왼쪽: 클립 길이. 53%가 5초보다 짧다. 점선은 SAM 요청 최소 길이(10fps로 50프레임). 오른쪽: 시퀀스당 클립 수. 쓸 만한 클립이 하나도 없는 시퀀스가 2개.</figcaption>
+        <figcaption>왼쪽: 클립 길이. 53%가 5초보다 짧음. 점선은 SAM 요청 최소 길이(10fps로 50프레임). 오른쪽: 시퀀스당 클립 수. 쓸 만한 클립이 하나도 없는 시퀀스가 2개.</figcaption>
       </figure>
 
       <div class="tbl">
@@ -1374,11 +1374,11 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp08_P0002_016222d1_orientation.jpg" loading="lazy" width="1680" height="560" alt="P0002 시퀀스 한 프레임에 세 방향으로 투영한 물체 모델과 데이터셋 박스를 그린 그림">
-        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0002_016222d1. 왼쪽부터 투영 그대로, 시계 90°, 반시계 90°. 시계 방향만 모델이 책상 위 실제 주걱과 접시에 놓인다. 데이터셋 박스는 그대로 그리면 모니터 근처 엉뚱한 곳에 있다.</figcaption>
+        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0002_016222d1. 왼쪽부터 투영 그대로, 시계 90°, 반시계 90°. 시계 방향일 때만 모델이 책상 위 실제 주걱과 접시에 놓임. 데이터셋 박스는 그대로 그리면 모니터 근처 엉뚱한 곳에 위치함.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp08_P0001_10a27bf7_orientation.jpg" loading="lazy" width="1680" height="560" alt="P0001 시퀀스 한 프레임에 세 방향으로 투영한 물체 모델과 데이터셋 박스를 그린 그림">
-        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0001_10a27bf7. 시계 방향이면 머그가 오른손 아래, 덤벨이 실제 덤벨 위에 놓인다.</figcaption>
+        <div class="keys"><span class="key"><i class="box" style="--c:#22cc22"></i>데이터셋 물체 박스</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>투영한 3D 모델</span></div><figcaption>P0001_10a27bf7. 시계 방향이면 머그가 오른손 아래, 덤벨이 실제 덤벨 위에 놓임.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1434,11 +1434,11 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp09_P0001_10a27bf7_hands.jpg" loading="lazy" width="1680" height="560" alt="P0001 시퀀스의 세 장면에 계산한 손 뼈대를 그린 그림">
-        <div class="keys"><span class="key"><i class="ln" style="--c:#3b8eea"></i>손 0 (왼손)</span><span class="key"><i class="ln" style="--c:#f2b233"></i>손 1 (오른손)</span><span class="key"><i class="dot" style="--c:#e0261f"></i>손가락 끝</span></div><figcaption>P0001_10a27bf7. 뼈대가 덤벨, 휴대폰, 머그를 쥔 실제 손 위에 놓인다.</figcaption>
+        <div class="keys"><span class="key"><i class="ln" style="--c:#3b8eea"></i>손 0 (왼손)</span><span class="key"><i class="ln" style="--c:#f2b233"></i>손 1 (오른손)</span><span class="key"><i class="dot" style="--c:#e0261f"></i>손가락 끝</span></div><figcaption>P0001_10a27bf7. 뼈대가 덤벨, 휴대폰, 머그를 쥔 실제 손 위에 놓임.</figcaption>
       </figure>
       <figure>
         <img src="assets/exp09_P0002_016222d1_hands.jpg" loading="lazy" width="1680" height="560" alt="P0002 시퀀스의 세 장면에 계산한 손 뼈대를 그린 그림">
-        <figcaption>P0002_016222d1. 오른손 손가락 끝이 감자 으깨개 손잡이를 감싼다.</figcaption>
+        <figcaption>P0002_016222d1. 오른손 손가락 끝이 감자 으깨개 손잡이를 감쌈.</figcaption>
       </figure>
 
       <div class="tbl">
@@ -1714,7 +1714,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp12_signal_check.png" loading="lazy" width="1040" height="442" alt="무료 항목 세 개와 물체 기준선의 AUC를 비교한 그래프" style="max-width:720px">
-        <div class="keys"><span class="key"><i class="" style="--c:#868e96"></i>무료 항목 세 개 (각각, 합친 것)</span><span class="key"><i class="" style="--c:#1c7ed6"></i>물체만, 물체 + 세 항목</span></div><figcaption>세 항목은 물체 위에 아무것도 더하지 못한다.</figcaption>
+        <div class="keys"><span class="key"><i class="" style="--c:#868e96"></i>무료 항목 세 개 (각각, 합친 것)</span><span class="key"><i class="" style="--c:#1c7ed6"></i>물체만, 물체 + 세 항목</span></div><figcaption>세 항목은 물체 위에 아무것도 더하지 못함.</figcaption>
       </figure>
 
       <h4>사람을 합친 AUC의 함정</h4>
@@ -1798,7 +1798,7 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp13_hand_shape.png" loading="lazy" width="1500" height="475" alt="왼쪽은 모델별 AUC 막대, 오른쪽은 접촉 동안 엄지–중지 벌림의 분포">
         <div class="keys"><span class="key"><i style="--c:#868e96"></i>물체만</span><span class="key"><i style="--c:#1c7ed6"></i>영상 손 모양</span><span class="key"><i style="--c:#2b8a3e"></i>모션캡처 손 모양</span><span class="key"><i class="ln" style="--c:#1c7ed6"></i><i class="ln" style="--c:#2b8a3e"></i>따라할 수 있음</span><span class="key"><i class="dash" style="--c:#1c7ed6"></i><i class="dash" style="--c:#2b8a3e"></i>따라할 수 없음</span></div>
-        <figcaption>왼쪽: 모델별 AUC. 오른쪽: 접촉 동안 엄지 끝과 중지 끝 사이 벌림. 따라할 수 없는 잡기가 영상과 모션캡처 모두에서 더 벌어져 있다.</figcaption>
+        <figcaption>왼쪽: 모델별 AUC. 오른쪽: 접촉 동안 엄지 끝과 중지 끝 사이 벌림. 따라할 수 없는 잡기가 영상과 모션캡처 모두에서 더 벌어져 있음.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1866,7 +1866,7 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp14_sam_rule_pilot.png" loading="lazy" width="1440" height="684" alt="세 에피소드에서 손별로 장갑 접촉과 방법 B 예측을 시간축에 그린 그림">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B 예측 (기준값은 나머지 두 에피소드에서 이 정답으로)</span></div>
-        <figcaption>오래 쥐는 구간은 찾는다(53번, 0번 왼손). 손이 쉬지 않고 물체들 곁에서 일할 때(0번 오른손, 30번)는 여러 접촉을 하나의 긴 덩어리로 묶는다.</figcaption>
+        <figcaption>오래 쥐는 구간은 검출함(53번, 0번 왼손). 손이 쉬지 않고 물체들 곁에서 일할 때(0번 오른손, 30번)는 여러 접촉을 하나의 긴 덩어리로 묶음.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -1938,7 +1938,7 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp15_can_grasps.jpg" loading="lazy" width="1440" height="1080" alt="캔, 우유팩, 병 잡기 네 장면을 세 방식으로 리타게팅한 그림" style="max-width:720px">
         <div class="keys"><span class="key"><i style="--c:#10cc10"></i>물체 모델</span><span class="key"><i class="dot light" style="--c:#ffffff"></i>사람 손 지점</span><span class="key"><i class="dot" style="--c:#ff8c1a"></i>Allegro 링크 지점</span><span class="key"><i class="dot" style="--c:#ff0000"></i>Allegro 손가락 끝</span></div>
-        <figcaption>캔, 우유팩, 병 잡기 네 장면. 위에서부터 비율, 크기 1.0, 위치 맞춤. 비율 방식에서는 Allegro 손가락 끝이 물체 너머에 떨어지고, 나머지 둘에서는 표면 위에 놓인다.</figcaption>
+        <figcaption>캔, 우유팩, 병 잡기 네 장면. 위에서부터 비율, 크기 1.0, 위치 맞춤. 비율 방식에서는 Allegro 손가락 끝이 물체 너머에 떨어지고, 나머지 둘에서는 표면 위에 놓임.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2204,7 +2204,7 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp18_object_geometry.png" loading="lazy" width="1625" height="550" alt="왼쪽은 물체 종류와 물체 형상의 AUC 막대, 오른쪽은 물체별 가장 긴 변과 가장 짧은 변 산점도">
         <div class="keys"><span class="key"><i style="--c:#868e96"></i>물체 종류</span><span class="key"><i style="--c:#1c7ed6"></i>물체 형상</span><span class="key"><i class="dash" style="--c:#479957"></i>통과선 0.65</span><span class="key"><i class="dash" style="--c:#d04646"></i>실패선 0.60</span><span class="key"><i class="dot" style="--c:#b71126"></i>따라할 수 있음 0%</span><span class="key"><i class="dot" style="--c:#fafdb8"></i>50%</span><span class="key"><i class="dot" style="--c:#036e3a"></i>100%</span></div>
-        <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있다.</figcaption>
+        <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있음.</figcaption>
       </figure>
       <p class="note">형상으로 덜 설명되는 물체: 우유팩 두 개(높이 19cm, 8%와 19%), 아령(18cm, 10%), 작은 정육면체인데 46%만 나온 퍼즐 장난감.</p>
 
@@ -2246,7 +2246,7 @@ video:  에피소드 하나 전체, 10fps
 
       <figure>
         <img src="assets/exp19_object_sheet.jpg" loading="lazy" width="1560" height="1560" alt="물체마다 잡는 장면 한 장씩 모은 시트" style="max-width:640px">
-        <figcaption>물체마다 잡는 장면 한 장. 손잡이 항목을 판단하는 데만 썼다.</figcaption>
+        <figcaption>물체마다 잡는 장면 한 장. 손잡이 항목 판단에만 사용함.</figcaption>
       </figure>
 
       <div class="tbl">
@@ -2283,7 +2283,7 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp19_object_items.png" loading="lazy" width="1500" height="475" alt="왼쪽은 항목·등급별 따라할 수 있음 비율, 오른쪽은 항목 6개와 정확한 형상의 AUC">
         <div class="keys"><span class="key"><i style="--c:#c92a2a"></i>하</span><span class="key"><i style="--c:#fab005"></i>중</span><span class="key"><i style="--c:#2b8a3e"></i>상</span><span class="key"><i style="--c:#868e96"></i>정확한 형상</span><span class="key"><i style="--c:#1c7ed6"></i>항목 6개</span><span class="key"><i class="dash" style="--c:#2b8a3e"></i>통과선 0.65</span></div>
-        <figcaption>왼쪽: 항목과 등급별 "따라할 수 있음" 비율. 오른쪽: 거친 항목 6개가 정확한 크기의 신호를 거의 다 지킨다.</figcaption>
+        <figcaption>왼쪽: 항목과 등급별 "따라할 수 있음" 비율. 오른쪽: 거친 항목 6개가 정확한 크기의 신호를 거의 다 유지함.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2439,13 +2439,13 @@ video:  에피소드 하나 전체, 10fps
       <figure>
         <img src="assets/exp22_sam_rule_split.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 새 방법 B">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙</span></div>
-        <figcaption>에피소드 0의 오른손은 이제 접촉이 따로따로 잡혀 장갑에 가깝다. 같은 에피소드의 왼손은 용기 하나를 오래 쥐는데, 이제 여러 조각으로 잘린다.</figcaption>
+        <figcaption>에피소드 0의 오른손은 이제 접촉이 따로 검출되어 장갑에 가까움. 같은 에피소드의 왼손은 용기 하나를 오래 쥐는데, 이제 여러 조각으로 잘림.</figcaption>
       </figure>
 
       <figure>
         <img src="assets/exp22_arm_ceilings_split.png" loading="lazy" width="1125" height="450" alt="새 방법 B를 쓴 방법별 최고 점수 막대">
         <div class="keys"><span class="key"><i style="--c:#1c7ed6"></i>경계 F1 ±5프레임</span><span class="key"><i style="--c:#74c0fc"></i>경계 F1 ±15프레임</span><span class="key"><i style="--c:#2b8a3e"></i>접촉 IoU</span></div>
-        <figcaption>새 B를 쓴 방법별 최고 점수. C는 완벽하게 고르면 이제 0.315까지 간다.</figcaption>
+        <figcaption>새 B를 쓴 방법별 최고 점수. C는 완벽하게 고르면 0.315까지 도달함.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2588,7 +2588,7 @@ Answer with JSON only.</pre>
       <figure>
         <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#e8590c"></i>방법 B, 나머지 두 에피소드에서 고른 규칙 (유지 3프레임)</span></div>
-        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜하다.</figcaption>
+        <figcaption>에피소드 0의 왼손은 긴 쥐기 동안 여전히 조각나지만 바로 앞 실험(EXP-22)보다 덜함.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2647,13 +2647,13 @@ Answer with JSON only.</pre>
       <figure>
         <img src="assets/exp25_fisheye_zones.png" loading="lazy" width="1200" height="432" alt="화면 중심에서 손목까지 각도별로 원본과 편 프레임의 손 찾음 비율과 2D 오차">
         <div class="keys"><span class="key"><i style="--c:#1971c2"></i>원본</span><span class="key"><i style="--c:#e8590c"></i>편 프레임</span></div>
-        <figcaption>화면 중심에서 손목까지의 각도별. 왼쪽: 손을 찾은 프레임 비율. 오른쪽: 둘 다 찾은 프레임의 2D 오차 중앙값. 편 프레임은 모든 구역에서 손을 덜 찾는다. 각도 추정으로 90도를 넘는 14개는 빠짐.</figcaption>
+        <figcaption>화면 중심에서 손목까지의 각도별. 왼쪽: 손을 찾은 프레임 비율. 오른쪽: 둘 다 찾은 프레임의 2D 오차 중앙값. 편 프레임은 모든 구역에서 손을 덜 찾음. 각도 추정으로 90도를 넘는 14개는 빠짐.</figcaption>
       </figure>
 
       <figure>
         <img src="assets/exp25_fisheye_example.png" loading="lazy" width="880" height="880" alt="원본 어안 프레임과 같은 프레임을 편 영상 두 쌍" style="max-width:560px">
         <div class="keys"><span class="key"><i class="dot" style="--c:#00ff00"></i>모션캡처 손 지점</span></div>
-        <figcaption>왼쪽: 원본 프레임. 오른쪽: 같은 프레임을 편 것. 곧은 모서리가 곧게 나와 렌즈 모델이 제대로 적용됐다.</figcaption>
+        <figcaption>왼쪽: 원본 프레임. 오른쪽: 같은 프레임을 편 것. 곧은 모서리가 곧게 나와 렌즈 모델이 제대로 적용됨.</figcaption>
       </figure>
 
       <ul class="plain concl">
@@ -2937,7 +2937,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <figure>
         <img src="assets/exp29_arm_a_timelines.png" loading="lazy" width="1320" height="759" alt="에피소드 0, 30, 53의 손별 접촉: 장갑 정답, Muse Spark 단독, 보정한 Muse Spark">
         <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>정리한 장갑 (주 정답)</span><span class="key"><i style="--c:#1971c2"></i>Muse Spark 단독</span><span class="key"><i style="--c:#e8590c"></i>다른 두 에피소드에서 배운 보정을 적용</span></div>
-        <figcaption>에피소드 0의 오른손처럼 짧은 접촉이 이어지는 곳을 Muse Spark는 긴 접촉 하나로 본다.</figcaption>
+        <figcaption>에피소드 0의 오른손처럼 짧은 접촉이 이어지는 곳을 Muse Spark는 긴 접촉 하나로 판정함.</figcaption>
       </figure>
 
       <div class="tbl">
@@ -3073,7 +3073,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <figure>
         <img src="assets/exp30_grade_tables.png" loading="lazy" width="1680" height="408" alt="크기와 감쌀 폭의 Muse Spark 등급 대 3D 모델 등급 표, 1판과 2판">
         <div class="keys"><span class="key"><i style="--c:#08306b"></i>칸에 든 클립이 많음</span><span class="key"><i class="box" style="--c:#bfd8ec"></i>적음</span></div>
-        <figcaption>크기와 감쌀 폭에서 Muse Spark 등급(가로) 대 3D 모델 등급(세로), 1판과 2판. 상은 "로봇 손에 쉬움", 즉 작거나 좁음. 2판은 중간 크기 물체 일부를 "작음"에서 빼내지만, 넓은 물체 다수를 여전히 좁다고 본다.</figcaption>
+        <figcaption>크기와 감쌀 폭에서 Muse Spark 등급(가로) 대 3D 모델 등급(세로), 1판과 2판. 상은 "로봇 손에 쉬움", 즉 작거나 좁음. 2판은 중간 크기 물체 일부를 "작음"에서 빼내지만, 넓은 물체 다수를 여전히 좁다고 판정함.</figcaption>
       </figure>
 
       <div class="tbl">
@@ -3260,7 +3260,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 08:31 KST
+    마지막 갱신 2026-10-28 08:33 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
