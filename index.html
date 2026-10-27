@@ -381,6 +381,7 @@
       <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
       <li>측정 계획을 지원서의 비교 구조로 다시 맞춤. 평가 1은 촉각 장갑을 정답으로 세 방법을 비교하고, 평가 2는 검증 클립 1,426개에서 우리 점수를 Muse Spark 단독과 비교함. 유료 호출은 지금 보류 중.</li>
       <li>평가 1의 방법 B(SAM 규칙) 코드 완성. 파일럿에서 접촉 구간 IoU는 0.75로 "항상 접촉"보다 낫지만, 연이은 접촉을 하나로 묶어 경계를 잘 못 찾음.</li>
+      <li>평가 1의 A(Muse Spark 단독)와 C(B + Muse Spark 경계 확인) 코드 완성. 정답을 그대로 답으로 줘 최고 점수를 재니 A는 5fps에서도 경계 F1(±5) 0.96, C는 B가 찾은 경계 190개 중 52개에 묶여 0.15. 유료 실행 전에 C를 공정한 비교로 만드는 방법을 정해야 함.</li>
       <li>평가 2 클립 완성. 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
       <li>평가 2 정답 라벨을 다시 만듦. 처음 라벨은 손 크기 비율로 늘린 리타게팅 탓에 Allegro 손가락 끝이 사람 손가락 끝에서 31mm 떨어져, 로봇 손보다 리타게팅의 부작용을 쟀음. 새 라벨 v2는 손가락 위치를 맞춘 뒤 메쉬 충돌과 접촉점 도달을 검사함. 튜닝 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(+0.04). 다만 허용 깊이에 민감함(2mm 18%, 10mm 66%). 같은 기준으로 검증 클립 1,426개는 46.4%, 사람별 43~51%.</li>
       <li>v2 라벨에서는 물체 종류만으로 AUC 0.74. 영상 손 모양 항목은 0.52로 신호를 잃었고(이전 라벨의 0.63은 리타게팅 부작용을 배운 것), 영상 항목을 다 합쳐도 물체 위에 약 0.01만 더함. 체크리스트는 영상 품질을 재는데 정답은 주로 물체의 성질.</li>
@@ -469,6 +470,7 @@
             <tr><td class="first"><a href="#exp-18">EXP-18</a></td><td class="wrap-ok">물체 형상 점검 (선택지 A)</td><td>3D 모델의 크기·모양 숫자 7개로 0.695(물체 이름 0.742), 처음 보는 물체에서도 0.673. 미리 정한 규칙으로 통과, 선택지 A로 진행.</td></tr>
             <tr><td class="first"><a href="#exp-19">EXP-19</a></td><td class="wrap-ok">물체 항목 6개, 대리 등급 점검</td><td>상·중·하 항목 6개로 0.683, 처음 보는 물체 0.666. 정확한 크기의 신호를 거의 다 지켜 통과. 손 대비 크기가 대부분을 설명.</td></tr>
             <tr><td class="first"><a href="#exp-20">EXP-20</a></td><td class="wrap-ok">검증 클립 v2 라벨</td><td>고정한 기준으로 검증 46.4%(튜닝 47.0%), 사람별 43~51%. 물체별 비율이 튜닝과 순위 상관 0.85. 라벨만 냈고 채점은 아직.</td></tr>
+            <tr><td class="first"><a href="#exp-21">EXP-21</a></td><td class="wrap-ok">평가 1 각 방법의 최고 점수</td><td>완벽한 답이면 A(5fps)는 경계 F1 ±5에서 0.96이라 5fps는 걸림돌이 아님. C는 B가 찾은 경계에 묶여 최고 0.15.</td></tr>
           </tbody>
         </table>
       </div>
@@ -506,8 +508,8 @@
             </tr>
             <tr>
               <td class="first">방법 B가 연이은 접촉을 묶음</td>
-              <td>손이 늘 어떤 물체 곁에 있어 접촉 여러 개가 한 구간이 됨. 경계 190~248개 중 52개만 찾음 (EXP-14)</td>
-              <td>가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 끊는 규칙을 튜닝 50개에서 정함</td>
+              <td>손이 늘 어떤 물체 곁에 있어 접촉 여러 개가 한 구간이 됨. 경계 190~248개 중 52개만 찾음 (EXP-14). C는 B의 경계만 옮길 수 있어 완벽한 답으로도 0.15가 최고라, 계획대로의 A 대 C 비교는 구조 때문에 A에 유리함 (EXP-21)</td>
+              <td>유료 실행 전에 결정: (1) 가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 끊는 규칙을 튜닝 50개에서 정해 B 재현율을 올림, 또는 (2) C가 B의 긴 접촉 구간 안도 훑게 함</td>
             </tr>
             <tr>
               <td class="first">HOT3D 어안 왜곡</td>
@@ -580,7 +582,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -2127,12 +2129,69 @@ video:  에피소드 하나 전체, 10fps
         <li>이 라벨이 이제 평가 2 AUC의 정답. 검증 클립에서는 아직 어떤 점수나 체크리스트도 돌리지 않음.</li>
       </ul>
     </article>
+
+    <!-- EXP-21 -->
+    <article class="exp" id="exp-21">
+      <div class="exp-h"><span class="id">EXP-21</span><span class="t">평가 1 각 방법이 낼 수 있는 최고 점수</span><span class="d">10/27</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 1의 Muse Spark 방법 두 개(A Muse Spark 단독, C SAM 규칙 + Muse Spark 경계 확인)의 코드를 썼다. 돈을 쓰기 전에 두 가지를 본다. 코드가 답을 접촉 구간과 점수로 제대로 바꾸는가. 그리고 만든 구조상 각 방법이 낼 수 있는 최고 점수는 얼마인가. A는 5fps로는 ±5프레임에 닿을 수 없다는 지적이 있었고, C는 B가 찾은 경계만 옮길 수 있다.</dd>
+        <dt>입력</dt><dd>튜닝 파일럿 에피소드 0, 30, 53. 주 정답은 정리한 촉각 장갑.</dd>
+        <dt>방법</dt><dd>자체 점검: Muse Spark 대신 주 정답 자체를 답으로 줌. 완벽한 Muse Spark인 셈이라 코드를 점검하면서 각 방법의 상한을 줌. 두 방법 모두 뒤에 B 규칙(0.2초 이하 틈은 잇고 0.2초보다 짧은 접촉은 버림)을 적용.</dd>
+      </dl>
+
+      <div class="io two">
+        <div>
+          <div class="k">A: Muse Spark 단독</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>720p 에피소드에서 6프레임마다 하나(5fps), 요청 하나에 10프레임</li>
+            <li>프레임과 손마다 접촉 여부를 답함</li>
+            <li>샘플 하나가 자기 6프레임을 대표</li>
+          </ul>
+        </div>
+        <div>
+          <div class="k">C: B + Muse Spark 경계 확인</div>
+          <ul class="plain" style="font-size:13.5px;margin:0">
+            <li>B가 찾은 시작과 끝마다 15프레임 앞부터 15프레임 뒤까지 5프레임 간격으로 7장</li>
+            <li>Muse Spark가 첫 접촉 프레임이나 마지막 접촉 프레임을 고르거나 B를 그대로 둠</li>
+            <li>B 규칙은 다른 파일럿 에피소드에서 고른 것(EXP-14)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">정리한 장갑 기준, 파일럿 3개, 양손</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>방법</th><th class="n">경계 F1 ±5</th><th class="n">경계 F1 ±15</th><th class="n">접촉 IoU</th><th class="n">찾은 경계 / 실제</th></tr></thead>
+            <tbody>
+              <tr><td class="first">A, 5fps에서 완벽한 답</td><td class="n"><b>0.956</b></td><td class="n">0.956</td><td class="n">0.957</td><td class="n">174 / 190</td></tr>
+              <tr><td class="first">B, SAM 규칙 실측 (EXP-14)</td><td class="n">0.066</td><td class="n">0.149</td><td class="n">0.747</td><td class="n">52 / 190</td></tr>
+              <tr><td class="first">C, B + 완벽한 경계 선택</td><td class="n"><b>0.149</b></td><td class="n">0.149</td><td class="n">0.752</td><td class="n">52 / 190</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">장갑 원신호 기준 A 상한은 ±5에서 0.825, 데이터셋 라벨 기준 0.830(±15에서 0.939). C는 0.12~0.15에 머문다.</p>
+
+      <figure>
+        <img src="assets/exp21_arm_ceilings.png" loading="lazy" width="1125" height="450" alt="방법별 최고 점수 막대: 경계 F1 ±5, ±15, 접촉 IoU">
+        <div class="keys"><span class="key"><i style="--c:#1c7ed6"></i>경계 F1 ±5프레임</span><span class="key"><i style="--c:#74c0fc"></i>경계 F1 ±15프레임</span><span class="key"><i style="--c:#2b8a3e"></i>접촉 IoU</span></div>
+        <figcaption>방법별 최고 점수. A는 5fps에서 완벽한 답, B는 실측, C는 B 위에 완벽한 경계 선택.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>코드는 제대로 동작함. 구조가 허락하는 곳에서는 완벽한 답이 거의 완벽한 점수를 냄.</li>
+        <li>5fps는 A가 ±5프레임에 닿는 것을 막지 않음. 5fps의 완벽한 Muse Spark는 0.96. 그 지적은 너무 셌음. 실제 Muse Spark가 모자라면 그건 프레임 수가 아니라 답 때문.</li>
+        <li>C는 B를 크게 넘을 수 없음. B가 찾은 경계 190개 중 52개만 옮길 수 있어 완벽하게 골라도 0.15. 지금 구조의 "SAM + Muse Spark"는 B가 접촉을 몇 개로 나누느냐에 묶이고, B는 연이은 접촉을 하나로 묶음(EXP-14).</li>
+        <li>그래서 계획대로의 A 대 C 비교는 구조 때문에 A에 유리함. 돈을 쓰기 전에 C를 공정한 비교로 만들 방법을 정해야 함: (1) 튜닝 50개에서 가장 가까운 물체가 바뀌거나 손이 잠깐 떨어지면 접촉을 끊는 규칙으로 B의 재현율을 먼저 올림(튜닝 나머지 SAM 실행 필요), 또는 (2) C가 B의 긴 접촉 구간 안도 초당 몇 프레임씩 훑어 놓친 놓음과 닿음을 찾게 함(Muse Spark 호출이 늘어남).</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
     <h2><span class="no">2</span>진행 중인 작업</h2>
     <h3 style="margin-top:0">접촉 구간 검출</h3>
-    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
+    <p>영상만 보고 손별로 접촉 시작과 끝을 찾는다. 파일럿 3개(EXP-06)로 전 과정이 끝까지 도는 것을 확인했고, 측정 계획을 지원서의 세 비교 대상으로 다시 맞췄다. 방법 B는 구현해서 파일럿으로 점검했다(<a href="#exp-14">EXP-14</a>). A와 C도 코드를 끝냈고, 완벽한 답으로 잰 최고 점수는 A 0.96, C 0.15다(<a href="#exp-21">EXP-21</a>). C가 B의 경계에 묶이는 문제를 어떻게 풀지 정한 뒤 유료로 돌린다. 유료 호출이 보류 중이라 튜닝 나머지 47개의 SAM 실행을 기다린다.</p>
 
     <h3>비교 대상</h3>
     <ol class="flow">
@@ -2272,7 +2331,7 @@ video:  에피소드 하나 전체, 10fps
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-27 23:30 KST
+    마지막 갱신 2026-10-27 23:33 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -2320,6 +2379,8 @@ video:  에피소드 하나 전체, 10fps
         ["done", "측정 계획 고정 (비교 대상 3가지)"],
         ["done", "주 정답 확정: 깜빡임을 정리한 촉각 장갑"],
         ["done", "방법 B와 참고 행 구현, 파일럿 3개로 점검 (EXP-14)"],
+        ["done", "A·C 코드 완성, 최고 점수 측정: A 0.96, C 0.15 (EXP-21)"],
+        ["todo", "C를 공정한 비교로 만드는 방법 결정"],
         ["todo", "튜닝 나머지 47개 SAM 실행 (유료 호출 보류)"],
         ["todo", "B SAM 규칙 기준값과 시작 지연 정하기 (튜닝 50개)"],
         ["todo", "A Muse Spark 단독 (5fps)"],

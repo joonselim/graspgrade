@@ -545,16 +545,19 @@ def cmd_rule(args):
     eps = [e for e in split["tune"] if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
     data = load_cached(eps, ground_truth(eps))
     report = {"episodes": eps, "note": "glove_clean = tactile sum > 800 with flicker under 0.1 s removed (main). glove = raw tactile sum > 800 and label = dataset labels (checks)"}
+    segments_out = {}
     for target, name in (("tactile_clean", "glove_clean"), ("tactile", "glove"), ("label", "label")):
         sc, chosen, per_ep = Score(), {}, {}
         for ep in eps:
             train = [u for (e, s), u in data.items() if e != ep]
-            test = [u for (e, s), u in data.items() if e == ep]
+            test = [(s, u) for (e, s), u in data.items() if e == ep]
             params, shifts = pick_rule(train, target)
             chosen[ep] = {"params": params, "shift_start_end": shifts}
             one = Score()
-            for u in test:
+            for side, u in test:
                 segs = to_30fps(rule_segments(u["base"], u["gap"], **params), u["n30"], 0, *shifts)
+                if target == "tactile_clean":  # arm B output for arm C, rule chosen on the other episodes
+                    segments_out.setdefault(str(ep), {"n30": u["n30"]})[side] = [[int(a), int(b)] for a, b in segs]
                 sc.add(segs, u["gt30"][target])
                 one.add(segs, u["gt30"][target])
             per_ep[ep] = {k: one.result()[k] for k in ("boundary_f1_5", "boundary_f1_15", "contact_iou")}
@@ -568,6 +571,7 @@ def cmd_rule(args):
             "contact_share": round(float(np.mean(np.concatenate([u["gt30"][target] for u in units]))), 3),
         }
     (OUT / "rule_report.json").write_text(json.dumps(report, indent=1, default=str))
+    (OUT / "rule_segments.json").write_text(json.dumps(segments_out))
     for name in ("glove_clean", "glove", "label"):
         r = report[name]
         print(name, "contact share", r["contact_share"])

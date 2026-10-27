@@ -78,5 +78,6 @@ Windows 사본을 WSL로 동기화:
 | `scripts/muse_hot3d.py` | 숫자 2 Muse 체크리스트/기준선 호출. `--send` 없으면 비용만. 크레딧 사용 |
 | `scripts/number2_sam_checks.py` | SAM 결과로 가시성, 접촉 명확성 등급 |
 | `scripts/number2_score.py` | 숫자 2 점수 학습과 비교. `--check` (튜닝만, 코드 점검), `--final` (held-out, 마지막에 한 번) |
+| `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만), `score`, `selftest` (가상 Muse로 상한) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |

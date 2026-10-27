@@ -165,6 +165,12 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - `out/hot3d_clips/clips_labeled.csv`가 숫자 2의 클립 목록 + 정답이다.
 - SAM 비용 다시 계산: held-out 전부 + 튜닝 400개, 겹치는 클립을 한 요청으로 합치면 $17.76 + $8.82 = 약 $27. Muse는 클립마다 약 $0.024라 전부면 약 $44, held-out 절반이면 약 $27.
 
+## 숫자 1 Muse 비교군 준비 (EXP-21, 무료)
+
+- `muse_contact.py`: A (Muse 단독, 5fps, 호출당 10프레임)와 C (B 경계마다 7프레임) 코드, `--send` 없으면 비용만. held-out A 약 $11.86, C 경계당 약 $0.013. 프롬프트 `scripts/prompts/number1_arm_a.txt`, `number1_arm_c.txt`.
+- 정답을 그대로 답하는 가상 Muse로 상한 측정 (파일럿 3개, 정리한 장갑): A 5fps 상한 F1(±5) 0.956 (5fps는 걸림돌 아님), C 상한 0.149 (B가 190개 중 52개 경계만 찾기 때문).
+- 결정 필요: C를 공정한 비교로 만들려면 (1) 튜닝 50개로 B 재현율을 올리거나 (SAM $11.89 필요), (2) C가 B의 긴 접촉 구간 안도 몇 fps로 훑게 한다 (Muse 호출 증가).
+
 ## 숫자 2 유료 실행 준비 (2026-10-27, 무료로 완료)
 
 - `hot3d_number2_inputs.py`: 최종 클립 세트 `out/number2/clips_final.csv` (score_train 400, item_train 1,985, held_out 1,426, 정답 v2). 겹치는 클립을 합친 SAM 윈도우 513개를 10fps mp4로 잘라 둠 (`out/number2/sam_windows/`, 2.6 GB). Muse용 720 px 프레임 클립당 6장, 10,956장 (`out/number2/muse_frames/`).

@@ -81,6 +81,11 @@ Details fixed now:
   some object. Proposed: also break a contact when the nearest object
   changes or the hand leaves for a moment, chosen on tuning episodes.
 - Arm C only refines the boundaries arm B finds, so arm B sets its recall.
+- Measured ceilings (EXP-21, pilot episodes, perfect answers): arm A at 5 fps
+  0.956 boundary F1 at ±5 frames, arm C 0.149 because arm B finds 52 of 190
+  boundaries. Before the paid run, either raise arm B recall on the 50 tuning
+  episodes, or let arm C also sample inside long arm B contacts. To decide
+  with the user.
 
 ### What we expect
 
