@@ -1,7 +1,8 @@
-"""Copyable label v2 (docs/MEASUREMENT_PLAN.md, "Copyable definition v2"), tuning clips only.
+"""Copyable label v2 (docs/MEASUREMENT_PLAN.md, "Copyable definition v2"), thresholds fixed on tuning clips.
 
-    python scripts/hot3d_copyable_v2.py run       # per clip geometry, cached
-    python scripts/hot3d_copyable_v2.py report    # labels, acceptance checks, figures
+    python scripts/hot3d_copyable_v2.py run [tune|held_out]     # per clip geometry, cached
+    python scripts/hot3d_copyable_v2.py report [tune|held_out]  # labels and checks
+    python scripts/hot3d_copyable_v2.py figures                  # tuning figures
 
 Per clip at its contact frame:
   - position retargeting of the clip hand (Allegro, free base),
@@ -123,10 +124,10 @@ def clip_geometry(args):
     return rows, arrays
 
 
-def cmd_run():
+def cmd_run(name="tune"):
     split = json.loads((ROOT / "splits" / "hot3d_aria.json").read_text())
     clips = pd.read_csv(ROOT / "out" / "hot3d_clips" / "clips.csv")
-    clips = clips[clips.sequence.isin(split["tune"]) & clips.moved & (clips.clip_qa_pass_pct >= 90)]
+    clips = clips[clips.sequence.isin(split[name]) & clips.moved & (clips.clip_qa_pass_pct >= 90)]
     jobs = [(s, g) for s, g in clips.groupby("sequence")]
     rows, arrays = [], []
     with Pool(10) as pool:
@@ -134,8 +135,8 @@ def cmd_run():
             rows += r
             arrays += a
             print(f"{i + 1}/{len(jobs)}", flush=True)
-    pd.DataFrame(rows).to_csv(OUT / "tune_v2_clips.csv", index=False)
-    np.savez_compressed(OUT / "tune_v2_geometry.npz",
+    pd.DataFrame(rows).to_csv(OUT / f"{name}_v2_clips.csv", index=False)
+    np.savez_compressed(OUT / f"{name}_v2_geometry.npz",
                         tip_sd=np.stack([a["tip_sd"] for a in arrays]), reach=np.stack([a["reach"] for a in arrays]),
                         mesh_min=np.stack([a["mesh_min"] for a in arrays]),
                         human_touch=np.stack([a["human_touch"] for a in arrays]))
@@ -164,9 +165,9 @@ def within_object_corr(df):
     return float(np.average(rs, weights=ws)) if rs else float("nan")
 
 
-def cmd_report():
-    df = pd.read_csv(OUT / "tune_v2_clips.csv")
-    g = dict(np.load(OUT / "tune_v2_geometry.npz"))
+def cmd_report(name="tune"):
+    df = pd.read_csv(OUT / f"{name}_v2_clips.csv")
+    g = dict(np.load(OUT / f"{name}_v2_geometry.npz"))
     lab, parts = label(g, parts=True)
     df["copyable"] = lab.astype(int)
     share = float(df.copyable.mean())
@@ -192,8 +193,8 @@ def cmd_report():
         "wrist_to_human_wrist_mm_median": float(df.wrist_to_human_wrist_mm.median()),
         "deepest_mesh_point_mm_median_no_shift": round(float(-1000 * np.median(g["mesh_min"][:, np.argmin(np.linalg.norm(SHIFTS, axis=1))])), 1),
     }
-    (OUT / "tune_v2_report.json").write_text(json.dumps(out, indent=1))
-    df.to_csv(OUT / "tune_v2_clips_labeled.csv", index=False)
+    (OUT / f"{name}_v2_report.json").write_text(json.dumps(out, indent=1))
+    df.to_csv(OUT / f"{name}_v2_clips_labeled.csv", index=False)
     print(json.dumps(out, indent=1))
 
 
@@ -312,7 +313,11 @@ def cmd_figures():
 
 
 def main():
-    {"run": cmd_run, "report": cmd_report, "figures": cmd_figures}[sys.argv[1]]()
+    cmd = sys.argv[1]
+    if cmd == "figures":
+        cmd_figures()
+    else:
+        {"run": cmd_run, "report": cmd_report}[cmd](sys.argv[2] if len(sys.argv) > 2 else "tune")
 
 
 if __name__ == "__main__":

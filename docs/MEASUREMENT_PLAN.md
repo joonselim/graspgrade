@@ -197,11 +197,11 @@ number 2 before any paid call.
 
 | Use | Clips | Copyable |
 | --- | --- | --- |
-| Train the score weights | 400 random tuning clips (seed 20261026) from 2,385 | 53.3% in all tuning clips |
-| Report AUC | all 1,426 held-out clips | 51.7% |
+| Train the score weights | 400 random tuning clips (seed 20261026) from 2,385 | 47.0% in all tuning clips (v2) |
+| Report AUC | all 1,426 held-out clips | 46.4% (v2, EXP-20) |
 
-(The copyable shares in this table are from the EXP-10 label. With the v2
-label the tuning share is 47.0%. Held-out v2 labels are not computed yet.)
+Ground truth is the copyable v2 label (EXP-16), with the thresholds fixed on
+tuning. Object shares agree between the splits (rank correlation 0.85, EXP-20).
 
 ### Option A check (written 2026-10-27, before computing, EXP-18)
 

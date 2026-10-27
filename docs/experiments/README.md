@@ -30,5 +30,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-17](exp17_v2_signal.md) | 2026-10-27 | What predicts the v2 label (EXP-12 and EXP-13 again) | $0 | Object identity alone 0.74. Video hand shape lost its signal (0.52, it had learned the retargeting side effect). Our video checks add about 0.01 on top of the object. |
 | [EXP-18](exp18_object_geometry.md) | 2026-10-27 | Option A check: object geometry vs object identity | $0 | Seven size and shape numbers from the 3D models reach 0.695 (identity 0.742) and still 0.673 on unseen objects, where identity is 0.5. Option A passes. |
 | [EXP-19](exp19_object_items.md) | 2026-10-27 | Six object items for the checklist, stand-in grades | $0 | Coarse three-level items keep the object signal: 0.683 leaving a person out, 0.666 leaving an object out. Size next to the hand does most of the work. |
+| [EXP-20](exp20_v2_held_out_labels.md) | 2026-10-27 | Held-out copyable v2 labels | $0 | Fixed v2 rule on held-out: 46.4% copyable (tuning 47.0%), persons 43% to 51%. Object shares agree with tuning (rank correlation 0.85). Labels only, nothing scored. |
 
 Total Meta API spend so far: about $1.53 of $150.
