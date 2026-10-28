@@ -561,6 +561,7 @@
             <tr class="core"><td class="first"><a href="#exp-28">EXP-28</a></td><td class="wrap-ok">정답을 다시 쓸 수 있는 벤치마크로</td><td>두 정답을 라벨 파일과 독립 채점 코드로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현. 평가 1은 CC BY 4.0, 평가 2는 CC BY-NC-SA 4.0.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-29">EXP-29</a></td><td class="wrap-ok">튜닝 데이터에서 받은 첫 실제 Muse Spark 답</td><td>Muse Spark는 접촉을 약 7프레임 일찍 보고 보정이 F1을 두 배로 만듦. 직접 물은 Muse Spark는 0.52, 체크리스트로 물으면 0.63~0.65. 가중치 학습의 이득(+0.019)은 잡음 안. 처음 보는 물체에서 0.607.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-30">EXP-30</a></td><td class="wrap-ok">Muse Spark가 튜닝에서 틀리는 곳과 프롬프트 한 번 수정</td><td>Muse Spark는 물체를 실제보다 작고 좁게 보고 1초 미만의 놓음을 거의 못 봄. 프롬프트를 한 번 고쳐도 점수가 오르지 않아 두 프롬프트 모두 1판 유지.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-31">EXP-31</a></td><td class="wrap-ok">물체 비율을 더하는 비교와 물체 안 AUC의 코드 점검</td><td>코드가 계획을 따르고 기존 출력은 그대로. 튜닝 대리 등급에서 라벨 5개일 때만 우리 점수가 물체 비율에 더하고, 같은 물체 안에서는 우연 수준에 가까움(0.574).</td></tr>
           </tbody>
         </table>
       </div>
@@ -593,7 +594,7 @@
             </tr>
             <tr>
               <td class="first">같은 물체 안의 잡기 순위 (평가 2)</td>
-              <td>물체 33개 모두 따라할 수 있는 잡기와 없는 잡기가 섞여 있고, 24개는 20~80%. 물체가 라벨 분산의 약 4분의 1만 설명함. 지금 점수는 물체 단위로 작동함</td>
+              <td>물체 33개 모두 따라할 수 있는 잡기와 없는 잡기가 섞여 있고, 24개는 20~80%. 물체가 라벨 분산의 약 4분의 1만 설명함. 튜닝 점검에서 같은 물체 안 AUC 0.574로 점수는 물체 단위로 작동함(EXP-31)</td>
               <td>검증에서 물체 안 AUC와 실패 원인별 AUC를 보고(계산 전에 규칙 고정)</td>
             </tr>
             <tr>
@@ -873,7 +874,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3190,6 +3191,58 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>방법 A는 약 1초보다 짧은 놓음을 보지 못하고, 프롬프트로는 바뀌지 않음. 5fps에서 0.5초 놓음은 2~3프레임이고 그동안 손은 물체 바로 옆에 있음. 이것이 A의 경계 F1을 묶는 한계이고, 프레임 수가 아님(완벽한 답의 최고 점수 0.956).</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-31">
+      <div class="exp-h"><span class="id">EXP-31</span><span class="t">물체 비율을 더하는 비교와 물체 안 AUC의 코드 점검</span><span class="d">10/28</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>10/28 제안서로 더한 비교 6(라벨이 있는 물체에 물체 비율을 더함)과 보고 행 두 개(같은 물체 안 AUC, 실패 원인별 AUC)의 코드가 계산 전에 적은 규칙을 따르는가. 기존 출력은 그대로인가.</dd>
+        <dt>입력</dt><dd>튜닝만. 학습 1,985개, 시험은 점수 학습용 400개. 물체 항목 6개는 Muse Spark 답이 아니라 3D 모델 대리 등급(EXP-19), Muse Spark 단독은 실제 답(EXP-29). 유료 호출 없음.</dd>
+        <dt>방법</dt><dd>물체의 라벨 클립이 <i>k</i> = 5, 20, 전체일 때 물체 비율 = (따라할 수 있는 클립 + 1) / (<i>k</i> + 2). 우리 점수의 로짓과 물체 비율의 로짓으로 로지스틱 회귀를 학습. 학습 클립의 우리 점수는 그 사람을 빼고 맞춘 값, 물체 비율은 다른 사람의 클립에서 뽑음. <i>k</i> = 5, 20은 20번 뽑아 평균. 물체 안 AUC는 같은 물체의 두 클립 쌍 중 순서가 맞는 비율(동점은 절반). 가짜 데이터 점검 30개로 sklearn AUC와 대조.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">비교 6: 물체 비율을 더할 때 (점수 학습용 400개, 대리 등급)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>라벨 클립</th><th class="n">물체 비율만</th><th class="n">결합</th><th class="n">결합 − 물체 비율</th><th class="n">결합 − 우리 점수</th></tr></thead>
+            <tbody>
+              <tr><td class="first">0 (우리 점수만)</td><td class="n"></td><td class="n">0.721</td><td class="n"></td><td class="n"></td></tr>
+              <tr><td class="first">5</td><td class="n">0.722</td><td class="n"><b>0.749</b></td><td class="n">+0.027 (−0.002~0.060)</td><td class="n">+0.028 (−0.013~0.061)</td></tr>
+              <tr><td class="first">20</td><td class="n">0.770</td><td class="n">0.773</td><td class="n">+0.003 (−0.010~0.017)</td><td class="n">+0.052 (0.014~0.091)</td></tr>
+              <tr><td class="first">전체</td><td class="n">0.777</td><td class="n">0.783</td><td class="n">+0.005 (−0.006~0.019)</td><td class="n">+0.061 (0.028~0.095)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">물체 비율이 믿을 만해질수록 결합 모델에서 우리 점수의 가중치가 0.63(<i>k</i> = 5)에서 0.22(전체)로 줄어듦.</p>
+
+      <div class="tbl">
+        <p class="cap">보고 행: 물체 안 AUC와 실패 원인별 AUC (점수 학습용 400개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>점수</th><th class="n">같은 물체 안</th><th class="n">같은 물체·사람 안</th><th class="n">잡기 실패 (22)</th><th class="n">도달 실패 (50)</th><th class="n">충돌 (154)</th></tr></thead>
+            <tbody>
+              <tr><td class="first">우리 점수</td><td class="n">0.574 (0.495~0.652)</td><td class="n">0.520</td><td class="n">0.775</td><td class="n">0.693</td><td class="n">0.723</td></tr>
+              <tr><td class="first">R3 (학습한 등급)</td><td class="n">0.568 (0.505~0.636)</td><td class="n">0.550</td><td class="n">0.795</td><td class="n">0.698</td><td class="n">0.708</td></tr>
+              <tr><td class="first">Muse Spark 단독</td><td class="n">0.526 (0.450~0.613)</td><td class="n">0.532</td><td class="n">0.614</td><td class="n">0.566</td><td class="n">0.486</td></tr>
+              <tr><td class="first">물체 비율</td><td class="n">0.500 (정의상)</td><td class="n">0.500</td><td class="n">0.860</td><td class="n">0.719</td><td class="n">0.783</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">같은 물체의 쌍은 1,074개로 전체 쌍의 2.7%. 이 400개에서 따라할 수 있는 클립과 없는 클립이 각각 5개 이상인 물체는 10개(검증에서는 27개).</p>
+
+      <figure>
+        <img src="assets/exp31_comparison6_extra_check.png" loading="lazy" width="1320" height="480" alt="왼쪽은 라벨 클립 수별 우리 점수, 물체 비율, 결합의 AUC, 오른쪽은 물체 안과 실패 원인별 AUC">
+        <figcaption>왼쪽: 물체의 라벨 클립 수에 따른 AUC. 라벨 5개에서는 결합이 물체 비율보다 높고, 20개부터는 거의 같음. 오른쪽: 같은 물체 안에서는 모든 점수가 0.5 근처이고, Muse Spark 단독은 충돌 실패를 구분하지 못함(0.486).</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>코드가 측정 계획의 규칙을 따름. 가짜 데이터 점검 30개 통과, 기존 출력은 바이트 단위로 같음.</li>
+        <li>대리 등급으로 낸 튜닝 수치라 결과가 아니라 코드 점검임. 검증 결과의 방향만 시사함: 라벨 5개일 때는 우리 점수가 물체 비율에 더하고, 20개부터는 물체 비율만으로 결합과 같음.</li>
+        <li>같은 물체 안에서 우리 점수는 우연 수준에 가까움(0.574, 구간이 0.5를 포함). 지금 점수는 물체 단위로 작동함.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3253,6 +3306,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>프롬프트를 튜닝에서 한 번만 고쳐 봄(<a href="#exp-30">EXP-30</a>). 체크리스트 2판(물체 세 변을 cm로)은 등급은 더 정확했지만 학습된 점수가 0.625로 1판 0.638보다 낮았고, 방법 A 2판(잠깐 놓음도 비접촉)은 답의 2%만 바꾸고 F1이 0.120으로 1판 0.132보다 낮았음. 미리 정한 규칙대로 검증에는 두 프롬프트 모두 1판을 씀. 검증용 A 보정은 시작 +7, 끝 −7프레임.</li>
       <li>10/28 제안서로 점수의 용도와 범위를 정함. 우리 점수는 라벨 없는 물체의 기본값이고, 라벨이 있는 물체에는 물체 비율을 더함(비교 6). 점수는 강체에만 매기고, 부드러운 물체는 Muse Spark 질문 하나로 걸러 "촉각 확인 필요"로 분류함. 같은 물체 안 AUC와 실패 원인별 AUC를 보고 행으로 더함. 모두 계산 전에 측정 계획에 고정.</li>
       <li>코드에서 찾은 차이: 물체 기준선(비교 2)이 튜닝 2,385개가 아니라 점수 학습용 400개로 물체 비율을 계산하고 있었음. 검증 채점 전에 2,385개로 고침.</li>
+      <li>비교 6과 보고 행 두 개의 코드를 튜닝 대리 등급으로 점검(<a href="#exp-31">EXP-31</a>). 라벨 5개일 때 결합 0.749 대 물체 비율 0.722, 20개부터는 거의 같음. 같은 물체 안 AUC는 0.574. 결과가 아니라 코드 점검.</li>
       <li>다음: 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
@@ -3346,7 +3400,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 15:42 KST
+    마지막 갱신 2026-10-28 15:57 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3462,6 +3516,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "물체 기준선의 물체 비율을 튜닝 2,385개로 수정"],
         ["todo", "부드러운 물체 라벨 시트 (두 사람, 호출 전 커밋)"],
         ["todo", "부드러운 물체 확인: 파일럿 20개 → HOT3D 1,426개 + OpenGraph 약 330구간"],
+        ["done", "비교 6과 물체 안·실패 원인별 AUC 코드 점검 (EXP-31)"],
         ["todo", "비교 6과 물체 안·실패 원인별 AUC (검증)"]
       ]
     },
