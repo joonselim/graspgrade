@@ -29,6 +29,7 @@ glove and the dataset labels (annotation.hand) are reported next to it as checks
 import argparse
 import json
 import sys
+from itertools import product
 from pathlib import Path
 
 import cv2
@@ -563,13 +564,58 @@ def score_rule(units, params, target, shifts=(0, 0)):
     return sc.result()
 
 
-def pick_rule(units, target):
-    """Grid search on tuning units: best F1 at 15 frames plus IoU, then the median start and end delay."""
-    from itertools import product
+GRID = [dict(zip(RULE_GRID, v)) for v in product(*RULE_GRID.values())]
+_GRID_UNITS, _GRID_TARGETS = None, None
+
+
+def _grid_job(i):
+    """Unshifted arm B score parts of grid point i on every unit and target."""
+    out = []
+    for u in _GRID_UNITS:
+        segs = to_30fps(rule_segments(u["base"], u["gap"], oid=u.get("oid"), **GRID[i]), u["n30"], 0)
+        parts = {}
+        for t in _GRID_TARGETS:
+            parts[t] = Score()
+            parts[t].add(segs, u["gt30"][t])
+        out.append(parts)
+    return out
+
+
+def grid_parts(units, targets):
+    """parts[i][j][target]: Score of grid point i on unit j, computed once in parallel (fork)."""
+    global _GRID_UNITS, _GRID_TARGETS
+    from multiprocessing import get_context
+    _GRID_UNITS, _GRID_TARGETS = units, list(targets)
+    with get_context("fork").Pool() as pool:
+        return pool.map(_grid_job, range(len(GRID)))
+
+
+def merge_scores(parts):
+    """One Score from per-unit Scores, the same as adding the units to one Score in this order."""
+    sc = Score()
+    for p in parts:
+        for t in TOLS:
+            sc.tp[t] += p.tp[t]
+        sc.n_pred += p.n_pred
+        sc.n_ref += p.n_ref
+        sc.inter += p.inter
+        sc.union += p.union
+        for k in sc.err:
+            sc.err[k] += p.err[k]
+    return sc
+
+
+def pick_rule(units, target, parts=None, idx=None):
+    """Grid search on tuning units: best F1 at 15 frames plus IoU, then the median start and end delay.
+
+    parts (from grid_parts) and idx (which of its units are the training units)
+    avoid scoring the grid again for every leave-one-out fold. Same result as
+    scoring each grid point on the units directly."""
+    if parts is None:
+        parts, idx = grid_parts(units, [target]), list(range(len(units)))
     best = None
-    for values in product(*RULE_GRID.values()):
-        p = dict(zip(RULE_GRID, values))
-        r = score_rule(units, p, target)
+    for i, p in enumerate(GRID):
+        r = merge_scores([parts[i][j][target] for j in idx]).result()
         key = r["boundary_f1_15"] + r["contact_iou"]
         if best is None or key > best[0]:
             best = (key, p, r)
@@ -587,16 +633,19 @@ def reference(units, target, kind):
 def cmd_rule(args):
     """Arm B and the reference rows, leave one tuning episode out (parameters chosen on the others)."""
     split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
-    eps = [e for e in split["tune"] if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
+    pool = [int(x) for x in args.episodes.split(",")] if args.episodes else split["tune"]
+    eps = [e for e in pool if (OUT / "features" / f"episode_{e:06d}.npz").exists()]
     data = load_cached(eps, ground_truth(eps))
     report = {"episodes": eps, "note": "glove_clean = tactile sum > 800 with flicker under 0.1 s removed (main). glove = raw tactile sum > 800 and label = dataset labels (checks)"}
     segments_out = {}
+    keys = list(data)
+    parts = grid_parts(list(data.values()), ["tactile_clean", "tactile", "label"])
     for target, name in (("tactile_clean", "glove_clean"), ("tactile", "glove"), ("label", "label")):
         sc, chosen, per_ep = Score(), {}, {}
         for ep in eps:
-            train = [u for (e, s), u in data.items() if e != ep]
+            idx = [j for j, (e, s) in enumerate(keys) if e != ep]
             test = [(s, u) for (e, s), u in data.items() if e == ep]
-            params, shifts = pick_rule(train, target)
+            params, shifts = pick_rule(None, target, parts, idx)
             chosen[ep] = {"params": params, "shift_start_end": shifts}
             one = Score()
             for side, u in test:
@@ -615,8 +664,8 @@ def cmd_rule(args):
             "reference_never_in_contact": reference(units, target, "never"),
             "contact_share": round(float(np.mean(np.concatenate([u["gt30"][target] for u in units]))), 3),
         }
-    (OUT / "rule_report.json").write_text(json.dumps(report, indent=1, default=str))
-    (OUT / "rule_segments.json").write_text(json.dumps(segments_out))
+    (OUT / f"{args.name}_report.json").write_text(json.dumps(report, indent=1, default=str))
+    (OUT / f"{args.name}_segments.json").write_text(json.dumps(segments_out))
     for name in ("glove_clean", "glove", "label"):
         r = report[name]
         print(name, "contact share", r["contact_share"])
@@ -655,7 +704,8 @@ def plot_rule(eps, data, chosen, name="exp22_sam_rule_split.png"):
         ax.set_yticks([p for p, _ in ticks])
         ax.set_yticklabels([n for _, n in ticks], fontsize=7)
         ax.set_xlim(0, t[-1])
-        ax.set_title(f"Episode {ep}, rule chosen on the other pilot episodes: {params}", fontsize=9)
+        ax.set_title(f"Episode {ep}, rule chosen on the other {len(data) // 2 - 1} tuning episodes: {params}",
+                     fontsize=9)
         ax.grid(axis="x", alpha=0.3)
     axes[-1, 0].set_xlabel("seconds")
     fig.tight_layout()
@@ -701,6 +751,8 @@ def main():
     c = sub.add_parser("cv")
     c.add_argument("--plot", help="comma list of episodes to draw")
     r = sub.add_parser("rule")
+    r.add_argument("--episodes", help="comma list of tuning episodes (default: every tuning episode with features)")
+    r.add_argument("--name", default="rule", help="outputs out/contact/<name>_report.json and <name>_segments.json")
     r.add_argument("--plot", help="comma list of episodes to draw")
     r.add_argument("--fig", default="exp22_sam_rule_split.png", help="figure name in docs/experiments/img")
     a = sub.add_parser("rule-apply")

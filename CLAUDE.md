@@ -57,7 +57,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/sam_fps_compare.py` | 같은 클립의 SAM 10fps 결과와 30fps 결과 비교, 그림 저장 (API 호출 없음) |
 | `scripts/sam_episodes.py` | OpenGraph 에피소드 전체를 10fps로 SAM에 보냄 (`hand`, `small object`). `--send` 없으면 클립 생성과 비용 출력만 |
 | `scripts/sam_fast.py` | SAM 출력 빠른 리더. 공식 파서와 같은 디코더를 numba로 컴파일 (마스크당 약 3ms, 공식은 400ms). `--check`로 공식 파서와 대조 |
-| `scripts/contact_cut.py` | 숫자 1: SAM 마스크로 손별 접촉 구간 추정 (특징 + 로지스틱 회귀 + 히스테리시스), boundary F1 / contact IoU 평가. `rule`은 B 규칙(겹침 + 동반 이동)과 참고 행을 leave-one-out으로 평가 |
+| `scripts/contact_cut.py` | 숫자 1: SAM 마스크로 손별 접촉 구간 추정 (특징 + 로지스틱 회귀 + 히스테리시스), boundary F1 / contact IoU 평가. `rule`은 B 규칙(겹침 + 동반 이동)과 참고 행을 leave-one-out으로 평가 (`--episodes`, `--name`으로 일부 에피소드와 출력 이름 지정, 격자는 병렬로 한 번만 계산) |
 | `scripts/sam_track_check.py` | 에피소드 전체 SAM 추적 점검 (검출률, id 수명, 손 좌우, 접촉 프레임에서 손 검출), 타임라인 그림 |
 | `scripts/hot3d_clip_count.py` | 모캡 물체 이동으로 HOT3D 잡기 클립 수와 길이를 세고 숫자 2 SAM 비용 계산 (API 호출 없음) |
 | `scripts/hot3d_calib_check.py` | HOT3D 보정 방향 확인: 물체 모델 투영 vs 2D 박스, MediaPipe 손 vs 2D 손 박스 (방향, 프레임 밀림) |
@@ -91,6 +91,6 @@ Windows 사본을 WSL로 동기화:
 | `scripts/viewer_data.py` | 뷰어 데모 데이터 (튜닝만): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
-| `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 11개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다 |
+| `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 11개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)로 돌아 50개 B 출력을 덮어쓰지 않는다 |
 | `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단). API 호출 없음 |
 | `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |

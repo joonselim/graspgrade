@@ -24,15 +24,19 @@ PY = sys.executable
 REG = ROOT / "out" / "regression"
 IMG = ROOT / "docs" / "experiments" / "img"
 EPS = "0,30,53"
+# arm B on the three pilot episodes only, in its own files, so the check never overwrites the
+# 50-episode arm B (out/contact/rule_*.json) and stays comparable after P2
+PILOT_SEGS = ["--segments", "out/contact/rule_pilot_segments.json"]
 
 # name: (command, output files written by it)
 COMMANDS = {
-    "rule": (["scripts/contact_cut.py", "rule"],
-             ["out/contact/rule_report.json", "out/contact/rule_segments.json"]),
-    "selftest": (["scripts/muse_contact.py", "selftest", "--episodes", EPS], ["out/number1/selftest.json"]),
-    "selftest_lag6": (["scripts/muse_contact.py", "selftest", "--episodes", EPS, "--lag", "6"],
+    "rule": (["scripts/contact_cut.py", "rule", "--episodes", EPS, "--name", "rule_pilot"],
+             ["out/contact/rule_pilot_report.json", "out/contact/rule_pilot_segments.json"]),
+    "selftest": (["scripts/muse_contact.py", "selftest", "--episodes", EPS] + PILOT_SEGS, ["out/number1/selftest.json"]),
+    "selftest_lag6": (["scripts/muse_contact.py", "selftest", "--episodes", EPS, "--lag", "6"] + PILOT_SEGS,
                       ["out/number1/selftest_lag6.json"]),
-    "score_tune": (["scripts/muse_contact.py", "score", "--episodes", EPS], ["out/number1/arms_score.json"]),
+    "score_tune": (["scripts/muse_contact.py", "score", "--episodes", EPS, "--shift-segments",
+                    "out/contact/rule_pilot_segments.json"] + PILOT_SEGS, ["out/number1/arms_score.json"]),
     "n2_check": (["scripts/number2_score.py", "--check"], ["out/number2/number2_check.json"]),
     "gate_standin": (["scripts/number2_score.py", "--gate", "--standin"], ["out/number2/gate_standin.json"]),
     "gate": (["scripts/number2_score.py", "--gate"], ["out/number2/gate.json"]),
