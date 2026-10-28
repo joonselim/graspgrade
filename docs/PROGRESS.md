@@ -12,7 +12,9 @@ P1 파일럿 (EXP-23), A 튜닝 3개와 P7a (EXP-29, $10.62), 프롬프트 1회 
 
 10/28 제안서 반영 (2026-10-28, API 호출 없음): [PROPOSAL.md](PROPOSAL.md)에 사실 3개 수정 (Do as I Do는 원문대로 "2,000개 중 83개(4%)가 품질 검사 통과", 5%는 저자들의 최선 추정치, "33개 물체 모두 섞여 있고 24개가 20~80%", HOT3D는 모두 강체로 추적되며 짜는 병/종이팩 11.9%는 squeezable로 점수 유지). 측정 계획에 계산 전 규칙 추가: 비교 6 (라벨 k=0/5/20/전체, 튜닝 2,385개에서 뽑은 물체 비율과 우리 점수의 로지스틱 회귀, 20회 추첨), extra (물체 안 AUC, 실패 원인별 AUC: held-out 662 / grip 80 / reach 146 / collision 538), 부드러운 물체 확인 (사람 라벨 시트 `splits/softness_labels.csv` 33+71개, 프롬프트 고정, HOT3D held-out 1,426개 + OpenGraph held-out 286구간 + 튜닝 soft 구간, 합격 soft 70% 이상 잡기 & HOT3D 보류 10% 이하, 약 $14). 발견: `number2_score.py`의 비교 2가 튜닝 2,385개가 아니라 score_train 400개로 물체 비율을 계산했다. 수정함 (`reference_pool`, `object_reference`): `--final`은 튜닝 2,385개, `--check`는 item_train 1,985개 (전과 같음). 출력에 `object_reference_clips` 추가. 가짜 점검 26개 통과, 회귀 11개 중 n2_check는 새 키 한 줄만 달라 기준값을 다시 저장, 나머지 동일.
 
-비교 6과 extra 코드 (EXP-31, $0, 튜닝 `--check`, 대리값 등급): `number2_score.py`에 `object_rate_add_on`, `extra_rows` 추가, 출력 키 `object_rate_add_on`, `extra`. 기존 키는 바이트 동일, 가짜 점검 30개 통과, 실행 약 70초. 튜닝 점검 수치(결과 아님): 라벨 5개면 결합 0.749 vs 물체 비율 0.722 (+0.027, 구간 -0.002~0.060), 20개부터 물체 비율만으로 결합과 같음 (0.770 vs 0.773), 물체 안 AUC는 우리 점수 0.574 (0.495~0.652). 실패 원인별: grip 0.775, reach 0.693, collision 0.723 (물체 비율 0.860 / 0.719 / 0.783). 부드러운 물체 확인은 두 사람이 라벨 시트를 채우고 커밋한 뒤에만 보낸다.
+비교 6과 extra 코드 (EXP-31, $0, 튜닝 `--check`, 대리값 등급): `number2_score.py`에 `object_rate_add_on`, `extra_rows` 추가, 출력 키 `object_rate_add_on`, `extra`. 기존 키는 바이트 동일, 가짜 점검 30개 통과, 실행 약 70초. 튜닝 점검 수치(결과 아님): 라벨 5개면 결합 0.749 vs 물체 비율 0.722 (+0.027, 구간 -0.002~0.060), 20개부터 물체 비율만으로 결합과 같음 (0.770 vs 0.773), 물체 안 AUC는 우리 점수 0.574 (0.495~0.652). 실패 원인별: grip 0.775, reach 0.693, collision 0.723 (물체 비율 0.860 / 0.719 / 0.783).
+
+부드러운 물체 확인 코드 (2026-10-28, API 호출 없음): `scripts/muse_soft.py`, 프롬프트 `scripts/prompts/soft_object.txt` (측정 계획 원문). OpenGraph 구간 1,239개 (held-out 286, 튜닝 953, 3개 제외)와 3프레임씩 추출 완료 (`out/soft/`, 218 MB, sponge 구간 눈으로 확인). 해석 못 한 답은 바로 한 번 더 보내고, 두 번 실패하면 unsure로 저장. 예외는 저장 안 함. 라벨 시트의 `agreed`가 하나라도 비면 `--send`가 멈춘다. `number2_score.py`가 클립별 점수를 `number2_{check,final}_scores.csv`로 저장 (보류 후 AUC용). 가짜 점검 42개 통과, 회귀 11개 동일. 부드러운 물체 확인은 두 사람이 라벨 시트를 채우고 커밋한 뒤에만 보낸다.
 
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
 git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private)를 보고서 세션이 커밋하고 푸시한다. 실험 세션은 파일만 고친다. WSL `~/graspgrade`의 별도 로컬 이력은 더 쓰지 않는다.
@@ -246,7 +248,7 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | P6 | 숫자 2 SAM 전체 (파일럿 3윈도우는 이미 보냄) | `sam_hot3d.py --role score_train/held_out --send` | $8.72 + $17.76 |
 | P7a (완료, EXP-29) | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개 → 게이트 weak (0.636 / 0.601), 결정대로 P7b 진행 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | $7.98 |
 | P7b | 게이트가 stop이 아니면: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
-| P7c | 부드러운 물체 확인: 라벨 시트 완료·커밋 후 파일럿 20개 → HOT3D held-out 1,426개 + OpenGraph 약 330구간 (코드 아직 없음) | 미작성 | 약 $14 |
+| P7c | 부드러운 물체 확인: 라벨 시트 완료·커밋 후 파일럿 20개 → HOT3D held-out 1,426개 + OpenGraph held-out 286구간 + 튜닝 soft 구간 | `muse_soft.py send --set pilot --send` → `--set hot3d --send`, `--set opengraph --send` → `score` | $10.46 + $2.60 + 1달러 미만 |
 | P8 | 숫자 2 최종 (물체 하나씩 빼기, 비교 6, extra 포함. 코드 완료, EXP-31) | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
 
 P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400개에서 Muse 물체 항목 6개 등급으로 로지스틱 회귀, v2 라벨. (1) 사람 하나씩 빼기 6명 평균 AUC, (2) 물체 하나씩 빼기 AUC (시퀀스 부트스트랩 95% 구간). 둘 다 0.65 이상이면 P7b, 하나라도 0.60 미만이면 P7b를 보내지 않고 사용자와 정한다. 그 사이(weak)면 P7b를 보낸다 (사용자 결정 2026-10-28, P7a 전). 같이 보고하되 게이트에는 안 쓰는 것: 같은 400개의 대리값 AUC, Muse 단독 사람별 AUC, 항목별 Muse-대리값 일치율. SAM 결과 없이 판단할 수 있어 P6과 순서가 무관하다.

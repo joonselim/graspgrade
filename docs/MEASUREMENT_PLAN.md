@@ -640,6 +640,11 @@ clips out of the score.
   given.
 - If it does not pass: the viewer still shows the touch check list, marked
   as not validated, and the summary does not claim that the check works.
+- Code (2026-10-28, no call): `scripts/muse_soft.py` (`segments`, `frames`,
+  `send --set pilot|hot3d|opengraph`, `score`), prompt in
+  `scripts/prompts/soft_object.txt`. Sending stops until every label is
+  agreed. Cost at measured token counts: HOT3D held-out $10.46, OpenGraph
+  held-out $2.60, plus the tuning soft segments and the pilot (under $1).
 
 ## One prompt revision on tuning (written 2026-10-28, before sending any revised prompt)
 

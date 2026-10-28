@@ -46,6 +46,9 @@ half, also inside object and person, and per object with 5 or more clips of
 each kind), and AUC of copyable clips against the clips failing for each
 reason (grip, reach, collision, from benchmark/number2/clips.csv).
 
+Per clip test scores go to number2_{check,final}_scores.csv (the soft object
+check reads the final one for the AUC on kept clips).
+
 Gate (docs/MEASUREMENT_PLAN.md, "Muse Spark run in two steps"): logistic
 regression on the six object item grades of the 400 score_train clips,
 leave one person out (mean AUC over people) and leave one object out
@@ -522,6 +525,7 @@ def main():
     out["extra"] = extra_rows(train, test, items)
     name ="number2_check.json" if args.check else "number2_final.json"
     (N2 / name).write_text(json.dumps(out, indent=1))
+    test[["clip_id", "our_score"]].to_csv(N2 / name.replace(".json", "_scores.csv"), index=False)  # for muse_soft.py
     print(json.dumps(out, indent=1))
 
 

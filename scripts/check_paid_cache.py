@@ -18,6 +18,9 @@ Checks, in a temporary folder:
 7. number2_score.pair_auc and draw_rates (comparison 6 and the extra rows):
    the AUC inside groups equals sklearn per group, rates leave out the clip's
    own person and use (copyable + 1) / (n + 2).
+8. Soft object check (muse_soft): a reply that does not parse is sent once
+   more, two such replies count as unsure, a call that raises is not cached,
+   the metrics and verdict follow the plan, an empty label blocks sending.
 """
 
 import json
@@ -32,6 +35,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import muse_contact  # noqa: E402
 import muse_hot3d  # noqa: E402
+import muse_soft  # noqa: E402
 import number2_score  # noqa: E402
 import sam_episodes  # noqa: E402
 
@@ -201,11 +205,66 @@ def check_comparison6_and_extra():
     return res
 
 
+def check_soft(tmp):
+    muse_soft.OUT = tmp / "soft"
+    res = [expect(f"soft parse {t!r} -> {w}", (muse_soft.parse(t) or {}).get("softness") == w)
+           for t, w in (('{"softness": " Soft "}', "soft"), ('{"softness": "hard"}', None), ("no json", None),
+                        ('{"object": "can", "softness": "squeezable", "reason": "x"}', "squeezable"))]
+    items = []
+    for k in range(3):
+        r = SimpleNamespace(item=f"og_000001_left_{k:05d}", dataset="opengraph", hand="left")
+        d = muse_soft.OUT / "frames" / r.item
+        d.mkdir(parents=True)
+        for j in range(3):
+            (d / f"f{j}.jpg").write_bytes(b"jpg")
+        items.append(r)
+    unparsed = muse_soft.OUT / "muse" / "unparsed"
+    rec = muse_soft.call(FakeMuse(["sorry", "still no"]), items[0])
+    res.append(expect("soft: two unparsed replies -> cached as unsure, both kept in unparsed/",
+                      rec["parsed"] == {"softness": "unsure", "object": None, "reason": None, "forced_unsure": True}
+                      and muse_soft.answer_path(items[0].item).exists()
+                      and len(list(unparsed.glob(f"{items[0].item}_*.json"))) == 2))
+    rec = muse_soft.call(FakeMuse(["sorry", '{"softness": "rigid"}']), items[1])
+    res.append(expect("soft: second reply parses -> rigid, one kept in unparsed/, both calls paid",
+                      rec["parsed"]["softness"] == "rigid" and len(list(unparsed.glob(f"{items[1].item}_*.json"))) == 1
+                      and abs(rec["cost_usd"] - 2 * (1000 * muse_soft.PRICE_IN + 100 * muse_soft.PRICE_OUT)) < 1e-9))
+    try:
+        muse_soft.call(FakeMuse([]), items[2])
+    except IndexError:
+        pass
+    res.append(expect("soft: a call that raises is not cached", not muse_soft.answer_path(items[2].item).exists()))
+    a = muse_soft.answers([r.item for r in items])
+    res.append(expect("soft: answers read back, the failed item missing",
+                      a.softness.to_dict() == {items[0].item: "unsure", items[1].item: "rigid"}))
+
+    lab = pd.DataFrame({"dataset": ["hot3d", "hot3d"] + ["opengraph"] * 5,
+                        "object": ["can", "bottle", "sponge", "wrap", "glove", "plant", "cup"],
+                        "labeler_1": [""] * 7, "labeler_2": [""] * 7,
+                        "agreed": ["rigid", "squeezable", "soft", "soft", "soft", "soft", "rigid"]})
+    hot = pd.DataFrame({"object": ["can"] * 10 + ["bottle"] * 10, "split": "held_out",
+                        "softness": ["rigid"] * 9 + ["soft"] + ["squeezable"] * 10, "forced_unsure": False})
+    og = pd.DataFrame({"object": ["sponge", "wrap", "glove", "plant"] * 5 + ["cup"] * 4,
+                       "split": ["held_out", "tune"] * 12,
+                       "softness": ["soft"] * 12 + ["unsure"] * 3 + ["rigid"] * 5 + ["rigid"] * 4,
+                       "forced_unsure": False})
+    m = muse_soft.soft_metrics(hot, og, lab)
+    res.append(expect("soft metrics: caught 15/20, HOT3D held back 1/20, squeezable kept -> pass",
+                      m["caught"]["all"] == 0.75 and m["hot3d_held_back"]["all"] == 0.05
+                      and m["hot3d_held_back"]["by_label"] == {"rigid": 0.1, "squeezable": 0.0} and m["verdict"] == "pass"))
+    m = muse_soft.soft_metrics(hot, og[og.object != "plant"], lab)
+    res.append(expect("soft metrics: 15 segments of 3 soft objects -> too few", m["verdict"].startswith("too few")))
+    m = muse_soft.soft_metrics(hot.assign(softness="unsure"), og, lab)
+    res.append(expect("soft metrics: every HOT3D clip held back -> fail", m["verdict"] == "fail"))
+    res.append(expect("soft labels: an empty agreed cell blocks sending",
+                      muse_soft.labels_complete(lab) and not muse_soft.labels_complete(lab.assign(agreed=["rigid", ""] * 3 + [""]))))
+    return res
+
+
 def main():
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
         res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items() \
-            + check_object_reference() + check_comparison6_and_extra()
+            + check_object_reference() + check_comparison6_and_extra() + check_soft(tmp)
     print(f"{sum(res)} of {len(res)} passed")
     sys.exit(0 if all(res) else 1)
 
