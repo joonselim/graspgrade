@@ -461,6 +461,9 @@ object rate adds as the number of labeled clips of the object grows.
   (does the rate add). A difference counts as a gain if its 95% interval lies
   above 0. All are reported whatever they show.
 - Objects with no labels are comparison 4, not this one.
+- Code check (EXP-31, tuning, stand-in grades): object rate alone 0.722,
+  0.770, 0.777 and combined 0.749, 0.773, 0.783 at k = 5, 20, all (our score
+  0.721). A check of the code, not a result.
 
 ### What the score can and cannot tell apart, extra rows (written 2026-10-28, before computing)
 
@@ -490,6 +493,9 @@ reference.
      for that reason. On held-out: 662 copyable, 80 grip, 146 reach, 538
      collision. 95% interval resampling sequences.
    - The grip row has few clips, so its interval is wide.
+- Code check (EXP-31, tuning, stand-in grades): our score 0.574 inside
+  objects, 0.775, 0.693, 0.723 against grip, reach and collision fails. A
+  check of the code, not a result.
 
 ### Checks before any paid call
 

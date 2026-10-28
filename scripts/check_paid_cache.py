@@ -15,6 +15,9 @@ Checks, in a temporary folder:
    missing Muse alone answer stops the run, in check mode the item is left out.
 6. number2_score.object_reference: in the final run the object share comes
    from all tuning clips, in check mode never from the score_train test clips.
+7. number2_score.pair_auc and draw_rates (comparison 6 and the extra rows):
+   the AUC inside groups equals sklearn per group, rates leave out the clip's
+   own person and use (copyable + 1) / (n + 2).
 """
 
 import json
@@ -177,11 +180,32 @@ def check_object_reference():
             expect("check mode: object share from item_train only", check == [1.0, 0.0])]
 
 
+def check_comparison6_and_extra():
+    from sklearn.metrics import roc_auc_score
+    rng = np.random.default_rng(0)
+    y, s = rng.integers(0, 2, 300), rng.integers(0, 5, 300).astype(float)  # many ties
+    g = rng.choice(["a", "b", "c"], 300)
+    pooled, table = number2_score.pair_auc(y, s, g)
+    want = sum(roc_auc_score(y[g == k], s[g == k]) * table.loc[k, "pairs"] for k in "abc") / table.pairs.sum()
+    res = [expect("pair AUC equals the pair-weighted sklearn AUC per group, with ties", abs(pooled - want) < 1e-12),
+           expect("pair AUC with one group equals sklearn AUC",
+                  abs(number2_score.pair_auc(y, s, np.zeros(300))[0] - roc_auc_score(y, s)) < 1e-12)]
+    pool = pd.DataFrame({"object": ["mug"] * 6, "person": ["P1", "P1", "P2", "P2", "P2", "P2"],
+                         "copyable": [1, 1, 0, 0, 0, 0]})
+    clips = pd.DataFrame({"object": ["mug", "mug", "bowl"], "person": ["P1", "P3", "P1"]})
+    r = np.random.default_rng(0)
+    res.append(expect("rates from all clips of other persons: (0+1)/(4+2), (2+1)/(6+2), unseen (0+1)/(0+2)",
+                      np.allclose(number2_score.draw_rates(clips, pool, None, r, True), [1 / 6, 3 / 8, 0.5])))
+    res.append(expect("rates from k = 2 clips stay in [1/4, 3/4]",
+                      all(np.isin(number2_score.draw_rates(clips, pool, 2, r, False)[:2], [0.25, 0.5, 0.75]))))
+    return res
+
+
 def main():
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
         res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items() \
-            + check_object_reference()
+            + check_object_reference() + check_comparison6_and_extra()
     print(f"{sum(res)} of {len(res)} passed")
     sys.exit(0 if all(res) else 1)
 

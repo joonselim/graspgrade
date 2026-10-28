@@ -34,6 +34,18 @@ Muse checklist grades (equal weights, no learning), R3 a logistic regression
 on the same grades. Paired AUC differences with a 95% interval resampling
 sequences: R3 - R2, our score - R3, and R2 - R1, R3 - R1 when Muse alone exists.
 
+Object rate as an add-on (comparison 6): for k = 5, 20 and all labeled tuning
+clips of the object, a logistic regression on logit(our score) and
+logit((copyable + 1) / (k + 2)), trained on the training clips (scores left one
+person out, rates from other persons), 20 draws for k = 5 and 20. Rows: object
+rate alone and combined, paired differences against both with a 95% interval
+resampling sequences.
+
+Extra rows: AUC inside each object (pairs from the same object, ties count
+half, also inside object and person, and per object with 5 or more clips of
+each kind), and AUC of copyable clips against the clips failing for each
+reason (grip, reach, collision, from benchmark/number2/clips.csv).
+
 Gate (docs/MEASUREMENT_PLAN.md, "Muse Spark run in two steps"): logistic
 regression on the six object item grades of the 400 score_train clips,
 leave one person out (mean AUC over people) and leave one object out
@@ -68,6 +80,9 @@ OBJECT_ITEMS = list(STANDIN)  # the six object items, finger occlusion is not on
 HAND_SHAPE_ROLE = "item_train"
 GATE_PASS, GATE_STOP = 0.65, 0.60
 CHECKLIST_TASK = "checklist"  # the checklist version for held-out, picked by the rule in the plan (EXP-30)
+BENCH_CLIPS = ROOT / "benchmark" / "number2" / "clips.csv"  # failed_condition per clip (EXP-28)
+K_LABELED, RATE_DRAWS = (5, 20, None), 20  # comparison 6: labeled clips per object (None = all), draws
+FAIL_REASONS = ("grip", "reach", "collision")
 
 
 def terciles(train_scores):
@@ -256,6 +271,146 @@ def unseen_objects(d, items, train_role, test_role):
     return out
 
 
+def logit(p):
+    p = np.clip(np.asarray(p, float), 1e-4, 1 - 1e-4)
+    return np.log(p / (1 - p))
+
+
+def oof_by_person(train, cols):
+    """Score of each training clip from a fit without that clip's person."""
+    s = pd.Series(np.nan, index=train.index)
+    for p in train.person.unique():
+        te = train.person == p
+        s[te] = fit_score(train[~te], train[te], cols)[0]
+    return s.values
+
+
+def draw_rates(clips, pool, k, rng, other_persons):
+    """Object rate (copyable + 1) / (n + 2) from k labeled pool clips of each clip's object.
+
+    k None takes every pool clip of the object. With other_persons, pool clips of the
+    clip's own person are not used (training clips)."""
+    by_object = {o: (g.copyable.values, g.person.values) for o, g in pool.groupby("object")}
+    out = np.empty(len(clips))
+    for j, (o, p) in enumerate(zip(clips.object.values, clips.person.values)):
+        lab, who = by_object.get(o, (np.zeros(0), np.zeros(0)))
+        if other_persons:
+            lab = lab[who != p]
+        if k is not None and len(lab) > k:
+            lab = rng.choice(lab, k, replace=False)
+        out[j] = (lab.sum() + 1) / (len(lab) + 2)
+    return out
+
+
+def boot_indices(seqs, n=1000, seed=20261026):
+    """Clip indices of n resamples of whole sequences."""
+    rng = np.random.default_rng(seed)
+    uniq = np.unique(seqs)
+    idx = {q: np.where(seqs == q)[0] for q in uniq}
+    return [np.concatenate([idx[q] for q in rng.choice(uniq, len(uniq))]) for _ in range(n)]
+
+
+def interval(values):
+    return [round(float(np.percentile(values, 2.5)), 3), round(float(np.percentile(values, 97.5)), 3)]
+
+
+def object_rate_add_on(train, test, pool, items, seed=20261026):
+    """Comparison 6: our score with the object rate from k labeled tuning clips of the object added.
+
+    Per k, a logistic regression on logit(our score) and logit(object rate), trained on
+    the training clips with leave-one-person-out scores and rates from other persons,
+    applied to the test clips. 20 draws for k = 5 and 20, one for all. Bootstrap draw b
+    uses rate draw b modulo the number of draws."""
+    tr_score, te_score = logit(oof_by_person(train, items)), logit(test.our_score.values)
+    y = test.copyable.values
+    boots = [i for i in boot_indices(test.sequence.values, seed=seed) if y[i].min() != y[i].max()]
+    out = {"labeled_pool_clips": len(pool), "k0_our_score_auc": round(float(roc_auc_score(y, te_score)), 3)}
+    for k in K_LABELED:
+        n_draws = 1 if k is None else RATE_DRAWS
+        rates, combined, weights = [], [], []
+        for r in range(n_draws):
+            rng = np.random.default_rng(seed + r)
+            tr_rate, te_rate = draw_rates(train, pool, k, rng, True), draw_rates(test, pool, k, rng, False)
+            m = LogisticRegression(C=0.5, max_iter=2000).fit(np.c_[tr_score, logit(tr_rate)], train.copyable)
+            rates.append(te_rate)
+            combined.append(m.predict_proba(np.c_[te_score, logit(te_rate)])[:, 1])
+            weights.append(m.coef_[0])
+        a_rate = np.array([roc_auc_score(y, s) for s in rates])
+        a_comb = np.array([roc_auc_score(y, s) for s in combined])
+        row = {"draws": n_draws, "object_rate_auc": round(float(a_rate.mean()), 3),
+               "combined_auc": round(float(a_comb.mean()), 3),
+               "combined_weights_mean": dict(zip(["our_score", "object_rate"], np.round(np.mean(weights, 0), 3).tolist()))}
+        d_rate, d_score = [], []
+        for b, i in enumerate(boots):
+            c = roc_auc_score(y[i], combined[b % n_draws][i])
+            d_rate.append(c - roc_auc_score(y[i], rates[b % n_draws][i]))
+            d_score.append(c - roc_auc_score(y[i], te_score[i]))
+        for name, point, diffs in (("combined minus object rate", a_comb - a_rate, d_rate),
+                                   ("combined minus our score", a_comb - roc_auc_score(y, te_score), d_score)):
+            lo, hi = interval(diffs)
+            row[name] = {"difference": round(float(np.mean(point)), 3), "ci95_by_sequence": [lo, hi], "gain": lo > 0}
+        out["k=all" if k is None else f"k={k}"] = row
+    return out
+
+
+def pair_auc(y, s, groups):
+    """Share of correctly ordered pairs (one copyable, one not) inside each group, ties count half.
+
+    The pooled share is the AUC per group weighted by its number of pairs. Also returns
+    the table per group."""
+    t = pd.DataFrame({"y": y, "s": s, "g": groups})
+    t["r"] = t.groupby("g").s.rank()
+    t["ry"] = t.r * t.y
+    g = t.groupby("g").agg(pos=("y", "sum"), n=("y", "size"), ry=("ry", "sum"))
+    g["neg"] = g.n - g.pos
+    g["pairs"] = g.pos * g.neg
+    g["u"] = g.ry - g.pos * (g.pos + 1) / 2
+    return float(g.u.sum() / g.pairs.sum()), g
+
+
+def extra_rows(train, test, items, seed=20261026):
+    """Extra rows: AUC inside each object, and AUC for each reason a clip fails."""
+    test = test.copy()
+    cols = ["our_score", "object_reference"]
+    grades = [c for c in MUSE_ITEMS if c in items]
+    if grades:
+        test["R3_learned"], _ = fit_score(train, test, grades)
+        cols.append("R3_learned")
+    if "muse_baseline" in test and test.muse_baseline.notna().any():
+        cols.append("muse_baseline")
+    fail = pd.read_csv(BENCH_CLIPS)[["clip_id", "copyable", "failed_condition"]]
+    test = test.merge(fail, on="clip_id", how="left", suffixes=("", "_benchmark"))
+    if (test.copyable != test.copyable_benchmark).any():
+        raise SystemExit("copyable in clips_final.csv and benchmark/number2/clips.csv differ")
+    y = test.copyable.values
+    n1, n0 = y.sum(), len(y) - y.sum()
+    pos_obj = test.groupby("object").copyable.agg(["sum", "size"])
+    same = int((pos_obj["sum"] * (pos_obj["size"] - pos_obj["sum"])).sum())
+    inside = {"pairs_same_object": same, "share_of_all_pairs": round(same / (n1 * n0), 3)}
+    for c in cols:
+        t = test.dropna(subset=[c])
+        y, s, seqs = t.copyable.values, t[c].values, t.sequence.values
+        obj, obj_person = t.object.values, (t.object + "|" + t.person).values
+        main, table = pair_auc(y, s, obj)
+        boots = [pair_auc(y[i], s[i], obj[i])[0] for i in boot_indices(seqs, seed=seed)]
+        both = table[(table.pos >= 5) & (table.neg >= 5)]
+        inside[c] = {"clips": len(t), "within_object": round(main, 3), "ci95_by_sequence": interval(boots),
+                     "within_object_and_person": round(pair_auc(y, s, obj_person)[0], 3),
+                     "per_object_5_each": {o: {"clips": int(r.n), "copyable": int(r.pos), "auc": round(r.u / r.pairs, 3)}
+                                           for o, r in both.iterrows()}}
+    reasons = {"clips": test.failed_condition.value_counts().to_dict()}
+    for reason in FAIL_REASONS:
+        sub = test[(test.copyable == 1) | (test.failed_condition == reason)]
+        reasons[reason] = {}
+        for c in cols:
+            t = sub.dropna(subset=[c])
+            y, s = t.copyable.values, t[c].values
+            reasons[reason][c] = {"clips": len(t), "auc": round(float(roc_auc_score(y, s)), 3),
+                                  "ci95_by_sequence": ci_by_sequence(y, s, t.sequence.values, seed)}
+    return {"note": "object_reference gives one score per object, so it is 0.5 inside objects by construction",
+            "inside_each_object": inside, "per_failure_reason": reasons}
+
+
 def two_tests(t, cols):
     """EXP-19 tests on one clip table: leave one person out and leave one object out."""
     def fit_predict(tr, te):
@@ -363,6 +518,8 @@ def main():
         out["muse_plus_checks"] = metrics(te, "plug_in")
     out["unseen_objects"] = unseen_objects(d, items, train_role, test_role)
     out["checklist_vs_learning"] = checklist_vs_learning(train, test, items)
+    out["object_rate_add_on"] = object_rate_add_on(train, test, reference_pool(d, test_role), items)
+    out["extra"] = extra_rows(train, test, items)
     name ="number2_check.json" if args.check else "number2_final.json"
     (N2 / name).write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
