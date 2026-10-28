@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light only">
+<title>GraspGrade 실험 기록</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --page: #eef0f3; --sheet: #ffffff; --ink: #1a1d23; --ink-2: #3b4250; --muted: #6a7382;
+    --faint: #9aa2ae; --rule: #dde1e7; --rule-strong: #1a1d23; --tint: #f5f6f8; --done: #2350c9;
+    --sheet-pad: 48px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+      "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    font-size: 15px; line-height: 1.7; overflow-wrap: anywhere;
+  }
+  a { color: var(--done); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .sheet { max-width: 920px; margin: 28px auto 56px; background: var(--sheet); border: 1px solid var(--rule); padding: var(--sheet-pad); }
+  @media (max-width: 720px) { :root { --sheet-pad: 20px; } .sheet { margin: 0; border: 0; } }
+  .topnav {
+    position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 22px;
+    margin: calc(var(--sheet-pad) * -1) calc(var(--sheet-pad) * -1) 28px; padding: 0 var(--sheet-pad);
+    background: var(--sheet); border-bottom: 1px solid var(--rule); font-size: 14px;
+    overflow-x: auto; white-space: nowrap;
+  }
+  .topnav .brand { font-weight: 800; letter-spacing: -0.02em; margin-right: auto; padding: 14px 0; }
+  .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
+  .topnav a:hover { color: var(--ink); text-decoration: none; }
+  .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  .doc-head { border-bottom: 2px solid var(--rule-strong); padding-bottom: 16px; }
+  .doc-title { font-size: 30px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; margin: 0; }
+  @media (max-width: 720px) { .doc-title { font-size: 25px; } }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 13px; font-family: var(--mono); }
+  h2.sec { font-size: 20px; font-weight: 750; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+  article { margin-top: 56px; padding-top: 22px; border-top: 2px solid var(--rule-strong); scroll-margin-top: 56px; }
+  article h2 { font-size: 21px; font-weight: 780; letter-spacing: -0.02em; margin: 0 0 6px; }
+  article h3 { font-size: 16.5px; font-weight: 720; margin: 26px 0 8px; }
+  article h4, article h5 { font-size: 14.5px; font-weight: 700; margin: 20px 0 8px; }
+  .meta { font-size: 12.5px; color: var(--muted); font-family: var(--mono); margin: 0 0 14px; }
+  p { margin: 0 0 12px; color: var(--ink-2); }
+  ul, ol { margin: 0 0 12px; padding-left: 1.3em; color: var(--ink-2); }
+  li { margin: 3px 0; }
+  li > ul, li > ol { margin: 4px 0 4px; }
+  code { font-family: var(--mono); font-size: 0.86em; background: var(--tint); padding: 1px 5px; border-radius: 3px; }
+  blockquote { margin: 0 0 14px; padding: 8px 14px; border-left: 3px solid var(--rule); background: var(--tint); color: var(--ink-2); font-size: 14px; }
+  .wrap { overflow-x: auto; margin: 0 0 14px; }
+  table { border-collapse: collapse; font-size: 13.5px; min-width: 100%; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 650; border-bottom: 1.5px solid var(--ink); white-space: nowrap; }
+  td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  figure { margin: 16px 0 18px; }
+  figure img, p img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .idx td:first-child { white-space: nowrap; font-family: var(--mono); font-size: 12.5px; }
+  .idx td:nth-child(2), .idx td:nth-child(3) { white-space: nowrap; }
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <nav class="topnav" aria-label="페이지">
+    <span class="brand">GraspGrade</span>
+    <a href="index.html#summary">요약</a>
+    <a href="index.html#story">핵심 실험</a>
+    <a href="index.html#detail">실험 상세</a>
+    <a href="demo.html">데모</a>
+    <a href="logs.html" class="on">기록</a>
+  </nav>
+  <header class="doc-head">
+    <h1 class="doc-title">실험 기록 전체</h1>
+    <nav class="jump" aria-label="실험 바로가기"><a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a></nav>
+  </header>
+  <h2 class="sec">목록</h2>
+  <div class="wrap"><table class="idx"><thead><tr><th>ID</th><th>Date</th><th>Cost</th><th>Topic</th><th>Result in one line</th></tr></thead><tbody><tr><td><a href="#exp-01">EXP-01</a></td><td>2026-10-27</td><td>$0.035</td><td>Meta Model API smoke test</td><td>Muse Spark and SAM 3.1 both work on our clips. SAM costs $0.03 per 5 s clip and finds both gloved hands in every frame.</td></tr><tr><td><a href="#exp-02">EXP-02</a></td><td>2026-10-27</td><td>$0.15</td><td>SAM 3.1 object prompts, small container clip</td><td>Only <code>small object</code> works as a generic prompt. 2D hand and object overlap does not show contact.</td></tr><tr><td><a href="#exp-03">EXP-03</a></td><td>2026-10-27</td><td>$0.15</td><td>SAM 3.1 object prompts, spray bottle clip</td><td><code>small object</code> also finds a large spray bottle in every frame. It is our object prompt.</td></tr><tr><td><a href="#exp-04">EXP-04</a></td><td>2026-10-27</td><td>$0</td><td>Cleaning OpenGraph without any API call</td><td>Labels match tactile at threshold 800, not at 0. Head IMU gives camera motion for free.</td></tr><tr><td><a href="#exp-05">EXP-05</a></td><td>2026-10-27</td><td>$0.04</td><td>SAM 3.1 at 10 fps vs 30 fps</td><td>Hands and the grasped object get the same ids and masks (IoU 0.97 to 0.99) at 10 fps. SAM cost drops to a third.</td></tr><tr><td><a href="#exp-06">EXP-06</a></td><td>2026-10-27</td><td>$1.15</td><td>Contact cutting pilot, 3 whole episodes</td><td>SAM keeps hand ids over whole episodes. First boundary F1 is low (0.18 at ±5 frames, 2 training episodes). Visible contact starts about 0.2 s before glove pressure. (Appendix model, see the measurement plan.)</td></tr><tr><td><a href="#exp-07">EXP-07</a></td><td>2026-10-27</td><td>$0</td><td>HOT3D grasp clip count and number 2 cost</td><td>2,152 usable grasp clips (median 4.6 s) from mocap. SAM on all costs $59, so we keep all 713 held-out clips plus 400 tuning clips (about $32). (Pricing only. The clip set is EXP-11.)</td></tr><tr><td><a href="#exp-08">EXP-08</a></td><td>2026-10-27</td><td>$0</td><td>HOT3D calibration orientation</td><td>Calibration and dataset 2D boxes are in raw Aria orientation. Preview video = raw turned 90 degrees clockwise, raw (u, v) to (1407 - v, u). Frame k = k-th RGB timestamp.</td></tr><tr><td><a href="#exp-09">EXP-09</a></td><td>2026-10-27</td><td>$0</td><td>Fingertips from UmeTrack, no MANO</td><td>Our forward kinematics puts 100% of landmarks inside the dataset hand boxes. Hand 0 = left (profile as is), hand 1 = right (x mirror). During grasps the closest fingertip is 2.3 mm from the object (median).</td></tr><tr><td><a href="#exp-10">EXP-10</a></td><td>2026-10-27</td><td>$0</td><td>Copyable labels (Allegro retargeting) and label skew</td><td>Chosen rule (near 1.5 cm, deep 1 cm, wrist shift up to 2 cm) gives 54% copyable on 1,422 tuning grasps. The share is set mostly by the near threshold. 26% to 94% by object.</td></tr><tr><td><a href="#exp-11">EXP-11</a></td><td>2026-10-27</td><td>$0</td><td>Number 2 clips from hand to object distance, held-out labels</td><td>Fixed rule gives 52.6% copyable on held-out grasps. Mocap clips: 2,385 tuning and 1,426 held-out, 52% to 53% copyable. SAM for all held-out clips plus 400 tuning clips is about $27 with overlapping clips joined.</td></tr><tr><td><a href="#exp-12">EXP-12</a></td><td>2026-10-27</td><td>$0</td><td>Free checklist items and object-only reference</td><td>The three free checks measure well (camera vs headset 0.93) but do not predict copyable (AUC 0.49 to 0.53). Object identity alone reaches 0.70 (leave one person out). Pooled AUC across people is misleading.</td></tr><tr><td><a href="#exp-13">EXP-13</a></td><td>2026-10-27</td><td>$0</td><td>Hand shape during contact as the retargeting check</td><td>Video hand shape predicts copyable at 0.63 (mocap upper bound 0.67), mostly as a stand-in for object size. Object alone 0.69. Both together 0.72.</td></tr><tr><td><a href="#exp-14">EXP-14</a></td><td>2026-10-27</td><td>$0</td><td>Arm B (SAM rule) and reference rows, pilot</td><td>Code check on 3 tuning episodes: arm B IoU 0.75 vs 0.67 for always-in-contact, but it finds only 52 of 190 to 248 boundaries. The raw glove flickers under 0.1 s, so the cleaned glove is now the main ground truth.</td></tr><tr><td><a href="#exp-15">EXP-15</a></td><td>2026-10-27</td><td>$0</td><td>Copyable label methods: robot or retargeting?</td><td>The EXP-10 label mostly measures a retargeting side effect (fingertips 31 mm off the human ones). Faithful retargeting calls 94% to 96% copyable. No method passes the pre-set criteria. The label is on hold.</td></tr><tr><td><a href="#exp-16">EXP-16</a></td><td>2026-10-27</td><td>$0</td><td>Copyable label v2: position retargeting, mesh collision, contact reach</td><td>Passes the checks set in advance: 47% copyable, hand size correlation +0.04. Failures are mostly collisions (25.5%) and reach (10.9%). The share depends strongly on the depth limit.</td></tr><tr><td><a href="#exp-17">EXP-17</a></td><td>2026-10-27</td><td>$0</td><td>What predicts the v2 label (EXP-12 and EXP-13 again)</td><td>Object identity alone 0.74. Video hand shape lost its signal (0.52, it had learned the retargeting side effect). Our video checks add about 0.01 on top of the object.</td></tr><tr><td><a href="#exp-18">EXP-18</a></td><td>2026-10-27</td><td>$0</td><td>Option A check: object geometry vs object identity</td><td>Seven size and shape numbers from the 3D models reach 0.695 (identity 0.742) and still 0.673 on unseen objects, where identity is 0.5. Option A passes.</td></tr><tr><td><a href="#exp-19">EXP-19</a></td><td>2026-10-27</td><td>$0</td><td>Six object items for the checklist, stand-in grades</td><td>Coarse three-level items keep the object signal: 0.683 leaving a person out, 0.666 leaving an object out. Size next to the hand does most of the work.</td></tr><tr><td><a href="#exp-20">EXP-20</a></td><td>2026-10-27</td><td>$0</td><td>Held-out copyable v2 labels</td><td>Fixed v2 rule on held-out: 46.4% copyable (tuning 47.0%), persons 43% to 51%. Object shares agree with tuning (rank correlation 0.85). Labels only, nothing scored.</td></tr><tr><td><a href="#exp-21">EXP-21</a></td><td>2026-10-27</td><td>$0</td><td>Number 1 arms: code check and best possible scores</td><td>A perfect Muse Spark at 5 fps would reach 0.96 boundary F1 at ±5 frames, so 5 fps is not the limit. Arm C is capped at 0.15 by the boundaries arm B finds.</td></tr><tr><td><a href="#exp-22">EXP-22</a></td><td>2026-10-27</td><td>$0</td><td>Arm B splits contacts when the nearest object changes</td><td>Boundary F1 doubles (0.15 at ±5, 0.32 at ±15) and so does the arm C ceiling (0.32), but arm B now overshoots (392 boundaries for 190) and IoU falls to 0.66.</td></tr><tr><td><a href="#exp-23">EXP-23</a></td><td>2026-10-28</td><td>$0.20</td><td>Number 2 paid pilot (P1): SAM and Muse on HOT3D</td><td>SAM finds the grasped object in 99% of contact frames and our code picks it as nearest in 92%. Muse object grades match the 3D model stand-ins in 27 of 30. Muse costs $0.0097 per call, so P7 drops to about $35.</td></tr><tr><td><a href="#exp-24">EXP-24</a></td><td>2026-10-28</td><td>$0</td><td>Arm B splits only when the new object stays nearest</td><td>Waiting 3 frames lifts IoU from 0.66 to 0.72 but lowers boundary F1 at ±5 from 0.151 to 0.145. Even with the right number of boundaries, F1 is 0.09. The option stays in the grid for the 50 episodes.</td></tr><tr><td><a href="#exp-25">EXP-25</a></td><td>2026-10-28</td><td>$0</td><td>Does undistorting the fisheye frames help MediaPipe?</td><td>No. Undistorted frames give 10 points fewer hands found (70.6% to 60.3%), slightly worse 2D points and only 7% better hand shape, against a rule set in advance. Fisheye stays raw and is reported as a limit.</td></tr><tr><td><a href="#exp-26">EXP-26</a></td><td>2026-10-28</td><td>$0</td><td>Code check of the P7 gate and the unseen object report</td><td>Code works. The gate is tight: perfect stand-in grades pass by 0.007 (0.657), and at the P1 agreement of 90% the expected verdict is "weak". On tuning, the object-only reference beats our score (0.776 vs 0.721), while on unseen objects our score keeps 0.675.</td></tr><tr><td><a href="#exp-27">EXP-27</a></td><td>2026-10-28</td><td>$0</td><td>Code checks for the timing shift and the checklist against learning rows, and a power check</td><td>Learned shifts undo a 6 frame lag for arms A and C (C 0.149 to 0.307). On tuning, learned weights beat equal weights by +0.067 AUC (0.014 to 0.120). A 3-person held-out set detects this in 95% of draws, 77% with P1-level grade errors.</td></tr><tr><td><a href="#exp-28">EXP-28</a></td><td>2026-10-28</td><td>$0</td><td>The ground truth as a reusable benchmark</td><td><code>benchmark/</code> holds both ground truths (labels only), license notes (CC BY 4.0 and CC BY-NC-SA 4.0) and standalone scorers. The scorers reproduce the project numbers exactly.</td></tr><tr><td><a href="#exp-29">EXP-29</a></td><td>2026-10-28</td><td>$10.62</td><td>First real Muse Spark answers on tuning data (arm A on 3 episodes, P7a)</td><td>Muse Spark is about 7 frames early at starts and late at ends, and the learned shift doubles arm A F1 at ±5 (0.062 to 0.132). Muse alone barely beats chance on copyable (0.52), the checklist reaches 0.63 to 0.65, learning adds only +0.019. On unseen objects the checklist keeps 0.607.</td></tr><tr><td><a href="#exp-30">EXP-30</a></td><td>2026-10-28</td><td>$6.71</td><td>Where Muse Spark goes wrong on tuning, and one prompt revision</td><td>Muse Spark sees objects as smaller and narrower than they are and misses releases under 1 s. Asking for cm improves item accuracy but not the learned score (0.625 vs 0.638). The arm A revision changed 2% of answers. By the rule set in advance, both prompts stay at version 1.</td></tr><tr><td><a href="#exp-31">EXP-31</a></td><td>2026-10-28</td><td>$0</td><td>Code check for comparison 6 (object rate add-on) and the extra rows (AUC inside objects, per failure reason)</td><td>The code follows the plan and earlier outputs do not change. On tuning with stand-in grades, our score adds to the object rate at 5 labeled clips (+0.027) but not from 20 on, and inside an object it is near chance (0.574). A code check, not a result.</td></tr><tr><td><a href="#exp-32">EXP-32</a></td><td>2026-10-28</td><td>$11.89</td><td>Arm B (SAM rule) fixed on all 50 tuning episodes (P2)</td><td>Leaving one episode out, arm B reaches F1 0.153 at ±5 and 0.294 at ±15, IoU 0.683 (always in contact 0.623). It makes 2.5 times too many boundaries. 46 of 50 folds pick the same rule, which is now fixed for held-out.</td></tr></tbody></table></div>
+<article id="exp-01">
+<h2>EXP-01: Meta Model API smoke test</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/meta_smoke.py</code>. Raw output: <code>out/meta_smoke/</code>.</p>
+<h3>Question</h3>
+<p>Do Muse Spark and SAM 3.1 work on our data, what do the responses look like, and what do they cost per call?</p>
+<h3>Setup</h3>
+<ul><li>Input: OpenGraph episode 1 (tuning split), frames 270 to 419. That is a 5 second clip at 1280x720, H.264, 407 KB. The tactile glove says the right hand first touches the object at frame 321.</li><li>Muse Spark: <code>muse-spark-1.3</code>, chat completions, one JPEG frame (frame 330), <code>reasoning_effort=&quot;low&quot;</code>. The prompt asks which hand is touching, the object, and how visible the fingertips are, as JSON.</li><li>SAM 3.1: <code>sam-3.1</code>, Responses API, the clip uploaded with the Files API, text prompt <code>hand</code>, streamed.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Muse Spark</th><th>SAM 3.1</th></tr></thead>
+<tbody>
+<tr><td>Time</td><td>6.0 s</td><td>3.2 s upload, first frame after 3.0 s, done after 22.4 s</td></tr>
+<tr><td>Usage</td><td>1,261 input tokens (the 720p image is about 1,100), 780 output tokens of which 714 are reasoning</td><td>150 frames processed, 0 tokens</td></tr>
+<tr><td>Cost</td><td>$0.0049</td><td>$0.03 ($0.20 per 1,000 frames)</td></tr>
+<tr><td>Answer</td><td>right hand touching, left hand not touching, object "mat"</td><td>both hands found in all 150 frames, with stable ids</td></tr>
+</tbody></table></div>
+<p>The Muse Spark answer matches the tactile label for frame 330.</p>
+<figure><img src="assets/logs/exp01_sam_hand_f330.jpg" alt="SAM 3.1 hand masks on frame 330" loading="lazy"><figcaption>SAM 3.1 with the prompt <code>hand</code>, frame 330. Red is object id 0 (left hand), blue is object id 1 (right hand). The right hand mask covers the glove fingers but not the white sensor box on the wrist.</figcaption></figure>
+<h3>Response format</h3>
+<ul><li>SAM 3.1 sends one <code>response.output_text.delta</code> event per frame and ends with <code>response.completed</code>.</li><li>Each line is a frame marker <code>&lt;Nf&gt;</code> and then, per object, an id, a box token with corners in source pixels, and a mask token. The mask is a raster the size of the box, encoded in base85.</li><li>Meta's own Python parser, <code>meta-sam-parser</code> 0.1.0, reads the stream and decodes the masks. We use it as is.</li><li>Raw output is about 15 KB per frame (2.28 MB for this clip).</li></ul>
+<h3>What it means for the budget</h3>
+<p>At these prices, SAM 3.1 over all 138,629 OpenGraph frames costs about $28 per text prompt. All 480,375 HOT3D frames with ground truth would cost about $96 per prompt, which does not fit the $150 credit. So HOT3D clips are selected first from motion capture, and only those clips go to SAM.</p>
+<h3>Note</h3>
+<p>The first call failed with HTTP 401. The key line in <code>.env</code> had the variable name twice (<code>MODEL_API_KEY=MODEL_API_KEY=...</code>). Fixing the line fixed the call.</p>
+</article>
+<article id="exp-02">
+<h2>EXP-02: Which text prompt finds the objects? (small container clip)</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/meta_smoke.py</code>, <code>scripts/sam_prompt_compare.py</code>. Raw output: <code>out/meta_smoke/prompt_compare.json</code>. Meta API cost: $0.15.</p>
+<h3>Question</h3>
+<p>SAM 3.1 takes one short text prompt per call. Our contact signal needs object masks for any object, so we need one generic prompt that works across the dataset. Which prompt is that?</p>
+<h3>Setup</h3>
+<ul><li>Same 5 second clip as EXP-01: OpenGraph episode 1, frames 270 to 419. Two small round containers on a dark mat. The right hand picks one up. The tactile glove says contact starts at clip frame 51.</li><li>Four generic prompts: <code>object</code>, <code>held object</code>, <code>item</code>, <code>small object</code>.</li><li>One specific prompt as a reference: <code>round container</code>.</li><li>Each call is billed for all 150 frames, even when nothing is found.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th>Prompt</th><th>Frames with an object</th><th>Objects per frame</th><th>Ids (frames seen)</th><th>Boxes on a hand</th></tr></thead>
+<tbody>
+<tr><td><code>object</code></td><td>0%</td><td>0</td><td>none</td><td></td></tr>
+<tr><td><code>held object</code></td><td>0%</td><td>0</td><td>none</td><td></td></tr>
+<tr><td><code>item</code></td><td>0%</td><td>0</td><td>none</td><td></td></tr>
+<tr><td><code>small object</code></td><td>100%</td><td>1.45</td><td>0 (150), 1 (56), 2 (11)</td><td>0%</td></tr>
+<tr><td><code>round container</code></td><td>100%</td><td>1.37</td><td>0 (150), 1 (56)</td><td>0%</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp02_small_object.jpg" alt="small object" loading="lazy"><figcaption>Prompt <code>small object</code>. Blue boxes are the hands from the <code>hand</code> prompt. Coloured masks are the objects SAM found.</figcaption></figure>
+<figure><img src="assets/logs/exp02_round_container.jpg" alt="round container" loading="lazy"><figcaption>Prompt <code>round container</code>, the specific name, for reference.</figcaption></figure>
+<ul><li><code>small object</code> gives almost the same result as the specific name. Its one extra id (id 2, frames 7 to 17) is a small false box near the right wrist.</li><li>Very generic words (<code>object</code>, <code>item</code>, <code>held object</code>) find nothing.</li><li>Hand masks and object masks are within 3 pixels of each other in 100% of frames before the tactile contact (98% for <code>round container</code>) and in 100% after it. Seen from the head, the hand covers the object long before it touches it.</li></ul>
+<h3>Conclusion</h3>
+<ul><li><code>small object</code> is the first candidate for a generic object prompt.</li><li>2D overlap alone cannot tell touch from occlusion. The contact signal also needs co-movement: after a real grasp, the object moves with the hand.</li></ul>
+</article>
+<article id="exp-03">
+<h2>EXP-03: Does the generic prompt hold on a large object? (spray bottle clip)</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/meta_smoke.py</code>, <code>scripts/sam_prompt_compare.py</code>. Raw output: <code>out/meta_smoke/ep53/</code>. Meta API cost: $0.15 (5 calls of 150 frames).</p>
+<h3>Question</h3>
+<p>EXP-02 picked <code>small object</code> on a clip with small containers. Spray bottle tasks are about 20% of all frames, the bottle is large, and the background is a beige table close to the glove colour. Does <code>small object</code> still work there?</p>
+<h3>Setup</h3>
+<ul><li>OpenGraph episode 53 (tuning split), frames 136 to 285, 5 seconds at 720p. The right hand reaches for a spray bottle on the table. The tactile glove says contact starts at clip frame 50. The head moves in this episode (see EXP-04).</li><li>Prompts: <code>hand</code> (for the hand masks), <code>small object</code>, <code>handheld object</code>, <code>bottle</code>, and the specific name <code>spray bottle</code> as a reference.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th>Prompt</th><th>Frames with an object</th><th>Objects per frame</th><th>Ids (frames seen)</th><th>Boxes on a hand</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td><code>handheld object</code></td><td>0%</td><td>0</td><td>none</td><td></td><td>6.9 s</td></tr>
+<tr><td><code>small object</code></td><td>100%</td><td>1.44</td><td>0 (150), 1 (66)</td><td>0%</td><td>16.9 s</td></tr>
+<tr><td><code>bottle</code></td><td>100%</td><td>1.00</td><td>0 (150)</td><td>0%</td><td>14.9 s</td></tr>
+<tr><td><code>spray bottle</code></td><td>100%</td><td>1.00</td><td>0 (150)</td><td>0%</td><td>17.2 s</td></tr>
+</tbody></table></div>
+<p><code>hand</code> found both gloved hands in all 150 frames (22.2 s).</p>
+<figure><img src="assets/logs/exp03_small_object.jpg" alt="small object on the spray bottle clip" loading="lazy"><figcaption>Prompt <code>small object</code>. Id 0 (yellow) is the spray bottle in every frame. Id 1 (pink, left edge) is another object at the edge of the table.</figcaption></figure>
+<figure><img src="assets/logs/exp03_spray_bottle.jpg" alt="spray bottle" loading="lazy"><figcaption>Prompt <code>spray bottle</code>, the specific name, for reference. The bottle mask is the same as with <code>small object</code>.</figcaption></figure>
+<ul><li><code>small object</code> finds the large bottle in every frame, with the same mask as the specific name. It also picks up one background object (id 1, 66 frames).</li><li><code>handheld object</code> finds nothing, like the other very generic words in EXP-02.</li><li>No prompt put a box on a glove, even on the beige table.</li><li>Right hand and object masks are within 3 pixels in 76% to 80% of frames before contact and 100% after. Better than the container clip, but still far from a usable contact signal on its own.</li></ul>
+<h3>Conclusion</h3>
+<ul><li><code>small object</code> works on both a small and a large object. We use it as the single object prompt for OpenGraph.</li><li>Extra background objects are expected. The contact step keeps only the object that moves with a hand.</li><li>Cost check: one prompt over all OpenGraph frames is about $28 at 30 fps. With <code>hand</code> and <code>small object</code>, the full run is about $55, or about $18 at 10 fps if the 10 fps test in EXP-04 holds.</li></ul>
+</article>
+<article id="exp-04">
+<h2>EXP-04: Cleaning OpenGraph without any API call</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/refine_check.py</code>, <code>scripts/refine_plots.py</code>. Output: <code>out/refine_check/summary.json</code>, <code>out/refine_check/per_episode.csv</code>. Cost: $0. Everything here runs on the local CPU.</p>
+<h3>Question</h3>
+<p>Before we spend credit on SAM 3.1, what can the dataset itself tell us about label quality, ground truth, and camera motion?</p>
+<h3>1. The contact labels follow a thresholded tactile signal</h3>
+<p>OpenGraph labels which hand is in contact (<code>annotation.hand</code>). We compared this, frame by frame, with our own rule: a hand is touching when the sum of its 80 taxels is above a threshold.</p>
+<figure><img src="assets/logs/exp04_tactile_and_head_motion.png" alt="Label vs tactile agreement and head motion per episode" loading="lazy"><figcaption>Left: agreement between labels and the tactile rule as the threshold rises. Right: head gyro p95 per episode.</figcaption></figure>
+<ul><li>With threshold 0 (any pressure), agreement is 97% for episodes 0 to 62 but only 72% to 74% for episodes 63 to 71. In those episodes the gloves read a small pressure at rest, so "any pressure" marks a hand as touching when it is not.</li><li>With threshold 800, agreement is 98.7% (left) and 97.2% (right) over all 138,629 frames, and 96.6% to 96.9% for episodes 63 to 71.</li><li>Contact onsets with threshold 800: for the right hand, 93.5% of label onsets have a tactile onset within 5 frames (median offset 0). For the left hand it is 79.6% (median offset 1 frame, tactile first).</li></ul>
+<p>Use for the project: we can build a second, independent ground truth for number 1 from the raw tactile data, but only with a threshold near 800 or a resting baseline per episode. Plain "any pressure" is wrong for 9 of 72 episodes.</p>
+<h3>2. No short blips to clean</h3>
+<p>There are 261 contact segments. None is shorter than 5 frames and no gap between two contacts is shorter than 5 frames. Segment length is 24 frames at p10, 246 at the median, and 978 at p90. The labels need no smoothing before we score boundaries with a 5 frame window.</p>
+<h3>3. Camera motion is known for free</h3>
+<p>The head IMU gyro splits the data into two groups. In episodes 0 to 47 and 63 to 71 the camera is almost still (p95 at most 0.06 rad/s). In the spray bottle episodes 48 to 62 the head moves (p95 0.45 to 0.83 rad/s).</p>
+<p>Use for the project: the "camera stability" check, which we compute from the video only, can be tested against the IMU at no cost. It also means camera stability only varies inside the spray bottle group in OpenGraph.</p>
+<h3>4. Cheaper SAM input, not yet tested</h3>
+<p>SAM 3.1 is billed per frame. Sending clips at 10 fps instead of 30 fps would cut the OpenGraph bill from $27.73 to $9.24 per prompt. A 10 fps step is 0.1 s, which is inside the 0.167 s (5 frame) boundary window, and boundaries can be refined locally at 30 fps. This needs one paid test to check that tracking holds at 10 fps.</p>
+<h3>Other API free steps for later</h3>
+<ul><li>HOT3D: pick contact clips from motion capture (hand to object distance) and drop frames that fail the dataset QA flags (434,452 of 480,375 pass). Only those clips go to SAM.</li><li>HOT3D: <code>box2d_hands.csv</code> has ground truth 2D hand boxes. It checks SAM hand boxes at no cost.</li></ul>
+</article>
+<article id="exp-05">
+<h2>EXP-05: Can we send SAM 3.1 a 10 fps clip instead of 30 fps?</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/meta_smoke.py --step 3</code>, <code>scripts/sam_fps_compare.py</code>. Raw output: <code>out/meta_smoke/fps10/</code>. Meta API cost: $0.04 (4 calls of 50 frames).</p>
+<h3>Question</h3>
+<p>SAM 3.1 video is billed per frame. If we keep every third frame, the same 5 seconds cost a third as much. Do the hand and object tracks stay the same?</p>
+<h3>Setup</h3>
+<ul><li>The same two clips as EXP-02 and EXP-03:<ul><li>ep1: OpenGraph episode 1, frames 270 to 419, two small containers, the right hand picks one up. Tactile contact at clip frame 51.</li><li>ep53: OpenGraph episode 53, frames 136 to 285, spray bottle, the head moves. Tactile contact at clip frame 50.</li></ul></li><li>The 10 fps clip keeps clip frames 0, 3, 6, up to 147 (50 frames). Each 10 fps frame was checked against its 30 fps twin (pixel MSE 1.6 to 5.4, against 78 to 206 for the next frame), so frame k at 10 fps is frame 3k at 30 fps.</li><li>Prompts <code>hand</code> and <code>small object</code>. The 30 fps runs are the ones from EXP-02 and EXP-03, compared on the same 50 frames.</li><li>Mask IoU: for each 10 fps object id we take the 30 fps id that overlaps it most. A frame where only one of the two runs has the object counts as 0.</li></ul>
+<h3>Results</h3>
+<h4>Main tracks</h4>
+<div class="wrap"><table>
+<thead><tr><th>Clip</th><th>Track</th><th>Frames found, 10 fps / 30 fps</th><th>Mask IoU mean</th><th>Mask IoU min</th></tr></thead>
+<tbody>
+<tr><td>ep1</td><td>left hand</td><td>50 / 50</td><td>0.992</td><td>0.987</td></tr>
+<tr><td>ep1</td><td>right hand</td><td>50 / 50</td><td>0.991</td><td>0.981</td></tr>
+<tr><td>ep1</td><td>grasped container</td><td>50 / 50</td><td>0.974</td><td>0.940</td></tr>
+<tr><td>ep53</td><td>left hand</td><td>50 / 50</td><td>0.990</td><td>0.975</td></tr>
+<tr><td>ep53</td><td>right hand</td><td>50 / 50</td><td>0.978</td><td>0.770</td></tr>
+<tr><td>ep53</td><td>spray bottle</td><td>50 / 50</td><td>0.983</td><td>0.968</td></tr>
+</tbody></table></div>
+<p>All six tracks keep the same id in all 50 frames. The one low value (0.77, ep53 right hand, clip frame 15) is a single frame where the 10 fps mask reaches further right (box right edge at x = 1231 against 1111). The next frame is back at 0.98.</p>
+<figure><img src="assets/logs/exp05_ep1_30fps_vs_10fps.jpg" alt="ep1, 30 fps on top, 10 fps below" loading="lazy"><figcaption>ep1. Top row 30 fps, bottom row 10 fps, same source frames. Blue: hand masks. Yellow: the grasped container (id 0). At frame 147 the second container is id 1 at 30 fps but id 3 at 10 fps.</figcaption></figure>
+<figure><img src="assets/logs/exp05_ep53_30fps_vs_10fps.jpg" alt="ep53, 30 fps on top, 10 fps below" loading="lazy"><figcaption>ep53. The spray bottle (id 0) and both hands look the same at both frame rates. Id 1 (pink, left edge) is the background object seen in EXP-03.</figcaption></figure>
+<figure><img src="assets/logs/exp05_mask_iou_by_frame.png" alt="mask IoU per frame" loading="lazy"><figcaption>Mask IoU between the 10 fps and 30 fps results on the same frame, for the tracks that last the whole clip. Hand id 0 is the left hand in ep1 and the right hand in ep53. Small object id 0 is the grasped object in both.</figcaption></figure>
+<h4>Side tracks</h4>
+<ul><li>ep1, second container: it is hidden under the right hand from about clip frame 7 to 101. At 30 fps it comes back with its old id. At 10 fps it comes back as a new id (id 2 for one frame, then id 3). In the 14 frames where both runs see it, the masks agree (median IoU 0.97).</li><li>ep1, false box near the right wrist (the id 2 from EXP-02): present at both frame rates in the same frames (clip frames 9 to 15). At 10 fps the id 2 label is later reused for the returning container and a tiny box.</li><li>ep1: two tiny extra boxes (about 21 x 6 pixels) in the last two 10 fps frames, not in the 30 fps run.</li><li>ep53, background object: 21 frames at 10 fps against 22 at 30 fps, mean IoU 0.89.</li></ul>
+<h4>Contact cue and speed</h4>
+<div class="wrap"><table>
+<thead><tr><th></th><th>ep1 10 fps</th><th>ep1 30 fps</th><th>ep53 10 fps</th><th>ep53 30 fps</th></tr></thead>
+<tbody>
+<tr><td>Right hand within 3 px of an object, before contact</td><td>94%</td><td>100%</td><td>82%</td><td>82%</td></tr>
+<tr><td>Same, after contact</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr>
+<tr><td><code>hand</code> stream time</td><td>9.5 s</td><td>22.4 s</td><td>9.4 s</td><td>22.2 s</td></tr>
+<tr><td><code>small object</code> stream time</td><td>5.7 s</td><td>9.6 s</td><td>5.9 s</td><td>16.9 s</td></tr>
+<tr><td><code>hand</code> raw output</td><td>0.71 MB</td><td>2.28 MB</td><td>0.87 MB</td><td>2.57 MB</td></tr>
+</tbody></table></div>
+<p>The 30 fps columns use the same 50 frames. The one ep1 difference before contact is a single frame where the 30 fps run still had a thin sliver of the second container next to the hand.</p>
+<h3>Conclusion</h3>
+<ul><li>At 10 fps, SAM 3.1 gives the same hand and grasped-object tracks as at 30 fps: same ids, mask IoU 0.97 to 0.99. We will send 10 fps clips.</li><li>What we lose: an object that stays hidden for about 3 seconds may come back with a new id. The contact step only needs the object that moves with the hand, so this does not change it. If we need one id per object, we can join tracks by position after the gap.</li><li>Contact timing is measured at 30 fps, so a 10 fps signal has a step of 3 frames (0.1 s). That is inside the ±5 frame target, but it uses up to a third of it. Muse Spark boundary checks can still look at the 30 fps frames around each boundary.</li><li>Cost: one prompt over all OpenGraph frames drops from about $27.7 to $9.2. <code>hand</code> plus <code>small object</code> drops from about $55 to about $18. It is also 2 to 3 times faster and gives a third of the raw output.</li></ul>
+</article>
+<article id="exp-06">
+<h2>EXP-06: Contact cutting pilot on three whole episodes</h2>
+<blockquote>Note, 2026-10-27: the logistic regression tested here is now an appendix. The compared arms for number 1 are set in the measurement plan: Muse Spark alone, a SAM rule (overlap plus co-movement), and the SAM rule plus a Muse Spark boundary check. The main ground truth is the cleaned glove (tactile sum above 800, flicker under 0.1 s removed, EXP-14). The contact images on this page were redrawn on 2026-10-27 with the model trained on that ground truth. The tables are from the original run on labels and raw glove.</blockquote>
+<p>Date: 2026-10-27. Scripts: <code>scripts/sam_episodes.py</code>, <code>scripts/sam_fast.py</code>, <code>scripts/sam_track_check.py</code>, <code>scripts/contact_cut.py</code>. Raw output: <code>out/sam10/</code>, <code>out/contact/</code>. Meta API cost: $1.15 (6 calls, 5,762 frames).</p>
+<h3>Question</h3>
+<p>Before we send all 50 tuning episodes, does SAM 3.1 keep its tracks over a whole episode (1 to 2.5 minutes), and does our contact pipeline run end to end and give a first signal?</p>
+<h3>Setup</h3>
+<ul><li>Three tuning episodes with different tasks:<ul><li>ep0: 146 s, moving small black and white discs between clear containers. The right hand touches 48 times.</li><li>ep30: 68 s, orange cardboard box.</li><li>ep53: 74 s, spray bottle, the head moves.</li></ul></li><li>Each whole episode goes to SAM 3.1 as one 10 fps clip (EXP-05), once with <code>hand</code> and once with <code>small object</code>. SAM takes up to 15,000 frames per request. Our longest episode has 1,457 frames at 10 fps.</li><li>Masks are decoded with <code>sam_fast.py</code>. It runs the same decoder as the official <code>meta-sam-parser</code>, compiled with numba. On 345 masks the result was bit for bit the same, at about 3 ms per mask instead of 400 ms.</li><li>Contact model (<code>contact_cut.py</code>), per 10 fps frame and hand:<ul><li>13 features: the gap between the hand mask and the nearest object mask, the share of that object next to the hand, object motion with camera motion removed, whether object and hand move together, hand motion, visible object area, number of objects.</li><li>The same features from 6 frames before to 6 frames after are added as context.</li><li>A logistic regression gives a contact probability. Smoothing and two thresholds turn it into segments, which go back to 30 fps.</li></ul></li><li>Baseline rule: contact when the hand mask is within 3 px of an object mask.</li><li>Scoring: leave one episode out (train on two, test on the third). Ground truth is the dataset label, with tactile sum above 800 as a check.<ul><li>Boundary F1 at ±5 frames (0.167 s) and ±15 frames (0.5 s). Starts and ends are matched one to one, only to the same kind.</li><li>Contact IoU over all frames.</li></ul></li></ul>
+<h3>Results</h3>
+<h4>SAM over whole episodes</h4>
+<div class="wrap"><table>
+<thead><tr><th></th><th>ep0</th><th>ep30</th><th>ep53</th></tr></thead>
+<tbody>
+<tr><td>Request time (<code>hand</code> / <code>small object</code>)</td><td>77 s / 83 s</td><td>44 s / 44 s</td><td>48 s / 49 s</td></tr>
+<tr><td>Raw output, both prompts, gzip</td><td>127 MB</td><td>94 MB</td><td>81 MB</td></tr>
+<tr><td>Frames with a hand</td><td>99.4%</td><td>99.0%</td><td>100%</td></tr>
+<tr><td>Hand ids</td><td>2</td><td>2</td><td>3 (one lives 6 frames)</td></tr>
+<tr><td>Objects per frame, mean / max</td><td>6.9 / 12</td><td>2.3 / 4</td><td>1.6 / 3</td></tr>
+<tr><td>Object ids</td><td>16</td><td>4</td><td>5</td></tr>
+<tr><td>Left hand found in left-contact frames</td><td>100%</td><td>100%</td><td>96.7%</td></tr>
+<tr><td>Right hand found in right-contact frames</td><td>98.3%</td><td>97.2%</td><td>100%</td></tr>
+</tbody></table></div>
+<p>All six requests ran in parallel in 93 seconds. The two hand ids last the whole episode in all three cases.</p>
+<figure><img src="assets/logs/exp06_ep0_timeline.png" alt="ep0 SAM timeline" loading="lazy"><figcaption>Episode 0. Blue: SAM found the hand. Green: the hand is in contact (label). Orange: object ids from <code>small object</code>. The scene has many discs and containers, so SAM uses 16 object ids, up to 12 in one frame. The limit is 16.</figcaption></figure>
+<p>One thing had to be fixed first. Our first rule called a hand id left or right from its median position in the image. Hands cross the image centre often. In ep53 the left hand spends 56% of its frames right of the centre, so it was called the right hand. We now use frames that show both hands: the id that is more often the left one of the pair is the left hand. The table above uses the fixed rule.</p>
+<h4>First contact numbers (3 episodes only)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Method</th><th>Ground truth</th><th>Boundary F1 ±5</th><th>Boundary F1 ±15</th><th>Contact IoU</th></tr></thead>
+<tbody>
+<tr><td>Rule, gap ≤ 3 px</td><td>label</td><td>0.00</td><td>0.07</td><td>0.74</td></tr>
+<tr><td>Logistic regression</td><td>label</td><td>0.18</td><td>0.31</td><td>0.64</td></tr>
+<tr><td>Rule, gap ≤ 3 px</td><td>tactile</td><td>0.01</td><td>0.07</td><td>0.75</td></tr>
+<tr><td>Logistic regression</td><td>tactile</td><td>0.16</td><td>0.30</td><td>0.64</td></tr>
+</tbody></table></div>
+<p>The rule has a higher IoU because it marks long blocks of "contact". The hand is next to some object most of the time. But it finds almost no boundaries.</p>
+<p>Without any shift, our starts come 6 frames (0.2 s) before the label starts (median). Ends have no delay (median 0). That means the hand looks like it touches before the glove feels pressure. The pipeline now moves starts by the median delay seen in the training episodes.</p>
+<p>How well single frames are separated (ROC AUC of the model probability, each episode left out):</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>ep0</th><th>ep30</th><th>ep53</th></tr></thead>
+<tbody>
+<tr><td>Left hand</td><td>0.93</td><td>0.70</td><td>0.91</td></tr>
+<tr><td>Right hand</td><td>0.59</td><td>0.65</td><td>0.92</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp06_ep53_contact.png" alt="ep53 contact" loading="lazy"><figcaption>Episode 53, model trained on ep0 and ep30. Blue line: contact probability. Green: label contact. Grey: tactile above 800. Orange: predicted contact. The long holds are found. The short releases at 9 s and 13 s are missed, and the ends come 1 to 3 s late, while the hands are still next to the bottle.</figcaption></figure>
+<figure><img src="assets/logs/exp06_ep0_contact.png" alt="ep0 contact" loading="lazy"><figcaption>Episode 0. The left hand holds a container in six long blocks, and the probability follows them. The right hand picks up small discs 48 times. It never leaves the area next to the containers, so the probability cannot separate touch from no touch.</figcaption></figure>
+<figure><img src="assets/logs/exp06_ep30_contact.png" alt="ep30 contact" loading="lazy"><figcaption>Episode 30, cardboard box. Long contacts are found. Short gaps where the hand rests on the box without pressure are often called contact.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>SAM 3.1 handles whole episodes at 10 fps. Hand ids last the whole episode, and each hand is found in 97% to 100% of its contact frames. We can send one request per episode.</li><li>Cost and time are as planned: $0.20 per 1,000 frames, about 1 minute per request, about 100 MB of raw output per episode.</li><li>The pipeline runs end to end. Large held objects are separated well from single frames (AUC 0.91 to 0.93). Quick pinches of small objects next to a container are not (AUC 0.59).</li><li>Boundary F1 is low (0.18 at ±5 frames). This model was trained on only two episodes, so the number is not the final answer. It does show that masks alone will not place boundaries within ±5 frames. The Muse Spark boundary check in the plan is needed.</li><li>Visible contact starts about 0.2 s before glove pressure. This is the delay the plan asked us to measure, but it comes from three episodes only.</li><li>Note: the two thresholds were picked on the same out-of-fold probabilities that were scored, so these numbers are slightly optimistic.</li></ul>
+</article>
+<article id="exp-07">
+<h2>EXP-07: How many grasp clips does HOT3D give, and what will number 2 cost?</h2>
+<blockquote>Note, 2026-10-27: this page counts clips for pricing only. The clip set used for number 2 is the one cut from hand to object distance in <a href="#exp-11">EXP-11</a>: 400 tuning clips for the weights and all 1,426 held-out clips for the AUC. See the measurement plan.</blockquote>
+<p>Date: 2026-10-27. Script: <code>scripts/hot3d_clip_count.py</code>. Raw output: <code>out/hot3d_clips/events.csv</code>, <code>summary.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>Number 2 sends HOT3D grasp clips to SAM 3.1 and Muse Spark. Sending every frame of the 136 sequences that have ground truth would cost about $96 per SAM prompt, so we only send clips around grasps. How many clips are there, how long are they, and what do they cost?</p>
+<h3>Setup</h3>
+<ul><li>All 136 Aria sequences with hand and object pose ground truth (85 tuning, 51 held-out, 480,375 RGB frames). Motion capture only, no video.</li><li>HOT3D objects move only when a hand moves them. Per object, at the RGB frame times (30 fps):<ul><li>speed = position change over 0.2 s. A resting object reads about 0.0003 m/s, a carried one 0.2 to 1 m/s. Moving means above 0.03 m/s.</li><li>Moves less than 0.5 s apart are joined. Moves shorter than 0.3 s, or that end less than 3 cm from where they began, are dropped.</li><li>One move is one grasp event. Its clip adds 1 s before (reach) and 1 s after (release).</li></ul></li><li>Two checks per event: a MANO wrist comes within 0.25 m of the object, and at least 90% of the clip frames pass the dataset QA mask.</li><li>SAM price: $0.20 per 1,000 frames, at least 50 frames per request, 10 fps (EXP-05), two prompts (hand and object).</li><li>This count is for pricing only. The clips for number 2 will be cut on Day 5 from the distance between the hand and the object.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Tuning</th><th>Held-out</th><th>All</th></tr></thead>
+<tbody>
+<tr><td>Sequences</td><td>85</td><td>51</td><td>136</td></tr>
+<tr><td>Grasp events (object moves)</td><td>1,709</td><td>915</td><td>2,624</td></tr>
+<tr><td>Wrist within 0.25 m</td><td>1,581</td><td>871</td><td>2,452</td></tr>
+<tr><td>Wrist near and clip passes QA</td><td>1,439</td><td>713</td><td>2,152</td></tr>
+<tr><td>Move length, median</td><td>2.3 s</td><td>3.5 s</td><td>2.7 s</td></tr>
+<tr><td>Clip length, median / 90th percentile</td><td>4.3 / 10.3 s</td><td>5.5 / 11.7 s</td><td>4.6 / 10.9 s</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp07_hot3d_clips.png" alt="HOT3D grasp clips" loading="lazy"><figcaption>Left: clip lengths. 53% of clips are shorter than 5 s, so SAM bills them as 50 frames. Right: clips per sequence. Two sequences have no usable clip.</figcaption></figure>
+<p>93% of moving objects have a wrist within 0.25 m, so object motion is a good grasp detector. The most moved objects are the white mug (164 events), a puzzle toy, a coffee pot and a cellphone.</p>
+<h4>SAM cost for the 2,152 clips</h4>
+<div class="wrap"><table>
+<thead><tr><th>Option</th><th>Requests</th><th>Billed frames</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td>Every frame of all 136 sequences, 30 fps, 2 prompts</td><td>272</td><td>960,750</td><td>$192</td></tr>
+<tr><td>One request per clip, 30 fps</td><td>4,304</td><td>766,080</td><td>$153</td></tr>
+<tr><td>One request per clip, 10 fps</td><td>4,304</td><td>293,156</td><td>$59</td></tr>
+<tr><td>Overlapping clips joined, 10 fps</td><td>1,452</td><td>220,812</td><td>$44</td></tr>
+<tr><td>All 713 held-out clips plus 400 random tuning clips, 10 fps</td><td>2,226</td><td>158,070</td><td>$32</td></tr>
+</tbody></table></div>
+<h3>Conclusion</h3>
+<ul><li>HOT3D gives about 2,150 usable grasp clips, a median of 4.6 s each.</li><li>Sending all of them to SAM at 10 fps costs about $59, or $44 if overlapping clips are joined. Muse Spark on every clip adds about $50 (estimate, see below). Together that is too much next to the rest of the plan.</li><li>We do not need every tuning clip. The score is a logistic regression with 7 inputs, so a few hundred tuning clips are enough. The held-out clips are where the AUC and its confidence interval come from, so we keep all 713.</li><li>Plan: all held-out clips plus 400 random tuning clips (seed 20261026), about $32 for SAM.</li><li>Muse Spark estimate: two calls per clip (the two checklist items together, then the checklist-free baseline), 6 frames each, frames resized to 720 px (about 1,100 tokens each, measured in EXP-01 on OpenGraph frames). That is about $0.024 per clip, or about $27 for 1,113 clips. Token counts at HOT3D resolution are not measured yet.</li></ul>
+</article>
+<article id="exp-08">
+<h2>EXP-08: Which image orientation does the HOT3D calibration use?</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_calib_check.py</code>. Raw output: <code>out/hot3d_calib/report.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>Number 2 projects mocap hands and objects into the HOT3D video. We use <code>preview_rgb.mp4</code>, which is upright. Raw Aria images are rotated 90 degrees. The camera calibration in <code>ground_truth/camera_models.json</code> (FISHEYE624) and the dataset 2D boxes may belong to either orientation. If we guess wrong, every projection in number 2 lands in the wrong place.</p>
+<h3>Setup</h3>
+<ul><li>Three sequences from three people: P0001_10a27bf7 (held-out), P0002_016222d1 and P0011_72efb935 (tuning).</li><li>Check 1, calibration against the dataset 2D object boxes:<ul><li>For 25 frames per sequence, project each object's 3D model (from <code>assets/*.glb</code>) with the mocap poses: object to world, world to headset, headset to RGB camera, then the FISHEYE624 lens model.</li><li>Compare the bounding box of the projected points with the box in <code>box2d_objects.csv</code> (stream 214-1, visibility above 0.6), as projected and after a 90 degree turn either way.</li></ul></li><li>Check 2, against the video itself (independent of the dataset boxes):<ul><li>Run MediaPipe Hands on 150 preview frames per sequence. HOT3D hands are bare, so MediaPipe works here.</li><li>Compare its hand boxes with the dataset hand boxes (<code>box2d_hands.csv</code>) for each orientation and for frame offsets from -2 to +2. The video has one frame fewer than the RGB timestamps, so the time match needs checking too.</li></ul></li><li>Check 3, by eye: projected models drawn on the video frame.</li></ul>
+<h3>Results</h3>
+<h4>Check 1: projection against dataset object boxes (mean IoU)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Sequence</th><th>Boxes</th><th>As projected</th><th>Turned 90° clockwise</th><th>Turned 90° counter-clockwise</th></tr></thead>
+<tbody>
+<tr><td>P0001_10a27bf7</td><td>68</td><td>0.86</td><td>0.00</td><td>0.00</td></tr>
+<tr><td>P0002_016222d1</td><td>116</td><td>0.98</td><td>0.02</td><td>0.02</td></tr>
+<tr><td>P0011_72efb935</td><td>111</td><td>0.95</td><td>0.01</td><td>0.01</td></tr>
+</tbody></table></div>
+<p>The calibration and the dataset boxes agree with each other, so our projection code (poses and lens model) is right. This check alone does not say which orientation the video uses.</p>
+<h4>Check 2: MediaPipe on the video against dataset hand boxes (mean IoU)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Sequence</th><th>As given, offset 0</th><th>Counter-clockwise, offset 0</th><th>Clockwise, offset -1</th><th>Clockwise, offset 0</th><th>Clockwise, offset +1</th></tr></thead>
+<tbody>
+<tr><td>P0001_10a27bf7</td><td>0.01</td><td>0.00</td><td>0.41</td><td><strong>0.43</strong></td><td>0.42</td></tr>
+<tr><td>P0002_016222d1</td><td>0.03</td><td>0.00</td><td>0.43</td><td><strong>0.45</strong></td><td>0.44</td></tr>
+<tr><td>P0011_72efb935</td><td>0.00</td><td>0.00</td><td>0.37</td><td><strong>0.38</strong></td><td>0.38</td></tr>
+</tbody></table></div>
+<p>The IoU tops out near 0.4 because a MediaPipe box only spans the 21 hand landmarks, while the dataset box covers the whole visible hand. What matters is where the peak is: clockwise, offset 0, in all three sequences.</p>
+<h4>Check 3: by eye</h4>
+<figure><img src="assets/logs/exp08_P0002_016222d1_orientation.jpg" alt="P0002 orientation" loading="lazy"><figcaption>P0002_016222d1. Green: dataset object boxes as given. Orange: projected 3D models. Only the clockwise panel puts the models on the real spatula and plate on the table. The given boxes sit up near the monitor, in the wrong place.</figcaption></figure>
+<figure><img src="assets/logs/exp08_P0001_10a27bf7_orientation.jpg" alt="P0001 orientation" loading="lazy"><figcaption>P0001_10a27bf7. Clockwise puts the mug under the right hand and the dumbbell on the green dumbbell.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>The calibration and the dataset 2D boxes (<code>box2d_objects.csv</code>, <code>box2d_hands.csv</code>) are in the raw Aria orientation. The preview video is that image turned 90 degrees clockwise.</li><li>To use them with the preview video, map a raw pixel (u, v) to (1407 - v, u). The same holds for every projected mocap point.</li><li>Preview frame k matches the k-th RGB timestamp (stream 214-1). The one missing video frame is at the end.</li><li>This closes open issue 1 in the plan. Mocap hands and objects can now be drawn on the clips we will send to SAM, and SAM boxes can be checked against the dataset boxes after the same turn.</li></ul>
+</article>
+<article id="exp-09">
+<h2>EXP-09: Fingertip 3D positions from UmeTrack, without MANO</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_hands.py</code>. Raw output: <code>out/hot3d_hands/report.json</code>, <code>tip_distances.csv</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>The copyable label in number 2 needs 3D fingertip positions next to the object. HOT3D gives hands in two formats. MANO needs a separate model file that requires registration on the MANO website. UmeTrack ships inside HOT3D. Can we get fingertips from UmeTrack alone?</p>
+<h3>Setup</h3>
+<ul><li><code>hand_data/umetrack_hand_user_profile.json</code> holds a full kinematic hand model per person: 22 joints (rest positions in mm, rotation axes, parents), 21 landmarks bound to bones, and a 788 vertex skinned mesh.</li><li><code>umetrack_hand_pose_trajectory.jsonl</code> holds, per timestamp and hand, 22 joint angles and the wrist pose in the world frame.</li><li>We wrote the forward kinematics: each joint turns by its angle about its axis through its rest position, on top of its parent, and each landmark moves with its bone. Landmarks 0 to 4 are the five fingertips.</li><li>The profile describes one hand. The other hand is its mirror image, and we did not know which hand or which axis. We tried all four options per hand (no mirror, or mirror along x, y or z).</li><li>Check 1: project the 21 landmarks into the raw image (lens model from EXP-08) and count how many fall inside the dataset hand box (<code>box2d_hands.csv</code>, hands at least 90% visible, box padded by 5%). 120 frames per sequence.</li><li>Check 2: draw the skeleton on the preview video (turned as in EXP-08).</li><li>Check 3: for each grasp event from EXP-07 in these sequences, the distance from the closest fingertip to the object surface (20,000 points sampled on the 3D model), in the middle of the move and 1.5 s before it starts.</li><li>Sequences: P0001_10a27bf7, P0002_016222d1, P0011_72efb935.</li></ul>
+<h3>Results</h3>
+<h4>Check 1: landmarks inside the dataset hand box</h4>
+<div class="wrap"><table>
+<thead><tr><th>Hand index</th><th>No mirror</th><th>Mirror x</th><th>Mirror y</th><th>Mirror z</th></tr></thead>
+<tbody>
+<tr><td>0, P0001 / P0002 / P0011</td><td><strong>1.00 / 1.00 / 1.00</strong></td><td>0.06 / 0.05 / 0.07</td><td>0.72 / 0.66 / 0.58</td><td>0.99 / 0.99 / 0.99</td></tr>
+<tr><td>1, P0001 / P0002 / P0011</td><td>0.05 / 0.05 / 0.06</td><td><strong>1.00 / 1.00 / 1.00</strong></td><td>0.06 / 0.05 / 0.06</td><td>0.06 / 0.06 / 0.06</td></tr>
+</tbody></table></div>
+<p>Hand 1 only fits when mirrored along x. So the profile is hand 0 as it is, and hand 1 is its x mirror. (For hand 0, mirror z also stays inside the box, because a box cannot tell a hand from its mirror image. But a real profile must fit one hand without mirroring, and hand 1 rules that out.)</p>
+<h4>Check 2: skeleton on the video</h4>
+<figure><img src="assets/logs/exp09_P0001_10a27bf7_hands.jpg" alt="P0001 hands" loading="lazy"><figcaption>P0001_10a27bf7. Blue: hand 0. Orange: hand 1. Red dots: fingertips. The skeletons sit on the real hands, holding the dumbbell, the phone and the mug. Hand 0 is the left hand and hand 1 is the right hand.</figcaption></figure>
+<figure><img src="assets/logs/exp09_P0002_016222d1_hands.jpg" alt="P0002 hands" loading="lazy"><figcaption>P0002_016222d1. The right hand fingertips close around the potato masher handle.</figcaption></figure>
+<h4>Check 3: fingertip to object distance</h4>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Grasp events</th><th>Closest fingertip, median</th><th>90th percentile</th><th>Within 15 mm</th><th>2 or more fingertips within 15 mm</th></tr></thead>
+<tbody>
+<tr><td>Middle of the move</td><td>65</td><td>2.3 mm</td><td>6.0 mm</td><td>97%</td><td>95%</td></tr>
+<tr><td>1.5 s before the move</td><td>60</td><td>265 mm</td><td>601 mm</td><td>5%</td><td>5%</td></tr>
+</tbody></table></div>
+<p>While an object moves, fingertips sit a few millimetres from its surface. Before the move, the hand is far away. This is the signal the copyable label is built on.</p>
+<h3>Conclusion</h3>
+<ul><li>UmeTrack alone gives 21 hand landmarks with fingertips in 3D, in the same world frame as the objects. We do not need MANO and nobody needs to register for it.</li><li>Hand 0 is the left hand and uses the profile as it is. Hand 1 is the right hand and is the profile mirrored along x.</li><li>Fingertip to surface distances are accurate to a few millimetres during grasps, which is fine enough for the copyable rule ("thumb and at least one other finger near the surface, none deep inside").</li><li>Next: send these landmarks to dex-retargeting (Allegro hand) and measure the Allegro fingertips against the object surface. That gives the copyable label, and then the label skew check on the tuning set (plan, risk 1).</li></ul>
+</article>
+<article id="exp-10">
+<h2>EXP-10: Copyable labels from Allegro retargeting, and the label skew check</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_copyable.py</code>. Raw output: <code>out/hot3d_copyable/tune_events.csv</code>, <code>tune_sd.npy</code>, <code>tune_report.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>Number 2 needs a ground truth: can a robot hand copy this human grasp? The plan defines it with an Allegro hand. The biggest known risk was label skew. The Allegro hand is larger than a human hand, so a strict rule could call almost nothing copyable, and a loose rule almost everything. The plan asks for a copyable share between 20% and 80% on the tuning split. Does our label land there, and how much does it depend on the thresholds?</p>
+<h3>Setup</h3>
+<ul><li>Grasps: the EXP-07 events in the 85 tuning sequences (wrist near the object, clip passes QA). 1,422 of 1,439 had hand poses at the contact frame. Contact frame = the middle of the object move.</li><li>Hand: the one whose fingertips are closest to the object. Landmarks from UmeTrack (EXP-09), put in MediaPipe order.</li><li>Retargeting: dex-retargeting 0.4.6, the Allegro vector config for that hand (<code>allegro_hand_right</code> or <code>allegro_hand_left</code>). It matches the four wrist-to-fingertip vectors, using the same wrist frame as the dex-retargeting MediaPipe example. We turned off the low pass filter and reset the solver per grasp, because every grasp is a single frame.</li><li>Size factor: Allegro wrist-to-index-tip length (0.247 m) over the person's own (from the UmeTrack profile). Median 1.26. The default 1.6 in the config is tuned for MediaPipe input, not metric mocap.</li><li>Placement: the Allegro wrist sits at the human wrist, turned by the same wrist frame. Every Allegro link point then goes into the object frame.</li><li>Signed distance to the object surface: nearest of 30,000 points sampled on the 3D model, negative when the point is behind the surface normal (inside).</li><li>Rule, per grasp: copyable if, for some wrist shift up to R (1 cm grid):<ul><li>the Allegro thumb tip is within <code>near</code> of the surface (and not deeper than <code>deep</code>),</li><li>at least one other Allegro fingertip is too,</li><li>and no Allegro link point is deeper than <code>deep</code> inside the object.</li></ul></li><li>Sanity check on the same frames: the human rule (thumb and one more human fingertip within 15 mm) holds for 89.5% of grasps.</li></ul>
+<h3>Results</h3>
+<p>Retargeting reaches the target vectors with a median error of 4.3%.</p>
+<h4>Copyable share over thresholds (tuning split, 1,422 grasps)</h4>
+<div class="wrap"><table>
+<thead><tr><th>near</th><th>deep</th><th>Wrist fixed</th><th>Shift up to 2 cm</th><th>Shift up to 4 cm</th></tr></thead>
+<tbody>
+<tr><td>1.0 cm</td><td>1 cm</td><td>9.4%</td><td>33.5%</td><td>45.9%</td></tr>
+<tr><td>1.5 cm</td><td>0.5 cm</td><td>19.7%</td><td>53.3%</td><td>66.8%</td></tr>
+<tr><td><strong>1.5 cm</strong></td><td><strong>1 cm</strong></td><td>20.7%</td><td><strong>54.4%</strong></td><td>66.9%</td></tr>
+<tr><td>1.5 cm</td><td>2 cm</td><td>21.6%</td><td>55.2%</td><td>67.1%</td></tr>
+<tr><td>2.0 cm</td><td>1 cm</td><td>39.0%</td><td>75.7%</td><td>86.6%</td></tr>
+<tr><td>3.0 cm</td><td>1 cm</td><td>69.1%</td><td>94.4%</td><td>97.4%</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp10_copyable_rate.png" alt="copyable share over thresholds" loading="lazy"><figcaption>Copyable share as the near threshold grows, for three wrist shift limits. Yellow: the 20% to 80% band from the plan.</figcaption></figure>
+<ul><li>The <code>near</code> threshold and the wrist shift decide the share. The <code>deep</code> limit barely matters: with the wrist fixed, only 4.1% of grasps have any Allegro link more than 1 cm inside the object.</li><li>With the wrist fixed, the median Allegro thumb tip is 11 mm from the surface and the closest other fingertip 19 mm.</li></ul>
+<h4>Chosen rule</h4>
+<p>near 1.5 cm (the same distance as the human fingertip check in EXP-09), deep 1 cm, wrist shift up to 2 cm. Copyable share: <strong>54.4%</strong>. The share stays inside the band for any near value from 0.75 cm to 2.0 cm at this shift, so the label is not sitting on an edge. From here on these thresholds are fixed.</p>
+<h4>Who and what is copyable (chosen rule)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Person</th><th>P0002</th><th>P0003</th><th>P0009</th><th>P0011</th><th>P0014</th><th>P0015</th></tr></thead>
+<tbody>
+<tr><td>Grasps</td><td>147</td><td>122</td><td>427</td><td>326</td><td>147</td><td>253</td></tr>
+<tr><td>Copyable</td><td>29%</td><td>38%</td><td>76%</td><td>48%</td><td>35%</td><td>60%</td></tr>
+</tbody></table></div>
+<div class="wrap"><table>
+<thead><tr><th>Lowest objects (at least 25 grasps)</th><th>Copyable</th><th>Highest objects</th><th>Copyable</th></tr></thead>
+<tbody>
+<tr><td>can_tomato_sauce</td><td>26%</td><td>flask</td><td>94%</td></tr>
+<tr><td>can_soup</td><td>27%</td><td>bowl</td><td>93%</td></tr>
+<tr><td>mouse</td><td>28%</td><td>vase</td><td>84%</td></tr>
+<tr><td>bottle_ranch</td><td>31%</td><td>plate_bamboo</td><td>82%</td></tr>
+<tr><td>potato_masher</td><td>34%</td><td>mug_patterned</td><td>78%</td></tr>
+</tbody></table></div>
+<p>Left hand 50%, right hand 57%.</p>
+<figure><img src="assets/logs/exp10_examples.jpg" alt="examples" loading="lazy"><figcaption>Four tuning grasps. Green: object model. White: human hand landmarks. Orange: Allegro link points, red: Allegro fingertips, after the wrist shift. Left two: copyable (coffee pot). Right two: not copyable (whiteboard marker, parmesan can).</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>The label pipeline runs end to end without any paid call: mocap hand, UmeTrack landmarks, Allegro retargeting, signed distance to the object model.</li><li>Label skew is not a problem with the chosen rule: 54% copyable on the tuning split, and a wide range of thresholds stays inside 20% to 80%.</li><li>But the share is set mostly by the near threshold. So the label is a graded "how close do the Allegro fingertips come" turned into yes or no. This is the definition from the plan. We report it with the threshold curve, not as a single number.</li><li>The label varies a lot by object (26% to 94%) and by person (29% to 76%). That gives number 2 something to predict. It also means the held-out persons may have a different share. AUC does not depend on the share.</li><li>Limits:<ul><li>Allegro points are link frames, not finger surfaces.</li><li>The inside or outside sign comes from the nearest sampled surface normal, which can be wrong at thin edges.</li><li>Each grasp is judged on one frame.</li></ul></li><li>Next: compute the same labels for the held-out persons with these fixed thresholds, cut the number 2 clips, and run the free checklist items (camera stability, MediaPipe retargeting) on them.</li></ul>
+</article>
+<article id="exp-11">
+<h2>EXP-11: Number 2 clips cut from hand to object distance, with held-out labels</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/hot3d_clips.py</code>, <code>scripts/hot3d_copyable.py</code>. Raw output: <code>out/hot3d_clips/clips.csv</code>, <code>clips_labeled.csv</code>, <code>out/hot3d_copyable/</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<ol><li>With the copyable rule fixed on the tuning split (EXP-10), what share of held-out grasps is copyable?</li><li>The plan says number 2 clips must be cut from mocap hand to object distance, not from our own video pipeline, so that cutting errors do not mix into the score check. What clips does that give, and what labels?</li></ol>
+<h3>Setup</h3>
+<ul><li>Held-out labels: the EXP-10 pipeline and rule, unchanged (near 1.5 cm, deep 1 cm, wrist shift up to 2 cm), on the 713 held-out EXP-07 grasps.</li><li>Clips (all 136 sequences, every 30 fps RGB frame):<ul><li>Per hand and object, a frame is in contact when at least two UmeTrack fingertips are within 15 mm of the object surface.</li><li>Contact frames are joined across gaps up to 0.5 s and kept if they last at least 0.3 s.</li><li>The clip runs from 1 s before the contact (reach) to 1 s after it (release).</li><li>We keep clips where the object travels at least 3 cm (a real pick, not a brush) and at least 90% of the clip frames pass the dataset QA mask.</li><li>The copyable label is judged at the middle of the contact, for the hand of that clip.</li></ul></li><li>Fingertip distances use forward kinematics on all frames at once. All 136 sequences take 17 seconds on 12 processes.</li></ul>
+<h3>Results</h3>
+<h4>1. Held-out labels on the EXP-07 grasps</h4>
+<div class="wrap"><table>
+<thead><tr><th>Split</th><th>Grasps</th><th>Copyable</th><th>Human rule check</th><th>By person</th></tr></thead>
+<tbody>
+<tr><td>Tuning</td><td>1,422</td><td>54.4%</td><td>89.5%</td><td>29% to 76%</td></tr>
+<tr><td>Held-out</td><td>707</td><td><strong>52.6%</strong></td><td>90.0%</td><td>P0001 30%, P0010 47%, P0012 73%</td></tr>
+</tbody></table></div>
+<p>The held-out share is close to the tuning share, and inside 20% to 80%.</p>
+<h4>2. Clips from hand to object distance</h4>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Tuning</th><th>Held-out</th></tr></thead>
+<tbody>
+<tr><td>Contacts (per hand)</td><td>2,987</td><td>1,858</td></tr>
+<tr><td>Object moved at least 3 cm</td><td>2,656</td><td>1,750</td></tr>
+<tr><td>Moved and clip passes QA</td><td>2,433</td><td>1,449</td></tr>
+<tr><td>Labelled (hand pose at the contact frame)</td><td>2,385</td><td>1,426</td></tr>
+<tr><td>Contact length, median</td><td>2.2 s</td><td>2.2 s</td></tr>
+<tr><td>Clip length, median / 90th percentile</td><td>4.2 / 9.7 s</td><td>4.2 / 8.9 s</td></tr>
+<tr><td>Both hands on the object for most of the contact</td><td>29.5%</td><td>33.5%</td></tr>
+<tr><td>Copyable</td><td><strong>53.3%</strong></td><td><strong>51.7%</strong></td></tr>
+</tbody></table></div>
+<p>There are more clips than EXP-07 grasps because a clip belongs to one hand. When both hands hold an object, that gives two clips. A put-down and a re-grasp also give two.</p>
+<p>Lowest and highest objects (at least 40 clips): parmesan can 27%, soup can 29%, potato masher 32%, tomato sauce can 33%, milk carton 34%, against patterned mug 73%, bowl 75%, white mug 75%, bamboo plate 77%, dino toy 79%.</p>
+<figure><img src="assets/logs/exp11_clips_timeline.png" alt="clips timeline" loading="lazy"><figcaption>P0002_016222d1 (tuning). Top: distance from the potato masher to the second closest fingertip of each hand. Contact is below the dashed 15 mm line. Bottom: every clip in the sequence, coloured by its copyable label.</figcaption></figure>
+<h4>SAM cost for these clips (10 fps, 2 prompts)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Set</th><th>One request per clip</th><th>Overlapping clips joined</th></tr></thead>
+<tbody>
+<tr><td>All 1,426 held-out clips</td><td>$34.97</td><td><strong>$17.76</strong> (198 requests)</td></tr>
+<tr><td>400 random tuning clips (seed 20261026)</td><td>$10.04</td><td><strong>$8.82</strong> (315 requests)</td></tr>
+</tbody></table></div>
+<p>Joining overlapping clips into one request costs half as much. SAM tracks every hand and object in the window, and each clip takes its own frames out of the result.</p>
+<h3>Conclusion</h3>
+<ul><li>Number 2 now has its clip list and its ground truth, made from mocap only: 2,385 tuning and 1,426 held-out clips, about 52% to 53% copyable in both splits.</li><li>The held-out share (52.6% on EXP-07 grasps, 51.7% on clips) is close to tuning, so the fixed rule carries over. The person to person spread stays large (30% to 73% in held-out).</li><li>About a third of clips are two-handed. The copyable label is per hand.</li><li>Planned SAM spend for number 2: about $27 (all held-out clips plus 400 tuning clips, overlapping clips joined). Muse Spark still runs per clip: 1,826 clips at about $0.024 is about $44. Running Muse on a random half of the held-out clips would bring that to about $27. To be decided when the credit arrives.</li></ul>
+</article>
+<article id="exp-12">
+<h2>EXP-12: Do the free checklist items predict copyable? And how far does object identity go?</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/hot3d_local_checks.py</code>, <code>scripts/hot3d_signal_check.py</code>. Raw output: <code>out/hot3d_checks/clip_checks.csv</code>, <code>summary.json</code>, <code>signal_check.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>Number 2 compares our score with Muse Spark asked the same question with no checklist (see the measurement plan). The copyable share differs a lot by object (26% to 94%), so a model that only recognises the object may already do well. Before we spend credit:</p>
+<ol><li>Do the three checklist items that need no API call carry any signal for copyable?</li><li>How well does object identity alone predict copyable?</li></ol>
+<p>Only tuning clips are used. Held-out clips are not looked at.</p>
+<h3>Setup</h3>
+<ul><li>Clips: the EXP-11 set, 2,385 tuning clips (53.3% copyable), and the held-out clips for the values only.</li><li>Video pass, once per sequence, every 3rd frame (10 fps), on the raw fisheye preview:<ul><li>camera motion: corners tracked between frames, a similarity transform fitted with RANSAC,</li><li>MediaPipe Hands, with the left and right labels flipped for a non-mirrored view.</li></ul></li><li>Three checks per clip, video only:<ul><li>camera stability: 90th percentile of camera motion in the clip,</li><li>retargeting recoverability: MediaPipe world landmarks of the clip's hand through dex-retargeting (Allegro) during the contact, as hand found share times (1 - vector error),</li><li>action completeness: the hand is seen and moves in the second before contact (reach) and in the second after it (release).</li></ul></li><li>Grades 1, 0.5, 0. Cut points for camera and retargeting are the tuning terciles, now fixed. Completeness has a fixed rule.</li><li>Mocap checks of the checks themselves (not inputs): camera motion against headset rotation, and MediaPipe hand labels against the mocap hand nearest in the image (EXP-08 projection).</li><li>Models, leave one tuning person out (6 folds):<ul><li>object-only reference: each object's copyable share in the other five people, given to the left-out person's clips,</li><li>the three grades in a logistic regression,</li><li>object share plus the three grades.</li></ul></li></ul>
+<h3>Results</h3>
+<h4>The checks measure what they should</h4>
+<div class="wrap"><table>
+<thead><tr><th>Check of the check</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Camera motion vs headset rotation from mocap, per clip (Spearman)</td><td>0.93</td></tr>
+<tr><td>MediaPipe hand label matches the mocap hand</td><td>1,197 of 1,241 (96.5%)</td></tr>
+<tr><td>Clip hand found by MediaPipe during contact, median</td><td>87%</td></tr>
+<tr><td>Retargeting vector error, median</td><td>10%</td></tr>
+</tbody></table></div>
+<h4>But they do not predict copyable</h4>
+<div class="wrap"><table>
+<thead><tr><th>Signal</th><th>AUC on tuning clips</th></tr></thead>
+<tbody>
+<tr><td>Camera stability grade</td><td>0.533</td></tr>
+<tr><td>Retargeting recoverability grade</td><td>0.494</td></tr>
+<tr><td>Action completeness grade</td><td>0.515</td></tr>
+<tr><td>Same three, inside each object (weighted mean)</td><td>0.517 / 0.529 / 0.530</td></tr>
+<tr><td>Three grades in a logistic regression, leave one person out, mean of 6 people</td><td>0.534</td></tr>
+<tr><td><strong>Object-only reference, leave one person out, mean of 6 people</strong></td><td><strong>0.698</strong> (0.59 to 0.81 by person)</td></tr>
+<tr><td>Object share plus the three grades</td><td>0.693</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp12_signal_check.png" alt="signal check" loading="lazy"><figcaption>Grey: the three free checks, alone and together. Blue: object identity alone, and with the three checks. The checks add nothing to object identity.</figcaption></figure>
+<h4>A trap in pooled AUC</h4>
+<p>When the six left-out people are pooled into one AUC, the numbers drop: 0.616 for the object-only reference, and 0.365 for the three grades, below chance. The reason is the people, not the checks. Their copyable share runs from 29% to 74%, and a model trained without a high-share person gives that person's clips low scores. Pooling then ranks people instead of clips. Held-out has the same problem (30%, 47% and 73% by person). So the held-out AUC must be reported per person as well as pooled.</p>
+<h3>Conclusion</h3>
+<ul><li>The three free checks work as measurements: camera motion agrees with the headset (0.93), and MediaPipe finds the right hand 96.5% of the time.</li><li>They carry no information about copyable (AUC 0.49 to 0.53, also inside each object). These checks describe how good the video is. The copyable label describes whether the Allegro hand fits the grasp. Those are different questions.</li><li>Object identity alone reaches AUC 0.70 (mean over people). If Muse Spark recognises the object, it should land near there. Our score, as planned, would then lose the main comparison of number 2 unless the two Muse Spark checks (finger occlusion, object property) carry this signal.</li><li>What to do before spending credit:<ul><li>make retargeting recoverability measure what the proposal says, whether the hand shape fits a robot hand. Candidate video-only features: hand opening, finger curl and grasp type from MediaPipe, and later object size against hand size from SAM masks. They can be tested for free on these tuning clips, like here.</li><li>report the plug-in comparison (Muse Spark alone vs Muse Spark plus our checks) next to the main one, as the measurement plan says.</li><li>keep per-person AUC next to pooled AUC.</li></ul></li><li>Limits: MediaPipe runs on the raw fisheye image. Grades use tercile cut points, which hide small effects but not an AUC this close to 0.5.</li></ul>
+</article>
+<article id="exp-13">
+<h2>EXP-13: Hand shape during contact as the retargeting check</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_hand_shape.py</code>. Raw output: <code>out/hot3d_checks/hand_shape.csv</code>, <code>hand_shape.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>EXP-12 showed that the three free checks measure the video well but do not predict copyable (AUC about 0.5), while object identity alone reaches 0.70. The proposal describes the retargeting check as "whether the hand shape fits a robot hand". Do hand shape features from the video predict copyable, and do they add anything to object identity?</p>
+<h3>Setup</h3>
+<ul><li>2,385 tuning clips (EXP-11). 54 clips where MediaPipe never found the clip's hand during contact are left out, so 2,331 remain (53.4% copyable). Held-out clips are not used.</li><li>Ten features per clip, the median over the contact frames at 10 fps, from 21 hand points:<ul><li>opening: thumb tip to index tip, and thumb tip to middle tip, over hand size (wrist to middle finger base),</li><li>curl of each of the five fingers: 1 - (base to tip) / (length along the joints),</li><li>spread: angle between the index and little finger directions,</li><li>closure: mean fingertip distance to the palm centre, over hand size,</li><li>pinch vs power: index curl minus the mean curl of ring and little finger.</li></ul></li><li>Two sources for the same features:<ul><li>video: MediaPipe world landmarks, the check we can actually use,</li><li>mocap: UmeTrack landmarks, an upper bound for what hand shape could tell with a perfect hand tracker. It is never an input to our score.</li></ul></li><li>Models: logistic regression, leave one tuning person out, AUC per person and the mean over the six people (EXP-12 explains why pooled AUC misleads). "Within object" is the AUC inside each object, weighted by clip count.</li></ul>
+<h3>Results</h3>
+<h4>Single features (tuning clips, AUC for copyable)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Feature</th><th>Video</th><th>Mocap</th></tr></thead>
+<tbody>
+<tr><td>Opening, thumb to index</td><td>0.37</td><td>0.37</td></tr>
+<tr><td>Opening, thumb to middle</td><td>0.39</td><td>0.38</td></tr>
+<tr><td>Closure</td><td>0.39</td><td>0.35</td></tr>
+<tr><td>Curl, middle / ring</td><td>0.59 / 0.59</td><td>0.62 / 0.63</td></tr>
+<tr><td>Spread</td><td>0.54</td><td>0.61</td></tr>
+<tr><td>Pinch vs power</td><td>0.51</td><td>0.49</td></tr>
+</tbody></table></div>
+<p>An AUC below 0.5 means the relation is reversed: a wider hand opening goes with not copyable. Video and mocap agree on the direction and size.</p>
+<h4>Models, leave one person out</h4>
+<div class="wrap"><table>
+<thead><tr><th>Model</th><th>AUC, mean of 6 people</th><th>Range over people</th><th>Within object</th></tr></thead>
+<tbody>
+<tr><td>Object-only reference</td><td>0.693</td><td>0.59 to 0.81</td><td></td></tr>
+<tr><td>Video hand shape</td><td>0.632</td><td>0.56 to 0.71</td><td>0.48</td></tr>
+<tr><td><strong>Video hand shape + object</strong></td><td><strong>0.722</strong></td><td>0.62 to 0.84</td><td>0.42</td></tr>
+<tr><td>Mocap hand shape (upper bound)</td><td>0.671</td><td>0.58 to 0.74</td><td>0.56</td></tr>
+<tr><td>Mocap hand shape + object</td><td>0.729</td><td>0.63 to 0.82</td><td>0.51</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp13_hand_shape.png" alt="hand shape" loading="lazy"><figcaption>Left: model AUCs. Right: the thumb to middle fingertip opening during contact. Not copyable grasps (dashed) are more open, from video and from mocap alike.</figcaption></figure>
+<h3>What this means</h3>
+<ul><li>Hand shape from video does predict copyable (0.63), unlike the EXP-12 checks. The video version gets most of what perfect mocap hand shape gets (0.67).</li><li>It works mainly as a stand-in for object size. A wide opening means a big object, and big objects (cans, cartons) are less often copyable. Inside one object, video hand shape does not separate copyable from not copyable (0.48).</li><li>It is still below object identity (0.63 against 0.69). Combined, the two reach 0.72, so hand shape adds about 0.03 on top of knowing the object.</li><li>For number 2 this means:<ul><li>Our score with this check should beat the free checks but may still lose to Muse Spark alone, if Muse Spark knows the object well.</li><li>The plug-in comparison (Muse Spark alone vs Muse Spark plus our checks) is where we can show a gain. On tuning, object plus hand shape beats object alone by about 0.03 AUC.</li></ul></li><li>Decision for the checklist: the retargeting recoverability check becomes "hand shape fit". It is the logistic regression on the ten video features, graded by tuning terciles. It is trained on tuning clips that are not in the 400 clips used for the final score weights, so the two models do not share training data.</li><li>Limits: MediaPipe runs on the raw fisheye image. The within-object AUC of the combined video model is below 0.5 (0.42). Across objects, a closed hand means copyable. Inside an object the link is weak and slightly reversed, so the model should not be read as "close your hand to be copyable".</li></ul>
+</article>
+<article id="exp-14">
+<h2>EXP-14: Arm B (SAM rule) and the reference rows on the three pilot episodes</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/contact_cut.py rule</code>. Raw output: <code>out/contact/rule_report.json</code>. Meta API cost: $0 (uses the EXP-06 SAM output).</p>
+<h3>Question</h3>
+<p>The measurement plan brings number 1 back to three arms. Arm B is the SAM rule from the proposal: mask overlap plus co-movement. Is it implemented, does it run end to end against the glove ground truth, and how does it compare with the reference rows "always in contact" and "never in contact"? This is a code check on three tuning episodes, not a result.</p>
+<h3>Setup</h3>
+<ul><li>Episodes 0, 30 and 53 (tuning), SAM 3.1 at 10 fps (EXP-06).</li><li>Arm B, per hand at 10 fps:<ul><li>near: the hand mask is within <code>gap_px</code> pixels of an object mask,</li><li>co-moving: the nearest object moves at least <code>move</code> object sizes over 0.3 s, with camera motion removed, and moves with the hand (<code>comove</code> at most a limit),</li><li>a contact is a run of near frames (gaps up to 0.2 s joined) that contains at least one co-moving frame, from the start of the run to its end. A touch counts once the object has moved with the hand, and it lasts while the hand stays at the object.</li><li>Contacts go back to 30 fps and are shifted by the median start and end delay measured on the training episodes.</li></ul></li><li>Parameters: grid over <code>gap_px</code> (2, 4, 8, 12), <code>move</code> (0.05, 0.1, 0.2) and <code>comove</code> (0.5, 0.7). For each episode, the parameters and the shift are chosen on the other two episodes (leave one out), by boundary F1 at ±15 frames plus IoU.</li><li>Ground truth:<ul><li>glove, cleaned (main since this experiment): tactile sum above 800, with pressure dropouts up to 0.1 s joined and pressure blips under 0.1 s dropped,</li><li>glove, raw: tactile sum above 800 with no cleaning (check),</li><li>labels: the dataset contact labels (check).</li></ul></li></ul>
+<h3>Results</h3>
+<h4>The raw glove signal flickers</h4>
+<p>On these three episodes the glove gives 124 contact segments (both hands together). 21 of them are shorter than 0.2 s, and 28 gaps between them last 0.1 s or less. The dataset labels have 78 segments and none of either kind. These flickers come from pressure crossing the threshold, not from a hand letting go. They add boundaries that no video method can see: 248 boundaries on the raw glove, 190 after cleaning, 156 in the labels.</p>
+<h4>Arm B against the reference rows (leave one episode out)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Ground truth</th><th>Method</th><th>Boundary F1 ±5</th><th>Boundary F1 ±15</th><th>Contact IoU</th><th>Boundaries found / true</th></tr></thead>
+<tbody>
+<tr><td><strong>Glove, cleaned (main)</strong></td><td>Arm B</td><td>0.07</td><td>0.15</td><td>0.747</td><td>52 / 190</td></tr>
+<tr><td>Glove, cleaned (main)</td><td>Always in contact</td><td>0.02</td><td>0.02</td><td>0.669</td><td>12 / 190</td></tr>
+<tr><td>Glove, cleaned (main)</td><td>Never in contact</td><td>0</td><td>0</td><td>0</td><td>0 / 190</td></tr>
+<tr><td>Glove, raw</td><td>Arm B</td><td>0.04</td><td>0.12</td><td>0.745</td><td>52 / 248</td></tr>
+<tr><td>Glove, raw</td><td>Always in contact</td><td>0.02</td><td>0.02</td><td>0.666</td><td>12 / 248</td></tr>
+<tr><td>Labels</td><td>Arm B</td><td>0.02</td><td>0.14</td><td>0.744</td><td>52 / 156</td></tr>
+<tr><td>Labels</td><td>Always in contact</td><td>0.04</td><td>0.04</td><td>0.663</td><td>12 / 156</td></tr>
+</tbody></table></div>
+<p>Per episode (raw glove): ep0 IoU 0.72 and F1 ±15 0.05, ep30 0.60 and 0.23, ep53 0.94 and 0.27. The leave-one-out runs picked <code>gap_px</code> 2 every time. Against the raw glove, starts come 4 frames early and ends 6 frames late (median).</p>
+<p>For context, the appendix model from EXP-06 (logistic regression, raw glove) reached F1 0.16 / 0.30 and IoU 0.64 on the same episodes. Its thresholds were picked on the scored predictions, so those numbers are optimistic.</p>
+<figure><img src="assets/logs/exp14_sam_rule_pilot.png" alt="arm B on the pilot" loading="lazy"><figcaption>Green: the cleaned glove (main ground truth). Orange: arm B, with parameters chosen on the other two episodes against it. Long holds are found (ep53, ep0 left hand). When a hand works next to objects without pause (ep0 right hand, ep30), arm B joins many touches into one long block.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>Arm B and both reference rows run end to end against the glove and the labels, with parameters chosen on other episodes. The code is ready for the 50 tuning episodes.</li><li>Arm B beats "always in contact" on IoU (0.75 against 0.67) but finds only 52 of 190 to 248 boundaries. In a first-person view the hand stays within a few pixels of some object most of the time, so near-runs rarely break between touches. This was already visible in EXP-02 and EXP-03.</li><li>That limits arm C as well. Arm C only moves the boundaries that arm B finds, so it cannot add the touches arm B joined together.</li><li>Decisions:<ol><li>Decided on 2026-10-27: the main ground truth is the cleaned glove (dropouts and blips under 0.1 s removed). The raw glove asks video to see pressure flicker. The cleaning rule is fixed now and does not use any result.</li><li>Still open. Arm B: also break a near-run when the nearest object changes or when the hand moves away from the object for a moment. This should split touches that follow each other (ep0 right hand). Any new rule is chosen on the 50 tuning episodes only.</li></ol></li><li>Three episodes are too few to choose between rules. The next step for number 1 needs SAM on the remaining 47 tuning episodes ($11.89, after the credit arrives).</li></ul>
+</article>
+<article id="exp-15">
+<h2>EXP-15: Is the copyable label measuring the robot, or the retargeting?</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/hot3d_copyable.py --method</code>, <code>scripts/hot3d_label_compare.py</code>. Raw output: <code>out/hot3d_copyable/tune_clips*_events.csv</code>, <code>label_compare.json</code>. Meta API cost: $0. Tuning clips only. Held-out clips were not used.</p>
+<h3>Question</h3>
+<p>Feedback on EXP-10 pointed out two warning signs:</p>
+<ul><li>Cans, cartons and bottles came out as "not copyable" (26% to 33%), yet wrapping a cylinder is one of the easiest grasps for an Allegro hand.</li><li>The copyable share per person fell as the scale factor rose (r = -0.78 over 9 people). The scale factor is Allegro length over the person's hand length.</li></ul>
+<p>Is the label measuring the Allegro hand, or a side effect of how we retarget? We compared three label methods. The choice criteria were written into the measurement plan before any result.</p>
+<h3>Setup</h3>
+<ul><li>2,385 tuning clips (EXP-11). The copyable rule is unchanged: near 1.5 cm, deep 1 cm, wrist shift up to 2 cm.</li><li>Three retargeting methods (dex-retargeting 0.4.6, Allegro):<ul><li><code>ratio</code> (EXP-10): wrist-to-fingertip vectors, scaled by Allegro length over the person's hand length, wrist at the human wrist.</li><li><code>scale1</code>: the same vectors with scale 1.0.</li><li><code>position</code>: Allegro fingertips and finger bases fitted to the human positions, with a free hand base (the dex-retargeting offline config).</li></ul></li><li>Criteria, fixed before the results:<ul><li>fidelity: on solid human grasps (thumb and one more human fingertip within 15 mm of the surface), the median distance from each Allegro fingertip to the matching human fingertip,</li><li>hand size: the rank correlation between the person's hand length and the label inside each object (weighted mean). It should be near 0.</li><li>share: inside 20% to 80%.</li><li>rule: among methods with |hand size correlation| ≤ 0.1 and the share in the band, take the best fidelity.</li></ul></li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th></th><th>ratio (EXP-10)</th><th>scale1</th><th>position</th></tr></thead>
+<tbody>
+<tr><td>Copyable share</td><td>53.3%</td><td>93.7%</td><td>95.6%</td></tr>
+<tr><td>Fidelity: Allegro tip to human tip, median</td><td>31.0 mm</td><td><strong>6.9 mm</strong></td><td>11.4 mm</td></tr>
+<tr><td>Hand size correlation inside objects</td><td>+0.19</td><td>-0.13</td><td><strong>-0.07</strong></td></tr>
+<tr><td>Copyable among solid human grasps</td><td>55%</td><td>99%</td><td>99%</td></tr>
+<tr><td>Cans, cartons, bottles: copyable</td><td>31%</td><td>96%</td><td>97%</td></tr>
+<tr><td>Cans, cartons, bottles: closest non-thumb Allegro tip to surface</td><td>25.5 mm outside</td><td>2.8 mm</td><td>2.2 mm</td></tr>
+<tr><td>Mugs, bowl, plate, flask, vase: copyable</td><td>75%</td><td>94%</td><td>95%</td></tr>
+<tr><td>Allegro wrist to human wrist, median</td><td>0 (fixed)</td><td>0 (fixed)</td><td>26 mm</td></tr>
+<tr><td>Passes the share band</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Passes the hand size check</td><td>no</td><td>no</td><td>yes</td></tr>
+</tbody></table></div>
+<p>Lowest objects with <code>position</code>: keyboard 67%, bamboo plate 90%, flask 91%. With <code>scale1</code>: keyboard 58%, birdhouse toy 85%, cellphone 88%. These are flat or thin objects.</p>
+<figure><img src="assets/logs/exp15_label_methods.png" alt="label methods" loading="lazy"><figcaption>Left: copyable share by object group. Yellow: the 20% to 80% band. Middle: fidelity, lower is better. Right: copyable share per tuning person against hand length.</figcaption></figure>
+<figure><img src="assets/logs/exp15_can_grasps.jpg" alt="can grasps" loading="lazy"><figcaption>Four can, carton and bottle grasps. Rows: ratio, scale1, position. Green: object model. White: human hand. Orange: Allegro link points, red: Allegro fingertips. With <code>ratio</code> the Allegro fingertips land beyond the object. With the other two they sit on its surface.</figcaption></figure>
+<p><strong>By the rule fixed in advance, no method passes.</strong></p>
+<h3>What this means</h3>
+<ul><li>The feedback was right. The EXP-10 label measures mostly a retargeting side effect:<ul><li>with <code>ratio</code>, Allegro fingertips are 31 mm from where the human put them, and 25 mm off the surface of cans the person holds firmly,</li><li>the label also depends on hand size (+0.19 inside objects).</li><li>Its 53% share, which passed the skew check in EXP-10, came from this distortion.</li></ul></li><li>When the fingertips are retargeted faithfully (<code>scale1</code>, <code>position</code>), almost every human grasp counts as copyable (94% to 96%). The few failures are flat or thin objects (keyboard, plate), which is believable for a large four-finger hand.</li><li>So the copyable rule as built cannot tell grasps apart once the retargeting is honest. This is risk 1 of the plan, label skew, now showing up for the right reason.</li><li>One part of the rule is too weak. "No part of the Allegro hand deep inside the object" was checked only at about 20 link origin points, not on the finger and palm shapes. A larger hand that puts its fingertips where the human did will often push its finger bodies or palm into the object, and this check misses it.</li><li>Everything built on the EXP-10 label is on hold until the label is fixed: the held-out shares in EXP-11, the object reference in EXP-12, and the hand shape check in EXP-13. The clips themselves (EXP-11) are not affected.</li></ul>
+<h3>Candidate next definition (to be fixed in the plan before computing)</h3>
+<ul><li>Retargeting: <code>position</code> (it passes the hand size check, and its fingertips land 11 mm from the human ones).</li><li>Collision on the real Allegro link meshes, not on link origins. Copyable only if no finger or palm surface goes more than <code>deep</code> into the object.</li><li>Reach: the Allegro fingertip for each human finger that touches the object must land within a set distance of the human contact point.</li><li>Then the same criteria as here: hand size correlation near 0, share between 20% and 80%, chosen on tuning only.</li></ul>
+</article>
+<article id="exp-16">
+<h2>EXP-16: Copyable label v2, with mesh collision and contact reach</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_copyable_v2.py</code>. Raw output: <code>out/hot3d_copyable/tune_v2_*</code>. Meta API cost: $0. Tuning clips only. Held-out clips were not used.</p>
+<h3>Question</h3>
+<p>EXP-15 showed that the EXP-10 label mostly measured a retargeting side effect. Faithful retargeting called almost every grasp copyable, because the old rule checked collisions only at link origin points. Does a stricter, more physical definition give a label we can use?</p>
+<p>The definition, its thresholds and the acceptance rule were written into the measurement plan before computing ("Copyable definition v2").</p>
+<h3>Setup</h3>
+<ul><li>2,385 tuning clips (EXP-11), contact frame of each clip, the clip's hand.</li><li>Position retargeting (dex-retargeting Allegro offline config): Allegro fingertips and finger bases fitted to the human ones, free hand base.</li><li>Allegro surface: about 300 points sampled on the visual mesh of each of 21 links, placed by forward kinematics.</li><li>The hand may shift up to 2 cm (1 cm grid). A clip is copyable if one shift passes all three conditions:<ol><li>Grip: the Allegro thumb tip and one more Allegro fingertip are within 1.5 cm of the object surface.</li><li>Reach: every human finger (thumb, index, middle, ring) that touches the object (tip within 15 mm) has its Allegro fingertip within 2.0 cm of it.</li><li>No collision: no Allegro mesh point is more than 5 mm inside the object.</li></ol></li><li>Acceptance, fixed in advance: share between 20% and 80%, and the rank correlation of hand length with the label inside objects at most 0.1 in size.</li></ul>
+<h3>Results</h3>
+<h4>Acceptance</h4>
+<div class="wrap"><table>
+<thead><tr><th>Check</th><th>Result</th><th>Pass</th></tr></thead>
+<tbody>
+<tr><td>Copyable share</td><td>47.0%</td><td>yes</td></tr>
+<tr><td>Hand size correlation inside objects</td><td>+0.04</td><td>yes</td></tr>
+</tbody></table></div>
+<p><strong>The v2 label passes both checks set in advance.</strong></p>
+<h4>Why clips fail</h4>
+<div class="wrap"><table>
+<thead><tr><th>Condition that no hand shift can meet</th><th>Share of all clips</th></tr></thead>
+<tbody>
+<tr><td>No collision</td><td>25.5%</td></tr>
+<tr><td>Reach</td><td>10.9%</td></tr>
+<tr><td>Grip</td><td>3.9%</td></tr>
+</tbody></table></div>
+<p>Without any shift, the deepest Allegro mesh point sits 7.9 mm inside the object (median). Allegro fingertips land 11.5 mm from the human fingertips (median), and the free hand base sits 26 mm from the human wrist.</p>
+<h4>By person and object</h4>
+<div class="wrap"><table>
+<thead><tr><th>Person</th><th>P0002</th><th>P0003</th><th>P0009</th><th>P0011</th><th>P0014</th><th>P0015</th></tr></thead>
+<tbody>
+<tr><td>Hand length (mm)</td><td>196</td><td>181</td><td>211</td><td>188</td><td>187</td><td>215</td></tr>
+<tr><td>Copyable, v2</td><td>48%</td><td>49%</td><td>45%</td><td>44%</td><td>45%</td><td>54%</td></tr>
+<tr><td>Copyable, EXP-10 label</td><td>29%</td><td>33%</td><td>74%</td><td>45%</td><td>40%</td><td>56%</td></tr>
+</tbody></table></div>
+<div class="wrap"><table>
+<thead><tr><th>Lowest objects (at least 25 clips)</th><th>Copyable</th><th>Highest objects</th><th>Copyable</th></tr></thead>
+<tbody>
+<tr><td>keyboard</td><td>1%</td><td>holder_black</td><td>96%</td></tr>
+<tr><td>carton_oj</td><td>8%</td><td>holder_gray</td><td>91%</td></tr>
+<tr><td>dumbbell_5lb</td><td>10%</td><td>bottle_bbq</td><td>81%</td></tr>
+<tr><td>flask</td><td>14%</td><td>mug_white</td><td>78%</td></tr>
+<tr><td>dino_toy</td><td>16%</td><td>whiteboard_marker</td><td>74%</td></tr>
+<tr><td>carton_milk</td><td>19%</td><td>can_tomato_sauce</td><td>68%</td></tr>
+</tbody></table></div>
+<p>Cans, cartons and bottles together: 49% (EXP-10 label: 31%).</p>
+<figure><img src="assets/logs/exp16_copyable_v2.png" alt="v2 summary" loading="lazy"><figcaption>Left: copyable share for other reach and depth limits. The star is the fixed choice. Middle: why clips fail. Right: share per tuning person, v2 (green) and the EXP-10 label (grey).</figcaption></figure>
+<figure><img src="assets/logs/exp16_examples.jpg" alt="v2 examples" loading="lazy"><figcaption>Two tuning clips per outcome. Green: object model. White: human hand. Orange: Allegro mesh points. Red: mesh points more than 5 mm inside the object. Left: copyable (eraser, parmesan can). Middle: collision, the larger Allegro fingers go into the keyboard and the spatula. Right: reach, on the wide bowl and plate the Allegro hand cannot put its fingertips where the human did.</figcaption></figure>
+<h4>Sensitivity</h4>
+<div class="wrap"><table>
+<thead><tr><th>Reach \ depth</th><th>2 mm</th><th>5 mm</th><th>10 mm</th></tr></thead>
+<tbody>
+<tr><td>1 cm</td><td>2%</td><td>5%</td><td>8%</td></tr>
+<tr><td><strong>2 cm</strong></td><td>18%</td><td><strong>47%</strong></td><td>66%</td></tr>
+<tr><td>3 cm</td><td>29%</td><td>62%</td><td>80%</td></tr>
+</tbody></table></div>
+<h3>Conclusion</h3>
+<ul><li>The v2 label passes the acceptance rule set before computing: 47% copyable, and almost no link to hand size (+0.04 inside objects, 44% to 54% by person, against 29% to 74% for the EXP-10 label).</li><li>The failures make physical sense: the bigger Allegro fingers collide with flat or crowded objects (keyboard, spatula), and the hand cannot span wide objects the way the human did (bowl, plate). Cylinders are no longer pushed to "not copyable". Some low objects are less obvious (dumbbell 10%, flask 14%) and are worth a look.</li><li>Limits, stated plainly:<ul><li>The share depends strongly on the depth limit (18% at 2 mm, 66% at 10 mm). 5 mm is about the size of the mocap and model error, so the label is partly "how much the Allegro hand overlaps the object, within measurement error". The choice was fixed before computing, and we report the curve.</li><li>A reach of 1 cm leaves almost nothing copyable, because the fitted Allegro fingertips sit about 11 mm from the human ones.</li><li>One frame per clip. The free base moves the hand 26 mm from the human wrist (median).</li><li>The inside or outside sign comes from the nearest surface sample.</li></ul></li><li>Next, all free:<ul><li>recompute on the v2 label the object-only reference (EXP-12) and the hand shape check (EXP-13), on tuning clips,</li><li>then compute the held-out v2 labels with these fixed thresholds.</li></ul></li></ul>
+</article>
+<article id="exp-17">
+<h2>EXP-17: What predicts the v2 copyable label? (EXP-12 and EXP-13 again)</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_v2_signal.py</code>. Raw output: <code>out/hot3d_checks/v2_signal.json</code>. Meta API cost: $0. Tuning clips only. Held-out clips were not used.</p>
+<h3>Question</h3>
+<p>EXP-12 and EXP-13 were scored against the EXP-10 label, which EXP-15 showed to be mostly a retargeting side effect. With the v2 label (EXP-16), how well do the free checks, the video hand shape and object identity predict copyable?</p>
+<h3>Setup</h3>
+<ul><li>2,331 tuning clips with a MediaPipe hand during contact (54 of 2,385 left out, as in EXP-13). v2 copyable share: 47%.</li><li>Same features and models as EXP-12 and EXP-13, leave one tuning person out, AUC per person and the mean over the six people:<ul><li>the three free checks (camera stability, retargeting recoverability, action completeness),</li><li>object-only reference: the copyable share of each object in the other five people,</li><li>video hand shape: 10 MediaPipe features during contact,</li><li>mocap hand shape: the same 10 features from UmeTrack, as an upper bound,</li><li>combinations with the object share.</li></ul></li><li>The v2 label is also scored at depth limits of 2 mm and 10 mm, to see whether the picture depends on the depth limit.</li></ul>
+<h3>Results</h3>
+<h4>Main label (depth 5 mm)</h4>
+<div class="wrap"><table>
+<thead><tr><th>Model</th><th>AUC, mean of 6 people</th><th>Range over people</th><th>Within object</th></tr></thead>
+<tbody>
+<tr><td>Camera / retargeting / completeness grade, single</td><td>0.521 / 0.538 / 0.480</td><td></td><td></td></tr>
+<tr><td>Three free checks</td><td>0.529</td><td>0.49 to 0.57</td><td>0.50</td></tr>
+<tr><td><strong>Object-only reference</strong></td><td><strong>0.741</strong></td><td>0.67 to 0.80</td><td></td></tr>
+<tr><td>Video hand shape</td><td>0.521</td><td>0.49 to 0.57</td><td>0.53</td></tr>
+<tr><td>Video hand shape + object</td><td>0.751</td><td>0.68 to 0.80</td><td>0.46</td></tr>
+<tr><td>Three free checks + video hand shape + object</td><td>0.748</td><td>0.68 to 0.80</td><td>0.46</td></tr>
+<tr><td>Mocap hand shape (upper bound)</td><td>0.617</td><td>0.55 to 0.73</td><td>0.55</td></tr>
+<tr><td>Mocap hand shape + object</td><td>0.764</td><td>0.72 to 0.83</td><td>0.48</td></tr>
+</tbody></table></div>
+<h4>Other depth limits</h4>
+<div class="wrap"><table>
+<thead><tr><th>Model</th><th>Depth 2 mm (18% copyable)</th><th>Depth 5 mm (47%)</th><th>Depth 10 mm (66%)</th></tr></thead>
+<tbody>
+<tr><td>Three free checks</td><td>0.579</td><td>0.529</td><td>0.519</td></tr>
+<tr><td>Object-only reference</td><td>0.719</td><td>0.741</td><td>0.761</td></tr>
+<tr><td>Video hand shape</td><td>0.604</td><td>0.521</td><td>0.542</td></tr>
+<tr><td>Video hand shape + object</td><td>0.726</td><td>0.751</td><td>0.756</td></tr>
+<tr><td>Mocap hand shape (upper bound)</td><td>0.728</td><td>0.617</td><td>0.643</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp17_v2_signal.png" alt="v2 signal" loading="lazy"><figcaption>AUC for the v2 label on tuning clips, leave one person out. Blue: the fixed depth limit of 5 mm. Grey: 2 mm and 10 mm.</figcaption></figure>
+<h3>What this means</h3>
+<ul><li>The video hand shape check from EXP-13 lost its signal (0.632 on the old label, 0.521 on v2). It had been learning the retargeting side effect: with the old label, a wide hand opening meant "not copyable", because wide grasps pushed the scaled Allegro fingertips off the object.</li><li>Object identity alone predicts the v2 label well (0.74, and 0.72 to 0.76 at the other depth limits). Copyability under v2 is mostly a property of the object: flat, crowded or wide objects fail, compact ones pass.</li><li>Our video checks add almost nothing on top of the object: +0.01 for hand shape, and nothing for the three free checks.</li><li>Hand pose does carry some information, since mocap hand shape reaches 0.62. MediaPipe on the raw fisheye video does not recover it (0.52). Inside an object, even mocap hand shape adds little (0.55).</li><li>For number 2:<ul><li>If Muse Spark recognises the object and has a fair sense of which objects a large robot hand struggles with, it may come close to 0.74. Our checklist, as it stands, would then lose the main comparison. In the plug-in comparison it would add about 0.01.</li><li>The physically sensible label makes the problem about the object, not about the video. The checklist was designed for video quality. That mismatch, not the label, is now the main issue for number 2.</li></ul></li><li>The depth limit changes the numbers by a few hundredths. Among the signals we can actually use, object identity is the strongest at every limit. At 2 mm the mocap hand shape (the upper bound, not a video method) edges past it, 0.728 against 0.719.</li></ul>
+</article>
+<article id="exp-18">
+<h2>EXP-18: Can object geometry carry the copyable signal? (option A check)</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/hot3d_object_geometry.py</code>. Raw output: <code>out/hot3d_checks/object_geometry.json</code>. Meta API cost: $0. Tuning clips only. Held-out clips were not used.</p>
+<h3>Question</h3>
+<p>EXP-17 showed that the v2 copyable label is mostly about the object: object identity alone reaches AUC 0.741, and our video checks add almost nothing. Option A keeps the question and the label, and turns "object property" into concrete object items that Muse Spark would rate from the video. That only makes sense if a few object properties, not the object's name, can carry the signal. Do they, and do they still work on an object the model has never seen?</p>
+<p>The features, tests and decision rule were written into the measurement plan before computing ("Option A check").</p>
+<h3>Setup</h3>
+<ul><li>2,385 tuning clips with the v2 label (47.0% copyable), 33 objects.</li><li>Seven features per object, from its 3D model only:<ul><li>the largest, middle and smallest side of its oriented bounding box,</li><li>flatness (smallest over largest) and elongation (middle over largest),</li><li>volume and fill (volume over box volume).</li><li>The HOT3D models are not watertight, so volume is the convex hull volume.</li></ul></li><li>Logistic regression on these features. Each clip gets its object's values.</li><li>Tests:<ol><li>leave one person out: AUC per person, mean over the six people,</li><li>leave one object out: the model never sees the object it scores. Pooled AUC, 95% interval resampling sequences.</li></ol></li><li>Decision rule (fixed in advance): pass if both AUCs are at least 0.65, fail if either is below 0.60, weak in between.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th>Test</th><th>Object identity reference</th><th>Object geometry</th></tr></thead>
+<tbody>
+<tr><td>Leave one person out, mean of 6 people</td><td>0.742</td><td><strong>0.695</strong> (0.65 to 0.76 by person)</td></tr>
+<tr><td>Leave one object out, pooled</td><td>0.5 (cannot score an unseen object)</td><td><strong>0.673</strong> (0.645 to 0.698)</td></tr>
+</tbody></table></div>
+<p><strong>Verdict by the rule set in advance: pass.</strong></p>
+<p>The strongest single feature is the largest side of the object. On its own its AUC is 0.32, which means 0.68 the other way round: the longer the object, the less often it is copyable. Volume works the same way (0.38).</p>
+<figure><img src="assets/logs/exp18_object_geometry.png" alt="object geometry" loading="lazy"><figcaption>Left: AUC of object identity and object geometry, leaving out a person or an object. Right: every object by its largest and smallest side, coloured by its copyable share. Long or bulky objects (keyboard, flask, dino toy, bowl) are mostly not copyable. Compact, hand-sized ones (holders, mugs, cans, bottles) mostly are.</figcaption></figure>
+<p>Objects that geometry explains less well:</p>
+<ul><li>the two cartons (19 cm tall, 8% and 19% copyable),</li><li>the dumbbell (18 cm, 10%),</li><li>the puzzle toy, a small cube that comes out at only 46%.</li></ul>
+<h3>What this means</h3>
+<ul><li>Seven numbers about an object's size and shape recover most of what the object's name tells (0.695 against 0.742). Unlike the name, they still work on an object the model has never seen (0.673 against 0.5).</li><li>So option A has a basis. A checklist that asks Muse Spark concrete questions about the object (how big it is next to the hand, how long, how flat, how wide) can carry the copyable signal. It can also carry it to new objects, which is the point of a reusable score.</li><li>What it does not show: whether Muse Spark can read these sizes from the video, and whether Muse Spark asked the plain question does just as well. Those need the paid run.</li><li>Limits:<ul><li>Only 33 objects. The leave-one-object-out interval resamples sequences, not objects, so it is narrower than the uncertainty over objects.</li><li>Volume and fill use the convex hull because the models are not watertight.</li><li>Mostly one feature (largest side) drives the result.</li></ul></li><li>Next:<ul><li>write the Muse Spark object items (size next to the hand, length, flatness, width, handle, crowding) and their high, mid, low anchors,</li><li>check them for free with the 3D model numbers as stand-ins,</li><li>then compute the held-out v2 labels with the fixed thresholds.</li></ul></li></ul>
+</article>
+<article id="exp-19">
+<h2>EXP-19: Six object items for the checklist, checked with stand-in grades</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/hot3d_object_items.py</code>, <code>scripts/hot3d_object_sheet.py</code>. Raw output: <code>out/hot3d_checks/object_items.csv</code>, <code>object_items.json</code>. Meta API cost: $0. Tuning clips only.</p>
+<h3>Question</h3>
+<p>Option A turns "object property" into concrete items that Muse Spark rates high, mid or low. EXP-18 showed that exact object sizes carry the copyable signal. Do six coarse three-level items, with fixed anchors, keep that signal? Here the grades come from the truth (3D models, mocap, a look at each object), as stand-ins for what Muse Spark would answer.</p>
+<p>Items, anchors and the pass rule were written into the measurement plan before computing ("Object items for Muse Spark").</p>
+<h3>Setup</h3>
+<ul><li>2,385 tuning clips, v2 label (47.0% copyable).</li><li>Six items. High always means "easier for a large four-finger robot hand", and the direction was set from the meaning, not the data:</li></ul>
+<div class="wrap"><table>
+<thead><tr><th>Item</th><th>High</th><th>Mid</th><th>Low</th><th>Stand-in source</th></tr></thead>
+<tbody>
+<tr><td>Size next to the hand (longest side)</td><td>up to 15 cm</td><td>15 to 25 cm</td><td>over 25 cm</td><td>3D model box</td></tr>
+<tr><td>Shape (middle over longest side)</td><td>0.6 or more</td><td>0.3 to 0.6</td><td>under 0.3</td><td>3D model box</td></tr>
+<tr><td>Thickness (shortest side)</td><td>4 cm or more</td><td>2 to 4 cm</td><td>under 2 cm</td><td>3D model box</td></tr>
+<tr><td>Width to wrap (middle side)</td><td>up to 8 cm</td><td>8 to 14 cm</td><td>over 14 cm</td><td>3D model box</td></tr>
+<tr><td>Handle</td><td>yes</td><td>partly</td><td>no</td><td>by eye, one frame per object</td></tr>
+<tr><td>Free space (gap to nearest other object)</td><td>10 cm or more</td><td>4 to 10 cm</td><td>under 4 cm</td><td>mocap poses at the contact frame</td></tr>
+</tbody></table></div>
+<ul><li>Handle was judged from the contact sheet below before looking at any label: yes for coffee pot, dumbbell, flask, both mugs, potato masher, spatula, wooden spoon and vase, partly for the whiteboard eraser, no for the rest.</li><li>Logistic regression on the six grades. Leave one person out (mean AUC over six people) and leave one object out (pooled AUC). Pass if both are 0.65 or more.</li></ul>
+<figure><img src="assets/logs/exp19_object_sheet.jpg" alt="object sheet" loading="lazy"><figcaption>One grasp per object, used only to judge the handle item.</figcaption></figure>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th>Test</th><th>Six items</th><th>Exact geometry (EXP-18)</th></tr></thead>
+<tbody>
+<tr><td>Leave one person out, mean of 6 people</td><td><strong>0.683</strong> (0.60 to 0.73)</td><td>0.695</td></tr>
+<tr><td>Leave one object out, pooled</td><td><strong>0.666</strong> (0.639 to 0.693)</td><td>0.673</td></tr>
+</tbody></table></div>
+<p><strong>Verdict by the rule set in advance: pass.</strong></p>
+<div class="wrap"><table>
+<thead><tr><th>Item</th><th>AUC alone</th><th>Weight in the full model</th></tr></thead>
+<tbody>
+<tr><td>Size next to the hand</td><td>0.673</td><td>+2.16</td></tr>
+<tr><td>Shape</td><td>0.567</td><td>-0.30</td></tr>
+<tr><td>Thickness</td><td>0.536</td><td>-0.24</td></tr>
+<tr><td>Width to wrap</td><td>0.518</td><td>-1.10</td></tr>
+<tr><td>Handle</td><td>0.478</td><td>-0.18</td></tr>
+<tr><td>Free space</td><td>0.534</td><td>+0.09</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp19_object_items.png" alt="object items" loading="lazy"><figcaption>Left: copyable share for each grade of each item. Right: the six coarse items keep almost all of the signal of the exact sizes.</figcaption></figure>
+<h3>What this means</h3>
+<ul><li>Six coarse items with fixed anchors keep nearly all of the object signal: 0.683 and 0.666, against 0.695 and 0.673 for exact sizes. If Muse Spark grades them about right, the checklist can carry the copyable signal, also for objects it has not seen.</li><li>Size next to the hand does almost all of the work (0.673 alone).</li><li>Two items do not behave as their meaning suggested:<ul><li>Handle: objects with a handle are slightly less often copyable (0.478). Most handled objects here are long tools (spatula, masher, spoon) or large (flask, coffee pot), and size wins.</li><li>Width to wrap gets a negative weight once size is known. Among objects of the same length, narrow ones (spoon, marker, remote) are harder. These directions are learned by the regression on tuning clips. The anchors stay as they are.</li></ul></li><li>Free space adds little (0.534). Most grasps have 16 cm or more of room (median).</li><li>What this does not test: whether Muse Spark can read these grades from fisheye frames. That needs the paid run. A short pilot on a few tuning clips should check Muse Spark grades against these stand-ins before the full run.</li></ul>
+</article>
+<article id="exp-20">
+<h2>EXP-20: Held-out copyable v2 labels, with the thresholds fixed on tuning</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/hot3d_copyable_v2.py run held_out</code>, <code>scripts/hot3d_v2_heldout_summary.py</code>. Raw output: <code>out/hot3d_copyable/held_out_v2_*</code>, <code>v2_split_summary.json</code>. Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>The v2 label was defined and accepted on tuning clips (EXP-16). With the same thresholds, what does it look like on the 1,426 held-out clips? This page looks at labels only. No model or checklist is scored on held-out data.</p>
+<h3>Setup</h3>
+<ul><li>Held-out clips: the EXP-11 set, persons P0001, P0010, P0012.</li><li>Same code and thresholds as EXP-16: position retargeting, hand shift up to 2 cm, grip within 1.5 cm, reach within 2.0 cm, no Allegro mesh point more than 5 mm inside the object.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Tuning</th><th>Held-out</th></tr></thead>
+<tbody>
+<tr><td>Clips</td><td>2,385</td><td>1,426</td></tr>
+<tr><td>Copyable</td><td>47.0%</td><td><strong>46.4%</strong></td></tr>
+<tr><td>By person</td><td>44% to 54%</td><td>P0001 46%, P0010 51%, P0012 43%</td></tr>
+<tr><td>Hand size correlation inside objects</td><td>+0.04</td><td>-0.08</td></tr>
+<tr><td>Fails: collision / reach / grip</td><td>25.5% / 10.9% / 3.9%</td><td>31.1% / 8.6% / 5.6%</td></tr>
+<tr><td>Allegro tip to human tip, median</td><td>11.5 mm</td><td>11.4 mm</td></tr>
+</tbody></table></div>
+<p>Sensitivity on held-out (reach 2 cm): depth 2 mm 20%, 5 mm 46%, 10 mm 65%. The tuning values were 18%, 47% and 66%.</p>
+<p>Lowest held-out objects: keyboard 1%, flask 4%, bowl 15%, vase 16%, orange juice carton 20%. Highest: gray holder 93%, black holder 92%, white mug 84%, whiteboard marker 80%.</p>
+<figure><img src="assets/logs/exp20_v2_splits.png" alt="v2 splits" loading="lazy"><figcaption>Left: copyable share per person, tuning in blue, held-out in orange. Right: copyable share per object in tuning against held-out (30 objects with at least 20 clips in each). Rank correlation 0.85.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>The fixed v2 rule carries over: 46.4% copyable on held-out, close to tuning, inside the band, with person shares from 43% to 51%. The person spread of the old label (30% to 73%) is gone.</li><li>Object shares agree closely between the splits (rank correlation 0.85). So the object-only reference, trained on tuning, will be strong on held-out as well. The main comparison has to be read with that in mind.</li><li>These labels are now the number 2 ground truth for the AUC. No score or checklist has been run on held-out data.</li></ul>
+</article>
+<article id="exp-21">
+<h2>EXP-21: How well could each number 1 arm do at best?</h2>
+<p class="meta">Date: 2026-10-27. Script: <code>scripts/muse_contact.py selftest</code>. Raw output: <code>out/number1/selftest.json</code>. Meta API cost: $0. Pilot tuning episodes 0, 30 and 53 only.</p>
+<h3>Question</h3>
+<p>The code for the two Muse Spark arms of number 1 is written (arm A, Muse Spark alone, and arm C, the SAM rule plus a Muse Spark boundary check). Before paying for them:</p>
+<ol><li>Does the code turn answers into contacts and scores correctly?</li><li>What is the best each arm could reach, given how it is built? Feedback said arm A cannot reach ±5 frames at 5 fps. Arm C can only adjust the boundaries that arm B finds.</li></ol>
+<h3>Setup</h3>
+<ul><li>Arm A: every 6th frame (5 fps) of the 720p episode, 10 frames per call. For each frame and hand, Muse Spark says touching or not. A sample stands for its 6 frames.</li><li>Arm C: for each start and end that arm B found (EXP-14, rule chosen on the other pilot episodes), 7 frames 5 frames apart, from 15 before to 15 after. Muse Spark picks the first or last touching frame, or keeps arm B.</li><li>Both arms then use the arm B rules: gaps up to 0.2 s joined, contacts shorter than 0.2 s dropped.</li><li>Self-test: instead of Muse Spark, the answers come from the main ground truth itself (cleaned glove). This is a perfect Muse Spark. It checks the code and gives each arm its ceiling.</li></ul>
+<h3>Results</h3>
+<p>Cleaned glove (main ground truth), 3 pilot episodes, both hands:</p>
+<div class="wrap"><table>
+<thead><tr><th>Arm</th><th>Boundary F1 ±5</th><th>Boundary F1 ±15</th><th>Contact IoU</th><th>Boundaries found / true</th></tr></thead>
+<tbody>
+<tr><td>A, perfect answers at 5 fps</td><td><strong>0.956</strong></td><td>0.956</td><td>0.957</td><td>174 / 190</td></tr>
+<tr><td>B, SAM rule as measured (EXP-14)</td><td>0.066</td><td>0.149</td><td>0.747</td><td>52 / 190</td></tr>
+<tr><td>C, B plus perfect boundary picks</td><td><strong>0.149</strong></td><td>0.149</td><td>0.752</td><td>52 / 190</td></tr>
+</tbody></table></div>
+<p>With the raw glove, the A ceiling is 0.825 at ±5 frames. With the labels it is 0.830, and 0.939 at ±15. Arm C stays at 0.12 to 0.15.</p>
+<figure><img src="assets/logs/exp21_arm_ceilings.png" alt="arm ceilings" loading="lazy"><figcaption>Best possible scores. Arm A with perfect answers at 5 fps, arm B as measured, arm C with perfect boundary picks on top of arm B.</figcaption></figure>
+<h3>What this means</h3>
+<ul><li>The code works: perfect answers give near-perfect scores where the design allows it.</li><li>5 fps does not stop arm A from reaching ±5 frames. A perfect Muse Spark at 5 fps scores 0.96. The feedback point was too strong. A real Muse Spark will fall short because of its answers, not because of the frame rate.</li><li>Arm C cannot beat arm B by much. It can only move the 52 boundaries arm B finds, out of 190, so even perfect picks give 0.15. As built, the planned "SAM plus Muse Spark" arm is limited by how many touches arm B separates, and arm B joins touches that follow each other (EXP-14).</li><li>So the comparison A against C, as planned, favours A, for a structural reason. Two ways to make arm C a fair test, to decide before paying:<ol><li>raise arm B recall first: break contacts when the nearest object changes or the hand leaves for a moment, chosen on the 50 tuning episodes (needs SAM on the remaining tuning episodes, $11.89),</li><li>let arm C also look inside long arm B contacts for missed releases and touches, by sampling a few frames per second there (more Muse Spark calls).</li></ol></li><li>Cost estimates without sending: arm A on the 22 held-out episodes about $11.86 (6,817 frames). Arm C about $0.013 per boundary.</li></ul>
+</article>
+<article id="exp-22">
+<h2>EXP-22: Arm B that splits contacts when the nearest object changes</h2>
+<p class="meta">Date: 2026-10-27. Scripts: <code>scripts/contact_cut.py rule</code>, <code>scripts/muse_contact.py selftest</code>. Raw output: <code>out/contact/rule_report.json</code>, <code>rule_segments.json</code>, <code>out/number1/selftest.json</code> (these files now hold the EXP-22 run, the EXP-14 numbers are in its page). Meta API cost: $0. Pilot tuning episodes 0, 30 and 53.</p>
+<h3>Question</h3>
+<p>EXP-14 showed that arm B joins touches that follow each other: it found 52 of 190 boundaries. EXP-21 showed that this also caps arm C at 0.15, because arm C can only move the boundaries arm B finds. Does arm B find more touches if it may break a contact when the nearest object changes, or keep short gaps instead of joining them?</p>
+<h3>Setup</h3>
+<ul><li>Same features and leave-one-episode-out search as EXP-14, with two more options in the grid:<ul><li>split on object change: inside a run of near frames, start a new contact when the nearest object id changes, and never join two contacts on different objects,</li><li>fill: join gaps of 0, 1 or 2 frames at 10 fps (EXP-14 always joined 2).</li></ul></li><li>Main ground truth: the cleaned glove. The grid includes the EXP-14 rule, so the search can still pick it.</li><li>Then the arm C ceiling again: perfect boundary picks on top of the new arm B.</li></ul>
+<h3>Results</h3>
+<p>Cleaned glove, leave one episode out:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>EXP-14 arm B</th><th>EXP-22 arm B</th><th>Always in contact</th></tr></thead>
+<tbody>
+<tr><td>Boundary F1 ±5</td><td>0.066</td><td><strong>0.151</strong></td><td>0.02</td></tr>
+<tr><td>Boundary F1 ±15</td><td>0.149</td><td><strong>0.323</strong></td><td>0.02</td></tr>
+<tr><td>Contact IoU</td><td>0.747</td><td>0.663</td><td>0.669</td></tr>
+<tr><td>Boundaries found / true</td><td>52 / 190</td><td>392 / 190</td><td>12 / 190</td></tr>
+<tr><td>Arm C ceiling, boundary F1 ±5</td><td>0.149</td><td><strong>0.315</strong></td><td></td></tr>
+</tbody></table></div>
+<p>All three left-out episodes chose "split on object change". The raw glove gives the same picture (F1 0.132 and 0.275, IoU 0.692).</p>
+<figure><img src="assets/logs/exp22_sam_rule_split.png" alt="arm B split" loading="lazy"><figcaption>Green: cleaned glove. Orange: arm B with the new options, chosen on the other two episodes. The right hand in episode 0 now gets separate contacts, close to the glove. The left hand in episode 0, which holds one container for long stretches, is now cut into many pieces.</figcaption></figure>
+<figure><img src="assets/logs/exp22_arm_ceilings_split.png" alt="arm ceilings" loading="lazy"><figcaption>Best possible scores with the new arm B. Arm C, with perfect picks, can now reach 0.315.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>Splitting on object change doubles arm B boundary F1 (0.15 at ±5 frames, 0.32 at ±15) and doubles the arm C ceiling (0.32).</li><li>It overshoots: 392 boundaries against 190 true ones, and contact IoU drops below "always in contact" (0.663 against 0.669). While a hand holds one object, the nearest object can flicker between it and its neighbours, which cuts long holds into pieces.</li><li>Three episodes cannot settle the trade-off. The grid is ready for the 50 tuning episodes once their SAM output exists ($11.89). A rule that also asks the new object to stay nearest for a few frames before splitting would be the next option to add to the grid.</li></ul>
+</article>
+<article id="exp-23">
+<h2>EXP-23: Number 2 paid pilot (P1)</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/sam_hot3d.py</code>, <code>scripts/muse_hot3d.py</code>, <code>scripts/number2_sam_checks.py</code>, <code>scripts/number2_pilot.py</code>. Raw output: <code>out/number2/sam/&lt;window_id&gt;/</code>, <code>out/number2/muse/{checklist,baseline}/</code>, <code>out/number2/sam_checks.csv</code>, <code>out/number2/pilot.json</code>. Meta API cost: <strong>$0.20</strong> (SAM $0.10, Muse checklist $0.05, Muse baseline $0.05). Data: score_train clips only (tuning persons). Nothing on held-out was sent or scored.</p>
+<h3>Question</h3>
+<p>Before the large number 2 runs (P6 SAM $26.58, P7 Muse about $44), do the calls work on HOT3D and do the answers make sense?</p>
+<ol><li>Does SAM 3.1 with the prompts <code>hand</code> and <code>small object</code> find the grasped object on HOT3D tables, and does our code pick that object as the one nearest to the hand?</li><li>Do the Muse Spark object grades match the 3D model stand-ins from EXP-19?</li><li>What does one call really cost?</li></ol>
+<h3>Setup</h3>
+<ul><li>SAM: 3 score_train windows drawn with seed 20261026 (500 frames at 10 fps, 5 clips inside them). Prompts <code>hand</code> and <code>small object</code>.</li><li>Muse: 5 score_train clips drawn with seed 20261026, the checklist prompt and the baseline prompt (<code>scripts/prompts/number2_{checklist,baseline}.txt</code>), 6 frames of 720 px each, reasoning effort low.</li><li>SAM check: per contact frame (mocap), the dataset 2D box of the grasped object (<code>box2d_objects.csv</code>, turned from the raw orientation to the preview with (1407 - v, u), EXP-08) against (a) any SAM object box and (b) the SAM object that the number 2 code takes as nearest to the clip's hand. A match is box IoU of 0.5 or more.</li><li>Muse check: the six object items against the EXP-19 stand-in grades of the same clip. The finger occlusion item has no stand-in.</li></ul>
+<h3>Bug found and fixed</h3>
+<p><code>number2_sam_checks.py</code> crashed on the first HOT3D window. The shared code in <code>contact_cut.py</code> placed masks in a 1280 x 720 frame (OpenGraph), but HOT3D windows are 1408 x 1408. <code>frame_table</code> now takes the frame size, and <code>number2_sam_checks.py</code> passes 1408 x 1408. The OpenGraph path is unchanged (self test gives the same value as before).</p>
+<h3>Results</h3>
+<p>SAM, 169 contact frames in 5 clips:</p>
+<div class="wrap"><table>
+<thead><tr><th>Clip</th><th>Object</th><th>Contact frames</th><th>SAM objects per frame</th><th>Grasped object found</th><th>Nearest object is the grasped one</th></tr></thead>
+<tbody>
+<tr><td>P0009_927973d7_left_02183</td><td>mug_patterned</td><td>23</td><td>8.2</td><td>100%</td><td>100%</td></tr>
+<tr><td>P0009_927973d7_left_02268</td><td>carton_oj</td><td>87</td><td>13.3</td><td>100%</td><td>100%</td></tr>
+<tr><td>P0009_927973d7_right_02490</td><td>carton_oj</td><td>27</td><td>8.7</td><td>100%</td><td>63%</td></tr>
+<tr><td>P0009_cf323827_left_02016</td><td>bottle_bbq</td><td>23</td><td>7.9</td><td>100%</td><td>100%</td></tr>
+<tr><td>P0011_e5cb6a80_left_03430</td><td>can_tomato_sauce</td><td>9</td><td>11.9</td><td>78%</td><td>67%</td></tr>
+<tr><td>All</td><td></td><td>169</td><td></td><td><strong>98.8%</strong></td><td><strong>92.3%</strong></td></tr>
+</tbody></table></div>
+<ul><li><code>hand</code> finds two hands in every frame with two stable ids.</li><li><code>small object</code> finds 8 to 13 objects per frame, because HOT3D tables are full. The grasped object is among them in 98.8% of contact frames.</li><li>Visibility is 1.0 for all 5 clips. On these clips it does not separate anything. Contact clarity ranges from 0.0 to 0.57.</li></ul>
+<figure><img src="assets/logs/exp23_sam_chosen_object.png" alt="SAM chosen object" loading="lazy"><figcaption>One contact frame per clip. Green: dataset box of the grasped object. Orange: the object our code takes as nearest to the hand. Blue: the other SAM objects.</figcaption></figure>
+<p>Muse, 5 clips:</p>
+<div class="wrap"><table>
+<thead><tr><th>Item</th><th>Muse grade equals stand-in</th></tr></thead>
+<tbody>
+<tr><td>size</td><td>5 / 5</td></tr>
+<tr><td>shape</td><td>5 / 5</td></tr>
+<tr><td>thickness</td><td>5 / 5</td></tr>
+<tr><td>width</td><td>3 / 5</td></tr>
+<tr><td>handle</td><td>4 / 5</td></tr>
+<tr><td>free space</td><td>5 / 5</td></tr>
+<tr><td>All</td><td><strong>27 / 30</strong></td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp23_muse_items.png" alt="Muse items" loading="lazy"><figcaption>Muse grade / stand-in grade per clip and item.</figcaption></figure>
+<ul><li>Width: Muse said "up to 8 cm" for the white mug and the tomato can. The 3D models put their middle side just over 8 cm. This is a cut point problem more than a wrong answer.</li><li>Handle: Muse missed the mug handle. In that clip the person turns the head away while grasping, and frames 2 to 5 do not show the mug at all. Muse graded finger occlusion low for this clip, which is right.</li><li>Object names were right (puzzle toy as "rubik's cube", mug as "cup", can).</li><li>Baseline: copyable probability 0.85 for the mug and the can (both copyable), 0.10 to 0.20 for the three puzzle toy clips (one copyable, two not). The baseline reasons are about object size against the robot fingers, so the baseline also reads the object.</li><li>3 of the 5 Muse clips are the same object (puzzle toy). The sample is small and narrow.</li></ul>
+<p>Cost per call:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Input tokens</th><th>Output tokens</th><th>Cost per call</th><th>Estimate used in plan</th></tr></thead>
+<tbody>
+<tr><td>Checklist</td><td>4,384</td><td>980</td><td>$0.0096</td><td>$0.0123</td></tr>
+<tr><td>Baseline</td><td>3,942</td><td>1,126</td><td>$0.0097</td><td>$0.0119</td></tr>
+</tbody></table></div>
+<p>A 720 px frame costs about 700 input tokens, not 1,100. Output is longer than the 800 assumed. P7 (1,826 clips, both prompts) rescales from $44.17 to about <strong>$35.4</strong>. SAM was billed exactly as estimated (500 frames, $0.10), so P6 stays $26.58 minus the $0.10 already spent.</p>
+<h3>Conclusion</h3>
+<ul><li>SAM works on HOT3D. The grasped object is found in 99% of contact frames, and the nearest object rule picks it in 92%. Errors come from a neighbour that is closer in the image for a few frames.</li><li>Muse object grades match the 3D model stand-ins in 27 of 30 cases. The misses are a cut point near 8 cm and a clip where the object is out of view. EXP-19 used the stand-ins to show that the items carry the object signal, and this pilot supports using Muse to grade them.</li><li>The visibility check was 1.0 on all 5 SAM clips. It may not vary enough to matter. The full run will show this.</li><li>Nothing here changes the plan. P6 and P7 can run as planned, and P7 is about $9 cheaper than planned.</li><li>Limits: 5 clips per check, 3 of them one object. This is a check that the calls work, not a measurement.</li></ul>
+</article>
+<article id="exp-24">
+<h2>EXP-24: Arm B splits only when the new object stays nearest</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/contact_cut.py rule</code>, <code>scripts/muse_contact.py selftest</code>. Raw output: <code>out/contact/rule_report.json</code>, <code>rule_segments.json</code>, <code>out/number1/selftest.json</code> (the EXP-22 run is kept as <code>rule_report_exp22.json</code>, <code>rule_segments_exp22.json</code>, <code>selftest_exp22.json</code>). Meta API cost: $0. Pilot tuning episodes 0, 30 and 53.</p>
+<h3>Question</h3>
+<p>EXP-22 let arm B start a new contact when the nearest object changes. This doubled boundary F1, but arm B found 392 boundaries for 190 true ones, because the nearest object flickers between the held object and its neighbours. Does it help to count a change only when the new object stays nearest for a few frames?</p>
+<p>This is a code check before the 50 tuning episodes (decision D1). Three episodes cannot settle which option is best.</p>
+<h3>Setup</h3>
+<ul><li>New option <code>persist</code> in the arm B grid: 1, 3 or 5 frames at 10 fps. A switch of the nearest object that lasts fewer frames is read as the object held before. 1 is the EXP-22 rule. It only matters with "split on object change".</li><li>Unit check on a made-up id sequence: short switches are removed, switches of at least <code>persist</code> frames are kept, frames with no id stay unknown.</li><li>Same leave-one-episode-out search as EXP-14 and EXP-22. The grid now has 432 settings. Main ground truth: the cleaned glove.</li><li>Ablation: the EXP-22 rule chosen for each left-out episode, with only <code>persist</code> changed (1, 2, 3, 5, 8).</li></ul>
+<h3>Results</h3>
+<p>Leave one episode out, cleaned glove:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>EXP-22 arm B</th><th>EXP-24 arm B</th><th>Always in contact</th></tr></thead>
+<tbody>
+<tr><td>Boundary F1 ±5</td><td><strong>0.151</strong></td><td>0.145</td><td>0.02</td></tr>
+<tr><td>Boundary F1 ±15</td><td><strong>0.323</strong></td><td>0.291</td><td>0.02</td></tr>
+<tr><td>Contact IoU</td><td>0.663</td><td><strong>0.718</strong></td><td>0.669</td></tr>
+<tr><td>Boundaries found / true</td><td>392 / 190</td><td>360 / 190</td><td>12 / 190</td></tr>
+<tr><td>Arm C ceiling, boundary F1 ±5</td><td><strong>0.315</strong></td><td>0.297</td><td></td></tr>
+</tbody></table></div>
+<p>All three left-out episodes chose <code>persist</code> 3. The raw glove gives the same picture (F1 0.164 and 0.299, IoU 0.717).</p>
+<p>Only <code>persist</code> changed, everything else as chosen in EXP-22:</p>
+<div class="wrap"><table>
+<thead><tr><th>persist</th><th>F1 ±5</th><th>F1 ±15</th><th>IoU</th><th>Boundaries found / true</th></tr></thead>
+<tbody>
+<tr><td>1 (EXP-22)</td><td>0.151</td><td>0.323</td><td>0.663</td><td>392 / 190</td></tr>
+<tr><td>2</td><td>0.145</td><td>0.287</td><td>0.691</td><td>388 / 190</td></tr>
+<tr><td>3</td><td>0.124</td><td>0.288</td><td>0.702</td><td>344 / 190</td></tr>
+<tr><td>5</td><td>0.109</td><td>0.243</td><td>0.717</td><td>270 / 190</td></tr>
+<tr><td>8</td><td>0.087</td><td>0.214</td><td>0.730</td><td>202 / 190</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp24_sam_rule_persist.png" alt="arm B persist" loading="lazy"><figcaption>Green: cleaned glove. Orange: arm B chosen on the other two episodes, now with persist 3. The left hand in episode 0 is still cut into pieces during long holds, but fewer than in EXP-22.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>Waiting for the new object to stay nearest is a trade-off, not a fix. It removes false splits (IoU 0.66 to 0.72, now above "always in contact") and also removes true ones (F1 at ±5 0.151 to 0.145, arm C ceiling 0.315 to 0.297).</li><li>Even at 8 frames, when arm B finds about as many boundaries as there are (202 for 190), F1 at ±5 is only 0.087. Most of the found boundaries are in the wrong place, not just too many. The weak part of arm B is where the near-runs start and end, not only the object flicker.</li><li>The option stays in the grid. The 50 tuning episodes (P2, $11.89) will pick between 1, 3 and 5 with the same search, as decided in D1.</li><li>Runtime: the grid is three times larger. On 50 episodes the leave-one-out search is estimated at about 1.5 hours on the CPU, which is fine to run in the background.</li><li>Limits: 3 episodes, and the search score (F1 at ±15 plus IoU) favours IoU, so it picked persist 3 over 1.</li></ul>
+</article>
+<article id="exp-25">
+<h2>EXP-25: Does undistorting the fisheye frames help MediaPipe?</h2>
+<p class="meta">Date: 2026-10-28. Script: <code>scripts/hot3d_fisheye_check.py</code>. Raw output: <code>out/hot3d_checks/fisheye.json</code>, <code>fisheye.csv</code>, <code>fisheye_rows.json</code> (side check: the same files with <code>_f1.0</code>). Meta API cost: $0. Data: tuning persons only (score_train and item_train clips).</p>
+<h3>Question</h3>
+<p>The original plan said to undistort the HOT3D Aria fisheye frames before MediaPipe. So far MediaPipe runs on the raw fisheye preview. Should we undistort, or report fisheye as a limit?</p>
+<h3>Decision rule (written in the measurement plan before computing)</h3>
+<p>Undistort only if undistortion raises the share of frames with the hand found by 5 points or more, or lowers the median 2D point error by 20% or more, or lowers the median hand shape feature error by 20% or more. Otherwise keep the raw preview and report fisheye as a limit.</p>
+<h3>Setup</h3>
+<ul><li>400 clips of tuning persons, drawn with seed 20261026, the middle contact frame of each. 395 frames had a mocap hand pose.</li><li>MediaPipe Hands, static image mode, on two versions of each frame:<ul><li>raw: the preview frame as it is,</li><li>undistorted: the same frame turned into a pinhole image with the dataset lens model (FISHEYE624), focal length 0.7 of the fisheye focal length, so that most of the view stays inside the image.</li></ul></li><li>Truth: the mocap hand (UmeTrack landmarks, EXP-09) projected to the preview with the lens model. MediaPipe points from the undistorted frame are mapped back to the preview, so both are measured in the same pixels.</li><li>Measures per frame:<ul><li>found: a MediaPipe hand whose median point error is under 0.5 hand size (wrist to middle finger base in pixels),</li><li>2D error: median point error over hand size,</li><li>hand shape error: the ten hand shape features of EXP-13 from MediaPipe 3D points against the same features from mocap, each over its spread across frames, mean over the ten features.</li></ul></li><li>Side check: the same with focal length 1.0, which keeps the image centre at full size but cuts off more of the edge.</li></ul>
+<h3>Results</h3>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Raw preview</th><th>Undistorted (focal 0.7)</th><th>Change</th><th>Needed to undistort</th></tr></thead>
+<tbody>
+<tr><td>Hand found</td><td><strong>70.6%</strong></td><td>60.3%</td><td>-10.3 points</td><td>+5 points</td></tr>
+<tr><td>Hand found, hand fully inside the undistorted image (372 frames)</td><td><strong>74.5%</strong></td><td>63.7%</td><td>-10.8 points</td><td></td></tr>
+<tr><td>2D error over hand size (212 frames found in both)</td><td><strong>0.102</strong></td><td>0.113</td><td>10.8% worse</td><td>20% better</td></tr>
+<tr><td>Hand shape error (same frames)</td><td>0.832</td><td>0.775</td><td>6.9% better</td><td>20% better</td></tr>
+</tbody></table></div>
+<p>Side check, focal 1.0: hand found 70.6% raw against 62.0% undistorted, 2D error 0.106 against 0.107, hand shape error 0.827 against 0.805. Only 80% of the hands are fully inside this image, and on those 77.0% against 71.6%.</p>
+<p>Where the hands are: the median wrist is 49 degrees from the image centre, and 90% of wrists are within 65 degrees. Most grasps happen in the outer part of the fisheye image, where distortion is strongest.</p>
+<figure><img src="assets/logs/exp25_fisheye_zones.png" alt="zones" loading="lazy"><figcaption>Raw (blue) against undistorted (orange), by the angle of the wrist from the image centre. Undistortion finds fewer hands in every zone. 14 frames beyond 90 degrees by the angle estimate are not shown.</figcaption></figure>
+<figure><img src="assets/logs/exp25_fisheye_example.png" alt="example" loading="lazy"><figcaption>Left: raw preview with the mocap hand in green. Right: the same frame undistorted. Straight edges come out straight, so the lens model is applied correctly.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>Undistortion does not pass the rule. It finds 10 points fewer hands, makes the 2D points slightly worse, and improves hand shape by only 7%. The focal 1.0 side check gives the same answer, so this is not a choice of focal length.</li><li>The loss is not only hands cut off at the edge: on hands fully inside the undistorted image, MediaPipe still finds 11 points fewer. A likely cause is that the pinhole image stretches the outer part, where most hands are, and shrinks the centre.</li><li>Decision: keep the raw preview and report fisheye as a limit.</li><li>Side finding: the hand shape error is about 0.8 of the mocap spread in both versions. MediaPipe 3D hand shape follows the mocap hand only loosely on this footage, with or without undistortion. This fits EXP-17, where video hand shape had no signal for the v2 label.</li><li>Muse frames stay raw. Whether Muse judges object size better on undistorted frames is not tested, because that costs credit.</li><li>Limits: one frame per clip, MediaPipe only, and the mocap hand as truth (about 2 mm from the object surface during grasps, EXP-09).</li></ul>
+</article>
+<article id="exp-26">
+<h2>EXP-26: Code check of the P7 gate and the unseen object report</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/number2_score.py</code> (<code>--gate</code>, <code>--check</code>), <code>scripts/number2_gate_noise.py</code>. Raw output: <code>out/number2/gate_standin.json</code>, <code>gate_fake_muse_selftest.json</code>, <code>number2_check.json</code>, <code>gate_noise.json</code>. Meta API cost: $0. Data: tuning persons only. Stand-in grades (EXP-19) take the place of Muse Spark. Nothing on held-out was used.</p>
+<h3>Question</h3>
+<p>The measurement plan now splits the number 2 Muse Spark run into P7a (400 score_train clips) and P7b (held-out), with a gate in between, and adds a report on objects the score has never seen (comparison 4). Both were written before computing. Does the code do what the plan says, and how hard is the gate to pass?</p>
+<h3>Setup</h3>
+<ul><li><code>number2_score.py --gate</code>: logistic regression on the six object item grades of the 400 score_train clips, v2 label. Leave one person out (mean AUC over the six people) and leave one object out (pooled AUC, 95% interval resampling sequences). Pass if both are 0.65 or more, stop if either is below 0.60, weak in between. It refuses to run until every one of the 400 clips has a Muse Spark grade. <code>--standin</code> runs it on the stand-in grades.</li><li>Unseen object report, now in the output of <code>--check</code> and <code>--final</code>: for each test object, the hand shape fit model, its cut points and the score weights are fit again without that object. The object-only reference gives every clip the training base rate.</li><li>Checks:<ol><li><code>--check</code> before and after the change: the earlier outputs must not move.</li><li><code>--gate</code> with only the 5 P1 clips graded: it must refuse.</li><li><code>--gate</code> on fake Muse grades (stand-ins with 10% of grades replaced at random), to run the full real-grade path, including the extra rows.</li><li>The hand shape fit refit really changes when an object is left out.</li><li>How the gate result falls as grading errors grow: stand-in grades with 0% to 40% of grades replaced at random, 10 draws each.</li></ol></li></ul>
+<h3>Results</h3>
+<p>Code checks:</p>
+<div class="wrap"><table>
+<thead><tr><th>Check</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>--check</code> weights, our score, object reference</td><td>unchanged</td></tr>
+<tr><td><code>--gate</code> with 5 of 400 clips graded</td><td>refuses: 395 clips have no Muse grade yet</td></tr>
+<tr><td><code>--gate</code> on fake Muse grades</td><td>runs, reports the extra rows; item agreement 91% to 96%, as expected for 10% random replacement</td></tr>
+<tr><td>Hand shape fit without <code>mug_white</code></td><td>592 of 3,811 clip grades change, so the refit happens</td></tr>
+</tbody></table></div>
+<p>Gate on stand-in grades (perfect grading, 400 clips):</p>
+<div class="wrap"><table>
+<thead><tr><th>Test</th><th>AUC</th><th>Needed to pass</th></tr></thead>
+<tbody>
+<tr><td>Leave one person out, mean over people</td><td>0.657 (0.484 to 0.794 by person)</td><td>0.65</td></tr>
+<tr><td>Leave one object out, pooled</td><td>0.666 (0.608 to 0.723)</td><td>0.65</td></tr>
+<tr><td>Verdict</td><td>pass</td><td></td></tr>
+</tbody></table></div>
+<p>EXP-19 had 0.683 and 0.666 on all 2,385 tuning clips. On 400 clips the person test drops to 0.657, just over the bar.</p>
+<p>Gate against grading errors:</p>
+<div class="wrap"><table>
+<thead><tr><th>Grades replaced at random</th><th>About the same as the stand-in</th><th>Person out</th><th>Object out</th><th>Verdicts in 10 draws</th></tr></thead>
+<tbody>
+<tr><td>0%</td><td>100%</td><td>0.657</td><td>0.666</td><td>pass</td></tr>
+<tr><td>5%</td><td>97%</td><td>0.643</td><td>0.650</td><td>2 pass, 8 weak</td></tr>
+<tr><td>10%</td><td>93%</td><td>0.640</td><td>0.637</td><td>1 pass, 8 weak, 1 stop</td></tr>
+<tr><td>20%</td><td>87%</td><td>0.608</td><td>0.600</td><td>4 weak, 6 stop</td></tr>
+<tr><td>30%</td><td>80%</td><td>0.594</td><td>0.578</td><td>2 weak, 8 stop</td></tr>
+<tr><td>40%</td><td>73%</td><td>0.566</td><td>0.544</td><td>10 stop</td></tr>
+</tbody></table></div>
+<p>A random grade equals the old one a third of the time, so replacing a share r leaves about 1 - 2r/3 of the grades the same as the stand-in.</p>
+<figure><img src="assets/logs/exp26_gate_noise.png" alt="gate noise" loading="lazy"><figcaption>Both gate tests against the share of grades replaced at random. Line: mean of 10 draws. Band: lowest to highest draw.</figcaption></figure>
+<p>Unseen objects in the <code>--check</code> run (train item_train, test score_train, stand-in grades):</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Main comparison</th><th>Unseen objects</th></tr></thead>
+<tbody>
+<tr><td>Our score</td><td>0.721 (0.668 to 0.775)</td><td>0.675 (0.618 to 0.731)</td></tr>
+<tr><td>Object-only reference</td><td><strong>0.776</strong> (0.731 to 0.819)</td><td>0.5 by construction</td></tr>
+</tbody></table></div>
+<h3>Conclusion</h3>
+<ul><li>The code does what the plan says. The earlier outputs did not change, and the gate refuses to run on partial Muse grades.</li><li>The gate is tight. With perfect grades it passes by 0.007. At the agreement seen in the P1 pilot (27 of 30, 90%, about 15% replaced), the expected verdict is "weak", which means a decision with the user before P7b. Below about 87% agreement it is most likely "stop".</li><li>Part of this is the sample: 400 clips over six people, about 67 per person, and two people (P0003, P0014) are near 0.5 even with perfect grades.</li><li>On tuning clips the object-only reference beats our score in the main comparison (0.776 against 0.721). On unseen objects our score keeps 0.675 while the reference falls to 0.5. This is the reason the unseen object report was added, and it is likely to show the same pattern on held-out.</li><li>The gate and its rule are not changed here. They were fixed before any Muse grade on the 400 clips exists. Changing them is a decision for the user, made before P7a.</li><li>Limits: random replacement is a simple error model. Real Muse errors are likely to cluster (for example width near 8 cm in EXP-23), which can hurt less or more than random errors.</li></ul>
+</article>
+<article id="exp-27">
+<h2>EXP-27: Code checks for the timing shift and the checklist against learning rows, and a power check</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/muse_contact.py</code> (<code>selftest --lag</code>, <code>score</code>, <code>c --sample</code>), <code>scripts/number2_score.py --check</code>, <code>scripts/number2_power.py</code>. Raw output: <code>out/number1/selftest_lag6.json</code>, <code>out/number2/number2_check.json</code>, <code>out/number2/power.json</code>. Meta API cost: $0. Data: tuning only. No Muse Spark answer is used: number 1 uses answers taken from the glove, number 2 uses the EXP-19 stand-in grades.</p>
+<h3>Question</h3>
+<p>The measurement plan gained two sets of rows, both written before any data:</p>
+<ul><li>Number 1: arms A and C get their own timing shift learned on tuning (until now only arm B had one), with a paired bootstrap over episodes.</li><li>Number 2, comparison 5: Muse Spark alone (R1), the checklist grades with equal weights (R2), the same grades with learned weights (R3), with paired bootstrap differences over sequences.</li></ul>
+<p>Does the code do this? And can a held-out set of 3 persons detect "R3 better than R2" at all?</p>
+<h3>Setup</h3>
+<ul><li>Number 1: <code>selftest --lag 6</code> makes the perfect answers see every change 6 frames early, like visible contact that comes before glove pressure (EXP-06). The arm A and C shifts are then learned on the same 3 pilot episodes. A working shift should bring the scores back to the no-lag ceilings. The plain <code>selftest</code> must give the same file as before.</li><li>Number 2: <code>number2_score.py --check</code> (train item_train, test score_train, stand-in grades) now also writes comparison 5. The earlier outputs must not change.</li><li>Power: for each of the 20 ways to pick 3 of the 6 tuning persons as a pseudo held-out set, R3 is trained on 400 clips of the other 3 persons, and R3 minus R2 is tested with the paired sequence bootstrap. Once with the stand-in grades as they are, once with 15% of grades replaced at random (3 draws, about the P1 agreement of EXP-23).</li></ul>
+<h3>Results</h3>
+<p>Number 1, oracle answers 6 frames early, cleaned glove, pilot episodes:</p>
+<div class="wrap"><table>
+<thead><tr><th>Row</th><th>Boundary F1 ±5</th><th>IoU</th><th>Ceiling without lag (EXP-24)</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>0.863</td><td>0.948</td><td>0.956</td></tr>
+<tr><td>A + shift (learned: +3, +3 frames)</td><td><strong>0.956</strong></td><td>0.975</td><td></td></tr>
+<tr><td>C</td><td>0.149</td><td>0.728</td><td>0.297</td></tr>
+<tr><td>C + shift (learned: +5, +6 frames, moved boundaries only)</td><td><strong>0.307</strong></td><td>0.750</td><td></td></tr>
+</tbody></table></div>
+<ul><li>The shifts undo the lag. Arm A is quantised at 6 frames (5 fps), so its learned shift is 3, half a sample.</li><li>Without a shift, a 6 frame lag halves arm C (0.297 to 0.149). Muse Spark picks the visible touch and so removes the arm B shift. This is the case the new rows are for.</li><li>The plain selftest output is byte for byte the same as before.</li><li>Paired bootstrap code runs (A + shift minus A: +0.093, C + shift minus C: +0.158). With 3 episodes the interval means nothing, it only checks the code.</li></ul>
+<p>Number 2, <code>--check</code> on tuning, stand-in grades (finger occlusion has no stand-in, so R2 and R3 use the six object items):</p>
+<div class="wrap"><table>
+<thead><tr><th>Row</th><th>AUC</th><th>95% interval</th></tr></thead>
+<tbody>
+<tr><td>R2 equal weights</td><td>0.647</td><td>0.592 to 0.699</td></tr>
+<tr><td>R3 learned weights</td><td>0.714</td><td>0.657 to 0.769</td></tr>
+<tr><td>Our full score</td><td>0.721</td><td>0.668 to 0.775</td></tr>
+</tbody></table></div>
+<div class="wrap"><table>
+<thead><tr><th>Difference</th><th>Value</th><th>95% interval (sequences)</th></tr></thead>
+<tbody>
+<tr><td>R3 minus R2</td><td><strong>+0.067</strong></td><td>0.014 to 0.120</td></tr>
+<tr><td>Our score minus R3</td><td>+0.007</td><td>-0.012 to 0.030</td></tr>
+</tbody></table></div>
+<ul><li>Learned weights: size +2.13, width -1.04, handle -0.21. Equal weights count width and handle in the direction of their meaning, which the labels say is wrong (EXP-19). That is where learning gains.</li><li>The local and SAM checks add nothing on top of R3 (+0.007), as expected from EXP-17.</li><li>The earlier <code>--check</code> outputs did not change. The R1 rows ran on the 5 P1 clips only, as a code path.</li></ul>
+<p>Power, pseudo held-out sets of 3 persons (median 1,192 clips, 41 sequences; held-out has 1,426 clips, 51 sequences):</p>
+<div class="wrap"><table>
+<thead><tr><th>Grades</th><th>Sets</th><th>R3 minus R2, median (range)</th><th>Interval above 0</th></tr></thead>
+<tbody>
+<tr><td>Stand-ins as they are</td><td>20</td><td>+0.062 (+0.021 to +0.102)</td><td><strong>95%</strong> of sets</td></tr>
+<tr><td>15% replaced at random</td><td>60</td><td>+0.049 (-0.002 to +0.075)</td><td><strong>77%</strong> of sets</td></tr>
+</tbody></table></div>
+<figure><img src="assets/logs/exp27_power.png" alt="power" loading="lazy"><figcaption>Each point is one pseudo held-out set, with its 95% interval. Blue: stand-in grades. Orange: 15% of grades replaced at random.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>The timing shift code works: on answers that come 6 frames early it recovers the ceilings of arms A and C. Without it, arm C would lose half of its ceiling to the lag.</li><li>Comparison 5 works and, on tuning, learning the weights beats equal weights by about 0.07 AUC, mainly by turning width and handle around.</li><li>A held-out set of 3 persons is large enough: the gain is detected in 95% of sets with perfect grades and 77% with P1-level grade errors.</li><li>Cost found on the way: arm C now has about 120 boundaries per episode (EXP-24 arm B), so held-out arm C is about $34, not $5 to $10, and the 200 tuning boundaries for the arm C shift are about $2.61 (dry run). Both depend on the arm B chosen on 50 episodes.</li><li>Limits: the stand-ins are not Muse Spark grades, random errors are a simple model of Muse Spark mistakes, and the pseudo held-out persons share objects with the training persons, as the real held-out does.</li></ul>
+</article>
+<article id="exp-28">
+<h2>EXP-28: The ground truth as a reusable benchmark</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/benchmark_export.py</code>, <code>benchmark/score_number1.py</code>, <code>benchmark/score_number2.py</code>. Output: <code>benchmark/</code> (README, two label files, two license notes, two example prediction files). Meta API cost: $0.</p>
+<h3>Question</h3>
+<p>The proposal says teams filter human video with their own rules and do not publish a score others can reuse. Our heaviest and most checked work is the ground truth (cleaned glove for number 1, copyable v2 for number 2). Can it be released as a benchmark that scores any video filter, whatever our own checklist scores, and do the release scorers give the same numbers as the project code?</p>
+<h3>Setup</h3>
+<ul><li>License texts that come with the data: <code>data/ego-tactile/README.md</code> (OpenGraph: CC BY 4.0) and <code>data/hot3d/assets/license.txt</code> (HOT3D: sequence data CC BY-SA 4.0, hand data CC BY-NC-SA 4.0, object models CC BY-SA 4.0 and not for sale). The copyable label uses the hand data, so number 2 is shared under CC BY-NC-SA 4.0. This is our reading of the texts, not legal advice.</li><li><code>benchmark_export.py</code> writes only labels we made, no video, sensor or motion capture values:<ul><li><code>number1/ground_truth.json</code>: per episode and hand, contact segments from the cleaned glove (main) and the raw glove, frame ranges at 30 fps,</li><li><code>number2/clips.csv</code>: per clip, where it is, the copyable label, the first condition that fails (grip, reach, collision), and the label at 2 mm and 10 mm depth limits.</li></ul></li><li>Two scorers that need only numpy, pandas and scikit-learn, written apart from the project code. Checked against numbers the project code already gave, on tuning episodes and clips.</li></ul>
+<h3>Results</h3>
+<p>What is in the files:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Tuning</th><th>Held-out</th></tr></thead>
+<tbody>
+<tr><td>Number 1 episodes / clean contacts</td><td>50 / 955</td><td>22 / 287</td></tr>
+<tr><td>Number 2 clips / persons / objects</td><td>2,385 / 6 / 33</td><td>1,426 / 3 / 33 (all seen in tuning)</td></tr>
+<tr><td>Number 2 copyable (5 mm)</td><td>47.0%</td><td>46.4%</td></tr>
+<tr><td>Number 2 copyable at 2 mm / 10 mm</td><td>17.5% / 65.7%</td><td></td></tr>
+</tbody></table></div>
+<p>The labels written to <code>clips.csv</code> equal the labels in the project clip table for all 3,811 clips (checked in the export).</p>
+<figure><img src="assets/logs/exp28_benchmark.png" alt="benchmark" loading="lazy"><figcaption>Left: length of the cleaned glove contacts. Right: share of clips that are copyable and, for the others, the first condition that fails.</figcaption></figure>
+<p>Scorer checks, release scorer against project code:</p>
+<div class="wrap"><table>
+<thead><tr><th>Input</th><th>Release scorer</th><th>Project code</th></tr></thead>
+<tbody>
+<tr><td>Arm B segments (EXP-24), pilot episodes, cleaned glove: F1 ±5, F1 ±15, IoU</td><td>0.145, 0.291, 0.718</td><td>0.145, 0.291, 0.718 (EXP-24)</td></tr>
+<tr><td>Same segments, raw glove</td><td>0.155, 0.293, 0.717</td><td>0.155, 0.293, 0.717 (selftest)</td></tr>
+<tr><td>Always in contact, pilot episodes: F1 ±5, IoU</td><td>0.02, 0.669</td><td>0.02, 0.669 (EXP-14)</td></tr>
+<tr><td>Object share reference (item_train shares) on score_train clips: AUC, interval</td><td>0.776, 0.731 to 0.819</td><td>0.776, 0.731 to 0.819 (EXP-26)</td></tr>
+<tr><td>Same, AUC per person</td><td>P0002 0.735 to P0015 0.785, all six equal</td><td>equal</td></tr>
+</tbody></table></div>
+<p>EXP-24 reported 0.164 on the raw glove because there the rule was chosen again for the raw glove. The exported segments were chosen on the cleaned glove, and the project selftest gives the same 0.155 for them.</p>
+<p>A smoke run of the number 1 scorer on held-out with "always in contact" gives F1 ±5 0.042 and IoU 0.600 (a reference row, no method involved).</p>
+<h3>Conclusion</h3>
+<ul><li>The ground truth is now a self-contained benchmark in <code>benchmark/</code>, with a README, license notes and example inputs. It stays useful whatever our checklist scores in the final run.</li><li>The release scorers reproduce the project numbers exactly, so results scored with them can be compared with ours.</li><li>Licenses: number 1 can be shared under CC BY 4.0. Number 2 must be shared under CC BY-NC-SA 4.0 and not sold, because it uses HOT3D hand data.</li><li>All 33 objects appear in both splits, so the object share lookup is a strong reference on held-out. The README says so and asks for a check on unseen objects.</li><li>Limits: the benchmark covers 72 episodes of one glove setup and 9 persons of HOT3D. The copyable label depends on the collision depth limit, which is why the 2 mm and 10 mm labels are included.</li></ul>
+</article>
+<article id="exp-29">
+<h2>EXP-29: First real Muse Spark answers on tuning data (arm A on 3 episodes, P7a)</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/muse_contact.py a</code>, <code>scripts/muse_hot3d.py</code>, <code>scripts/tuning_muse_check.py</code>, <code>scripts/number2_score.py --gate</code>. Raw output: <code>out/number1/muse_a/</code>, <code>out/number2/muse/{checklist,baseline}/</code>, <code>out/tuning_muse_check.json</code>, <code>out/number2/gate.json</code>. Meta API cost: <strong>$10.62</strong> (arm A $2.64, checklist $4.15, Muse alone $3.83). Total spent so far: $12.35. Data: tuning only. Nothing on held-out was sent or scored.</p>
+<h3>Question</h3>
+<p>Three claims rested on stand-in grades or simulated answers (EXP-26, EXP-27). Do they hold with real Muse Spark answers?</p>
+<ol><li>Timing shift: Muse Spark sees a touch before the glove does, and a shift learned from the glove fixes that.</li><li>Learning: weights learned from the labels beat the plain mean of the checklist grades.</li><li>Unseen objects: our score still works on objects it has not seen, where the object name reference cannot.</li></ol>
+<h3>Setup</h3>
+<ul><li>Number 1: arm A (Muse Spark alone, 10 frames per call at 5 fps) on tuning episodes 0, 30 and 53, 146 calls, every frame answered. The shift is learned on two episodes and applied to the third, for each episode in turn. Main truth: the cleaned glove.</li><li>Number 2: the checklist call and the Muse alone call on the 400 score_train clips, every reply parsed. Rows, all scored leave one person out (trained on the other five people):<ul><li>R1 Muse alone (its copyable probability),</li><li>R2 the mean of the seven checklist grades (equal weights, no learning),</li><li>R3 a logistic regression on the same seven grades,</li><li>for reference: R3 on the stand-in grades, and the object name reference (copyable share of the object in the other people's clips). Paired differences with a 95% interval resampling sequences. Leave one object out for R3. The P7 gate on the six object items.</li></ul></li></ul>
+<h3>Results</h3>
+<h4>Number 1: timing shift</h4>
+<div class="wrap"><table>
+<thead><tr><th>Row</th><th>Boundary F1 ±5</th><th>Boundary F1 ±15</th><th>IoU</th><th>Start / end error (frames)</th></tr></thead>
+<tbody>
+<tr><td>Arm A</td><td>0.062</td><td>0.171</td><td>0.804</td><td>-7 / +7</td></tr>
+<tr><td>Arm A + shift (learned on the other two episodes)</td><td><strong>0.132</strong></td><td><strong>0.240</strong></td><td><strong>0.824</strong></td><td>-5 / +2</td></tr>
+<tr><td>Arm B (EXP-24, for reference)</td><td>0.145</td><td>0.291</td><td>0.718</td><td></td></tr>
+<tr><td>Always in contact</td><td>0.02</td><td>0.02</td><td>0.669</td><td></td></tr>
+</tbody></table></div>
+<ul><li>Muse Spark marks a touch about 7 frames (0.23 s) before the glove and its end about 7 frames after. The learned shift is the same on every fold: +6 to +8 frames at the start, -6 to -7 at the end. For held-out it is +7 and -7 (learned on all three).</li><li>The shift doubles boundary F1 at ±5 frames. Over 3 episodes the paired interval is 0.000 to 0.132 (difference +0.070), so it is only at the edge.</li><li>Arm A finds 68 boundaries for 190 true ones. It joins short touches into one long contact (episode 0, right hand, in the figure), so its IoU is the best of all arms (0.80 to 0.82) but its F1 stays low. The perfect-answer ceiling at 5 fps was 0.956 (EXP-21), so the limit is what Muse Spark sees, not the frame rate.</li></ul>
+<figure><img src="assets/logs/exp29_arm_a_timelines.png" alt="arm A" loading="lazy"><figcaption>Green: cleaned glove. Blue: Muse Spark alone. Orange: the same with the shift learned on the other two episodes.</figcaption></figure>
+<h4>Number 2: checklist against learning</h4>
+<p>Leave one person out, 400 clips, 43.5% copyable:</p>
+<div class="wrap"><table>
+<thead><tr><th>Row</th><th>AUC pooled</th><th>Mean over people</th></tr></thead>
+<tbody>
+<tr><td>R1 Muse alone</td><td>0.516</td><td>0.521</td></tr>
+<tr><td>R2 checklist, equal weights</td><td>0.627</td><td>0.597</td></tr>
+<tr><td>R3 checklist, learned weights</td><td><strong>0.646</strong></td><td><strong>0.638</strong></td></tr>
+<tr><td>R3 on stand-in grades (perfect grading)</td><td>0.671</td><td>0.657</td></tr>
+<tr><td>Object name reference</td><td>0.688</td><td>0.670</td></tr>
+</tbody></table></div>
+<div class="wrap"><table>
+<thead><tr><th>Difference</th><th>Value</th><th>95% interval</th><th>Gain</th></tr></thead>
+<tbody>
+<tr><td>R2 minus R1 (asking through the checklist)</td><td>+0.111</td><td>0.034 to 0.184</td><td>yes</td></tr>
+<tr><td>R3 minus R1</td><td>+0.130</td><td>0.043 to 0.206</td><td>yes</td></tr>
+<tr><td>R3 minus R2 (learning the weights)</td><td>+0.019</td><td>-0.023 to 0.058</td><td>no</td></tr>
+<tr><td>Object reference minus R3</td><td>+0.042</td><td>0.002 to 0.083</td><td>reference better</td></tr>
+</tbody></table></div>
+<p>Unseen objects (leave one object out):</p>
+<div class="wrap"><table>
+<thead><tr><th>Row</th><th>AUC pooled</th></tr></thead>
+<tbody>
+<tr><td>R3 learned, object left out</td><td><strong>0.607</strong></td></tr>
+<tr><td>R1 Muse alone (learns nothing)</td><td>0.516</td></tr>
+<tr><td>Object name reference</td><td>0.5 by construction</td></tr>
+<tr><td>R3 minus R1</td><td>+0.091 (0.003 to 0.171)</td></tr>
+</tbody></table></div>
+<p>Gate (six object items): leave one person out 0.636, leave one object out 0.601 (0.548 to 0.650). Verdict: weak. As decided before P7a, P7b goes ahead.</p>
+<p>How often Muse Spark grades equal the stand-ins: size 75%, shape 83%, thickness 78%, width 49%, handle 90%, free space 62%. The P1 pilot (27 of 30) was too optimistic. Width is close to a guess.</p>
+<p>Weights learned on all 400 clips with real grades: shape +1.30, width +0.99, finger occlusion +0.45, size +0.37, handle +0.26, thickness -0.30, free space -0.13. The stand-in weights turned width around (EXP-19, EXP-27). The real grades do not.</p>
+<figure><img src="assets/logs/exp29_number2_rows.png" alt="number 2 rows" loading="lazy"><figcaption>Leave one person out AUC per row. Diamond: learned weights scored on objects left out of training.</figcaption></figure>
+<h3>Conclusion</h3>
+<ul><li>Claim 1, timing shift: holds on tuning. Muse Spark is about 7 frames early at the start and 7 late at the end, the shift is stable across episodes, and it doubles boundary F1. Three episodes are too few to be sure. The held-out arm A run will settle it.</li><li>Claim 2, learning: does not hold on tuning. Learned weights beat equal weights by only 0.019, inside the noise. With real grades the main gain comes from the checklist itself: asking Muse Spark item by item beats asking it directly by 0.11 AUC. Muse Spark asked directly is close to a coin flip (0.52).</li><li>Claim 3, unseen objects: holds on tuning. On objects left out of training the checklist score keeps 0.607, against 0.516 for Muse alone and 0.5 for the object name reference.</li><li>The object name reference still beats our score on known objects (0.688 against 0.646), as expected from EXP-26.</li><li>Muse Spark grades the object items less well than the P1 pilot suggested. Width (49% equal to the stand-in) is the weakest item.</li><li>These are tuning numbers. The held-out runs (P4 rest, P7b) decide what is reported. The comparisons are already fixed in the measurement plan.</li></ul>
+</article>
+<article id="exp-30">
+<h2>EXP-30: Where Muse Spark goes wrong on tuning, and one prompt revision</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/prompt_revision_check.py</code>, <code>scripts/muse_contact.py a --a-version 2</code>, <code>scripts/muse_hot3d.py --task checklist_v2</code>. Prompts: <code>scripts/prompts/number1_arm_a_v2.txt</code>, <code>scripts/prompts/number2_checklist_v2.txt</code>. Raw output: <code>out/number1/muse_a_v2/</code>, <code>out/number2/muse/checklist_v2/</code>, <code>out/prompt_revision.json</code>. Meta API cost: <strong>$6.71</strong> (arm A version 2 $2.64, checklist version 2 $4.07). Total spent so far: $19.06. Data: tuning only. Nothing on held-out was sent or scored.</p>
+<h3>Question</h3>
+<p>EXP-29 gave the first real Muse Spark answers. Before any held-out call the prompts can still change. Where does Muse Spark go wrong, and does one revision of each prompt fix it? The rule that picks the version for held-out was written in the measurement plan before the revised prompts were sent ("One prompt revision on tuning").</p>
+<h3>Error analysis of version 1 (free)</h3>
+<p>Number 2 checklist, 400 score_train clips, Muse grade against the 3D model grade (EXP-19 stand-ins):</p>
+<ul><li>Size: 72 of 103 mid-size objects (15 to 25 cm) are called small.</li><li>Width: 56 of 133 objects wider than 14 cm are called "up to 8 cm". Muse Spark seems to judge the part in the hand, not the whole object.</li><li>Thickness: 54 of 323 objects of 4 cm or more are called thin.</li><li>Handle is good (90% equal). Free space is noisy (62%).</li><li>Muse Spark alone: 72% of its answers are 0.85 or more and 27% are 0.25 or less. Its mean answer per object has a rank correlation of 0.09 with the copyable share of that object. It rates keyboard, bowl and juice carton (0% to 8% copyable) as likely. It does not know which objects fail.</li></ul>
+<p>Number 1 arm A, tuning episodes 0, 30, 53: Muse Spark covers the glove contacts well (77% to 100% of contact frames), but it rarely marks a short release between two contacts as "not touching":</p>
+<div class="wrap"><table>
+<thead><tr><th>Release length</th><th>Releases</th><th>Marked "not touching" at least once</th></tr></thead>
+<tbody>
+<tr><td>up to 0.2 s (below the 5 fps sampling)</td><td>5</td><td>0%</td></tr>
+<tr><td>0.2 to 0.5 s</td><td>27</td><td>4%</td></tr>
+<tr><td>0.5 to 1 s</td><td>27</td><td>15%</td></tr>
+<tr><td>1 to 2 s</td><td>12</td><td>83%</td></tr>
+<tr><td>over 2 s</td><td>18</td><td>94%</td></tr>
+</tbody></table></div>
+<p>So arm A joins touches that are less than 1 s apart, which is why it finds 68 of 190 boundaries.</p>
+<h3>The revisions</h3>
+<ul><li>Checklist version 2: Muse Spark gives the three sides of the whole object in cm, with the hand as a ruler (hand length 19 cm, palm width 8.5 cm, finger thickness 2 cm, no object examples). Our code turns the numbers into the size, shape, thickness and width grades with the EXP-19 anchors. Handle, free space and finger occlusion are asked as before.</li><li>Arm A version 2: the prompt says that a hand which lets go for a moment between two grasps is not touching, and asks to look for a visible gap in every frame.</li><li>Muse Spark alone keeps its prompt (it is the comparison the proposal defines). This is a limit of the comparison: the checklist got one revision on tuning, Muse alone none.</li></ul>
+<h3>Results</h3>
+<p>Number 2, 400 score_train clips, leave one person out:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Version 1</th><th>Version 2</th></tr></thead>
+<tbody>
+<tr><td>Size equal to 3D model grade</td><td>75%</td><td>79%</td></tr>
+<tr><td>Shape</td><td>83%</td><td>85%</td></tr>
+<tr><td>Thickness</td><td>78%</td><td>84%</td></tr>
+<tr><td>Width</td><td>49%</td><td>52%</td></tr>
+<tr><td>Handle / free space</td><td>90% / 62%</td><td>90% / 61%</td></tr>
+<tr><td>R2 equal weights, pooled / mean over people</td><td>0.627 / 0.597</td><td>0.632 / 0.623</td></tr>
+<tr><td><strong>R3 learned, pooled / mean over people</strong></td><td>0.646 / <strong>0.638</strong></td><td>0.611 / <strong>0.625</strong></td></tr>
+<tr><td>R3, objects left out</td><td>0.607</td><td>0.596</td></tr>
+</tbody></table></div>
+<p>Version 2 cm estimates against the 3D model box (median ratio, middle half): longest side 0.97 (0.86 to 1.04), middle side 0.86 (0.72 to 1.03), shortest side 0.85 (0.65 to 0.99). The longest side is read well. The other two are underestimated, so width stays the weakest item.</p>
+<figure><img src="assets/logs/exp30_grade_tables.png" alt="grade tables" loading="lazy"><figcaption>Muse Spark grade against the 3D model grade for size and width, versions 1 and 2. Version 2 moves some mid-size objects out of "small", but many wide objects are still called narrow.</figcaption></figure>
+<p>Number 1, arm A, tuning episodes 0, 30, 53, shift learned on the other two:</p>
+<div class="wrap"><table>
+<thead><tr><th></th><th>Version 1</th><th>Version 2</th></tr></thead>
+<tbody>
+<tr><td>Boundary F1 ±5, with shift</td><td><strong>0.132</strong></td><td>0.120</td></tr>
+<tr><td>Boundary F1 ±15, with shift</td><td>0.240</td><td>0.248</td></tr>
+<tr><td>IoU, with shift</td><td>0.824</td><td>0.826</td></tr>
+<tr><td>Boundaries found (of 190)</td><td>68</td><td>76</td></tr>
+<tr><td>Learned shift (start, end)</td><td>+7, -7</td><td>+7, -6</td></tr>
+</tbody></table></div>
+<p>Version 2 changed only 29 of 1,442 frame answers (2%). The releases it newly caught and newly missed cancel out, so the release table is the same.</p>
+<figure><img src="assets/logs/exp30_releases.png" alt="releases" loading="lazy"><figcaption>Share of glove releases that Muse Spark marks as "not touching", by release length, for both versions.</figcaption></figure>
+<h3>Decision (by the rule fixed before sending)</h3>
+<ul><li>Checklist: version 2 R3 (0.625) is not higher than version 1 (0.638), so <strong>version 1 stays</strong> for P7b.</li><li>Arm A: version 2 F1 (0.120) is not higher than version 1 (0.132), so <strong>version 1 stays</strong> for held-out. The held-out shift is +7, -7.</li><li>No further revision, as written in the plan.</li></ul>
+<h3>Conclusion</h3>
+<ul><li>Muse Spark's object errors are systematic: it sees objects as smaller and narrower than they are. Asking for centimetres makes the grades more accurate (size, shape and thickness up by 2 to 6 points), but the learned score does not get better. With 400 clips the difference (0.013) is within noise either way.</li><li>Muse Spark alone does not know which objects a robot hand fails on. This is knowledge only the sensor-based label has, and it is the gap the checklist closes (EXP-29: 0.52 to 0.63 or more).</li><li>Arm A cannot see releases shorter than about 1 s, and a prompt does not change that. At 5 fps a 0.5 s release is 2 to 3 frames in which the hand is still very close to the object. This limits arm A boundary F1, not the frame rate (the perfect-answer ceiling is 0.956).</li><li>Both held-out runs use version 1 prompts, as before.</li></ul>
+</article>
+<article id="exp-31">
+<h2>EXP-31: Code check for comparison 6 and the extra rows</h2>
+<p class="meta">Date: 2026-10-28. Script: <code>scripts/number2_score.py --check</code> (new functions <code>object_rate_add_on</code>, <code>extra_rows</code>, <code>pair_auc</code>, <code>draw_rates</code>), fake-data checks in <code>scripts/check_paid_cache.py</code>. Raw output: <code>out/number2/number2_check.json</code> (keys <code>object_rate_add_on</code>, <code>extra</code>). Meta API cost: $0. Data: tuning only. Train item_train (1,985 clips), test score_train (400 clips). The six object items are the EXP-19 stand-in grades, not Muse Spark. Muse alone is the real P7a answer.</p>
+<h3>Question</h3>
+<p>The October 28 proposal added comparison 6 (the object rate as an add-on) and two extra rows (AUC inside each object, AUC per failure reason). Their rules were written in the measurement plan before computing. Does the code follow them, and does it leave the earlier outputs unchanged?</p>
+<h3>Setup</h3>
+<ul><li>Comparison 6, as in the plan. For k = 5, 20 and all labeled clips of the object, the object rate is (copyable + 1) / (k + 2). A logistic regression on logit(our score) and logit(object rate) is trained on the training clips, with our score left one person out and rates drawn from other persons. It is applied to the test clips. 20 draws for k = 5 and 20. Paired bootstrap over sequences (1,000 draws).</li><li>In check mode the labeled pool is item_train (1,985 clips), so the score_train test clips are never in it. In the final run it is all 2,385 tuning clips.</li><li>Extra rows. AUC inside each object is the share of correctly ordered pairs from the same object, ties counting half. The failure reason is <code>failed_condition</code> from <code>benchmark/number2/clips.csv</code>. The code stops if its copyable label differs from <code>clips_final.csv</code> (it matches on all 3,811 clips).</li><li>Fake-data checks: the AUC inside groups equals the sklearn AUC per group, weighted by pairs, also with many ties. Rates leave out the clip's own person and give 1/2 for an unseen object.</li></ul>
+<h3>Results</h3>
+<p>The fake-data checks pass (30 of 30 in <code>check_paid_cache.py</code>). Every earlier key of <code>number2_check.json</code> is byte for byte the same. The run takes about 70 seconds.</p>
+<figure><img src="assets/logs/exp31_comparison6_extra_check.png" alt="Comparison 6 and extra rows on tuning" loading="lazy"></figure>
+<p>Comparison 6 (score_train, stand-in grades):</p>
+<div class="wrap"><table>
+<thead><tr><th>Labeled clips</th><th>Object rate alone</th><th>Combined</th><th>Combined minus rate</th><th>Combined minus our score</th></tr></thead>
+<tbody>
+<tr><td>0</td><td></td><td>0.721 (our score)</td><td></td><td></td></tr>
+<tr><td>5</td><td>0.722</td><td>0.749</td><td>+0.027 (-0.002 to 0.060)</td><td>+0.028 (-0.013 to 0.061)</td></tr>
+<tr><td>20</td><td>0.770</td><td>0.773</td><td>+0.003 (-0.010 to 0.017)</td><td>+0.052 (0.014 to 0.091)</td></tr>
+<tr><td>all</td><td>0.777</td><td>0.783</td><td>+0.005 (-0.006 to 0.019)</td><td>+0.061 (0.028 to 0.095)</td></tr>
+</tbody></table></div>
+<p>The weight on our score falls from 0.63 (k = 5) to 0.22 (all) as the object rate gets more reliable.</p>
+<p>Extra rows (score_train):</p>
+<div class="wrap"><table>
+<thead><tr><th>Score</th><th>Inside objects</th><th>Inside object and person</th><th>vs grip fails (22)</th><th>vs reach fails (50)</th><th>vs collision fails (154)</th></tr></thead>
+<tbody>
+<tr><td>Our score</td><td>0.574 (0.495 to 0.652)</td><td>0.520</td><td>0.775</td><td>0.693</td><td>0.723</td></tr>
+<tr><td>R3 (learned grades)</td><td>0.568 (0.505 to 0.636)</td><td>0.550</td><td>0.795</td><td>0.698</td><td>0.708</td></tr>
+<tr><td>Muse alone</td><td>0.526 (0.450 to 0.613)</td><td>0.532</td><td>0.614</td><td>0.566</td><td>0.486</td></tr>
+<tr><td>Object rate</td><td>0.500 (by construction)</td><td>0.500</td><td>0.860</td><td>0.719</td><td>0.783</td></tr>
+</tbody></table></div>
+<p>Pairs from the same object are 1,074, or 2.7% of all pairs. Only 10 objects have 5 or more clips of each kind in these 400 clips (27 on held-out).</p>
+<h3>Conclusion</h3>
+<p>The code for comparison 6 and the extra rows works and follows the plan. The earlier outputs do not change. These numbers use stand-in grades on tuning clips. They test the code, and they are not results. They suggest what the held-out run may show: with 5 labeled clips our score still adds to the object rate, from 20 clips on the object rate alone is as good as the combination, and inside an object the score is near chance. The final numbers come only from <code>--final</code> on held-out.</p>
+</article>
+<article id="exp-32">
+<h2>EXP-32: Arm B (SAM rule) fixed on all 50 tuning episodes (P2)</h2>
+<p class="meta">Date: 2026-10-28. Scripts: <code>scripts/sam_episodes.py --split tune --send</code>, <code>scripts/contact_cut.py features --split tune</code>, <code>contact_cut.py rule</code>, <code>contact_cut.py rule-apply --train tune --apply tune</code>. Raw output: <code>out/sam10/episode_*/</code>, <code>out/contact/rule_report.json</code>, <code>out/contact/rule_segments.json</code> (leave one episode out, the input for the arm C shift sample), <code>out/contact/rule_chosen_tune50.json</code> (the rule chosen on all 50). Meta API cost: $11.89 (SAM 3.1). Data: tuning only (50 episodes).</p>
+<h3>Question</h3>
+<p>Until now arm B was chosen on 3 pilot episodes (EXP-14, EXP-22, EXP-24). The plan says to fix its parameters and timing shift on all 50 tuning episodes before any held-out run. What does arm B score on 50 episodes, leaving one episode out, and which rule goes to held-out?</p>
+<h3>Setup</h3>
+<ul><li>SAM 3.1 on the 47 remaining tuning episodes at 10 fps, prompts <code>hand</code> and <code>small object</code>, one request per episode and prompt: 94 requests, 59,444 billed frames, $11.89. All 100 requests of the 50 episodes have status "completed". None failed.</li><li>Arm B grid as before (432 points: gap, object move, co-move, fill, split on a change of nearest object, persist). The choice rule is unchanged: best boundary F1 at ±15 frames plus contact IoU, then the median start and end error as the shift.</li><li>Leave one episode out: the rule and shift for each episode are chosen on the other 49. Scores are pooled over episodes and hands.</li><li>Speed-up, no change in result: each grid point is now scored once per episode and hand, in parallel, and the folds sum these parts. On the 3 pilot episodes the report, the segments and the printout are byte for byte the same as before. The 50-episode run takes 16 seconds.</li></ul>
+<h3>Results</h3>
+<p>Leave one episode out, 50 tuning episodes, 100 episode-hands:</p>
+<div class="wrap"><table>
+<thead><tr><th>Ground truth</th><th>F1 ±5</th><th>F1 ±15</th><th>Precision ±15</th><th>Recall ±15</th><th>IoU</th><th>Boundaries (arm B / truth)</th><th>Always in contact IoU</th></tr></thead>
+<tbody>
+<tr><td>Cleaned glove (main)</td><td>0.153</td><td>0.294</td><td>0.204</td><td>0.522</td><td>0.683</td><td>4,880 / 1,910</td><td>0.623</td></tr>
+<tr><td>Raw glove</td><td>0.159</td><td>0.303</td><td>0.232</td><td>0.439</td><td>0.683</td><td>4,872 / 2,570</td><td>0.621</td></tr>
+<tr><td>Dataset labels</td><td>0.108</td><td>0.265</td><td>0.189</td><td>0.445</td><td>0.682</td><td>3,372 / 1,430</td><td>0.620</td></tr>
+</tbody></table></div>
+<ul><li>F1 at ±5 per episode ranges from 0.00 to 0.30 (median 0.12).</li><li>The choice is stable: on the cleaned glove 46 of 50 folds pick the same rule, the other 4 differ only in the object move threshold.</li><li>The rule for held-out, chosen on all 50 episodes: gap 2 px, object move 0.05, co-move 0.7, no fill, split on a change of nearest object after 3 frames, shift +4 frames at the start and -1 at the end.</li><li>Arm C ceiling (oracle answers on pilot episodes 0, 30, 53, cleaned glove) with this arm B: boundary F1 at ±5 0.302, the same as with the pilot arm B (0.297). Arm A stays at 0.956.</li><li>Arm C cost: arm B makes about 98 boundaries per episode. The tuning shift sample (100 starts, 100 ends) costs $2.61. Held-out (22 episodes, about 2,150 boundaries) would cost about $28.</li></ul>
+<figure><img src="assets/logs/exp32_rule_50.png" alt="Arm B on three tuning episodes, rule chosen on the other 49" loading="lazy"></figure>
+<h3>Conclusion</h3>
+<p>On 50 episodes arm B keeps the pilot picture: it beats always in contact on IoU (0.683 against 0.623) and finds half the glove boundaries within ±15 frames, but it makes 2.5 times too many boundaries, so precision is low and F1 at ±5 is 0.153. The chosen values sit at the edge of the grid (smallest gap, smallest move, no fill). The grid stays as written. This rule and shift are now fixed for held-out. Next paid step: P3, SAM on the 22 held-out episodes ($5.45).</p>
+</article>
+  <footer>원문: docs/experiments/ (32개). 영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria).</footer>
+</main>
+</body>
+</html>
