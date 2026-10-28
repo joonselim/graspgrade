@@ -372,6 +372,15 @@
   /* key experiments page */
   .ch { margin-top: 26px; }
   .ch h3 { margin: 0 0 8px; }
+  .eq {
+    margin: 6px 0 10px; padding: 9px 14px; border-left: 2px solid var(--rule);
+    background: color-mix(in srgb, var(--ink) 3%, transparent);
+    font-size: 14.5px; line-height: 1.85; color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .eq i { font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif; font-size: 1.1em; }
+  .eq sub, .eq sup { font-size: 0.72em; line-height: 0; }
+  .eq .c { margin-left: 12px; font-size: 12.5px; color: var(--muted); }
+  .eq .c i { font-size: 1.05em; }
   /* experiment list: key experiments lightly shaded, the rest a little softer */
   tr.core td { background: color-mix(in srgb, var(--ink) 4.5%, transparent); }
   tr.minor td { color: color-mix(in srgb, var(--ink) 74%, transparent); }
@@ -716,8 +725,106 @@
     </div>
   </section>
 
+  <section id="k-calc">
+    <h2><span class="no">4</span>우리가 정한 기준과 계산</h2>
+
+    <div class="ch">
+      <h3>평가 1 정답: 정리한 장갑</h3>
+      <div class="eq">
+        <div><i>c<sub>t</sub></i> = 1[ &Sigma;<sub><i>i</i>=1..80</sub> <i>p<sub>i,t</sub></i> &gt; 800 ]<span class="c">손당 압력 센서 80개, 30fps</span></div>
+      </div>
+      <ul class="plain">
+        <li>0.1초(3프레임) 이하로 끊긴 접촉은 잇고, 0.1초보다 짧은 조각은 버림(EXP-14).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 1 방법 B: SAM 마스크 규칙 (10fps)</h3>
+      <div class="eq">
+        <div><i>near<sub>t</sub></i> = [ <i>d<sub>t</sub></i> &le; <i>&tau;<sub>d</sub></i> ]<span class="c"><i>d<sub>t</sub></i>: 손 마스크와 가장 가까운 물체 마스크 사이 거리(px)</span></div>
+        <div><i>m<sub>t</sub></i> = max( &Vert;&Delta;<i>o</i><sub><i>t</i>&minus;3&rarr;<i>t</i></sub>&Vert;, &Vert;&Delta;<i>o</i><sub><i>t</i>&rarr;<i>t</i>+3</sub>&Vert; ) / &radic;<i>A<sub>o</sub></i><span class="c">물체 이동, 물체 크기 단위</span></div>
+        <div><i>&kappa;<sub>t</sub></i> = &Vert;&Delta;<i>o</i> &minus; &Delta;<i>h</i>&Vert; / ( &Vert;&Delta;<i>o</i>&Vert; + &Vert;&Delta;<i>h</i>&Vert; + 5 )<span class="c">0에 가까우면 손과 물체가 함께 움직임</span></div>
+        <div><i>move<sub>t</sub></i> = <i>near<sub>t</sub></i> &and; <i>hand<sub>t</sub></i> &and; <i>m<sub>t</sub></i> &ge; <i>&tau;<sub>m</sub></i> &and; <i>&kappa;<sub>t</sub></i> &le; <i>&tau;<sub>&kappa;</sub></i></div>
+        <div>접촉 구간 = <i>move<sub>t</sub></i>를 한 프레임 이상 포함한 <i>near</i> 구간</div>
+      </div>
+      <ul class="plain">
+        <li>&Delta;<i>o</i>, &Delta;<i>h</i>는 물체와 손 마스크 중심의 이동에서 카메라 이동을 뺀 값. 카메라 이동은 같은 구간 다른 물체 이동의 중앙값. <i>A<sub>o</sub></i>는 물체 마스크 넓이의 중앙값.</li>
+        <li><i>f</i>프레임 이하 끊김은 잇고 0.2초보다 짧은 구간은 버림. 가장 가까운 물체가 바뀌어 <i>q</i>프레임 이상 유지되면 구간을 끊음(EXP-22, EXP-24).</li>
+        <li>기준값은 튜닝 에피소드에서 격자 탐색으로 정함: (<i>&tau;<sub>d</sub></i>, <i>&tau;<sub>m</sub></i>, <i>&tau;<sub>&kappa;</sub></i>, <i>f</i>, <i>q</i>) = argmax [ F1<sub>&plusmn;15</sub> + IoU ], <i>&tau;<sub>d</sub></i> &isin; {2, 4, 8, 12}px, <i>&tau;<sub>m</sub></i> &isin; {0.05, 0.1, 0.2}, <i>&tau;<sub>&kappa;</sub></i> &isin; {0.5, 0.7}, <i>f</i> &isin; {0, 1, 2}, <i>q</i> &isin; {1, 3, 5}.</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 1 시점 보정 (세 방법 공통)</h3>
+      <div class="eq">
+        <div><i>&delta;<sub>s</sub></i> = &minus;median( <i>&scirc;</i> &minus; <i>s</i> ),&ensp; <i>&delta;<sub>e</sub></i> = &minus;median( <i>&ecirc;</i> &minus; <i>e</i> )</div>
+        <div><i>&scirc;</i>&prime; = <i>&scirc;</i> + <i>&delta;<sub>s</sub></i>,&ensp; <i>&ecirc;</i>&prime; = <i>&ecirc;</i> + <i>&delta;<sub>e</sub></i></div>
+      </div>
+      <ul class="plain">
+        <li><i>&scirc;</i>, <i>&ecirc;</i>는 예측한 접촉 시작과 끝, <i>s</i>, <i>e</i>는 장갑의 시작과 끝. 중앙값은 튜닝 에피소드에서 계산함.</li>
+        <li>Muse Spark 단독은 <i>&delta;<sub>s</sub></i> = +7, <i>&delta;<sub>e</sub></i> = &minus;7프레임. 경계 F1 &plusmn;5가 0.06에서 0.13으로 오름(EXP-29).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 1 지표</h3>
+      <div class="eq">
+        <div>예측 경계와 장갑 경계를 |<i>&scirc;</i> &minus; <i>s</i>| &le; <i>k</i> 안에서 일대일로 짝지음</div>
+        <div><i>P</i> = 짝 수 / 예측 경계 수,&ensp; <i>R</i> = 짝 수 / 장갑 경계 수,&ensp; F1<sub>&plusmn;<i>k</i></sub> = 2<i>PR</i> / (<i>P</i> + <i>R</i>)</div>
+        <div>IoU = |예측 접촉 프레임 &cap; 장갑 접촉 프레임| / |예측 접촉 프레임 &cup; 장갑 접촉 프레임|</div>
+      </div>
+      <ul class="plain">
+        <li><i>k</i> = 5, 15프레임(0.17초, 0.5초).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 2 정답: v2 라벨</h3>
+      <div class="eq">
+        <div><i>copyable</i> = &exist; <i>u</i> &isin; <i>U</i> : <i>grip</i>(<i>u</i>) &and; <i>reach</i>(<i>u</i>) &and; &not;<i>collide</i>(<i>u</i>)<span class="c"><i>U</i>: 손 전체 이동, 1cm 격자, 2cm 이내</span></div>
+        <div><i>grip</i>: Allegro 엄지 끝과 다른 손가락 끝 하나 이상이 물체 표면에서 1.5cm 이내</div>
+        <div><i>reach</i>: 물체에 닿은 사람 손가락마다 대응하는 Allegro 손가락 끝이 2cm 이내</div>
+        <div><i>collide</i>: Allegro 손 표면의 점 중 물체 안으로 5mm보다 깊이 들어간 점이 있음</div>
+      </div>
+      <ul class="plain">
+        <li>Allegro 손은 모션캡처 사람 손가락 끝의 위치에 맞춤. 기준값은 계산 전에 고정함(EXP-16).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 2 항목 등급</h3>
+      <div class="eq">
+        <div><i>g</i>(<i>x</i>) = 1 (<i>x</i> &ge; <i>q</i><sub>2/3</sub>),&ensp; 0.5 (<i>q</i><sub>1/3</sub> &le; <i>x</i> &lt; <i>q</i><sub>2/3</sub>),&ensp; 0 (<i>x</i> &lt; <i>q</i><sub>1/3</sub>)<span class="c"><i>q</i>: 튜닝 클립의 삼분위</span></div>
+      </div>
+      <ul class="plain">
+        <li>카메라 안정성: <i>x</i> = &minus;(클립 동안 카메라 이동의 90번째 백분위).</li>
+        <li>손 모양: <i>x</i> = MediaPipe 손 특징 10개의 로지스틱 회귀 확률(튜닝의 학습용 클립으로 학습).</li>
+        <li>가시성: <i>x</i> = SAM이 손과 물체를 모두 찾은 프레임 비율.</li>
+        <li>접촉 명확성: <i>x</i> = 접촉 프레임 중 <i>d<sub>t</sub></i> &le; 3px 비율 &minus; 뻗기·놓기 프레임 중 같은 비율.</li>
+        <li>동작 완결성(고정 규칙): <i>g</i> = &frac12;( [뻗기 1초에 손 보임 &ge; 50% &and; 손목 이동 &ge; 화면의 3%] + [놓기 1초에 같은 조건] ).</li>
+        <li>Muse Spark 항목 7개(손가락 가림, 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간): 세 단계 답을 1, 0.5, 0으로 바꿈.</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>평가 2 점수와 비교 기준</h3>
+      <div class="eq">
+        <div><i>S</i> = 100 &middot; &sigma;( <i>w</i><sub>0</sub> + &Sigma;<sub><i>i</i></sub> <i>w<sub>i</sub> g<sub>i</sub></i> ),&ensp; &sigma;(<i>z</i>) = 1 / (1 + <i>e</i><sup>&minus;<i>z</i></sup>)<span class="c">우리 점수, 모든 항목</span></div>
+        <div>R1 = Muse Spark가 답한 "따라할 수 있음" 확률</div>
+        <div>R2 = (1/7) &Sigma;<sub><i>i</i>&isin;Muse</sub> <i>g<sub>i</sub></i><span class="c">Muse 등급 단순 평균, 학습 없음</span></div>
+        <div>R3 = &sigma;( <i>w</i><sub>0</sub> + &Sigma;<sub><i>i</i>&isin;Muse</sub> <i>w<sub>i</sub> g<sub>i</sub></i> )<span class="c">같은 등급, 가중치 학습</span></div>
+        <div><i>r</i>(<i>o</i>) = 튜닝 클립에서 물체 <i>o</i>의 "따라할 수 있음" 비율<span class="c">물체 이름 기준선</span></div>
+        <div>AUC = P( <i>S</i><sup>+</sup> &gt; <i>S</i><sup>&minus;</sup> ) + &frac12; P( <i>S</i><sup>+</sup> = <i>S</i><sup>&minus;</sup> )</div>
+      </div>
+      <ul class="plain">
+        <li><i>w</i>는 튜닝 400개 클립에서 L2 로지스틱 회귀(<i>C</i> = 0.5)로 학습함. 95% 구간은 시퀀스 단위 부트스트랩.</li>
+        <li>처음 보는 물체: 물체 <i>o</i>마다 <i>o</i>를 뺀 클립으로 손 모양 모델, 삼분위, <i>w</i>를 다시 학습해 <i>o</i>의 클립을 채점. 물체 이름 기준선은 이때 모든 클립에 같은 값을 주므로 AUC 0.5.</li>
+      </ul>
+    </div>
+  </section>
+
   <section id="k-bench">
-    <h2><span class="no">4</span>결과물: 정답 벤치마크</h2>
+    <h2><span class="no">5</span>결과물: 정답 벤치마크</h2>
     <ul class="plain">
       <li>정답 라벨과 채점 코드를 묶어 둠. 다른 팀이 자기 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음. 평가 1은 에피소드 72개의 접촉 구간, 평가 2는 클립 3,811개의 라벨과 처음 실패하는 조건. 공개용 채점 코드가 프로젝트 수치를 그대로 재현함(EXP-28).</li>
       <li>라벨만 포함하고, 원본 영상과 센서 데이터는 라이선스 때문에 각자 받아야 함.</li>
@@ -3200,7 +3307,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 11:38 KST
+    마지막 갱신 2026-10-28 11:44 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
