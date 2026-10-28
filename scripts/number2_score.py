@@ -14,7 +14,9 @@ Inputs, per clip (out/number2/clips_final.csv):
   Muse baseline  copyable probability (muse_hot3d.py --task baseline)
 With --check, the Muse object items are replaced by the EXP-19 stand-in grades
 and missing paid inputs are left out, so only the code path is tested.
-With --final, an item with any clip missing stops the run (it is not left out).
+With --final, a clip without a Muse checklist or Muse alone answer (a reply
+that never parsed after the resend) is dropped from every row, up to 5% of a
+set (plan: "Replies that never parse"). Any other missing grade stops the run.
 
 Comparisons: our score vs Muse alone; object-only reference (copyable share
 per object in every tuning clip outside the test role: all 2,385 tuning clips
@@ -86,6 +88,7 @@ CHECKLIST_TASK = "checklist"  # the checklist version for held-out, picked by th
 BENCH_CLIPS = ROOT / "benchmark" / "number2" / "clips.csv"  # failed_condition per clip (EXP-28)
 K_LABELED, RATE_DRAWS = (5, 20, None), 20  # comparison 6: labeled clips per object (None = all), draws
 FAIL_REASONS = ("grip", "reach", "collision")
+MAX_NO_MUSE_ANSWER = 0.05  # final run: share of clips a set may lose to a Muse reply that never parses
 
 
 def terciles(train_scores):
@@ -473,23 +476,38 @@ def cmd_gate(standin):
 
 
 def complete_items(train, test, items, final):
-    """The items with a grade on every train and test clip.
+    """Returns train, test, items and the clips dropped for a missing Muse answer.
 
-    In the final run nothing is left out without a decision: a missing grade,
-    or a missing Muse alone answer (a compared row), stops the run. In check
-    mode, items with a missing paid input are left out, as before.
+    Final run (docs/MEASUREMENT_PLAN.md, "Replies that never parse"): a clip
+    without a Muse checklist or Muse alone answer is dropped from every row, up
+    to 5% of the clips of a set. More than that, a missing Muse column, or any
+    other missing grade stops the run. Check mode: items with a missing paid
+    input are left out, as before, and no clip is dropped.
     """
-    missing = {c: int(train[c].isna().sum() + test[c].isna().sum()) for c in items}
-    if final:
-        missing["muse_baseline"] = int(train.muse_baseline.isna().sum() + test.muse_baseline.isna().sum()) \
-            if "muse_baseline" in train else len(train) + len(test)
-    missing = {c: n for c, n in missing.items() if n}
-    if missing and final:
-        raise SystemExit(f"clips without a grade, per item: {missing}. Every item must be complete on the train "
-                         "and test clips. Send what is missing (rerun the paid step) or decide on a rule first.")
-    if missing:
-        print(f"check mode, items left out (paid input missing on some clips): {missing}", file=sys.stderr)
-    return [c for c in items if c not in missing]
+    if not final:
+        missing = {c: int(train[c].isna().sum() + test[c].isna().sum()) for c in items}
+        missing = {c: n for c, n in missing.items() if n}
+        if missing:
+            print(f"check mode, items left out (paid input missing on some clips): {missing}", file=sys.stderr)
+        return train, test, [c for c in items if c not in missing], {}
+    absent = [c for c in MUSE_ITEMS if c not in items] + ([] if "muse_baseline" in train else ["muse_baseline"])
+    if absent:
+        raise SystemExit(f"no Muse answers at all for {absent}. Run the paid step first.")
+    other = {c: int(train[c].isna().sum() + test[c].isna().sum()) for c in items if c not in MUSE_ITEMS}
+    other = {c: n for c, n in other.items() if n}
+    if other:
+        raise SystemExit(f"clips without a grade, per item: {other}. Only a missing Muse answer has a fallback. "
+                         "Send what is missing (rerun the paid step) first.")
+    muse = MUSE_ITEMS + ["muse_baseline"]
+    dropped = {}
+    for name, t in (("train", train), ("test", test)):
+        bad = t[muse].isna().any(axis=1)
+        if bad.mean() > MAX_NO_MUSE_ANSWER:
+            raise SystemExit(f"{name}: {int(bad.sum())} of {len(t)} clips have no Muse answer after the resend, more "
+                             f"than {MAX_NO_MUSE_ANSWER:.0%}. The plan says: decide with the user before reporting.")
+        dropped[name] = t.clip_id[bad].tolist()
+    gone = dropped["train"] + dropped["test"]
+    return train[~train.clip_id.isin(gone)], test[~test.clip_id.isin(gone)], items, dropped
 
 
 def main():
@@ -506,9 +524,12 @@ def main():
     d, items = assemble(args.check)
     train_role, test_role = ("item_train", "score_train") if args.check else ("score_train", "held_out")
     train, test = d[d.role == train_role].copy(), d[d.role == test_role].copy()
-    items = complete_items(train, test, items, final=not args.check)
+    train, test, items, dropped = complete_items(train, test, items, final=not args.check)
     out = {"mode": "check (tuning only, stand-ins)" if args.check else "final", "train": train_role,
            "test": test_role, "items": items}
+    if dropped:
+        d = d[~d.clip_id.isin(dropped["train"] + dropped["test"])]
+        out["dropped_no_muse_answer"] = dropped
     test["our_score"], out["weights"] = fit_score(train, test, items)
     out["our_score"] = metrics(test, "our_score")
     test["object_reference"] = object_reference(d, test, test_role)

@@ -11,8 +11,11 @@ Checks, in a temporary folder:
    change) is a valid arm C answer.
 4. Arm C picks (muse_contact.load_c): a cached call for other frames than
    the current arm B segments stops the run.
-5. number2_score.complete_items: in the final run a missing grade or a
-   missing Muse alone answer stops the run, in check mode the item is left out.
+5. number2_score.complete_items: in the final run a clip without a Muse
+   answer is dropped from every row up to 5% of a set, more stops the run, and
+   any other missing grade stops it. In check mode the item is left out.
+   Arm A frames without an answer count as not touching, an arm C boundary
+   without a pick keeps arm B.
 6. number2_score.object_reference: in the final run the object share comes
    from all tuning clips, in check mode never from the score_train test clips.
 7. number2_score.pair_auc and draw_rates (comparison 6 and the extra rows):
@@ -152,24 +155,54 @@ def check_arm_c(tmp):
     return res
 
 
+def stops(f):
+    try:
+        f()
+        return False
+    except SystemExit:
+        return True
+
+
 def check_complete_items():
     train = pd.DataFrame({"a": [1.0, 0.5], "b": [1.0, 0.0], "muse_baseline": [0.2, 0.9]})
     test = pd.DataFrame({"a": [1.0, np.nan], "b": [0.5, 0.5], "muse_baseline": [0.3, 0.4]})
-    res = [expect("check mode: incomplete item left out", number2_score.complete_items(train, test, ["a", "b"], False)
-                  == ["b"])]
-    for name, tr, te in (("missing grade", train, test),
-                         ("missing Muse alone", train, test.assign(a=1.0, muse_baseline=[0.3, np.nan])),
-                         ("no Muse alone column", train.drop(columns="muse_baseline"),
-                          test.assign(a=1.0).drop(columns="muse_baseline"))):
-        try:
-            number2_score.complete_items(tr, te, ["a", "b"], True)
-            stopped = False
-        except SystemExit:
-            stopped = True
-        res.append(expect(f"final: {name} stops", stopped))
-    res.append(expect("final: complete items kept",
-                      number2_score.complete_items(train, test.assign(a=1.0), ["a", "b"], True) == ["a", "b"]))
+    res = [expect("check mode: incomplete item left out, no clip dropped",
+                  number2_score.complete_items(train, test, ["a", "b"], False)[2:] == (["b"], {}))]
+    # final run: 40 clips per set, a local grade and the seven Muse grades
+    items = ["local"] + number2_score.MUSE_ITEMS
+    full = pd.DataFrame({"clip_id": [f"c{i}" for i in range(40)], "local": 0.5, "muse_baseline": 0.4,
+                         **{c: 1.0 for c in number2_score.MUSE_ITEMS}})
+    tr, te = full.assign(clip_id="t" + full.clip_id), full
+
+    def final(train, test, its=items):
+        return number2_score.complete_items(train, test, its, True)
+
+    one, three = te.copy(), te.copy()
+    one.loc[5, "object_size"] = np.nan
+    three.loc[[1, 2], "muse_baseline"] = np.nan
+    three.loc[3, "free_space"] = np.nan
+    out = final(tr, one)
+    res += [expect("final: complete Muse answers keep every clip", len(final(tr, te)[1]) == 40),
+            expect("final: 1 of 40 clips without a Muse grade is dropped from the rows",
+                   len(out[1]) == 39 and out[3] == {"train": [], "test": ["c5"]} and len(out[0]) == 40),
+            expect("final: 3 of 40 clips (7.5%) without a Muse answer stops", stops(lambda: final(tr, three))),
+            expect("final: a missing local grade stops", stops(lambda: final(tr, te.assign(local=[np.nan] + [0.5] * 39)))),
+            expect("final: no Muse alone column stops",
+                   stops(lambda: final(tr.drop(columns="muse_baseline"), te.drop(columns="muse_baseline")))),
+            expect("final: a Muse checklist item absent from the items stops",
+                   stops(lambda: final(tr, te, items[:-1])))]
     return res
+
+
+def check_never_parsed_fallbacks():
+    """Plan "Replies that never parse": arm A frames without an answer are not touching, arm C keeps arm B."""
+    masks = muse_contact.a_masks(1, 60, {"0": {"left": True, "right": False}})  # frames 6 to 59 never answered
+    segs = {"1": {"n30": 300, "left": [[50, 100]], "right": []}}
+    return [expect("arm A fallback: frames without an answer are not touching",
+                   masks["left"][:6].all() and not masks["left"][6:].any() and not masks["right"].any()),
+            expect("arm C fallback: a boundary without a pick keeps arm B and is not a moved boundary",
+                   muse_contact.c_segments(segs, {})[(1, "left")] == [(50, 100)]
+                   and muse_contact.c_segments(segs, {}, moved_only=True)[(1, "left")] == {"start": [], "end": []})]
 
 
 def check_object_reference():
@@ -264,7 +297,8 @@ def main():
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
         res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items() \
-            + check_object_reference() + check_comparison6_and_extra() + check_soft(tmp)
+            + check_never_parsed_fallbacks() + check_object_reference() + check_comparison6_and_extra() \
+            + check_soft(tmp)
     print(f"{sum(res)} of {len(res)} passed")
     sys.exit(0 if all(res) else 1)
 

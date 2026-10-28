@@ -682,6 +682,38 @@ data, and the version for held-out is picked by a rule fixed here.
   2 F1 0.120 against 0.132. Both prompts stay at version 1 for held-out.
   The arm A shift for held-out is +7 at the start and -7 at the end.
 
+## Replies that never parse (written 2026-10-28, before any paid run)
+
+A Muse Spark reply that does not parse (no JSON, a missing field, a value
+outside the allowed answers) is never cached as done. The code keeps it under
+`unparsed/`, and a rerun of the same send command sends it again. This
+section fixes what happens to a reply that still does not parse after that.
+It covers every paid Muse Spark run from now on, tuning and held-out. The
+soft object check has its own rule in its section.
+
+- Resend: after the full run of a step, the same command is run once more.
+  It sends only the calls without a parsed answer. Whatever still has no
+  parsed answer after this second pass gets the fallback below. No third pass.
+- An API error (the call raises, no reply) is not a parse failure. Such calls
+  are resent until they get a reply.
+- Fallbacks, chosen so that a missing answer counts against the method that
+  failed to give it:
+
+| Call | Fallback after the second pass |
+| --- | --- |
+| Arm A (10 frames per call) | Every frame of the call counts as "not touching" for both hands. The episode stays in the number 1 table. |
+| Arm C (one boundary per call) | The arm B boundary is kept, as if Muse Spark had answered "no change". It does not enter the arm C shift, which uses moved boundaries only. |
+| Number 2 checklist or Muse alone (baseline) | The clip is dropped from every number 2 row (comparisons 1 to 6 and the extra rows), so all rows keep the same clips. |
+
+- Limit: if more than 5% of the calls of one step (arm A, arm C, checklist,
+  baseline) on held-out have no parsed answer after the second pass, the
+  results of that step are not reported until the user decides how to go on.
+  The 5% check for the checklist and baseline is in `number2_score.py
+  --final`. For arms A and C it is the number of calls left to send that the
+  send command prints on a third run with `--send` left out.
+- Reported with the results: per step, the calls that needed the second pass,
+  and the calls and clips that got the fallback.
+
 ## Release: the ground truth as a reusable benchmark (written 2026-10-28)
 
 The proposal's problem is that teams filter video with their own rules and
