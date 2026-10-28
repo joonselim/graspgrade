@@ -8,6 +8,8 @@ P1 파일럿 (EXP-23), A 튜닝 3개와 P7a (EXP-29, $10.62), 프롬프트 1회 
 숫자 2: 정답은 copyable v2 (EXP-16, held-out EXP-20), 체크리스트는 물체 항목 중심 (EXP-18, 19), 클립·SAM 윈도우·Muse 프레임·프롬프트 준비 완료. 숫자 1: B 규칙과 A, C 코드 준비, 파일럿 3개만 측정.
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
 
+유료 전 코드 점검 (2026-10-28, API 호출 없음): 회귀 기준값 저장 (`regression_check.py`, 11개 명령, 보고 수치 재현 확인). 수정 3개: (1) SAM 상태가 completed가 아니거나 Muse 답을 해석 못 하면 완료로 캐시하지 않고 `unparsed/` 또는 `.<status>` 파일로 남겨 재실행 시 다시 보냄, (2) `number2_score --final`은 등급이나 Muse 단독 답이 빈 클립이 있으면 멈춤 (전에는 그 항목을 조용히 뺐다), (3) arm C 캐시가 현재 B 구간과 프레임이 다르면 멈춤. 가짜 클라이언트 점검 24개 통과 (`check_paid_cache.py`), 수정 후 회귀 비교 11개 모두 바이트 동일. 열린 문제: held-out에서 끝내 해석되지 않는 답의 처리 규칙은 측정 계획에 없다.
+
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
 git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private)를 보고서 세션이 커밋하고 푸시한다. 실험 세션은 파일만 고친다. WSL `~/graspgrade`의 별도 로컬 이력은 더 쓰지 않는다.
 

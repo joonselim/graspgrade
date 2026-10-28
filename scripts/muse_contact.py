@@ -26,7 +26,12 @@ end shift learned on tuning episodes, the negative median error against the
 cleaned glove. Arm C's shift is learned on, and applied to, only the
 boundaries Muse Spark moved. `score` reports A, A + shift, B, C, C + shift and
 a paired bootstrap over episodes for each shift. Arm C picks are keyed by
-segment number, so the arm B segment files must not change after sending.
+segment number, so the arm B segment files must not change after sending:
+`c` and `score` compare each cached call with the current segments and stop
+if the frames differ. A reply that does not give every frame (arm A) or a
+frame number (arm C) is kept under unparsed/ and not counted as done, so a
+rerun sends it again. If it never parses, arm A reads those frames as not
+touching and arm C keeps the arm B boundary.
 """
 
 import argparse
@@ -35,6 +40,7 @@ import json
 import os
 import re
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -139,34 +145,41 @@ def cmd_a(args):
     if not args.send or not jobs:
         return
     client = make_client()
-
-    def run(ep, b):
-        jpg = read_frames(ep, b)
-        text = a_prompt().read_text().replace("{n}", str(len(b)))
-        reply, usage, cost = ask(client, text, [jpg[k] for k in b])
-        d = first_json(reply)
-        ans = {}
-        if d and isinstance(d.get("frames"), list):
-            for x in d["frames"]:
-                try:
-                    ans[int(x["i"])] = {s: bool(x.get(s)) for s in SIDES}
-                except (KeyError, TypeError, ValueError):
-                    pass
-        rec = {"episode": ep, "frames": b, "reply": reply, "answers": {str(b[i - 1]): v for i, v in ans.items()
-                                                                     if 1 <= i <= len(b)}, "usage": usage, "cost_usd": cost}
-        p = a_dir() / f"episode_{ep:06d}" / f"{b[0]:05d}.json"
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(rec))
-        return cost
-
-    spent = 0.0
+    spent, bad = 0.0, 0
     with ThreadPoolExecutor(args.workers) as pool:
-        for f in as_completed([pool.submit(run, *j) for j in jobs]):
+        for f in as_completed([pool.submit(a_call, client, *j) for j in jobs]):
             try:
-                spent += f.result()
+                cost, done = f.result()
+                spent += cost
+                bad += not done
             except Exception as exc:  # a rerun sends what is missing
                 print("FAILED", repr(exc)[:200], flush=True)
-    print(f"spent ${spent:.2f}")
+    print(f"spent ${spent:.2f}, replies without an answer for every frame {bad} (kept in unparsed/, a rerun sends them again)")
+
+
+def a_call(client, ep, b):
+    """One arm A call. Returns (cost, done). A reply without an answer for every frame is not done:
+    it is kept under unparsed/ and a rerun sends the batch again."""
+    jpg = read_frames(ep, b)
+    text = a_prompt().read_text().replace("{n}", str(len(b)))
+    reply, usage, cost = ask(client, text, [jpg[k] for k in b])
+    d = first_json(reply)
+    ans = {}
+    if d and isinstance(d.get("frames"), list):
+        for x in d["frames"]:
+            try:
+                ans[int(x["i"])] = {s: bool(x.get(s)) for s in SIDES}
+            except (KeyError, TypeError, ValueError):
+                pass
+    rec = {"episode": ep, "frames": b, "reply": reply, "answers": {str(b[i - 1]): v for i, v in ans.items()
+                                                                 if 1 <= i <= len(b)}, "usage": usage, "cost_usd": cost}
+    done = len(rec["answers"]) == len(b)
+    p = a_dir() / f"episode_{ep:06d}" / f"{b[0]:05d}.json"
+    if not done:
+        p = p.parent / "unparsed" / f"{b[0]:05d}_{time.time_ns()}.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(rec))
+    return cost, done
 
 
 def a_masks(ep, n30, answers):
@@ -183,8 +196,8 @@ def a_masks(ep, n30, answers):
 
 # ---------------------------------------------------------------- arm C
 
-def c_jobs(seg_path):
-    segs = json.loads(Path(seg_path).read_text())
+def c_jobs(segs):
+    """One job per start and end of the arm B segments {episode: {n30, left, right}}."""
     jobs = []
     for ep, d in ((k, v) for k, v in segs.items() if k.isdigit()):  # skip the "rule" entry of rule-apply files
         n30 = d["n30"]
@@ -193,7 +206,7 @@ def c_jobs(seg_path):
                 for kind, f in (("start", a), ("end", b - 1)):
                     frames = [int(np.clip(f + o, 0, n30 - 1)) for o in C_OFFSETS]
                     jobs.append({"episode": int(ep), "hand": s, "segment": i, "kind": kind, "frames": frames})
-    return segs, jobs
+    return jobs
 
 
 def c_text(job):
@@ -208,8 +221,51 @@ def c_key(job):
     return N1 / "muse_c" / f"episode_{job['episode']:06d}" / f"{job['hand']}_{job['segment']:03d}_{job['kind']}.json"
 
 
+def c_cached(job):
+    """The cached pick for this boundary, or None if it was not sent yet.
+
+    Picks are keyed by segment number, so a cached call must show the same
+    frames as the job. If not, the arm B segment file changed after sending,
+    and the cached picks belong to other boundaries: stop.
+    """
+    p = c_key(job)
+    if not p.exists():
+        return None
+    r = json.loads(p.read_text())
+    if r["frames"] != job["frames"]:
+        raise SystemExit(f"{p} was sent for frames {r['frames']}, the current arm B segments give {job['frames']}. "
+                         "The segment file changed after sending arm C.")
+    return r["pick"]
+
+
+def c_pick(reply):
+    """Muse Spark's frame number from an arm C reply (0 = no change), or None if the reply does not give one."""
+    d = first_json(reply) or {}
+    try:
+        pick = int(d["frame"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    return pick if 0 <= pick <= 7 else None
+
+
+def c_call(client, job):
+    """One arm C call. Returns (cost, done). A reply without a frame number is not done:
+    it is kept under unparsed/ and a rerun sends the boundary again."""
+    jpg = read_frames(job["episode"], job["frames"])
+    reply, usage, cost = ask(client, c_text(job), [jpg[k] for k in job["frames"]])
+    pick = c_pick(reply)
+    rec = {**job, "reply": reply, "pick": pick, "confidence": (first_json(reply) or {}).get("confidence"),
+           "usage": usage, "cost_usd": cost}
+    p = c_key(job)
+    if pick is None:
+        p = p.parent / "unparsed" / f"{p.stem}_{time.time_ns()}.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(rec))
+    return cost, pick is not None
+
+
 def cmd_c(args):
-    _, jobs = c_jobs(args.segments)
+    jobs = c_jobs(json.loads(Path(args.segments).read_text()))
     if args.sample:  # the tuning boundaries for the arm C shift: N starts and N ends at random
         rng = np.random.default_rng(20261026)
         drawn = []
@@ -217,35 +273,22 @@ def cmd_c(args):
             ks = [j for j in jobs if j["kind"] == kind]
             drawn += [ks[i] for i in sorted(rng.choice(len(ks), min(args.sample, len(ks)), replace=False))]
         jobs = drawn
-    todo = [j for j in jobs if not c_key(j).exists()]
+    todo = [j for j in jobs if c_cached(j) is None]
     est = len(todo) * (7 * TOKENS_PER_FRAME * PRICE_IN + TOKENS_OUT * PRICE_OUT)
     print(f"arm C: {len(jobs)} boundaries, {len(todo)} to send, about ${est:.2f}", flush=True)
     if not args.send or not todo:
         return
     client = make_client()
-
-    def run(job):
-        jpg = read_frames(job["episode"], job["frames"])
-        reply, usage, cost = ask(client, c_text(job), [jpg[k] for k in job["frames"]])
-        d = first_json(reply) or {}
-        try:
-            pick = int(d.get("frame", 0))
-        except (TypeError, ValueError):
-            pick = 0
-        rec = {**job, "reply": reply, "pick": pick if 0 <= pick <= 7 else 0, "confidence": d.get("confidence"),
-               "usage": usage, "cost_usd": cost}
-        c_key(job).parent.mkdir(parents=True, exist_ok=True)
-        c_key(job).write_text(json.dumps(rec))
-        return cost
-
-    spent = 0.0
+    spent, bad = 0.0, 0
     with ThreadPoolExecutor(args.workers) as pool:
-        for f in as_completed([pool.submit(run, j) for j in todo]):
+        for f in as_completed([pool.submit(c_call, client, j) for j in todo]):
             try:
-                spent += f.result()
+                cost, done = f.result()
+                spent += cost
+                bad += not done
             except Exception as exc:  # a rerun sends what is missing
                 print("FAILED", repr(exc)[:200], flush=True)
-    print(f"spent ${spent:.2f}")
+    print(f"spent ${spent:.2f}, replies without a frame number {bad} (kept in unparsed/, a rerun sends them again)")
 
 
 def c_segments(segs, picks, shift_on=0, shift_off=0, moved_only=False):
@@ -380,11 +423,13 @@ def load_a(eps, version=None):
     return out
 
 
-def load_c():
+def load_c(segs):
+    """Cached arm C picks for the boundaries of these arm B segments. Stops if one was sent for other frames."""
     picks = {}
-    for f in (N1 / "muse_c").glob("*/*.json"):
-        r = json.loads(f.read_text())
-        picks[(r["episode"], r["hand"], r["segment"], r["kind"])] = r["pick"]
+    for job in c_jobs(segs) if segs is not None else []:
+        pick = c_cached(job)
+        if pick is not None:
+            picks[(job["episode"], job["hand"], job["segment"], job["kind"])] = pick
     return picks
 
 
@@ -409,8 +454,8 @@ def cmd_score(args):
         if set(se) & set(eps):
             print("note: shift episodes overlap the scored episodes, fine for a check, not for the final run")
         tune_segs = json.loads(Path(args.shift_segments).read_text()) if Path(args.shift_segments).exists() else None
-        a_shift, c_shift = estimate_shifts(se, load_a(se), load_c(), tune_segs)
-    res, rows, gt = score_arms(eps, load_a(eps), load_c(), segs, a_shift, c_shift)
+        a_shift, c_shift = estimate_shifts(se, load_a(se), load_c(tune_segs), tune_segs)
+    res, rows, gt = score_arms(eps, load_a(eps), load_c(segs), segs, a_shift, c_shift)
     out = shifted_report(eps, res, rows, gt, a_shift, c_shift, se)
     (N1 / "arms_score.json").parent.mkdir(parents=True, exist_ok=True)
     (N1 / "arms_score.json").write_text(json.dumps(out, indent=1))

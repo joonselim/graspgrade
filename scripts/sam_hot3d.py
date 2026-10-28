@@ -7,7 +7,8 @@ Without --send nothing is sent. One request per window and prompt, prompts
 `hand` and `small object` (the object prompt was chosen on OpenGraph, EXP-02
 and EXP-03, and should be checked on a few HOT3D windows first). Output per
 window in out/number2/sam/<window_id>/, same files as sam_episodes.py.
-Done prompts are skipped.
+Done prompts are skipped. Only a "completed" response counts as done
+(see sam_episodes.send).
 """
 
 import argparse
@@ -56,7 +57,7 @@ def main():
     from openai import OpenAI
     load_env()
     client = OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MODEL_API_KEY"])
-    total = 0
+    total, failed = 0, 0
     with ThreadPoolExecutor(args.workers) as pool:
         futs = {pool.submit(send, client, *j): j for j in jobs}
         for fut in as_completed(futs):
@@ -64,10 +65,12 @@ def main():
             try:
                 info = fut.result()
                 total += info["frames_billed"] or 0
+                failed += info["status"] != "completed"  # not done, a rerun sends it again
                 print(f"{wid} {p}: {info['status']}, {info['frames_billed']} frames", flush=True)
             except Exception as exc:  # keep going, a rerun picks up what is missing
+                failed += 1
                 print(f"{wid} {p}: FAILED {exc!r}"[:300], flush=True)
-    print(f"billed {total} frames, ${total * SAM_PRICE_FRAME:.2f}")
+    print(f"billed {total} frames, ${total * SAM_PRICE_FRAME:.2f}, not done {failed}")
 
 
 if __name__ == "__main__":

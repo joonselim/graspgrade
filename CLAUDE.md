@@ -90,3 +90,5 @@ Windows 사본을 WSL로 동기화:
 | `scripts/viewer_data.py` | 뷰어 데모 데이터 (튜닝만): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
+| `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 11개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다 |
+| `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단). API 호출 없음 |

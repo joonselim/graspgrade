@@ -10,7 +10,9 @@ grasped-object tracks as 30 fps. 10 fps frame k is source frame 3k.
 
 Output per episode in out/sam10/episode_XXXXXX/:
   clip10.mp4, sam_<prompt>_events.jsonl.gz, sam_<prompt>.json (time, usage).
-Done prompts are skipped, so a failed run can simply be started again.
+Done prompts are skipped, so a failed run can simply be started again. Only a
+response with status "completed" counts as done. Any other status keeps its
+events as sam_<prompt>_events.<status>.jsonl.gz, and a rerun sends it again.
 SAM takes up to 15,000 frames per request. Our longest episode is 1,457 frames at 10 fps.
 """
 
@@ -84,12 +86,15 @@ def send(client, ep, clip, prompt):
         if ev.type in ("response.completed", "response.incomplete", "response.failed"):
             final = e.get("response")
     t_stream = time.perf_counter() - t1
+    status = final.get("status") if final else None
+    # only a completed response counts as done: anything else is kept under another name, so a rerun sends it again
+    name = f"sam_{tag}_events.jsonl.gz" if status == "completed" else f"sam_{tag}_events.{status or 'no_status'}.jsonl.gz"
     tmp = d / f"sam_{tag}_events.tmp.gz"
     with gzip.open(tmp, "wt") as fh:
         fh.write("\n".join(json.dumps(e) for e in events))
-    tmp.rename(d / f"sam_{tag}_events.jsonl.gz")
+    tmp.rename(d / name)
     usage = final.get("usage") if final else None
-    info = {"episode": ep, "prompt": prompt, "status": final.get("status") if final else None,
+    info = {"episode": ep, "prompt": prompt, "status": status,
             "upload_seconds": round(t_upload, 2), "stream_seconds": round(t_stream, 2),
             "frames_billed": (usage or {}).get("video_frames_processed"), "usage": usage}
     (d / f"sam_{tag}.json").write_text(json.dumps(info, indent=1))
@@ -142,6 +147,8 @@ def main():
             try:
                 info = fut.result()
                 total += info["frames_billed"] or 0
+                if info["status"] != "completed":
+                    failed.append((ep, p, info["status"]))
                 print(f"ep {ep} {p}: {info['status']}, {info['frames_billed']} frames, "
                       f"{info['stream_seconds']} s", flush=True)
             except Exception as exc:  # keep going, a rerun picks up what is missing

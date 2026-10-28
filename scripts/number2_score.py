@@ -14,6 +14,7 @@ Inputs, per clip (out/number2/clips_final.csv):
   Muse baseline  copyable probability (muse_hot3d.py --task baseline)
 With --check, the Muse object items are replaced by the EXP-19 stand-in grades
 and missing paid inputs are left out, so only the code path is tested.
+With --final, an item with any clip missing stops the run (it is not left out).
 
 Comparisons: our score vs Muse alone; object-only reference (copyable share
 per object in the training clips); Muse alone vs Muse plus our checks.
@@ -297,6 +298,26 @@ def cmd_gate(standin):
     print(json.dumps(out, indent=1))
 
 
+def complete_items(train, test, items, final):
+    """The items with a grade on every train and test clip.
+
+    In the final run nothing is left out without a decision: a missing grade,
+    or a missing Muse alone answer (a compared row), stops the run. In check
+    mode, items with a missing paid input are left out, as before.
+    """
+    missing = {c: int(train[c].isna().sum() + test[c].isna().sum()) for c in items}
+    if final:
+        missing["muse_baseline"] = int(train.muse_baseline.isna().sum() + test.muse_baseline.isna().sum()) \
+            if "muse_baseline" in train else len(train) + len(test)
+    missing = {c: n for c, n in missing.items() if n}
+    if missing and final:
+        raise SystemExit(f"clips without a grade, per item: {missing}. Every item must be complete on the train "
+                         "and test clips. Send what is missing (rerun the paid step) or decide on a rule first.")
+    if missing:
+        print(f"check mode, items left out (paid input missing on some clips): {missing}", file=sys.stderr)
+    return [c for c in items if c not in missing]
+
+
 def main():
     ap = argparse.ArgumentParser()
     g = ap.add_mutually_exclusive_group(required=True)
@@ -311,7 +332,7 @@ def main():
     d, items = assemble(args.check)
     train_role, test_role = ("item_train", "score_train") if args.check else ("score_train", "held_out")
     train, test = d[d.role == train_role].copy(), d[d.role == test_role].copy()
-    items = [c for c in items if train[c].notna().all() and test[c].notna().all()]
+    items = complete_items(train, test, items, final=not args.check)
     out = {"mode": "check (tuning only, stand-ins)" if args.check else "final", "train": train_role,
            "test": test_role, "items": items}
     test["our_score"], out["weights"] = fit_score(train, test, items)

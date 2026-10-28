@@ -9,6 +9,8 @@ six 720 px frames per clip from hot3d_number2_inputs.py. Prompts:
 scripts/prompts/number2_{checklist,baseline}.txt, with {hand} filled in.
 Each answer is cached in out/number2/muse/<task>/<clip_id>.json with the raw
 reply, the parsed JSON and the usage, so a rerun only sends what is missing.
+A reply that does not parse is not cached as done: it goes to
+out/number2/muse/<task>/unparsed/ and a rerun sends that clip again.
 Cost estimate before sending: 1,100 tokens per 720 px frame (EXP-01), plus the
 prompt, plus 800 output tokens (reasoning effort low, EXP-01).
 """
@@ -102,6 +104,8 @@ def call(client, task, r):
     rec = {"clip_id": r.clip_id, "task": task, "seconds": round(time.perf_counter() - t0, 2), "reply": text,
            "parsed": parse(task, text), "usage": u.model_dump() if u else None,
            "cost_usd": round(u.prompt_tokens * PRICE_IN + u.completion_tokens * PRICE_OUT, 6) if u else None}
+    if rec["parsed"] is None:  # not done: kept for reading, a rerun sends the clip again
+        dst = dst.parent / "unparsed" / f"{r.clip_id}_{time.time_ns()}.json"
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(json.dumps(rec, indent=1))
     return rec
@@ -144,7 +148,8 @@ def main():
             except Exception as exc:  # keep going, a rerun sends what is missing
                 failed += 1
                 print(f"{futs[fut]}: FAILED {exc!r}"[:300], flush=True)
-    print(f"spent ${spent:.2f}, replies that did not parse {bad}, failed {failed}")
+    print(f"spent ${spent:.2f}, replies that did not parse {bad} (kept in unparsed/, a rerun sends them again), "
+          f"failed {failed}")
 
 
 if __name__ == "__main__":
