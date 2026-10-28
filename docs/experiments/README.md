@@ -45,6 +45,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-32](exp32_arm_b_50_episodes.md) | 2026-10-28 | Arm B (SAM rule) fixed on all 50 tuning episodes (P2) | $11.89 | Leaving one episode out, arm B reaches F1 0.153 at ±5 and 0.294 at ±15, IoU 0.683 (always in contact 0.623). It makes 2.5 times too many boundaries. 46 of 50 folds pick the same rule, which is now fixed for held-out. |
 | [EXP-33](exp33_sam_held_out.md) | 2026-10-28 | SAM on the 22 held-out episodes and the fixed arm B applied (P3) | $5.45 | All 44 SAM requests completed. Arm B with the tuning rule gives 1,790 held-out boundaries (78.9 per minute, tuning 90.0), so held-out arm C costs about $23.31. Not scored yet. |
 | [EXP-34](exp34_arm_a_held_out.md) | 2026-10-29 | Arm A (Muse Spark alone) on the 22 held-out episodes (P4) | $12.44 | All 693 calls have a parsed answer after one resend of 1 call, so no fallback is used. Cost was 4.9% above the estimate. In 9 short episodes Muse Spark marks the left hand touching in at most 14% of frames. Not scored yet. |
-| [EXP-35](exp35_arm_c.md) | 2026-10-29 | Arm C, tuning shift sample (P5, part 1) | $3.09 | All 200 tuning boundaries have a parsed pick. Muse Spark moved 95 of them. Cost was 18% above the estimate, so held-out arm C would cost about $27.63. |
+| [EXP-35](exp35_arm_c.md) | 2026-10-29 | Arm C, tuning shift sample and held-out (P5) | $30.28 | All 200 tuning and 1,790 held-out boundaries have a parsed pick on the first pass. Muse Spark moved 42% of the held-out boundaries. Calls cost about 17% more than the first estimate because replies are longer. Not scored yet. |
 
-Total Meta API spend so far: about $51.93 of $150.
+Total Meta API spend so far: about $79.12 of $150.
