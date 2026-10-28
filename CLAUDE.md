@@ -5,9 +5,10 @@
 
 1. [docs/PROGRESS.md](docs/PROGRESS.md): 어디까지 했고 다음에 무엇을 할지
 2. [docs/MEASUREMENT_PLAN.md](docs/MEASUREMENT_PLAN.md): 무엇을 무엇과 비교하는지, 어느 데이터로. 다른 문서와 다르면 이 문서가 맞다
-3. [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md): 프로젝트 정의, 파이프라인, 10일 계획, 위험 (2026-10-21 원본)
-4. [docs/DATA_NOTES.md](docs/DATA_NOTES.md): 데이터에서 확인한 사실
-5. [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md): 환경, 버전 고정 이유, 함정
+3. [docs/PROPOSAL.md](docs/PROPOSAL.md): 10/28 제안서 (용도, 범위, 부드러운 물체 확인, 비교 6)
+4. [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md): 프로젝트 정의, 파이프라인, 10일 계획, 위험 (2026-10-21 원본)
+5. [docs/DATA_NOTES.md](docs/DATA_NOTES.md): 데이터에서 확인한 사실
+6. [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md): 환경, 버전 고정 이유, 함정
 
 ## 작업 규칙
 

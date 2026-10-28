@@ -1,7 +1,9 @@
 # GraspGrade measurement plan
 
-Version 2026-10-27. This page is the single source for what we compare and
-on which data. It brings the work back to the comparisons promised in the
+Version 2026-10-27, updated 2026-10-28 for the October 28 proposal
+([PROPOSAL.md](PROPOSAL.md)): comparison 6, the extra rows and the soft
+object check. This page is the single source for what we compare and on
+which data. It brings the work back to the comparisons promised in the
 proposal (October 21). Where an experiment page says something different,
 this page wins.
 
@@ -337,6 +339,8 @@ tuning clips compares its grades with these stand-ins.
 | 3 | Muse Spark alone vs Muse Spark plus our seven checks in one logistic regression | The plug-in framing: GraspGrade adds to an existing filter instead of replacing it |
 | 4 | Unseen objects: comparisons 1 and 2 again, with every learned part of our score refit without the object being scored (see "Leave one object out on held-out" below) | Held-out persons grasp the same objects as the tuning persons (EXP-20), so the object-only reference may beat our score on held-out. Our score can also rate an object it has never seen. The object-only reference cannot (0.5 by construction). |
 | 5 | Three Muse Spark rows on the same clips: Muse Spark alone (baseline prompt), Muse Spark checklist grades with fixed equal weights (no learning), Muse Spark checklist grades with a logistic regression trained on the 400 score_train clips | Splits what the checklist adds from what learning on the labels adds (see "Checklist against learning" below) |
+| 6 | Our score with the object rate added when 0, 5, 20 or all labeled tuning clips of the object exist (see "Object rate as an add-on" below) | Our score is the default for objects with no labels. The object rate is an add-on for the few objects that have them |
+| extra | AUC inside each object, and AUC for each reason a clip fails (see "What the score can and cannot tell apart" below) | Shows whether the score ranks grasps or only objects, and which failures it sees |
 
 ### Metrics
 
@@ -426,6 +430,67 @@ Reported in the final run next to the main results, whichever way it comes out.
 - The main comparisons (1 to 3) stay as they are. This one shows whether our
   score keeps its value on objects it has not seen.
 
+### Object rate as an add-on, comparison 6 (written 2026-10-28, before computing)
+
+The October 28 proposal makes our score the default and the object rate an
+add-on for objects that already have labels. Comparison 6 measures what the
+object rate adds as the number of labeled clips of the object grows.
+
+- Labeled clips: the copyable v2 labels of the tuning clips (all 2,385).
+  Every held-out object has 38 or more tuning clips.
+- k = 0, 5, 20 and all. For k = 5 and 20, k clips of the object are drawn
+  at random from its tuning clips. "All" is every tuning clip of the object.
+- Object rate from k clips: (copyable clips + 1) / (k + 2), so a rate from
+  few clips stays near one half.
+- Combined score: a logistic regression with two inputs, the logit of our
+  score and the logit of the object rate. One model per k.
+  - Trained on the 400 score_train clips. The our score input of a training
+    clip comes from a score fit without that clip's person (leave one person
+    out). Its object rate is drawn only from tuning clips of other persons.
+  - Applied to held-out clips, with our score from the final fit and the
+    object rate drawn from the tuning clips of the object.
+- k = 0 is our score alone, which is comparison 1.
+- Draws: 20 for k = 5 and k = 20 (seed 20261026 plus the draw number), each
+  with its own training and held-out rates. The reported AUC is the mean over
+  the 20 draws. k = all has one draw.
+- Rows for each k on held-out: our score, the object rate alone, and the
+  combined score.
+- Tests, paired bootstrap over the 51 held-out sequences (1,000 draws,
+  bootstrap draw b uses rate draw b modulo 20): combined minus object rate
+  alone (does our score add when labels exist) and combined minus our score
+  (does the rate add). A difference counts as a gain if its 95% interval lies
+  above 0. All are reported whatever they show.
+- Objects with no labels are comparison 4, not this one.
+
+### What the score can and cannot tell apart, extra rows (written 2026-10-28, before computing)
+
+Descriptive rows with no pass or fail. Held-out clips, with the scores of
+comparisons 1 to 5: our score, Muse Spark alone, R3 and the object-only
+reference.
+
+1. AUC inside each object.
+   - Main number: among pairs of held-out clips of the same object, one
+     copyable and one not, the share where the copyable clip has the higher
+     score (ties count half). This is the mean of the AUC per object,
+     weighted by its number of pairs. 95% interval resampling the 51
+     held-out sequences.
+   - The object-only reference gives one score to every clip of an object,
+     so it is 0.5 here by construction.
+   - Also reported: the same number inside each object and person, and a
+     table of AUC per object for objects with 5 or more clips of each kind
+     (27 of 33 objects on held-out).
+   - Pairs from the same object are about 3% of all copyable and not
+     copyable pairs on held-out, so this number can be low while the pooled
+     AUC is high.
+2. AUC for each reason a clip fails.
+   - Reason: the first condition of the v2 label that fails, in the order
+     grip, reach, collision (`failed_condition` in
+     `benchmark/number2/clips.csv`). Each failing clip has one reason.
+   - For each reason, the AUC of copyable clips against the clips that fail
+     for that reason. On held-out: 662 copyable, 80 grip, 146 reach, 538
+     collision. 95% interval resampling sequences.
+   - The grip row has few clips, so its interval is wide.
+
 ### Checks before any paid call
 
 - Single-check AUC of the three local checks on tuning clips (EXP-12).
@@ -465,6 +530,108 @@ Reported in the final run next to the main results, whichever way it comes out.
 - Result (EXP-25): undistortion fails the rule (hand found -10.3 points, 2D
   error 10.8% worse, hand shape error 6.9% better). Decided: raw preview,
   fisheye reported as a limit.
+- Comparison 2 in code: `number2_score.py` takes the object share from the
+  400 score_train clips only. This page says the tuning clips, and EXP-17
+  (0.741) used all of them. To fix in code before the final run: all 2,385
+  tuning clips, the same source as comparison 6.
+
+## Soft object check (written 2026-10-28, before any call)
+
+The October 28 proposal limits the score to rigid objects. A soft object
+changes shape in the hand, so the object items do not settle whether a robot
+hand can copy the grasp. One more Muse Spark question per clip takes these
+clips out of the score.
+
+### Ground truth
+
+- Every object name is labeled rigid, squeezable or soft by the two team
+  members, each on their own, from the name and one frame of the object,
+  before any soft check call (pilot included).
+  - The sheet is `splits/softness_labels.csv`: 33 HOT3D objects and 71
+    OpenGraph target object names, with clip and segment counts per split.
+  - When both are done, they settle disagreements together in the `agreed`
+    column. Agreement before that (share and Cohen's kappa) is reported.
+  - The sheet is committed before the first call.
+- Definitions (the same words go into the prompt):
+  - rigid: keeps its shape in a normal grasp (a can, a mug, a hard plastic
+    box, a tool),
+  - squeezable: keeps its shape, but its walls give a little under a firm
+    squeeze (a plastic squeeze bottle, a paper carton, a thin plastic cup),
+  - soft: changes shape in a normal grasp (a sponge, cloth, a glove, bubble
+    wrap, a bag, a plant).
+- HOT3D tracks every object as a rigid body, and the copyable label treats
+  it so. Some objects (bottle_bbq, bottle_mustard, bottle_ranch, carton_milk,
+  carton_oj, 11.9% of held-out clips) may be labeled squeezable. They stay
+  in the score.
+
+### Data
+
+- HOT3D: all 1,426 held-out clips. Frames f1, f2 and f3 of the existing Muse
+  frames (contact start, one third and two thirds into the contact).
+- OpenGraph: contact segments of the cleaned glove (the number 1 ground
+  truth), per hand. The object of a segment is the most common
+  `annotation.target_object` over its frames (in the median segment every
+  frame has the same object). Three segments whose name is a list of objects
+  or "no object" are left out.
+  - all 286 held-out segments,
+  - plus every tuning segment whose object is labeled soft.
+- Why tuning segments too: held-out OpenGraph has about a dozen segments
+  with soft looking objects (sponges, bubble wrap). The soft check learns
+  nothing from labels. The prompt is fixed here, and the answer is used as
+  it is. So tuning segments are as new to it as held-out segments. Held-out
+  results are also shown alone.
+- Frames: the first frame of the segment, one third in and two thirds in,
+  from the 720p episode video.
+
+### Call
+
+- One Muse Spark call per clip or segment, 3 frames, reasoning effort low
+  (as in the other calls). The prompt, fixed now (`{hand}` is left or right):
+
+  > These are 3 frames in time order from a first-person video. The person's
+  > {hand} hand is holding or touching an object. Look at that object only.
+  > How does it behave in a normal grasp? rigid: it keeps its shape (for
+  > example a can, a mug, a hard plastic box, a tool). squeezable: it keeps
+  > its shape, but its walls give a little under a firm squeeze (for example
+  > a plastic squeeze bottle, a paper carton, a thin plastic cup). soft: it
+  > changes shape in a normal grasp (for example a sponge, cloth, a glove,
+  > bubble wrap, a bag, a plant). unsure: you cannot tell from these frames.
+  > Answer with JSON only: {"object": "<short name>", "softness": "rigid,
+  > squeezable, soft or unsure", "reason": "<one sentence>"}
+
+- A clip is held back ("needs a touch check", no score) if the answer is
+  soft or unsure. Rigid and squeezable keep their score.
+- A reply that does not parse (no JSON, or softness not one of the four
+  words) is sent once more. If it still does not parse, it counts as unsure,
+  and the count is reported.
+- Pilot before the full run, to measure cost and parsing: 10 HOT3D
+  score_train clips and 10 OpenGraph tuning segments of objects labeled
+  rigid or squeezable (seed 20261026). None of them is in the evaluation.
+  The prompt does not change after the pilot, except the line on the JSON
+  format if 3 or more of the 20 replies do not parse.
+- This is a new prompt. "No further revision" in the prompt revision section
+  covers the checklist and arm A, and those do not change.
+
+### Metrics and pass
+
+- Caught: the share of OpenGraph segments with a soft object that are held
+  back. For all of them, held-out alone, tuning alone, and per object. 95%
+  interval resampling objects, because segments of one object are related.
+- Held back by mistake: the share of HOT3D held-out clips held back. All of
+  them count, because the score covers every HOT3D object. Also by human
+  label (rigid, squeezable), per object, and on OpenGraph rigid and
+  squeezable segments.
+- A table of the human label against the Muse Spark answer.
+- Our score AUC on the HOT3D held-out clips the check keeps, with its
+  interval resampling sequences, next to the AUC on all 1,426 clips.
+  Comparisons 1 to 6 stay on all 1,426 clips. The check does not change them.
+- Pass: 70% or more of the OpenGraph soft object segments caught, and 10% or
+  less of the HOT3D held-out clips held back.
+- Too few: if fewer than 20 segments or fewer than 4 objects are labeled
+  soft, the caught share is reported with its counts, and no pass or fail is
+  given.
+- If it does not pass: the viewer still shows the touch check list, marked
+  as not validated, and the summary does not claim that the check works.
 
 ## One prompt revision on tuning (written 2026-10-28, before sending any revised prompt)
 
@@ -539,7 +706,8 @@ Estimates at measured prices, $150 in total.
 | Number 1, Muse arm C: held-out boundaries (the EXP-24 arm B finds about 120 per episode, so about 2,600) plus 200 tuning boundaries for the arm C shift. Depends on the arm B chosen on 50 episodes | about $37 |
 | Number 2, SAM: all held-out clips plus 400 tuning clips, overlapping clips in one request | about $27 |
 | Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips unless the gate says stop | about $7.7 + $27.6 |
-| Total | about $132 |
+| Soft object check: 1,426 HOT3D clips at about $0.0075 and about 330 OpenGraph segments at about $0.0094 (3 frames each), plus a pilot of 20 | about $14 |
+| Total | about $146 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
 frames). Each arm is first run on one tuning episode or a few clips to
