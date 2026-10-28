@@ -368,6 +368,10 @@
   /* key experiments page */
   .ch { margin-top: 26px; }
   .ch h3 { margin: 0 0 8px; }
+  /* experiment list: only key experiments until asked */
+  table:not(.show-all) tr.minor { display: none; }
+  .more-btn { font: inherit; font-size: 14px; color: var(--done); background: none; border: 0; padding: 0; cursor: pointer; }
+  .more-btn:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -408,28 +412,14 @@
   <section>
     <h2><span class="no">2</span>요약</h2>
     <ul class="summary">
-      <li><b>첫 실제 Muse Spark 결과(튜닝, EXP-29).</b> 평가 2에서 Muse Spark에게 "로봇 손이 따라할 수 있나"를 직접 물으면 AUC 0.52로 동전 던지기에 가깝고, 같은 Muse Spark에게 체크리스트 항목별로 물으면 0.63~0.65로 오름(+0.11, 구간이 0 위). 라벨로 가중치를 배우는 이득은 +0.019로 잡음 안. 학습에서 뺀 처음 보는 물체에서도 0.607을 지킴. 아는 물체에서는 물체 이름만으로 0.688이라 여전히 이 기준선이 나음. 평가 1에서는 Muse Spark가 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝내며, 장갑으로 배운 보정이 경계 F1을 두 배로 만듦. 오류를 보면 Muse Spark는 물체를 실제보다 작고 좁게 보고, 1초보다 짧게 손을 놓는 순간을 거의 못 봄. 프롬프트를 한 번 고쳐 봤지만 점수가 오르지 않아 미리 정한 규칙대로 1판을 씀(EXP-30).</li>
-      <li>데이터 준비, 평가 분할 고정, Meta API(SAM 3.1, Muse Spark) 연결 완료. 현재 평가 1(접촉 구간 검출) 진행 중. 접촉 추정과 채점 코드는 준비됐고, 에피소드 전체를 SAM에 넣는 파일럿 3개가 끝남.</li>
-      <li>파일럿 3개 첫 결과: 접촉 구간 IoU 0.64, 경계 F1 0.31(±15프레임), 0.18(±5프레임). 마스크만으로는 ±5프레임 경계가 안 나와 Muse Spark 경계 확인이 필요함. 튜닝 50개로 다시 재기 전의 초기 수치.</li>
-      <li>보이는 접촉이 장갑 압력보다 약 0.2초 먼저 시작함. 끝은 지연 없음.</li>
-      <li>데이터셋의 접촉 라벨과 실제 촉각 신호가 프레임 기준 97~99% 일치. 평가 1의 정답으로 그대로 사용 가능.</li>
-      <li>SAM 3.1 설정 확정. 물체 프롬프트는 <code>small object</code>, 입력은 10fps. 10fps 결과는 30fps와 마스크 IoU 0.97 이상으로 같음.</li>
-      <li>SAM 3.1은 MediaPipe가 손을 거의 놓치는 장면(검출률 14%)에서도 양손을 모든 프레임에서 검출.</li>
-      <li>측정 계획을 지원서의 비교 구조로 다시 맞춤. 평가 1은 촉각 장갑을 정답으로 세 방법을 비교하고, 평가 2는 검증 클립 1,426개에서 우리 점수를 Muse Spark 단독과 비교함. 유료 호출은 지금 보류 중.</li>
-      <li>평가 1의 방법 B(SAM 규칙) 코드 완성. 파일럿에서 접촉 구간 IoU는 0.75로 "항상 접촉"보다 낫지만, 연이은 접촉을 하나로 묶어 경계를 잘 못 찾음.</li>
-      <li>평가 1의 A(Muse Spark 단독)와 C(B + Muse Spark 경계 확인) 코드 완성. 정답을 그대로 답으로 줘 최고 점수를 재니 A는 5fps에서도 경계 F1(±5) 0.96, C는 B가 찾은 경계 190개 중 52개에 묶여 0.15. 유료 실행 전에 C를 공정한 비교로 만드는 방법을 정해야 함.</li>
-      <li>가장 가까운 물체가 바뀌면 B가 접촉을 끊게 하니 파일럿에서 B의 경계 F1과 C의 최고 점수가 두 배(0.32)가 됨. 대신 긴 쥐기를 잘게 쪼개 경계가 실제의 두 배. 새 물체가 몇 프레임 유지될 때만 끊게 하면 IoU는 오르지만 F1은 조금 내려가는 맞바꿈이고, 경계 수를 맞춰도 자리가 틀린 경우가 많음(EXP-24). 튜닝 50개에서 정함.</li>
-      <li>평가 2 클립 완성. 모션캡처로 잘라 튜닝 2,385개, 검증 1,426개.</li>
-      <li>평가 2 정답 라벨을 다시 만듦. 처음 라벨은 손 크기 비율로 늘린 리타게팅 탓에 Allegro 손가락 끝이 사람 손가락 끝에서 31mm 떨어져, 로봇 손보다 리타게팅의 부작용을 쟀음. 새 라벨 v2는 손가락 위치를 맞춘 뒤 메쉬 충돌과 접촉점 도달을 검사함. 튜닝 47%가 "따라할 수 있음"이고 손 크기와 거의 관계없음(+0.04). 다만 허용 깊이에 민감함(2mm 18%, 10mm 66%). 같은 기준으로 검증 클립 1,426개는 46.4%, 사람별 43~51%.</li>
-      <li>v2 라벨에서는 물체 종류만으로 AUC 0.74. 영상 손 모양 항목은 0.52로 신호를 잃었고(이전 라벨의 0.63은 리타게팅 부작용을 배운 것), 영상 항목을 다 합쳐도 물체 위에 약 0.01만 더함. 체크리스트는 영상 품질을 재는데 정답은 주로 물체의 성질.</li>
-      <li>평가 2 방향 결정: 질문과 v2 라벨은 그대로 두고 "물체 성질" 항목을 구체적인 물체 항목(손 대비 크기, 길이, 납작함, 폭, 손잡이, 주변 물체)으로 늘림. 물체 3D 모델의 크기·모양 숫자 7개만으로 0.695(물체 이름 0.742), 처음 보는 물체에서도 0.673이 나와 미리 정한 기준을 통과함.</li>
-      <li>물체 항목 6개(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간)를 상·중·하 기준과 함께 고정. 정답에서 낸 대리 등급으로 0.683, 처음 보는 물체 0.666으로 통과. 손 대비 크기가 대부분을 설명함. Muse Spark가 영상에서 이 등급을 읽는지는 짧은 유료 파일럿으로 먼저 확인.</li>
-      <li>Muse Spark 게이트(튜닝 400개)는 빡빡함. 완벽한 대리 등급으로도 사람 하나씩 빼기 0.657로 기준 0.65를 겨우 넘고, 파일럿 수준의 일치율(90%)이면 "약함"이 예상돼 검증 클립에 보내기 전에 결정이 필요할 수 있음. 튜닝에서는 물체 기준선이 우리 점수를 이기지만(0.776 대 0.721), 처음 보는 물체에서는 우리 점수가 0.675를 지키고 물체 기준선은 0.5.</li>
-      <li>튜닝 점검에서 Muse Spark 체크리스트 등급의 가중치를 배우면 단순 평균보다 AUC가 +0.067 높음(주로 감쌀 폭과 손잡이의 방향을 바로잡아서). 사람 3명짜리 검증 세트로도 이 차이를 잡아낼 수 있음. 평가 1의 시점 보정 코드도 점검을 통과함.</li>
-      <li>두 정답을 누구나 영상 필터를 채점할 수 있는 벤치마크로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현해, 최종 점수가 어떻게 나오든 남는 결과물.</li>
-      <li>HOT3D 어안 영상은 왜곡을 풀지 않음. 풀면 MediaPipe가 손을 10%p 덜 찾아 미리 정한 기준을 통과하지 못함. 원본을 쓰고 한계로 보고.</li>
-      <li>평가 2 첫 유료 파일럿(튜닝 클립 5개): SAM은 붐비는 HOT3D 탁자에서도 잡은 물체를 접촉 프레임 99%에서 찾고, 우리 코드가 92%에서 그것을 손에 가장 가까운 물체로 고름. Muse Spark의 물체 등급은 3D 모델 대리 등급과 30개 중 27개 일치.</li>
-      <li>손과 물체의 2D 겹침만으로는 접촉 여부를 가릴 수 없음. 접촉 신호에 손과 물체의 동반 이동을 함께 사용.</li>
+      <li><b>평가 1, 접촉 시점.</b> 장갑 압력이 정답으로 쓸 만함(데이터셋 라벨과 97~99% 일치, EXP-04). 영상 방법은 접촉이 이어지는 구간은 잘 잡지만(IoU 0.72~0.82), 시작과 끝을 ±5프레임 안으로 맞추기는 어려움(경계 F1 0.13~0.15, 튜닝).</li>
+      <li>SAM 규칙(방법 B)은 손이 늘 물체 곁에 있어 연이은 접촉을 하나로 묶음. 가장 가까운 물체가 바뀌면 끊게 해도 경계의 개수보다 위치가 틀림(EXP-14, EXP-22, EXP-24).</li>
+      <li>Muse Spark 단독(방법 A)은 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝냄. 장갑으로 배운 시점 보정이 경계 F1을 0.06에서 0.13으로 두 배로 만듦. 1초보다 짧게 손을 놓는 순간은 프롬프트를 고쳐도 거의 못 봄(EXP-29, EXP-30).</li>
+      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 첫 정답 라벨은 로봇이 아니라 사람 손을 로봇 손으로 옮기는 방식의 부작용을 측정함(EXP-15). 충돌과 도달을 검사하는 v2 라벨로 바꿈: 튜닝 47%, 검증 46.4%, 손 크기와 무관(EXP-16, EXP-20).</li>
+      <li>v2 라벨을 가르는 것은 영상 품질이 아니라 물체. 물체 종류만으로 AUC 0.74이고, 원래 체크리스트의 영상 항목은 0.01만 더함(EXP-17). 그래서 "물체 성질"을 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목으로 나눔(EXP-18, EXP-19).</li>
+      <li>실제 Muse Spark에게 따라할 수 있는지 직접 물으면 0.52로 우연 수준이고, 같은 모델에게 체크리스트 항목별로 물으면 0.63~0.65. 학습에서 뺀 처음 보는 물체에서도 0.607을 유지함. 아는 물체에서는 물체 이름만으로 0.688이라 이 기준선이 아직 높음(EXP-29, 튜닝).</li>
+      <li><b>결과물.</b> 두 정답을 라벨 파일과 채점 코드로 묶음. 다른 팀이 자기 영상 선별 결과를 센서 기준으로 채점할 수 있음(EXP-28).</li>
+      <li><b>남은 것.</b> 검증 세트에서 세 방법(평가 1)과 다섯 비교(평가 2)를 한 번 측정함. 위 수치 중 튜닝이라고 적은 것은 확정이 아님.</li>
     </ul>
 
     <div class="tbl">
@@ -438,14 +428,12 @@
         <table class="min">
           <thead><tr><th>지표</th><th class="n">값</th><th>기준</th></tr></thead>
           <tbody>
-            <tr><td class="first">접촉 라벨과 촉각 신호 일치 (왼손 / 오른손)</td><td class="n">98.7% / 97.2%</td><td>전체 138,629 프레임, 촉각 임계값 800</td></tr>
-            <tr><td class="first">접촉 시작 시점 ±5프레임 이내 (오른손 / 왼손)</td><td class="n">93.5% / 79.6%</td><td>±5프레임 = ±0.167초</td></tr>
-            <tr><td class="first">접촉 구간</td><td class="n">261개</td><td>72개 에피소드</td></tr>
-            <tr><td class="first">SAM 3.1 손 검출 (스프레이병 장면)</td><td class="n">150 / 150 프레임</td><td>같은 유형 장면 MediaPipe 14%</td></tr>
-            <tr><td class="first">10fps 대 30fps 마스크 일치 (손, 잡는 물체)</td><td class="n">IoU 0.97~0.99</td><td>에피소드 2개, 50프레임씩</td></tr>
+            <tr><td class="first">평가 1: 데이터셋 라벨과 장갑 압력 일치 (왼손 / 오른손)</td><td class="n">98.7% / 97.2%</td><td>138,629 프레임 (EXP-04)</td></tr>
+            <tr><td class="first">평가 1: SAM 규칙 경계 F1 ±5 / 접촉 IoU</td><td class="n">0.145 / 0.718</td><td>튜닝 파일럿 3개 (EXP-24)</td></tr>
+            <tr><td class="first">평가 1: Muse Spark 경계 F1 ±5, 보정 전 / 후</td><td class="n">0.06 / 0.13</td><td>시작 −7, 끝 +7프레임 보정 (EXP-29)</td></tr>
+            <tr><td class="first">평가 2: v2 라벨 "따라할 수 있음" 비율 (튜닝 / 검증)</td><td class="n">47.0% / 46.4%</td><td>클립 2,385 / 1,426 (EXP-16, EXP-20)</td></tr>
             <tr><td class="first">평가 2: Muse Spark 단독 / 체크리스트 / 물체 이름</td><td class="n">0.52 / 0.65 / 0.69</td><td>튜닝 400개, 사람 하나씩 빼기 AUC (EXP-29)</td></tr>
-            <tr><td class="first">평가 2: 처음 보는 물체에서 체크리스트 점수</td><td class="n">0.607</td><td>물체 이름 기준선은 0.5 (EXP-29)</td></tr>
-            <tr><td class="first">평가 1: Muse Spark 시점 차이 (시작 / 끝)</td><td class="n">−7 / +7 프레임</td><td>장갑 대비, 보정 후 F1 ±5 0.06 → 0.13 (EXP-29)</td></tr>
+            <tr><td class="first">평가 2: 처음 보는 물체에서 체크리스트 점수</td><td class="n">0.607</td><td>물체 이름은 0.5 (EXP-29)</td></tr>
           </tbody>
         </table>
       </div>
@@ -454,7 +442,7 @@
 
   <section id="s-measure">
     <h2><span class="no">3</span>측정 계획</h2>
-    <p>무엇을 무엇과 비교하는지 고정했다. 기준값, 가중치, 프롬프트는 모두 튜닝 세트에서 정하고, 보고하는 수치는 모두 검증 세트에서 낸다. 입력은 영상뿐이고 장갑과 모션캡처는 채점에만 쓴다.</p>
+    <p>기준값, 가중치, 프롬프트는 튜닝 세트에서 정하고, 보고하는 수치는 검증 세트에서 냄. 입력은 영상뿐이고 장갑과 모션캡처는 채점에만 씀.</p>
 
     <div class="tbl">
       <p class="cap">평가 1: 영상만으로 접촉 시작과 끝을 찾는가</p>
@@ -470,7 +458,7 @@
         </table>
       </div>
     </div>
-    <p class="note">정답은 정리한 촉각 장갑(손당 80개 센서 합 &gt; 800에서 0.1초 이하 끊김은 잇고 0.1초보다 짧은 조각은 버림). 장갑 원신호와 데이터셋 라벨은 확인용으로 같이 보고(EXP-14에서 확정). 지표는 boundary F1(±5, ±15프레임)과 contact IoU, 손별과 합산. B의 시작·끝 지연도 함께 보고. 보이는 접촉은 장갑 압력보다 먼저 시작하므로 세 방법 모두 튜닝에서 배운 시점 보정(시작과 끝을 따로, 장갑 대비 오차 중앙값만큼 옮김)을 받고, 보정 전후를 둘 다 보고함(A, A + 보정, B, C, C + 보정). 보정이 의미 있는지는 검증 에피소드 22개 짝지은 부트스트랩으로 확인. 장갑은 압력을 재고 영상은 압력을 볼 수 없으므로 ±5프레임에서는 세 방법 모두 낮게 나올 수 있고, 주장하는 것은 방법 사이의 차이다.</p>
+    <p class="note">정답은 깜빡임을 정리한 촉각 장갑(EXP-14). 지표는 경계 F1(±5, ±15프레임)과 접촉 IoU. 세 방법 모두 튜닝에서 배운 시점 보정을 받고 보정 전후를 함께 보고함(EXP-27, EXP-29).</p>
 
     <div class="tbl" style="margin-top:18px">
       <p class="cap">평가 2: 우리 점수가 로봇 손이 따라할 수 있는 클립을 고르는가</p>
@@ -479,15 +467,15 @@
           <thead><tr><th>비교</th><th>이유</th></tr></thead>
           <tbody>
             <tr><td class="first">우리 점수 대 Muse Spark 단독</td><td>체크리스트 없이 같은 질문을 받은 Muse Spark와의 비교. 지원서의 주 비교</td></tr>
-            <tr><td class="first">물체 기준선</td><td>튜닝 클립에서 잰 물체별 "따라할 수 있음" 비율만으로 예측. 물체 종류만으로 얼마나 맞히는지 보여주는 참고값(v2 라벨에서 물체별 1~96%)</td></tr>
+            <tr><td class="first">물체 기준선</td><td>물체별 "따라할 수 있음" 비율만으로 예측하는 참고값</td></tr>
             <tr><td class="first">Muse Spark 대 Muse Spark + 12개 항목</td><td>GraspGrade가 기존 필터를 대체하지 않고 그 위에 더하는 구조인지 확인</td></tr>
-            <tr><td class="first">처음 보는 물체에서 위 비교 다시</td><td>검증 세트의 사람도 튜닝 사람과 같은 물체를 잡아서(EXP-20) 물체 기준선이 주 비교에서 이길 수 있음. 검증 물체마다 우리 점수에서 라벨로 배우는 부분을 그 물체 없이 다시 학습해 채점. 물체 기준선은 처음 보는 물체를 채점할 수 없어 0.5. 결과 방향과 상관없이 주 결과 옆에 냄</td></tr>
-            <tr><td class="first">체크리스트 대 학습</td><td>Muse Spark 답만 쓴 세 줄을 같은 검증 클립에서 비교: Muse Spark 단독 확률, 체크리스트 등급 7개의 단순 평균(학습 없음), 같은 등급 7개의 로지스틱 회귀(튜닝 400개로 학습). 체크리스트로 묻는 것의 몫과 라벨에서 배우는 것의 몫을 나눔</td></tr>
+            <tr><td class="first">처음 보는 물체에서 위 비교 다시</td><td>검증 물체마다 그 물체 없이 다시 학습해 채점. 물체 이름으로는 처음 보는 물체를 채점할 수 없음(0.5)</td></tr>
+            <tr><td class="first">체크리스트 대 학습</td><td>Muse Spark 단독, 체크리스트 등급 단순 평균, 같은 등급의 학습 가중치를 비교해 체크리스트의 몫과 학습의 몫을 나눔</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <p class="note">정답은 Allegro 로봇 손 기준 "따라할 수 있음". 처음 만든 정답 라벨(EXP-10)의 정의는 리타게팅 부작용을 주로 재서 보류했다(EXP-15). 새 정의(계산 전에 고정): 위치 맞춤으로 옮긴 Allegro 손을 손목 최대 2cm 옮겨 보며, (1) 엄지 끝과 다른 손가락 끝 하나가 표면 1.5cm 안, (2) 표면 15mm 안에 있는 사람 손가락(엄지, 검지, 중지, 약지)마다 대응하는 Allegro 손가락 끝이 2cm 안, (3) 링크마다 약 300점을 뽑은 손 표면이 물체 안 5mm보다 깊이 들어가지 않음. 세 조건을 함께 만족하는 위치가 하나라도 있으면 "따라할 수 있음". 받아들이는 기준은 비율 20~80%, 같은 물체 안 손 크기 상관 |r| ≤ 0.1. 튜닝에서 47%, +0.04로 받아들여짐(EXP-16). 같은 기준으로 검증 46.4%, 물체별 비율은 튜닝과 순위 상관 0.85(EXP-20). 깊이 한도별 곡선을 항상 같이 보고한다. 이 라벨에서 물체 기준선은 0.74, 우리 영상 항목은 물체 위에 약 0.01만 더한다(EXP-17). 그래서 "물체 성질"을 Muse Spark가 매기는 구체적인 물체 항목 여러 개로 늘린다. 물체 형상만으로 0.695, 처음 보는 물체에서 0.673(EXP-18). 상·중·하 물체 항목 6개의 대리 등급으로 0.683, 0.666(EXP-19). 가중치는 튜닝 클립 무작위 400개로 학습하고, AUC는 검증 클립 1,426개 전부에서 냄. 지표는 AUC와 95% 부트스트랩 구간(클립이 아니라 시퀀스 51개 단위로 재추출), 사람별 AUC, 점수 상위 20% 안의 "따라할 수 있음" 비율 대 기본 비율. 전체 클립과 한 손 클립만 따로 보고. 사람마다 비율이 크게 달라 사람을 합친 AUC는 사람을 줄 세우게 되므로, 사람별 AUC를 합친 AUC 옆에 항상 같이 둠(EXP-12).</p>
+    <p class="note">정답은 v2 라벨: 사람 손가락 위치에 맞춘 Allegro 손이 잡기, 도달, 충돌 없음 세 조건을 만족하면 "따라할 수 있음"(EXP-16). 가중치는 튜닝 400개로 학습하고 AUC는 검증 1,426개에서 냄. 사람별 AUC와 시퀀스 단위 부트스트랩 구간을 함께 보고함.</p>
   </section>
 
   <section>
@@ -497,19 +485,19 @@
         <table class="min">
           <thead><tr><th>번호</th><th>내용</th><th>결론</th></tr></thead>
           <tbody>
-            <tr><td class="first"><a href="#exp-01">EXP-01</a></td><td class="wrap-ok">Meta API 연결 확인</td><td>SAM 3.1, Muse Spark 모두 OpenGraph 영상에서 동작. 응답 형식 확인.</td></tr>
-            <tr><td class="first"><a href="#exp-02">EXP-02</a></td><td class="wrap-ok">물체 프롬프트, 작은 용기</td><td>일반 프롬프트 중 <code>small object</code>만 동작. 2D 겹침으로는 접촉 구분 불가.</td></tr>
-            <tr><td class="first"><a href="#exp-03">EXP-03</a></td><td class="wrap-ok">물체 프롬프트, 스프레이병</td><td><code>small object</code>가 큰 물체도 전 프레임 검출. 물체 프롬프트로 채택.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-01">EXP-01</a></td><td class="wrap-ok">Meta API 연결 확인</td><td>SAM 3.1, Muse Spark 모두 OpenGraph 영상에서 동작. 응답 형식 확인.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-02">EXP-02</a></td><td class="wrap-ok">물체 프롬프트, 작은 용기</td><td>일반 프롬프트 중 <code>small object</code>만 동작. 2D 겹침으로는 접촉 구분 불가.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-03">EXP-03</a></td><td class="wrap-ok">물체 프롬프트, 스프레이병</td><td><code>small object</code>가 큰 물체도 전 프레임 검출. 물체 프롬프트로 채택.</td></tr>
             <tr><td class="first"><a href="#exp-04">EXP-04</a></td><td class="wrap-ok">API 없이 데이터 점검</td><td>라벨은 촉각 임계값 800에서 일치. 머리 IMU로 카메라 흔들림 측정 가능.</td></tr>
-            <tr><td class="first"><a href="#exp-05">EXP-05</a></td><td class="wrap-ok">입력 30fps 대 10fps</td><td>손과 잡는 물체 마스크가 같음. 10fps로 결정.</td></tr>
-            <tr><td class="first"><a href="#exp-06">EXP-06</a></td><td class="wrap-ok">접촉 구간 검출 파일럿</td><td>에피소드 전체에서 손 추적 유지. 경계 F1 0.18(±5)로 마스크만으로는 부족. 이 로지스틱 회귀는 이후 부록으로 돌림.</td></tr>
-            <tr><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 규모 가늠용이고 실제 클립 세트는 평가 2 클립 실험(EXP-11)에서 다시 자름.</td></tr>
-            <tr><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-05">EXP-05</a></td><td class="wrap-ok">입력 30fps 대 10fps</td><td>손과 잡는 물체 마스크가 같음. 10fps로 결정.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-06">EXP-06</a></td><td class="wrap-ok">접촉 구간 검출 파일럿</td><td>에피소드 전체에서 손 추적 유지. 경계 F1 0.18(±5)로 마스크만으로는 부족. 이 로지스틱 회귀는 이후 부록으로 돌림.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D 잡기 클립 수</td><td>쓸 만한 클립 2,152개. 규모 가늠용이고 실제 클립 세트는 평가 2 클립 실험(EXP-11)에서 다시 자름.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D 카메라 보정 방향</td><td>보정값과 2D 박스는 원본 방향 기준. 영상에 쓰려면 시계 방향 90도 회전.</td></tr>
             <tr><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D 손가락 끝 3D 위치</td><td>UmeTrack만으로 손가락 끝을 얻음. 잡는 동안 표면에서 중앙값 2.3mm. MANO 불필요.</td></tr>
             <tr><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">로봇 재현 정답 라벨과 쏠림 점검</td><td>Allegro 기준 "따라할 수 있음" 54%. 라벨 방식 점검(EXP-15)에서 이 라벨이 리타게팅 부작용을 주로 잰다고 확인돼 v2로 교체.</td></tr>
-            <tr><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
-            <tr><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">무료 채점 항목의 신호와 물체 기준선</td><td>무료 항목 3개는 측정은 정확하지만 "따라할 수 있음" 예측력 없음(AUC 0.49~0.53). 물체만으로 0.70. v2 라벨에서는 물체 0.74, 무료 항목 0.53(EXP-17).</td></tr>
-            <tr><td class="first"><a href="#exp-13">EXP-13</a></td><td class="wrap-ok">손 모양으로 바꾼 리타게팅 항목</td><td>영상 손 모양 0.63, 물체와 합치면 0.72(물체만 0.69). 리타게팅 항목을 "손 모양 적합도"로 교체. v2 라벨에서는 0.52로 신호 사라짐(EXP-17).</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">평가 2 클립과 검증 세트 라벨</td><td>모션캡처로 자른 클립 튜닝 2,385개, 검증 1,426개. 검증 세트도 52%가 "따라할 수 있음".</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">무료 채점 항목의 신호와 물체 기준선</td><td>무료 항목 3개는 측정은 정확하지만 "따라할 수 있음" 예측력 없음(AUC 0.49~0.53). 물체만으로 0.70. v2 라벨에서는 물체 0.74, 무료 항목 0.53(EXP-17).</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-13">EXP-13</a></td><td class="wrap-ok">손 모양으로 바꾼 리타게팅 항목</td><td>영상 손 모양 0.63, 물체와 합치면 0.72(물체만 0.69). 리타게팅 항목을 "손 모양 적합도"로 교체. v2 라벨에서는 0.52로 신호 사라짐(EXP-17).</td></tr>
             <tr><td class="first"><a href="#exp-14">EXP-14</a></td><td class="wrap-ok">방법 B(SAM 규칙) 파일럿</td><td>코드는 완성. IoU 0.75로 "항상 접촉"(0.67)보다 낫지만 연이은 접촉을 묶어 경계를 52개만 찾음.</td></tr>
             <tr><td class="first"><a href="#exp-15">EXP-15</a></td><td class="wrap-ok">정답 라벨 방식 점검</td><td>EXP-10 라벨은 주로 리타게팅 부작용을 잼(손가락 끝 31mm 어긋남). 충실하게 옮기면 94~96%가 "따라할 수 있음". 미리 정한 기준을 통과한 방식 없음. v2로 교체(EXP-16).</td></tr>
             <tr><td class="first"><a href="#exp-16">EXP-16</a></td><td class="wrap-ok">정답 라벨 v2 (메쉬 충돌, 접촉점 도달)</td><td>미리 정한 규칙 통과: 47%가 "따라할 수 있음", 손 크기 상관 +0.04. 실패는 주로 충돌(25.5%)과 도달(10.9%). 깊이 한도에 민감함.</td></tr>
@@ -519,11 +507,11 @@
             <tr><td class="first"><a href="#exp-20">EXP-20</a></td><td class="wrap-ok">검증 클립 v2 라벨</td><td>고정한 기준으로 검증 46.4%(튜닝 47.0%), 사람별 43~51%. 물체별 비율이 튜닝과 순위 상관 0.85. 라벨만 냈고 채점은 아직.</td></tr>
             <tr><td class="first"><a href="#exp-21">EXP-21</a></td><td class="wrap-ok">평가 1 각 방법의 최고 점수</td><td>완벽한 답이면 A(5fps)는 경계 F1 ±5에서 0.96이라 5fps는 걸림돌이 아님. C는 B가 찾은 경계에 묶여 최고 0.15.</td></tr>
             <tr><td class="first"><a href="#exp-22">EXP-22</a></td><td class="wrap-ok">물체 바뀜으로 끊는 방법 B</td><td>경계 F1이 두 배(±5 0.15, ±15 0.32), C 최고 점수도 0.32. 하지만 경계 392개(실제 190)로 너무 많이 끊고 IoU 0.66.</td></tr>
-            <tr><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">평가 2 유료 파일럿</td><td>SAM이 접촉 프레임 99%에서 잡은 물체를 찾고 우리 코드가 92%에서 그것을 고름. Muse Spark 물체 등급은 대리 등급과 30개 중 27개 일치. 계획 변경 없음.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">평가 2 유료 파일럿</td><td>SAM이 접촉 프레임 99%에서 잡은 물체를 찾고 우리 코드가 92%에서 그것을 고름. Muse Spark 물체 등급은 대리 등급과 30개 중 27개 일치. 계획 변경 없음.</td></tr>
             <tr><td class="first"><a href="#exp-24">EXP-24</a></td><td class="wrap-ok">새 물체가 유지될 때만 끊는 방법 B</td><td>3프레임 기다리면 IoU 0.66 → 0.72지만 F1 ±5는 0.151 → 0.145. 경계 수를 맞춰도 F1 0.09라 자리가 틀린 게 문제. 선택지는 튜닝 50개 격자에 남김.</td></tr>
-            <tr><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">어안 왜곡을 풀면 MediaPipe가 나아지는가</td><td>아님. 왜곡을 풀면 손을 10%p 덜 찾고(70.6% → 60.3%) 2D 지점도 나빠짐. 원본을 쓰고 어안은 한계로 보고.</td></tr>
-            <tr><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</td><td>코드는 계획대로 동작. 게이트가 빡빡해 완벽한 등급으로도 0.657로 겨우 통과, 파일럿 일치율이면 "약함" 예상. 처음 보는 물체에서 우리 점수 0.675, 물체 기준선 0.5.</td></tr>
-            <tr><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력</td><td>배운 시점 보정이 6프레임 지연을 되돌림(C 0.149 → 0.307). 튜닝에서 학습 가중치가 단순 평균보다 +0.067. 사람 3명 검증 세트로 95%(등급 오류가 있으면 77%) 잡아냄.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">어안 왜곡을 풀면 MediaPipe가 나아지는가</td><td>아님. 왜곡을 풀면 손을 10%p 덜 찾고(70.6% → 60.3%) 2D 지점도 나빠짐. 원본을 쓰고 어안은 한계로 보고.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Muse Spark 게이트와 처음 보는 물체 비교의 코드 점검</td><td>코드는 계획대로 동작. 게이트가 빡빡해 완벽한 등급으로도 0.657로 겨우 통과, 파일럿 일치율이면 "약함" 예상. 처음 보는 물체에서 우리 점수 0.675, 물체 기준선 0.5.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">시점 보정과 "체크리스트 대 학습" 코드 점검, 검정력</td><td>배운 시점 보정이 6프레임 지연을 되돌림(C 0.149 → 0.307). 튜닝에서 학습 가중치가 단순 평균보다 +0.067. 사람 3명 검증 세트로 95%(등급 오류가 있으면 77%) 잡아냄.</td></tr>
             <tr><td class="first"><a href="#exp-28">EXP-28</a></td><td class="wrap-ok">정답을 다시 쓸 수 있는 벤치마크로</td><td>두 정답을 라벨 파일과 독립 채점 코드로 묶음. 공개용 채점 코드가 프로젝트 수치를 그대로 재현. 평가 1은 CC BY 4.0, 평가 2는 CC BY-NC-SA 4.0.</td></tr>
             <tr><td class="first"><a href="#exp-29">EXP-29</a></td><td class="wrap-ok">튜닝 데이터에서 받은 첫 실제 Muse Spark 답</td><td>Muse Spark는 접촉을 약 7프레임 일찍 보고 보정이 F1을 두 배로 만듦. 직접 물은 Muse Spark는 0.52, 체크리스트로 물으면 0.63~0.65. 가중치 학습의 이득(+0.019)은 잡음 안. 처음 보는 물체에서 0.607.</td></tr>
             <tr><td class="first"><a href="#exp-30">EXP-30</a></td><td class="wrap-ok">Muse Spark가 튜닝에서 틀리는 곳과 프롬프트 한 번 수정</td><td>Muse Spark는 물체를 실제보다 작고 좁게 보고 1초 미만의 놓음을 거의 못 봄. 프롬프트를 한 번 고쳐도 점수가 오르지 않아 두 프롬프트 모두 1판 유지.</td></tr>
@@ -531,6 +519,7 @@
         </table>
       </div>
     </div>
+    <p class="more"><button type="button" class="more-btn" id="minor-btn">나머지 실험 14개 보기</button></p>
     <p class="more"><a href="#story">핵심 실험만 읽기 →</a> &nbsp; <a href="#detail">실험 상세 보기 →</a> &nbsp; <a href="#s-now">진행 중인 작업 →</a></p>
   </section>
 
@@ -3244,7 +3233,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 11:29 KST
+    마지막 갱신 2026-10-28 11:31 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3748,7 +3737,19 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     setTimeout(update, 50);
   }
 
+  function listToggle() {
+    var b = document.getElementById("minor-btn");
+    if (!b) return;
+    var t = b.closest("section").querySelector("table");
+    var label = b.textContent;
+    b.addEventListener("click", function () {
+      var all = t.classList.toggle("show-all");
+      b.textContent = all ? "핵심 실험만 보기" : label;
+    });
+  }
+
   function render() {
+    listToggle();
     renderGantt();
     renderPhases();
     renderChart();
