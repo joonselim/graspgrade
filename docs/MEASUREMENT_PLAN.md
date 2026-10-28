@@ -751,14 +751,13 @@ Estimates at measured prices, $150 in total.
 
 | Item | Cost |
 | --- | --- |
-| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a, one prompt revision on tuning, P2 SAM on 47 tuning episodes) | $30.95 |
-| Number 1, SAM: 22 held-out episodes | $5.45 |
+| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a, one prompt revision on tuning, P2 SAM on 47 tuning episodes, P3 SAM on 22 held-out episodes) | $36.40 |
 | Number 1, Muse arm A at 5 fps (held-out, plus prompt tuning on a few tuning episodes) | about $14 |
-| Number 1, Muse arm C: held-out boundaries (the EXP-32 arm B finds about 98 per episode, so about 2,150) plus 200 tuning boundaries for the arm C shift ($2.61) | about $31 |
+| Number 1, Muse arm C: 1,790 held-out boundaries from the applied arm B (EXP-33, $23.31) plus 200 tuning boundaries for the arm C shift ($2.61) | about $26 |
 | Number 2, SAM: all held-out clips plus 400 tuning clips, overlapping clips in one request | about $27 |
 | Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips unless the gate says stop | about $7.7 + $27.6 |
 | Soft object check: 1,426 HOT3D clips at about $0.0075 and about 330 OpenGraph segments at about $0.0094 (3 frames each), plus a pilot of 20 | about $14 |
-| Total (spent $30.95, still to send: SAM held-out $5.45, arm A held-out $11.86, arm C about $31, number 2 SAM $26.48, P7b $27.6, soft check about $14) | about $147 |
+| Total (spent $36.40, still to send: arm A held-out $11.86, arm C about $26, number 2 SAM $26.48, P7b $27.6, soft check about $14) | about $142 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
 frames). Each arm is first run on one tuning episode or a few clips to

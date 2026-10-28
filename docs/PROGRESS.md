@@ -4,7 +4,7 @@
 
 ## 한 줄 상태
 
-P1 파일럿 (EXP-23), A 튜닝 3개와 P7a (EXP-29, $10.62), 프롬프트 1회 수정 확인 (EXP-30, $6.71), P2 SAM 튜닝 47개 (EXP-32, $11.89)까지 보냈다. 쓴 크레딧은 약 $30.95이다. 프롬프트는 둘 다 버전 1 유지. B는 튜닝 50개로 고정 (에피소드 하나씩 빼기 F1@5 0.153, F1@15 0.294, IoU 0.683). 다음 유료 단계는 P3 (숫자 1 SAM held-out 22개, $5.45, 승인 필요).
+P1 파일럿 (EXP-23), A 튜닝 3개와 P7a (EXP-29, $10.62), 프롬프트 1회 수정 확인 (EXP-30, $6.71), P2 SAM 튜닝 47개 (EXP-32, $11.89), P3 SAM held-out 22개 (EXP-33, $5.45)까지 보냈다. 쓴 크레딧은 약 $36.40이다. 프롬프트는 둘 다 버전 1 유지. B는 튜닝 50개로 고정 (에피소드 하나씩 빼기 F1@5 0.153, F1@15 0.294, IoU 0.683)했고 held-out에 적용했다 (경계 1,790개, 채점 안 함). 다음 유료 단계는 P4 (숫자 1 A held-out, $11.86)와 P5 (C, $2.61 + $23.31), 승인 필요.
 숫자 2: 정답은 copyable v2 (EXP-16, held-out EXP-20), 체크리스트는 물체 항목 중심 (EXP-18, 19), 클립·SAM 윈도우·Muse 프레임·프롬프트 준비 완료. 숫자 1: B 규칙과 A, C 코드 준비, 파일럿 3개만 측정.
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
 
@@ -242,9 +242,9 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | --- | --- | --- | --- |
 | P1 (완료, EXP-23) | 숫자 2 파일럿: SAM 3윈도우, Muse 체크리스트/기준선 각 5클립 → 대리값(EXP-19)과 비교 | `sam_hot3d.py --role score_train --limit 3 --send`, `muse_hot3d.py --task ... --role score_train --limit 5 --send`, `number2_pilot.py` | $0.20 |
 | P2 (완료, EXP-32) | 숫자 1 SAM 튜닝 나머지 47개 → B를 튜닝 50개로 확정 (100요청 모두 completed). held-out용 B: gap 2 px, move 0.05, comove 0.7, fill 0, 물체 바뀌면 3프레임 뒤 분할, 보정 +4/-1 | `sam_episodes.py --split tune --send`, `contact_cut.py features`, `contact_cut.py rule`, `rule-apply --train tune --apply tune` | $11.89 |
-| P3 | 숫자 1 SAM held-out 22개 | `sam_episodes.py --split held_out --allow-held-out --send` | $5.45 |
+| P3 (완료, EXP-33) | 숫자 1 SAM held-out 22개 (44요청 모두 completed) → features → 고정한 B 적용 (`out/contact/rule_segments_applied.json`, 경계 1,790개). held-out 채점 안 함 | `sam_episodes.py --split held_out --allow-held-out --send`, `contact_cut.py features --split held_out`, `rule-apply --train tune --apply held_out` | $5.45 |
 | P4 | 숫자 1 A (Muse 단독) 튜닝 3개 (완료, EXP-29, $2.64, A 보정 시작 +7 / 끝 -7) → held-out 22개 | `muse_contact.py a --episodes 0,30,53 --send` → `a --split held_out --send` | $11.86 남음 |
-| P5 | 숫자 1 C: 튜닝 경계 200개 (C 보정값) → held-out 경계 전부 | `muse_contact.py c --segments out/contact/rule_segments.json --sample 100 --send` → `c --segments out/contact/rule_segments_applied.json --send` | $2.61 + 약 $28 (B가 에피소드당 경계 약 98개, EXP-32) |
+| P5 | 숫자 1 C: 튜닝 경계 200개 (C 보정값) → held-out 경계 전부 | `muse_contact.py c --segments out/contact/rule_segments.json --sample 100 --send` → `c --segments out/contact/rule_segments_applied.json --send` | $2.61 + $23.31 (held-out 경계 1,790개, EXP-33) |
 | P6 | 숫자 2 SAM 전체 (파일럿 3윈도우는 이미 보냄) | `sam_hot3d.py --role score_train/held_out --send` | $8.72 + $17.76 |
 | P7a (완료, EXP-29) | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개 → 게이트 weak (0.636 / 0.601), 결정대로 P7b 진행 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | $7.98 |
 | P7b | 게이트가 stop이 아니면: 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | 약 $27.6 |
@@ -275,7 +275,7 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 - 수정판: 체크리스트는 cm로 세 변을 묻고 코드가 등급을 매김, A는 "잠깐 놓아도 비접촉" 문구 추가. Muse 단독 프롬프트는 비교 상대라 그대로 (한계로 보고).
 - 결과: 체크리스트 v2는 항목 정확도는 오르지만 (크기 75→79%, 두께 78→84%) R3 0.625 < v1 0.638. A v2는 답이 2%만 바뀌고 F1 0.120 < v1 0.132. 규칙대로 둘 다 버전 1 유지. held-out A 보정은 시작 +7, 끝 -7.
 
-합계 약 $147 예상 (지금까지 $30.95 사용, 남은 유료 약 $116: P3 $5.45, P4 $11.86, P5 약 $31, P6 $26.48, P7b 약 $27.6, P7c 약 $14). P5 입력인 held-out B 구간은 P3 뒤에 `contact_cut.py features --split held_out` → `contact_cut.py rule-apply --train tune --apply held_out`으로 만든다 (파일럿으로 점검 완료).
+합계 약 $142 예상 (지금까지 $36.40 사용, 남은 유료 약 $106: P4 $11.86, P5 약 $26, P6 $26.48, P7b 약 $27.6, P7c 약 $14). P5 입력인 held-out B 구간은 만들어 두었다 (EXP-33, `out/contact/rule_segments_applied.json`).
 
 무료 (지금):
 1. (완료, EXP-12) 로컬 3개 항목은 측정은 정확하지만(카메라 vs 머리 회전 0.93, MediaPipe 좌우 96.5%) copyable 예측력이 없다 (AUC 0.49~0.53, 물체 안에서도 0.52~0.53). 물체 기준선은 사람 하나씩 빼고 사람별 평균 AUC 0.70 (0.59~0.81). 사람별 copyable 비율 차이 때문에 사람을 합친 AUC는 왜곡된다 (물체 0.62, 로컬 0.37). held-out도 사람별 AUC를 같이 낸다.
