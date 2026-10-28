@@ -13,6 +13,8 @@ Checks, in a temporary folder:
    the current arm B segments stops the run.
 5. number2_score.complete_items: in the final run a missing grade or a
    missing Muse alone answer stops the run, in check mode the item is left out.
+6. number2_score.object_reference: in the final run the object share comes
+   from all tuning clips, in check mode never from the score_train test clips.
 """
 
 import json
@@ -163,10 +165,23 @@ def check_complete_items():
     return res
 
 
+def check_object_reference():
+    d = pd.DataFrame({"role": ["item_train"] * 2 + ["score_train"] * 2 + ["held_out"] * 2,
+                      "object": ["mug", "can", "mug", "can", "mug", "bowl"],
+                      "copyable": [1, 0, 0, 0, 1, 1]})
+    test = d[d.role == "held_out"]
+    final = number2_score.object_reference(d, test, "held_out").tolist()
+    check = number2_score.object_reference(d, d[d.role == "score_train"], "score_train").tolist()
+    return [expect("final: object share from item_train and score_train, unseen object gets their base rate",
+                   final == [0.5, 0.25]),
+            expect("check mode: object share from item_train only", check == [1.0, 0.0])]
+
+
 def main():
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
-        res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items()
+        res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items() \
+            + check_object_reference()
     print(f"{sum(res)} of {len(res)} passed")
     sys.exit(0 if all(res) else 1)
 

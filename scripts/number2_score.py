@@ -17,7 +17,9 @@ and missing paid inputs are left out, so only the code path is tested.
 With --final, an item with any clip missing stops the run (it is not left out).
 
 Comparisons: our score vs Muse alone; object-only reference (copyable share
-per object in the training clips); Muse alone vs Muse plus our checks.
+per object in every tuning clip outside the test role: all 2,385 tuning clips
+in the final run, the item_train clips in check mode); Muse alone vs Muse
+plus our checks.
 Metrics: AUC with a 95% interval resampling sequences, AUC per person,
 copyable share in the top 20% against the base rate, all clips and one-hand clips.
 
@@ -214,6 +216,20 @@ def fit_score(train, test, cols):
     return m.predict_proba(test[cols])[:, 1], dict(zip(cols, np.round(m.coef_[0], 3).tolist()))
 
 
+def reference_pool(d, test_role):
+    """Labeled tuning clips for the object-only reference: every tuning clip outside the test role.
+
+    In the final run that is all 2,385 tuning clips (item_train and score_train),
+    in check mode the item_train clips, so the score_train test clips are never in it."""
+    return d[(d.role != test_role) & (d.role != "held_out")]
+
+
+def object_reference(d, test, test_role):
+    """Comparison 2: the copyable share of each object in the reference pool."""
+    pool = reference_pool(d, test_role)
+    return test.object.map(pool.groupby("object").copyable.mean()).fillna(pool.copyable.mean())
+
+
 def unseen_objects(d, items, train_role, test_role):
     """Comparison 4: every learned part refit without the object being scored."""
     has_base = "muse_baseline" in d
@@ -231,7 +247,7 @@ def unseen_objects(d, items, train_role, test_role):
                 te.loc[ok, "plug_in"], _ = fit_score(trb, te[ok], ["muse_baseline"] + items)
         parts.append(te)
     u = pd.concat(parts)
-    u["object_reference"] = d[d.role == train_role].copyable.mean()  # an unseen object has no share
+    u["object_reference"] = reference_pool(d, test_role).copyable.mean()  # an unseen object has no share
     out = {"note": "per test object, hand shape fit (model and cut points) and score weights refit without it",
            "our_score": metrics(u, "our_score"), "object_reference": metrics(u, "object_reference")}
     if has_base and u.plug_in.notna().any():
@@ -337,8 +353,8 @@ def main():
            "test": test_role, "items": items}
     test["our_score"], out["weights"] = fit_score(train, test, items)
     out["our_score"] = metrics(test, "our_score")
-    share = train.groupby("object").copyable.mean()
-    test["object_reference"] = test.object.map(share).fillna(train.copyable.mean())
+    test["object_reference"] = object_reference(d, test, test_role)
+    out["object_reference_clips"] = len(reference_pool(d, test_role))
     out["object_reference"] = metrics(test, "object_reference")
     if "muse_baseline" in d and test.muse_baseline.notna().any() and train.muse_baseline.notna().any():
         out["muse_alone"] = metrics(test, "muse_baseline")

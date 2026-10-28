@@ -530,10 +530,12 @@ reference.
 - Result (EXP-25): undistortion fails the rule (hand found -10.3 points, 2D
   error 10.8% worse, hand shape error 6.9% better). Decided: raw preview,
   fisheye reported as a limit.
-- Comparison 2 in code: `number2_score.py` takes the object share from the
+- Comparison 2 in code: `number2_score.py` took the object share from the
   400 score_train clips only. This page says the tuning clips, and EXP-17
-  (0.741) used all of them. To fix in code before the final run: all 2,385
-  tuning clips, the same source as comparison 6.
+  (0.741) used all of them. Fixed 2026-10-28, before any held-out scoring:
+  the final run takes it from all 2,385 tuning clips, the same source as
+  comparison 6 (check mode keeps the item_train clips, so its test clips stay
+  out). The unseen object row uses the base rate of the same clips.
 
 ## Soft object check (written 2026-10-28, before any call)
 
