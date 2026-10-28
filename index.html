@@ -205,6 +205,9 @@
     font-variant-numeric: tabular-nums; line-height: 1.3;
   }
   .axis .g-day.today { color: var(--today); font-weight: 700; }
+  .g-cell.selcol, .axis .g-day.selcol { background: color-mix(in srgb, var(--done) 6%, transparent); }
+  .g-cell.hov, .axis .g-day.hov { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+  .axis .g-day.hov { color: var(--ink); font-weight: 700; }
   .axis .g-day small { display: block; font-size: 10px; color: var(--faint); }
   .axis .g-day.today small { color: var(--today); }
   .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 8px; }
@@ -3196,7 +3199,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 11:37 KST
+    마지막 갱신 2026-10-28 11:38 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
@@ -3358,7 +3361,17 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     return p.from === p.to ? DAYS[p.from - 1] : DAYS[p.from - 1] + "–" + DAYS[p.to - 1];
   }
 
+  // Shade the day columns a phase spans, in the axis and every row.
+  function shadeDays(i, cls) {
+    var p = i >= 0 ? PHASES[i] : null;
+    document.querySelectorAll("#gantt .g-day, #gantt .g-cell").forEach(function (c) {
+      var k = +c.dataset.k;
+      c.classList.toggle(cls, !!p && k >= p.from && k <= p.to);
+    });
+  }
+
   function select(i, scroll) {
+    shadeDays(i, "selcol");
     var rows = document.querySelectorAll(".g-row[data-i]");
     var cards = document.querySelectorAll(".phase");
     rows.forEach(function (r) { r.classList.toggle("sel", +r.dataset.i === i); });
@@ -3380,6 +3393,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     DAYS.forEach(function (d, k) {
       var c = el("div", "g-day" + (k + 1 === today ? " today" : ""));
       c.style.gridColumn = (k + 1) + " / " + (k + 2);
+      c.dataset.k = k + 1;
       var parts = d.split("/");
       c.textContent = +parts[1];
       c.appendChild(el("small", null, k === 0 || parts[1] === "01" ? +parts[0] + "월" : "D" + (k + 1)));
@@ -3401,6 +3415,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       for (var k = 1; k <= 10; k++) {
         var cell = el("div", "g-cell" + (k === today ? " today" : ""));
         cell.style.gridColumn = k + " / " + (k + 1);
+        cell.dataset.k = k;
         tr.appendChild(cell);
       }
       var bar = el("div", "g-bar " + p.status);
@@ -3413,6 +3428,10 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       row.setAttribute("role", "button");
       row.setAttribute("aria-label", (i + 1) + "단계 " + p.title);
       row.addEventListener("click", function () { select(i, true); });
+      row.addEventListener("mouseenter", function () { shadeDays(i, "hov"); });
+      row.addEventListener("mouseleave", function () { shadeDays(-1, "hov"); });
+      row.addEventListener("focus", function () { shadeDays(i, "hov"); });
+      row.addEventListener("blur", function () { shadeDays(-1, "hov"); });
       row.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(i, true); }
       });
