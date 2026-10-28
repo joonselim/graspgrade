@@ -97,6 +97,20 @@ reported.
 - Code check (EXP-27): with perfect answers made 6 frames early, the learned
   shifts bring arm A back from 0.863 to 0.956 and arm C from 0.149 to 0.307,
   the no-lag ceilings.
+- Episodes for each shift (written 2026-10-29, after the paid calls and
+  before any held-out score, EXP-36). Until now `muse_contact.py score` took
+  one list of shift episodes for both arms (default 0, 30, 53), so the arm C
+  shift would have used only the sample boundaries in those episodes (15 of
+  200). The two shifts now take separate lists:
+  - Arm A shift: tuning episodes 0, 30, 53, the only tuning episodes with arm
+    A answers. The score stops if a listed episode has no arm A answers, so
+    missing answers never count as "not touching" in the shift.
+  - Arm C shift: all 50 tuning episodes, with the arm B segments of the
+    tuning sample (`out/contact/rule_segments.json`, leave one episode out,
+    EXP-32). The cached tuning picks are exactly the 200 sample boundaries,
+    so the shift uses every moved boundary of the sample.
+  - Both lists may hold tuning episodes only. The score stops if one holds a
+    held-out episode.
 
 ### Metrics
 

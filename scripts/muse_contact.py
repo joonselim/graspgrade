@@ -24,7 +24,9 @@ boundaries arm B finds.
 Timing shift (docs/MEASUREMENT_PLAN.md): arm A and arm C each get a start and
 end shift learned on tuning episodes, the negative median error against the
 cleaned glove. Arm C's shift is learned on, and applied to, only the
-boundaries Muse Spark moved. `score` reports A, A + shift, B, C, C + shift and
+boundaries Muse Spark moved. The arm A shift uses --a-shift-episodes (tuning
+0, 30, 53, the episodes with arm A answers), the arm C shift uses
+--c-shift-episodes (all tuning, where the 200 sample boundaries are). `score` reports A, A + shift, B, C, C + shift and
 a paired bootstrap over episodes for each shift. Arm C picks are keyed by
 segment number, so the arm B segment files must not change after sending:
 `c` and `score` compare each cached call with the current segments and stop
@@ -56,6 +58,7 @@ CUTS = ROOT / "data" / "episodes_720p"
 PROMPTS = Path(__file__).resolve().parent / "prompts"
 A_STEP, A_BATCH = 6, 10
 A_VERSION = 1  # arm A prompt version for held-out, picked by the rule in the plan (EXP-30)
+C_DIR = None  # arm C answers, --c-cache (None: N1 / "muse_c")
 
 
 def a_dir(version=None):
@@ -218,7 +221,7 @@ def c_text(job):
 
 
 def c_key(job):
-    return N1 / "muse_c" / f"episode_{job['episode']:06d}" / f"{job['hand']}_{job['segment']:03d}_{job['kind']}.json"
+    return (C_DIR or N1 / "muse_c") / f"episode_{job['episode']:06d}" / f"{job['hand']}_{job['segment']:03d}_{job['kind']}.json"
 
 
 def c_cached(job):
@@ -394,14 +397,16 @@ def paired_bootstrap(rows, gt, base, new, eps, target="tactile_clean", tol=5, n=
             "ci95": [round(float(np.percentile(diffs, 2.5)), 3), round(float(np.percentile(diffs, 97.5)), 3)]}
 
 
-def estimate_shifts(eps, a_answers, c_picks, segs):
-    """Arm A and arm C shifts on tuning episodes. Arm C uses only the boundaries Muse Spark moved."""
-    gt = ground_truth(eps)
+def estimate_shifts(a_eps, a_answers, c_eps, c_picks, segs):
+    """Arm A shift on a_eps, arm C shift on c_eps (tuning episodes, plan EXP-36). Arm C uses only the
+    boundaries Muse Spark moved."""
     a_shift = c_shift = None
     if a_answers:
-        sc = score_rows(arm_rows(eps, gt, a_answers, None, None)["arm_A"], gt, "tactile_clean")
+        gt = ground_truth(a_eps)
+        sc = score_rows(arm_rows(a_eps, gt, a_answers, None, None)["arm_A"], gt, "tactile_clean")
         a_shift = shift_from_errors(sc.err["start"], sc.err["end"])
     if segs is not None and c_picks:
+        gt = ground_truth(c_eps)
         moved = c_segments(segs, c_picks, moved_only=True)
         err = {"start": [], "end": []}
         for (ep, s), m in moved.items():
@@ -445,18 +450,28 @@ def shifted_report(eps, res, rows, gt, a_shift, c_shift, shift_eps):
 
 
 def cmd_score(args):
-    """Score cached answers. Arm A and C shifts come from --shift-episodes (tuning) and are applied to --episodes."""
+    """Score cached answers. The arm A shift comes from --a-shift-episodes, the arm C shift from
+    --c-shift-episodes (tuning only, plan EXP-36), and both are applied to --episodes."""
     eps = episodes(args)
     segs = json.loads(Path(args.segments).read_text()) if Path(args.segments).exists() else None
-    a_shift = c_shift = None
-    se = [int(x) for x in args.shift_episodes.split(",")] if args.shift_episodes else []
-    if se:
-        if set(se) & set(eps):
-            print("note: shift episodes overlap the scored episodes, fine for a check, not for the final run")
-        tune_segs = json.loads(Path(args.shift_segments).read_text()) if Path(args.shift_segments).exists() else None
-        a_shift, c_shift = estimate_shifts(se, load_a(se), load_c(tune_segs), tune_segs)
+    split = json.loads((ROOT / "splits" / "opengraph.json").read_text())
+    shift_eps = {}
+    for arm, s in (("arm_A", args.a_shift_episodes), ("arm_C", args.c_shift_episodes)):
+        e = split[s] if s in split else [int(x) for x in s.split(",")] if s else []
+        held = sorted(set(e) & set(split["held_out"]))
+        if held:
+            raise SystemExit(f"{arm} shift episodes {held} are held-out. Shifts are learned on tuning only.")
+        if set(e) & set(eps):
+            print(f"note: {arm} shift episodes overlap the scored episodes, fine for a check, not for the final run")
+        shift_eps[arm] = e
+    a_ans = load_a(shift_eps["arm_A"])
+    missing = [ep for ep in shift_eps["arm_A"] if ep not in a_ans]
+    if missing:
+        raise SystemExit(f"arm A shift episodes {missing} have no arm A answers. They would count as not touching.")
+    tune_segs = json.loads(Path(args.shift_segments).read_text()) if Path(args.shift_segments).exists() else None
+    a_shift, c_shift = estimate_shifts(shift_eps["arm_A"], a_ans, shift_eps["arm_C"], load_c(tune_segs), tune_segs)
     res, rows, gt = score_arms(eps, load_a(eps), load_c(segs), segs, a_shift, c_shift)
-    out = shifted_report(eps, res, rows, gt, a_shift, c_shift, se)
+    out = shifted_report(eps, res, rows, gt, a_shift, c_shift, shift_eps)
     (N1 / "arms_score.json").parent.mkdir(parents=True, exist_ok=True)
     (N1 / "arms_score.json").write_text(json.dumps(out, indent=1))
     print(json.dumps({"shifts": out["shifts"], "paired_bootstrap": out["paired_bootstrap"],
@@ -502,7 +517,7 @@ def cmd_selftest(args):
     segs = json.loads(Path(args.segments).read_text())
     a_ans, picks = oracle(eps, gt, segs, args.lag)
     if args.lag:
-        a_shift, c_shift = estimate_shifts(eps, a_ans, picks, segs)
+        a_shift, c_shift = estimate_shifts(eps, a_ans, eps, picks, segs)
         res, rows, gt = score_arms(eps, a_ans, picks, segs, a_shift, c_shift)
         out = shifted_report(eps, res, rows, gt, a_shift, c_shift, eps)
         (N1 / f"selftest_lag{args.lag}.json").write_text(json.dumps(out, indent=1))
@@ -562,12 +577,19 @@ def main():
     ap.add_argument("--send", action="store_true", help="really call the API (costs credit)")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--sample", type=int, help="c: send only N starts and N ends drawn at random (tuning shift)")
-    ap.add_argument("--shift-episodes", default="0,30,53", help="score: tuning episodes for the arm A and C shifts")
+    ap.add_argument("--a-shift-episodes", default="0,30,53",
+                    help="score: tuning episodes for the arm A shift (comma list or split name)")
+    ap.add_argument("--c-shift-episodes", default="tune",
+                    help="score: tuning episodes for the arm C shift (comma list or split name)")
     ap.add_argument("--shift-segments", default=str(ROOT / "out" / "contact" / "rule_segments.json"),
-                    help="score: arm B segments of the shift episodes")
+                    help="score: arm B segments the tuning arm C picks were sent for")
+    ap.add_argument("--c-cache", help="arm C answer folder (default out/number1/muse_c; the regression check "
+                                      "points it at an empty folder)")
     ap.add_argument("--lag", type=int, default=0, help="selftest: the oracle sees changes this many frames early")
     ap.add_argument("--a-version", type=int, help="arm A prompt version (default: A_VERSION)")
     args = ap.parse_args()
+    global C_DIR
+    C_DIR = Path(args.c_cache) if args.c_cache else None
     if args.a_version:
         global A_VERSION
         A_VERSION = args.a_version

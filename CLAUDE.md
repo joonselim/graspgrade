@@ -86,11 +86,11 @@ Windows 사본을 WSL로 동기화:
 | `scripts/tuning_muse_check.py` | 진짜 Muse 답으로 튜닝 확인 (EXP-29): A 보정 (에피소드 하나씩 빼기), 숫자 2 R1/R2/R3 (사람 하나씩 빼기), 처음 보는 물체 |
 | `scripts/prompt_revision_check.py` | Muse 오류 분석과 프롬프트 1회 수정 비교 (EXP-30): 체크리스트 v1/v2, A v1/v2, 측정 계획 규칙으로 held-out 버전 선택. `muse_hot3d.py --task checklist_v2`, `muse_contact.py --a-version 2` |
 | `scripts/number2_gate_noise.py` | 대리값 등급에 무작위 오류를 섞어 게이트 결과가 어떻게 떨어지는지 (EXP-26, API 호출 없음) |
-| `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A, C 보정을 튜닝에서 배워 적용, 짝지은 부트스트랩), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
+| `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A 보정은 `--a-shift-episodes` 0,30,53, C 보정은 `--c-shift-episodes` 튜닝 50개에서 배워 적용, 짝지은 부트스트랩, EXP-36), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
 | `scripts/viewer_data.py` | 뷰어 데모 데이터 (튜닝만): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외) |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
-| `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 11개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)로 돌아 50개 B 출력을 덮어쓰지 않는다 |
-| `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단). API 호출 없음 |
+| `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 12개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)과 빈 C 폴더로 돌아 50개 B 출력을 덮어쓰지 않는다. `score_tune50`은 진짜 튜닝 C 답으로 최종과 같은 보정 |
+| `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단, 보정 에피소드에 held-out이 있으면 중단). API 호출 없음 |
 | `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |

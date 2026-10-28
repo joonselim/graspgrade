@@ -1,4 +1,4 @@
-"""Regression check: run the free commands behind numbers we already reported and compare their outputs.
+"""Regression check: run the free commands behind numbers we already reported (12) and compare their outputs.
 
     python scripts/regression_check.py save        # run all, keep the outputs in out/regression/baseline/
     python scripts/regression_check.py compare     # run all again, list every output that is not byte-identical
@@ -27,6 +27,9 @@ EPS = "0,30,53"
 # arm B on the three pilot episodes only, in its own files, so the check never overwrites the
 # 50-episode arm B (out/contact/rule_*.json) and stays comparable after P2
 PILOT_SEGS = ["--segments", "out/contact/rule_pilot_segments.json"]
+# the arm C answers on tuning were sent for the 50-episode arm B (EXP-35), so the pilot score reads
+# an empty arm C folder, as it did before those calls
+NO_C = ["--c-cache", "out/regression/empty_muse_c"]
 
 # name: (command, output files written by it)
 COMMANDS = {
@@ -36,7 +39,10 @@ COMMANDS = {
     "selftest_lag6": (["scripts/muse_contact.py", "selftest", "--episodes", EPS, "--lag", "6"] + PILOT_SEGS,
                       ["out/number1/selftest_lag6.json"]),
     "score_tune": (["scripts/muse_contact.py", "score", "--episodes", EPS, "--shift-segments",
-                    "out/contact/rule_pilot_segments.json"] + PILOT_SEGS, ["out/number1/arms_score.json"]),
+                    "out/contact/rule_pilot_segments.json"] + PILOT_SEGS + NO_C, ["out/number1/arms_score.json"]),
+    # real arm C answers of the tuning sample with the 50-episode arm B, shifts as in the final run (EXP-36)
+    "score_tune50": (["scripts/muse_contact.py", "score", "--episodes", EPS, "--segments",
+                      "out/contact/rule_segments.json"], ["out/number1/arms_score.json"]),
     "n2_check": (["scripts/number2_score.py", "--check"], ["out/number2/number2_check.json"]),
     "gate_standin": (["scripts/number2_score.py", "--gate", "--standin"], ["out/number2/gate_standin.json"]),
     "gate": (["scripts/number2_score.py", "--gate"], ["out/number2/gate.json"]),

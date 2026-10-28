@@ -163,6 +163,39 @@ def stops(f):
         return True
 
 
+def check_shift_episodes(tmp):
+    """Plan EXP-36: separate episode lists for the arm A and arm C shifts, tuning only."""
+    held = json.loads((muse_contact.ROOT / "splits" / "opengraph.json").read_text())["held_out"]
+
+    def score(a_eps, c_eps):
+        return lambda: muse_contact.cmd_score(SimpleNamespace(
+            episodes="0", split=None, segments=str(tmp / "none.json"), a_shift_episodes=a_eps,
+            c_shift_episodes=c_eps, shift_segments=str(tmp / "none.json")))
+    res = [expect("shift: a held-out episode in the arm A list stops", stops(score(str(held[0]), ""))),
+           expect("shift: a held-out episode in the arm C list stops", stops(score("", f"1,{held[0]}"))),
+           expect("shift: an arm A shift episode without arm A answers stops", stops(score("998", "")))]
+    lit = np.zeros(300, bool)
+    lit[40:100] = True
+    real_gt = muse_contact.ground_truth
+    muse_contact.ground_truth = lambda eps: {e: {"tactile_clean": {"left": lit, "right": np.zeros(300, bool)}}
+                                             for e in eps if e == 999}
+    try:
+        segs = {"999": {"n30": 300, "left": [[50, 100]], "right": []}}
+        picks = {(999, "left", 0, "start"): 3, (999, "left", 0, "end"): 5}  # moved to 45 and to 105
+        on_c = muse_contact.estimate_shifts([], {}, [999], picks, segs)[1]
+        on_a_only = muse_contact.estimate_shifts([999], {}, [], picks, segs)[1]
+    finally:
+        muse_contact.ground_truth = real_gt
+    res += [expect(f"shift: arm C shift measured on the arm C episodes ({on_c})", on_c == (-5, -5)),
+            expect("shift: arm C shift ignores the arm A episodes", on_a_only is None)]
+    muse_contact.C_DIR = tmp / "other_c"
+    job = muse_contact.c_jobs(segs)[0]
+    res.append(expect("--c-cache: arm C answers read from the given folder",
+                      muse_contact.c_key(job).parent.parent == tmp / "other_c" and muse_contact.load_c(segs) == {}))
+    muse_contact.C_DIR = None
+    return res
+
+
 def check_complete_items():
     train = pd.DataFrame({"a": [1.0, 0.5], "b": [1.0, 0.0], "muse_baseline": [0.2, 0.9]})
     test = pd.DataFrame({"a": [1.0, np.nan], "b": [0.5, 0.5], "muse_baseline": [0.3, 0.4]})
@@ -298,7 +331,7 @@ def main():
         tmp = Path(t)
         res = check_sam(tmp) + check_muse_hot3d(tmp) + check_arm_a(tmp) + check_arm_c(tmp) + check_complete_items() \
             + check_never_parsed_fallbacks() + check_object_reference() + check_comparison6_and_extra() \
-            + check_soft(tmp)
+            + check_soft(tmp) + check_shift_episodes(tmp)
     print(f"{sum(res)} of {len(res)} passed")
     sys.exit(0 if all(res) else 1)
 

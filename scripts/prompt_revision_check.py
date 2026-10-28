@@ -128,7 +128,7 @@ def arm_a(version, gt):
     rows = {"arm_A": {}, "arm_A_shift": {}}
     for ep in EPS:
         others = [e for e in EPS if e != ep]
-        a_shift, _ = estimate_shifts(others, {e: ans.get(e, {}) for e in others}, None, None)
+        a_shift, _ = estimate_shifts(others, {e: ans.get(e, {}) for e in others}, others, None, None)
         r = arm_rows([ep], gt, ans, None, None, a_shift)
         for name in rows:
             rows[name].update(r[name])
@@ -140,7 +140,7 @@ def arm_a(version, gt):
         x = sc.result()
         res[name] = {k: x[k] for k in ("boundary_f1_5", "boundary_f1_15", "contact_iou", "boundaries_pred",
                                        "boundaries_ref", "start_error_median", "end_error_median")}
-    res["shift_on_all_three"] = estimate_shifts(EPS, ans, None, None)[0]
+    res["shift_on_all_three"] = estimate_shifts(EPS, ans, EPS, None, None)[0]
     res["releases_caught"] = gap_catch(ans, gt)
     return res
 

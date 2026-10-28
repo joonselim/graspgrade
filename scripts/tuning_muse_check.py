@@ -44,14 +44,14 @@ def number1():
     shifts = {}
     for ep in EPS:
         others = [e for e in EPS if e != ep]
-        a_shift, _ = estimate_shifts(others, {e: ans.get(e, {}) for e in others}, None, None)
+        a_shift, _ = estimate_shifts(others, {e: ans.get(e, {}) for e in others}, others, None, None)
         shifts[ep] = a_shift
         r = arm_rows([ep], gt, ans, None, None, a_shift)
         for name in rows:
             rows[name].update(r[name])
     for (ep, s), segs in rows["arm_A"].items():
         raw.add(segs, gt[ep]["tactile_clean"][s])
-    all_shift, _ = estimate_shifts(EPS, ans, None, None)
+    all_shift, _ = estimate_shifts(EPS, ans, EPS, None, None)
     out = {"answered_frames": {ep: len(ans.get(ep, {})) for ep in EPS},
            "median_error_unshifted_frames": {"start": raw.result()["start_error_median"],
                                              "end": raw.result()["end_error_median"]},
