@@ -93,3 +93,4 @@ Windows 사본을 WSL로 동기화:
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
 | `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 11개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다 |
 | `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단). API 호출 없음 |
+| `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |
