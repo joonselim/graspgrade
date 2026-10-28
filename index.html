@@ -489,6 +489,16 @@
       </div>
     </div>
     <p class="note">정답은 v2 라벨: 사람 손가락 위치에 맞춘 Allegro 손이 잡기, 도달, 충돌 없음 세 조건을 만족하면 "따라할 수 있음"(EXP-16). 가중치는 튜닝 400개로 학습하고 AUC는 검증 1,426개에서 냄. 사람별 AUC와 시퀀스 단위 부트스트랩 구간을 함께 보고함.</p>
+
+    <p class="cap" style="margin-top:18px">우리가 정한 계산</p>
+    <div class="eq">
+      <div>평가 1 정답: 접촉<sub><i>t</i></sub> = [ 장갑 압력 합 &gt; 800 ]</div>
+      <div>평가 1 SAM 규칙: 접촉<sub><i>t</i></sub> = [ 손&ndash;물체 거리 &le; <i>&tau;<sub>d</sub></i> ] &and; [ 물체가 손과 함께 움직임 ]</div>
+      <div>평가 1 시점 보정: 시작&prime; = 시작 &minus; median( 예측 시작 &minus; 장갑 시작 ), 끝도 같음</div>
+      <div>평가 2 정답: 따라할 수 있음 = 손을 2cm 안에서 옮겨 잡기 &and; 도달 &and; 충돌 없음이 되는 위치가 있음</div>
+      <div>평가 2 점수: <i>S</i> = 100 &middot; &sigma;( <i>w</i><sub>0</sub> + &Sigma; <i>w<sub>i</sub> g<sub>i</sub></i> ),&ensp; <i>g<sub>i</sub></i> &isin; {0, 0.5, 1}<span class="c">튜닝 삼분위 등급</span></div>
+    </div>
+    <p class="more"><a href="#k-calc">전체 식과 기준값 →</a></p>
   </section>
 
   <section>
@@ -3307,7 +3317,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 11:44 KST
+    마지막 갱신 2026-10-28 11:47 KST
     <p class="demo-link"><a href="demo.html">25초 데모 보기 →</a></p>
   </footer>
 
