@@ -566,7 +566,7 @@
             <tr class="core"><td class="first"><a href="#exp-32">EXP-32</a></td><td class="wrap-ok">튜닝 50개로 확정한 방법 B (SAM 규칙)</td><td>에피소드 하나씩 빼고 F1 ±5 0.153, ±15 0.294, IoU 0.683(항상 접촉 0.623). 경계를 2.5배 많이 냄. 50번 중 46번 같은 규칙을 골라 검증용으로 고정.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-33">EXP-33</a></td><td class="wrap-ok">검증 22개 SAM과 고정한 방법 B 적용</td><td>SAM 요청 44개 모두 완료. 튜닝 규칙으로 검증 경계 1,790개(분당 78.9, 튜닝 90.0). 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-34">EXP-34</a></td><td class="wrap-ok">검증 22개에 보낸 방법 A (Muse Spark 단독)</td><td>호출 693개 모두 답(1개 재전송, 대체값 없음). 짧은 에피소드 9개에서 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름. 채점은 최종 실행에서.</td></tr>
-            <tr class="minor"><td class="first"><a href="#exp-35">EXP-35</a></td><td class="wrap-ok">방법 C의 시점 보정용 튜닝 표본</td><td>경계 200개 모두 답, Muse Spark가 95개를 옮김. 비용이 견적보다 18% 많아 검증 C(약 $27.63)는 결정 대기.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-35">EXP-35</a></td><td class="wrap-ok">방법 C의 시점 보정용 튜닝 표본</td><td>경계 200개 모두 답, Muse Spark가 95개를 옮김. 검증 경계에는 아직 보내지 않음.</td></tr>
           </tbody>
         </table>
       </div>
@@ -3550,7 +3550,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 07:11 KST
+    마지막 갱신 2026-10-29 07:15 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -3605,12 +3605,12 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "A·C 시점 보정 코드 점검: 6프레임 지연을 되돌림 (EXP-27)"],
         ["done", "A 튜닝 3개 실제 호출: Muse Spark가 7프레임 일찍, 보정으로 F1 두 배 (EXP-29)"],
         ["done", "A 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
-        ["done", "튜닝 나머지 47개 SAM 실행 (EXP-32, $11.89)"],
+        ["done", "튜닝 나머지 47개 SAM 실행 (EXP-32)"],
         ["done", "B SAM 규칙 기준값과 보정 확정: F1 ±5 0.153, IoU 0.683 (튜닝 50개, EXP-32)"],
         ["done", "검증 22개 SAM 실행, B 적용: 경계 1,790개 (EXP-33)"],
-        ["done", "A Muse Spark 단독 검증 22개: 693호출 모두 답 (EXP-34, $12.44)"],
-        ["done", "C 보정용 튜닝 표본 200개: 95개를 옮김 (EXP-35, $3.09)"],
-        ["todo", "C Muse Spark 경계 확인 검증 1,790개 (약 $27.63, 결정 대기)"],
+        ["done", "A Muse Spark 단독 검증 22개: 693호출 모두 답 (EXP-34)"],
+        ["done", "C 보정용 튜닝 표본 200개: 95개를 옮김 (EXP-35)"],
+        ["todo", "C Muse Spark 경계 확인 (검증 경계 1,790개)"],
         ["todo", "검증 22개로 세 방법 채점"]
       ]
     },
