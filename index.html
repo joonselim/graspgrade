@@ -567,6 +567,7 @@
             <tr class="minor"><td class="first"><a href="#exp-33">EXP-33</a></td><td class="wrap-ok">검증 22개 SAM과 고정한 방법 B 적용</td><td>SAM 요청 44개 모두 완료. 튜닝 규칙으로 검증 경계 1,790개(분당 78.9, 튜닝 90.0). 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-34">EXP-34</a></td><td class="wrap-ok">검증 22개에 보낸 방법 A (Muse Spark 단독)</td><td>호출 693개 모두 답(1개 재전송, 대체값 없음). 짧은 에피소드 9개에서 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름. 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-35">EXP-35</a></td><td class="wrap-ok">방법 C의 튜닝 보정 표본과 검증 경계</td><td>튜닝 200개, 검증 1,790개 모두 첫 전송에서 답. 검증에서 B 경계의 42%를 옮김. 평가 1의 검증 답이 모두 모임, 채점은 최종 실행에서.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-36">EXP-36</a></td><td class="wrap-ok">방법 A와 C의 시점 보정을 따로 배우도록 수정</td><td>채점 코드가 C 보정을 경계 1개로 정하게 되어 있던 것을 고침. C 보정은 튜닝 표본 31개로 시작 +6, 끝 −4프레임. A는 +7, −7 그대로.</td></tr>
           </tbody>
         </table>
       </div>
@@ -808,7 +809,7 @@
       </div>
       <ul class="plain">
         <li><i>&scirc;</i>, <i>&ecirc;</i>는 예측한 접촉 시작과 끝, <i>s</i>, <i>e</i>는 장갑의 시작과 끝. 중앙값은 튜닝 에피소드에서 계산함.</li>
-        <li>Muse Spark 단독은 <i>&delta;<sub>s</sub></i> = +7, <i>&delta;<sub>e</sub></i> = &minus;7프레임. 경계 F1 &plusmn;5가 0.06에서 0.13으로 오름(EXP-29).</li>
+        <li>Muse Spark 단독은 <i>&delta;<sub>s</sub></i> = +7, <i>&delta;<sub>e</sub></i> = &minus;7프레임. 경계 F1 &plusmn;5가 0.06에서 0.13으로 오름(EXP-29). 방법 C는 Muse Spark가 옮긴 튜닝 경계로만 배워 <i>&delta;<sub>s</sub></i> = +6, <i>&delta;<sub>e</sub></i> = &minus;4프레임(EXP-36).</li>
       </ul>
     </div>
 
@@ -881,7 +882,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3406,6 +3407,41 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>평가 1의 검증 답(방법 A, B, C)이 모두 모임. 채점은 최종 실행에서 함.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-36">
+      <div class="exp-h"><span class="id">EXP-36</span><span class="t">방법 A와 C의 시점 보정을 따로 배우도록 수정</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>방법 C의 시점 보정은 튜닝 표본 200개(EXP-35) 중 Muse Spark가 옮긴 경계로 배워야 함. 유료 호출 뒤 확인하니 채점 코드가 A와 C에 같은 에피소드 목록(0, 30, 53)을 써서, C 보정이 그 세 에피소드의 경계만 쓰게 되어 있었음. 고치는 규칙은 코드를 바꾸기 전, 검증 채점 전에 측정 계획에 적음.</dd>
+        <dt>입력</dt><dd>튜닝만. 유료 호출 없음. 검증은 채점하지 않음.</dd>
+        <dt>방법</dt><dd>A 보정 에피소드(0, 30, 53, A 답이 있는 유일한 튜닝 에피소드)와 C 보정 에피소드(튜닝 50개 전체)를 따로 받게 함. 어느 목록에든 검증 에피소드가 들어 있으면 멈춤. 회귀 점검과 가짜 데이터 점검으로 확인함.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">시점 보정 (30fps 프레임, 시작, 끝)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>보정</th><th class="n">이전 코드</th><th class="n">고친 코드</th></tr></thead>
+            <tbody>
+              <tr><td class="first">방법 A (에피소드 0, 30, 53)</td><td class="n">+7, −7</td><td class="n">+7, −7</td></tr>
+              <tr><td class="first"><b>방법 C</b></td><td class="n">0, −1 (옮긴 경계 1개)</td><td class="n"><b>+6, −4</b> (옮긴 경계 31개, 에피소드 20개)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">옮긴 표본 경계 95개(시작 41, 끝 54) 중 장갑 경계에서 15프레임 안에 있는 시작 10개, 끝 21개가 보정에 들어감. 오차 중앙값은 시작 −6, 끝 +4. 나머지는 어느 장갑 경계에서도 15프레임 넘게 떨어져 있음.</p>
+
+      <figure>
+        <img src="assets/exp36_arm_c_shift.png" loading="lazy" width="750" height="425" alt="튜닝 표본에서 옮긴 경계의 Muse Spark 선택과 정리한 장갑의 차이" style="max-width:600px">
+        <div class="keys"><span class="key"><i style="--c:#4c72b0"></i>옮긴 시작 (10)</span><span class="key"><i style="--c:#ff7f0e"></i>옮긴 끝 (21)</span></div>
+        <figcaption>장갑 경계 15프레임 안의 옮긴 경계에서 Muse Spark 선택과 정리한 장갑의 차이. 점선은 중앙값이고, 보정은 중앙값의 부호를 바꾼 값.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>최종 채점은 이제 계획대로 튜닝 표본 전체로 C 보정을 배움: 시작 +6, 끝 −4프레임(경계 31개). 이전 코드였다면 경계 1개로 정해졌음.</li>
+        <li>회귀 점검 12개 모두 같음(점수와 구간은 바이트 단위로 같고 출력의 보정 에피소드 목록만 바뀜). 가짜 데이터 점검 52개 통과. 검증 C 답 1,790개는 검증 B 구간과 맞게 읽힘.</li>
+        <li>옮긴 경계의 3분의 2가 장갑 경계에서 멀어 보정의 근거 경계가 적음. 보정이 도움이 되는지는 검증의 짝지은 부트스트랩으로 판정함.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3474,6 +3510,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>검증 22개에 SAM을 보내고($5.45) 고정한 방법 B를 적용(<a href="#exp-33">EXP-33</a>). 경계 1,790개, 정답으로 채점하지 않음. 방법 C 검증 비용은 약 $23.31.</li>
       <li>검증 22개에 방법 A를 보냄(<a href="#exp-34">EXP-34</a>, $12.44). 호출 693개 모두 답이 있고 대체값은 쓰지 않음. 짧은 에피소드 9개에서 Muse Spark가 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름(접촉 비율 상관 0.09). 채점은 최종 실행에서.</li>
       <li>방법 C의 보정용 튜닝 표본 200개와 검증 경계 1,790개를 보냄(<a href="#exp-35">EXP-35</a>, $3.09 + $27.19). 모두 첫 전송에서 답이 있고, 검증에서 B 경계의 42%를 옮김. 검증은 튜닝에서 잰 단가로 다시 승인받은 뒤 보냄. 평가 1의 검증 답이 모두 모임.</li>
+      <li>채점 코드가 방법 A와 C의 시점 보정을 같은 에피소드(0, 30, 53)로 배우게 되어 있어 C 보정이 경계 1개로 정해질 뻔한 것을 검증 채점 전에 고침(<a href="#exp-36">EXP-36</a>). C 보정은 튜닝 표본에서 옮긴 경계 31개로 시작 +6, 끝 −4프레임.</li>
       <li>다음: 평가 1 검증 채점, 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
@@ -3567,7 +3604,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 07:38 KST
+    마지막 갱신 2026-10-29 07:48 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
