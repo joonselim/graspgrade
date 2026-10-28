@@ -565,6 +565,7 @@
             <tr class="minor"><td class="first"><a href="#exp-31">EXP-31</a></td><td class="wrap-ok">물체 비율을 더하는 비교와 물체 안 AUC의 코드 점검</td><td>코드가 계획을 따르고 기존 출력은 그대로. 튜닝 대리 등급에서 라벨 5개일 때만 우리 점수가 물체 비율에 더하고, 같은 물체 안에서는 우연 수준에 가까움(0.574).</td></tr>
             <tr class="core"><td class="first"><a href="#exp-32">EXP-32</a></td><td class="wrap-ok">튜닝 50개로 확정한 방법 B (SAM 규칙)</td><td>에피소드 하나씩 빼고 F1 ±5 0.153, ±15 0.294, IoU 0.683(항상 접촉 0.623). 경계를 2.5배 많이 냄. 50번 중 46번 같은 규칙을 골라 검증용으로 고정.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-33">EXP-33</a></td><td class="wrap-ok">검증 22개 SAM과 고정한 방법 B 적용</td><td>SAM 요청 44개 모두 완료. 튜닝 규칙으로 검증 경계 1,790개(분당 78.9, 튜닝 90.0). 채점은 최종 실행에서.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-34">EXP-34</a></td><td class="wrap-ok">검증 22개에 보낸 방법 A (Muse Spark 단독)</td><td>호출 693개 모두 답(1개 재전송, 대체값 없음). 짧은 에피소드 9개에서 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름. 채점은 최종 실행에서.</td></tr>
           </tbody>
         </table>
       </div>
@@ -879,7 +880,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3318,6 +3319,43 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>이 구간으로 계산한 방법 C의 검증 비용은 약 $23.31(이전 추정 약 $28). 방법 A 검증은 약 $11.86. 예상 총액은 약 $142.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-34">
+      <div class="exp-h"><span class="id">EXP-34</span><span class="t">검증 22개에 보낸 방법 A (Muse Spark 단독)</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>방법 A는 Muse Spark에 5fps 프레임 10장씩 보내 손마다 접촉 여부를 물음. 프롬프트는 1판(EXP-30), 시점 보정은 시작 +7, 끝 −7프레임으로 튜닝에서 고정(EXP-29). 이 단계는 검증 답을 모으는 것이고, 채점은 방법 C와 함께 최종 실행에서 함.</dd>
+        <dt>입력</dt><dd>검증 에피소드 22개, 호출 693개, 6,817프레임, $12.44. 검증 정답에서는 영상 프레임 수만 읽음.</dd>
+        <dt>방법</dt><dd>측정 계획의 "해석되지 않는 답" 규칙대로 전체 실행 뒤 같은 명령을 한 번 더 보내고, 세 번째는 보내지 않고 남은 호출 수만 셈.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">전송 단계별 호출</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>단계</th><th class="n">보낸 호출</th><th class="n">모든 프레임에 답이 없는 호출</th><th class="n">비용</th></tr></thead>
+            <tbody>
+              <tr><td class="first">1차</td><td class="n">693</td><td class="n">1</td><td class="n">$12.42</td></tr>
+              <tr><td class="first">2차 (재전송)</td><td class="n">1</td><td class="n">0</td><td class="n">$0.02</td></tr>
+              <tr><td class="first">3차 (세기만)</td><td class="n">0</td><td class="n">0</td><td class="n">$0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">재전송한 1개(에피소드 57)는 처음에 10프레임 중 9개만 답했고 다시 보내 모두 답함. 대체값("비접촉")을 쓴 호출은 없음. 비용은 견적 $11.86보다 4.9% 많음(호출당 입력 11,946토큰). 방법 C도 같은 견적을 써서 약 5% 더 나올 수 있음.</p>
+
+      <figure>
+        <img src="assets/exp34_arm_a_held_out.png" loading="lazy" width="650" height="500" alt="검증 에피소드와 손별 접촉 프레임 비율, 방법 A 대 방법 B" style="max-width:520px">
+        <div class="keys"><span class="key"><i style="--c:#4c72b0"></i>왼손</span><span class="key"><i style="--c:#ff7f0e"></i>오른손</span></div>
+        <figcaption>정답 없이 본 검증 에피소드·손별 접촉 프레임 비율. 가로는 방법 B, 세로는 방법 A. 아래쪽에 모인 왼손 점 9개는 짧은 에피소드 9개로, Muse Spark가 왼손 접촉을 거의 표시하지 않음.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>검증 호출 693개 모두 재전송 한 번 뒤 답이 있어 5% 한도에 걸리지 않음. 최종 채점에 쓸 답이 갖춰짐.</li>
+        <li>Muse Spark는 왼손 접촉을 61.8%, 오른손을 79.6% 프레임에서 표시함(튜닝 3개: 74.4%, 86.5%).</li>
+        <li>약 35~40초 길이의 짧은 에피소드 9개(18, 24, 27, 39~43, 45)에서는 왼손 접촉이 14% 이하. 한 번 약 2.5초만 표시하거나(8개) 전혀 표시하지 않음(39번). 같은 에피소드에서 방법 B는 왼손 접촉을 51~86%로 봄. 에피소드·손별 두 방법의 접촉 비율 상관은 0.09.</li>
+        <li>어느 쪽이 맞는지는 최종 실행에서 장갑으로만 판정함.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3384,7 +3422,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>비교 6과 보고 행 두 개의 코드를 튜닝 대리 등급으로 점검(<a href="#exp-31">EXP-31</a>). 라벨 5개일 때 결합 0.749 대 물체 비율 0.722, 20개부터는 거의 같음. 같은 물체 안 AUC는 0.574. 결과가 아니라 코드 점검.</li>
       <li>평가 1 방법 B를 튜닝 50개로 확정(<a href="#exp-32">EXP-32</a>, SAM $11.89). 에피소드 하나씩 빼고 F1 ±5 0.153, ±15 0.294, IoU 0.683. 검증용 규칙: 거리 2px, 물체 이동 0.05, 동반 이동 0.7, 물체가 바뀌어 3프레임 유지되면 끊음, 보정 +4/−1프레임.</li>
       <li>검증 22개에 SAM을 보내고($5.45) 고정한 방법 B를 적용(<a href="#exp-33">EXP-33</a>). 경계 1,790개, 정답으로 채점하지 않음. 방법 C 검증 비용은 약 $23.31.</li>
-      <li>다음: 평가 1 방법 A 검증($11.86)과 방법 C(튜닝 보정 $2.61, 검증 약 $23.31), 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
+      <li>검증 22개에 방법 A를 보냄(<a href="#exp-34">EXP-34</a>, $12.44). 호출 693개 모두 답이 있고 대체값은 쓰지 않음. 짧은 에피소드 9개에서 Muse Spark가 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름(접촉 비율 상관 0.09). 채점은 최종 실행에서.</li>
+      <li>다음: 평가 1 방법 C(튜닝 보정 $2.61, 검증 약 $23.31~24.50), 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
 
@@ -3477,7 +3516,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-28 22:41 KST
+    마지막 갱신 2026-10-29 06:11 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -3535,7 +3574,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "튜닝 나머지 47개 SAM 실행 (EXP-32, $11.89)"],
         ["done", "B SAM 규칙 기준값과 보정 확정: F1 ±5 0.153, IoU 0.683 (튜닝 50개, EXP-32)"],
         ["done", "검증 22개 SAM 실행, B 적용: 경계 1,790개 (EXP-33)"],
-        ["todo", "A Muse Spark 단독 (5fps)"],
+        ["done", "A Muse Spark 단독 검증 22개: 693호출 모두 답 (EXP-34, $12.44)"],
         ["todo", "C Muse Spark 경계 확인"],
         ["todo", "검증 22개로 세 방법 채점"]
       ]
