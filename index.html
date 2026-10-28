@@ -566,6 +566,7 @@
             <tr class="core"><td class="first"><a href="#exp-32">EXP-32</a></td><td class="wrap-ok">튜닝 50개로 확정한 방법 B (SAM 규칙)</td><td>에피소드 하나씩 빼고 F1 ±5 0.153, ±15 0.294, IoU 0.683(항상 접촉 0.623). 경계를 2.5배 많이 냄. 50번 중 46번 같은 규칙을 골라 검증용으로 고정.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-33">EXP-33</a></td><td class="wrap-ok">검증 22개 SAM과 고정한 방법 B 적용</td><td>SAM 요청 44개 모두 완료. 튜닝 규칙으로 검증 경계 1,790개(분당 78.9, 튜닝 90.0). 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-34">EXP-34</a></td><td class="wrap-ok">검증 22개에 보낸 방법 A (Muse Spark 단독)</td><td>호출 693개 모두 답(1개 재전송, 대체값 없음). 짧은 에피소드 9개에서 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름. 채점은 최종 실행에서.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-35">EXP-35</a></td><td class="wrap-ok">방법 C의 시점 보정용 튜닝 표본</td><td>경계 200개 모두 답, Muse Spark가 95개를 옮김. 비용이 견적보다 18% 많아 검증 C(약 $27.63)는 결정 대기.</td></tr>
           </tbody>
         </table>
       </div>
@@ -880,7 +881,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3356,6 +3357,38 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>어느 쪽이 맞는지는 최종 실행에서 장갑으로만 판정함.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-35">
+      <div class="exp-h"><span class="id">EXP-35</span><span class="t">방법 C의 시점 보정용 튜닝 표본</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>방법 C는 방법 B의 경계마다 주변 7프레임을 Muse Spark에 보여 주고 실제 시작 또는 끝 프레임을 고르게 함(0은 그대로). C의 시점 보정은 튜닝에서 Muse Spark가 옮긴 경계로만 배움. 이 단계는 그 보정용 튜닝 표본을 보냄.</dd>
+        <dt>입력</dt><dd>EXP-32의 에피소드 하나씩 빼기 B 구간에서 무작위로 뽑은 시작 100개, 끝 100개(seed 20261026). 호출 200개, 각 7프레임, $3.09. 튜닝만.</dd>
+        <dt>방법</dt><dd>측정 계획의 "해석되지 않는 답" 규칙대로 같은 명령을 한 번 더 보내고, 남은 호출 수를 셈.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">Muse Spark가 고른 프레임 (경계 200개)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>고른 프레임</th><th class="n">0 (그대로)</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th></tr></thead>
+            <tbody>
+              <tr><td class="first">경계 수</td><td class="n">105</td><td class="n">14</td><td class="n">21</td><td class="n">21</td><td class="n">16</td><td class="n">10</td><td class="n">7</td><td class="n">6</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">7프레임은 B 경계에서 −15, −10, −5, 0, +5, +10, +15프레임 위치로, 4번이 B 경계 자체.</p>
+      <figure>
+        <img src="assets/exp35_arm_c_tuning_sample.png" loading="lazy" width="1125" height="412" alt="튜닝 경계 200개에서 Muse Spark가 고른 프레임과 호출당 비용">
+        <figcaption>왼쪽: Muse Spark가 고른 프레임, 시작 100개와 끝 100개(0은 그대로, 4는 B 경계 프레임). 오른쪽: 호출당 비용, 점선은 견적, 실선은 실측 평균.</figcaption>
+      </figure>
+      <p class="note">호출 200개 모두 첫 전송에서 프레임 번호를 받아 재전송과 대체값이 없음. 비용은 견적 $2.61보다 18% 많음. 호출당 입력 8,559토큰(견적 7,700), 출력 1,114토큰(견적 800, 중앙값 992, 95번째 백분위 2,337).</p>
+
+      <ul class="plain concl">
+        <li>C 보정용 튜닝 표본이 갖춰짐. Muse Spark가 경계 200개 중 95개를 옮김.</li>
+        <li>실측 단가($0.0154/호출)로 검증 경계 1,790개는 약 $27.63으로, 보내기 전에 승인한 범위($23.31~24.50)를 넘음. 그래서 검증 C는 보내지 않았고 결정을 기다림.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3423,7 +3456,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>평가 1 방법 B를 튜닝 50개로 확정(<a href="#exp-32">EXP-32</a>, SAM $11.89). 에피소드 하나씩 빼고 F1 ±5 0.153, ±15 0.294, IoU 0.683. 검증용 규칙: 거리 2px, 물체 이동 0.05, 동반 이동 0.7, 물체가 바뀌어 3프레임 유지되면 끊음, 보정 +4/−1프레임.</li>
       <li>검증 22개에 SAM을 보내고($5.45) 고정한 방법 B를 적용(<a href="#exp-33">EXP-33</a>). 경계 1,790개, 정답으로 채점하지 않음. 방법 C 검증 비용은 약 $23.31.</li>
       <li>검증 22개에 방법 A를 보냄(<a href="#exp-34">EXP-34</a>, $12.44). 호출 693개 모두 답이 있고 대체값은 쓰지 않음. 짧은 에피소드 9개에서 Muse Spark가 왼손 접촉을 거의 표시하지 않아 방법 B와 크게 다름(접촉 비율 상관 0.09). 채점은 최종 실행에서.</li>
-      <li>다음: 평가 1 방법 C(튜닝 보정 $2.61, 검증 약 $23.31~24.50), 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
+      <li>방법 C의 보정용 튜닝 표본 200개를 보냄(<a href="#exp-35">EXP-35</a>, $3.09). 모두 답이 있고 Muse Spark가 95개 경계를 옮김. 실측 단가가 견적보다 18% 높아 검증 C는 약 $27.63으로, 승인 범위를 넘어 보내지 않음.</li>
+      <li>다음: 평가 1 방법 C 검증(약 $27.63, 결정 대기), 평가 2 SAM 전체, Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
     </ul>
   </section>
 
@@ -3516,7 +3550,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 06:11 KST
+    마지막 갱신 2026-10-29 07:11 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -3575,7 +3609,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "B SAM 규칙 기준값과 보정 확정: F1 ±5 0.153, IoU 0.683 (튜닝 50개, EXP-32)"],
         ["done", "검증 22개 SAM 실행, B 적용: 경계 1,790개 (EXP-33)"],
         ["done", "A Muse Spark 단독 검증 22개: 693호출 모두 답 (EXP-34, $12.44)"],
-        ["todo", "C Muse Spark 경계 확인"],
+        ["done", "C 보정용 튜닝 표본 200개: 95개를 옮김 (EXP-35, $3.09)"],
+        ["todo", "C Muse Spark 경계 확인 검증 1,790개 (약 $27.63, 결정 대기)"],
         ["todo", "검증 22개로 세 방법 채점"]
       ]
     },
