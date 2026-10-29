@@ -254,6 +254,18 @@ def object_reference(d, test, test_role):
 def unseen_objects(d, items, train_role, test_role):
     """Comparison 4: every learned part refit without the object being scored."""
     has_base = "muse_baseline" in d
+    u = unseen_scores(d, items, train_role, test_role)
+    out = {"note": "per test object, hand shape fit (model and cut points) and score weights refit without it",
+           "our_score": metrics(u, "our_score"), "object_reference": metrics(u, "object_reference")}
+    if has_base and u.plug_in.notna().any():
+        out["muse_alone"] = metrics(u, "muse_baseline")
+        out["muse_plus_checks"] = metrics(u.dropna(subset=["plug_in"]), "plug_in")
+    return out
+
+
+def unseen_scores(d, items, train_role, test_role):
+    """The test clips with our_score and plug_in refit without their own object (comparison 4)."""
+    has_base = "muse_baseline" in d
     parts = []
     for o in sorted(d[d.role == test_role].object.unique()):
         dd = d.copy()
@@ -269,12 +281,7 @@ def unseen_objects(d, items, train_role, test_role):
         parts.append(te)
     u = pd.concat(parts)
     u["object_reference"] = reference_pool(d, test_role).copyable.mean()  # an unseen object has no share
-    out = {"note": "per test object, hand shape fit (model and cut points) and score weights refit without it",
-           "our_score": metrics(u, "our_score"), "object_reference": metrics(u, "object_reference")}
-    if has_base and u.plug_in.notna().any():
-        out["muse_alone"] = metrics(u, "muse_baseline")
-        out["muse_plus_checks"] = metrics(u.dropna(subset=["plug_in"]), "plug_in")
-    return out
+    return u
 
 
 def logit(p):

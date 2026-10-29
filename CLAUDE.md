@@ -81,6 +81,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/number2_pilot.py` | P1 파일럿 점검 (EXP-23): SAM이 고른 물체 vs 데이터셋 2D 박스, Muse 물체 등급 vs 3D 모델 대리값, 실제 호출 단가 (API 호출 없음) |
 | `scripts/hot3d_fisheye_check.py` | 어안 왜곡 보정 점검 (EXP-25): 원본 vs 보정 프레임에서 MediaPipe 손 검출, 2D 오차, 손 모양 오차를 모캡과 비교. `FISHEYE_FOCAL=1.0`은 보조 확인 |
 | `scripts/number2_score.py` | 숫자 2 점수 학습과 비교. `--check` (튜닝만, 코드 점검), `--gate` (P7a 뒤 게이트, `--standin`은 대리값 점검), `--final` (held-out, 마지막에 한 번). 출력에 물체 하나씩 빼기, 비교 5, 비교 6 (물체 비율 추가), extra (물체 안 AUC, 실패 원인별 AUC) 포함 |
+| `scripts/number2_depth.py` | 숫자 2 held-out을 깊이 2 mm / 10 mm 라벨로도 채점 (EXP-41). 5 mm로 배운 점수 그대로, 5 mm 행이 EXP-40과 같지 않으면 중단. API 호출 없음 |
 | `scripts/number2_power.py` | 비교 5 (학습 가중치 vs 같은 가중치) 검정력: 튜닝 3명짜리 가짜 held-out 20개, 대리값 (EXP-27, API 호출 없음) |
 | `scripts/benchmark_export.py` | 정답을 공개 벤치마크로 내보냄 (`benchmark/number1/ground_truth.json`, `benchmark/number2/clips.csv`, 그림). 채점은 `benchmark/score_number1.py`, `score_number2.py` (프로젝트 코드와 독립, EXP-28) |
 | `scripts/tuning_muse_check.py` | 진짜 Muse 답으로 튜닝 확인 (EXP-29): A 보정 (에피소드 하나씩 빼기), 숫자 2 R1/R2/R3 (사람 하나씩 빼기), 처음 보는 물체 |
@@ -88,7 +89,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/number2_gate_noise.py` | 대리값 등급에 무작위 오류를 섞어 게이트 결과가 어떻게 떨어지는지 (EXP-26, API 호출 없음) |
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A 보정은 `--a-shift-episodes` 0,30,53, C 보정은 `--c-shift-episodes` 튜닝 50개에서 배워 적용, 짝지은 부트스트랩, EXP-36), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
-| `scripts/viewer_data.py` | 뷰어 데모 데이터 (튜닝만): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외) |
+| `scripts/viewer_data.py` | 뷰어 데이터 (최종 held-out 결과, EXP-37, EXP-40): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외). 숫자 2 점수와 숫자 1 행이 최종 실행과 같은지 확인 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
 | `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 12개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)과 빈 C 폴더로 돌아 50개 B 출력을 덮어쓰지 않는다. `score_tune50`은 진짜 튜닝 C 답으로 최종과 같은 보정 |

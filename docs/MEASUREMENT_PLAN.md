@@ -517,6 +517,32 @@ reference.
   objects, 0.775, 0.693, 0.723 against grip, reach and collision fails. A
   check of the code, not a result.
 
+### Depth limit on held-out (written 2026-10-29, after the final run, before computing, EXP-41)
+
+The v2 label says that the result is reported at the depth limits 2 mm and
+10 mm as well (the copyable share moves from 18% to 66% on tuning). The final
+run (EXP-40) used 5 mm only. The depth rows are computed as follows, without
+changing anything learned:
+
+- The score stays as it is. Every weight, the hand shape fit and the Muse
+  Spark rows are learned on the 5 mm label of the score_train clips, as in
+  EXP-40. Only the held-out label they are scored against changes to the
+  2 mm and the 10 mm label (`copyable_depth_2mm`, `copyable_depth_10mm` in
+  `benchmark/number2/clips.csv`). The question is whether the ranking found
+  at 5 mm holds when the label is stricter or looser.
+- The object reference takes the share of each object on the 2,385 tuning
+  clips at the same depth, because it is defined as the label share.
+- Rows at each depth: comparisons 1 to 3 (our score, Muse Spark alone,
+  object reference, Muse Spark plus our checks), comparison 4 (unseen
+  objects, the per-object refit scores of EXP-40), comparison 5 (R1, R2, R3
+  and the four paired differences), the AUC inside each object for our score,
+  and the held-out copyable share.
+- Not repeated: comparison 6 and the rows per failure reason. Both depend on
+  the 5 mm label beyond the scored clips (the labeled tuning pool draws, the
+  failing condition at 5 mm).
+- The 5 mm rows must equal EXP-40. The code stops if they do not.
+- Same metrics as above: AUC with the sequence bootstrap, per person, top 20%.
+
 ### Checks before any paid call
 
 - Single-check AUC of the three local checks on tuning clips (EXP-12).
