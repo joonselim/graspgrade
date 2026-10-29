@@ -5,6 +5,8 @@
 
 \usepackage[margin=0.85in]{geometry}
 \usepackage{mathptmx}
+\usepackage[scaled=0.9]{helvet}
+\usepackage{courier}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -338,13 +340,13 @@ C $-$ B, $\pm 15$ & $+0.013$ & 0.002 to 0.023 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp37_number1_final.png}
+\includegraphics[width=\textwidth]{exp37_number1_final.png}
 \caption{Task 1 on the 22 held-out episodes, cleaned glove ground truth
 (EXP-37).}
 \label{fig:num1}
-\end{figure}
+\end{figure*}
 
 Table \ref{tab:num1} and Figure \ref{fig:num1} give the result. Muse Spark
 alone with the glove shift is the best row on all three metrics. The shift is
@@ -421,15 +423,15 @@ spatula, and the hand cannot span a wide bowl or plate the way the human did.
 By object, the share runs from 1 percent for a keyboard to 96 percent for a
 small holder.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp16_copyable_v2.png}
+\includegraphics[width=\textwidth]{exp16_copyable_v2.png}
 \caption{The copyable version 2 label. Left: the share for other reach and
 depth limits, with the fixed choice starred. Middle: which condition no hand
 shift can meet. Right: the share per tuning person for version 2 (green) and
 for the first label (grey). EXP-16.}
 \label{fig:label}
-\end{figure}
+\end{figure*}
 
 \begin{figure}[t]
 \centering
@@ -493,14 +495,14 @@ coarse three-level stand-in grades keep that signal: they reach 0.683 and
 0.666 (EXP-19). Both checks had to clear a 0.65 bar set in advance, and both
 did.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp18_object_geometry.png}
+\includegraphics[width=\textwidth]{exp18_object_geometry.png}
 \caption{Object geometry from the 3D models against object identity, on tuning
 clips (EXP-18). Geometry still works when the object is left out of training, where
 identity cannot work at all.}
 \label{fig:geom}
-\end{figure}
+\end{figure*}
 
 \subsection{What is compared}
 
@@ -574,12 +576,12 @@ Ours $-$ R3 (other checks) & $+0.001$ & $-0.011$ to 0.013 & no \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp40_number2_final.png}
+\includegraphics[width=\textwidth]{exp40_number2_final.png}
 \caption{Task 2 on the 1,426 held-out clips (EXP-40).}
 \label{fig:num2}
-\end{figure}
+\end{figure*}
 
 \paragraph{The checklist is what works, not learning.} Muse Spark asked the
 plain question cannot tell copyable from non-copyable clips at all
@@ -650,12 +652,12 @@ Our score inside an object & 0.505 & 0.506 & 0.504 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp41_number2_depth.png}
+\includegraphics[width=\textwidth]{exp41_number2_depth.png}
 \caption{Task 2 held-out at three collision depth limits (EXP-41).}
 \label{fig:depth}
-\end{figure}
+\end{figure*}
 
 The plan said to report the held-out result at 2 mm and 10 mm as well, and to
 learn nothing again. Table \ref{tab:depth} and Figure \ref{fig:depth} give it.
@@ -704,13 +706,13 @@ Rigid HOT3D clips held back & 2.1\% & $\le 10\%$ & yes \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{exp42_soft_check.png}
+\includegraphics[width=\textwidth]{exp42_soft_check.png}
 \caption{Muse Spark answers on the soft OpenGraph objects, and the HOT3D
 objects it holds back (EXP-42).}
 \label{fig:soft}
-\end{figure}
+\end{figure*}
 
 The check fails (Table \ref{tab:soft}). All 1,782 items returned a parsed
 answer on the first pass. Muse Spark leaves rigid HOT3D clips alone, holding
@@ -841,7 +843,7 @@ so that anyone can check this, and score their own filter against the same
 sensors.
 
 \begin{thebibliography}{9}
-\small
+\small\raggedright
 
 \bibitem{doasido}
 Do as I Do: Dexterous Manipulation Data from Everyday Human Videos.

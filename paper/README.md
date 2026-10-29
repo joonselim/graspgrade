@@ -18,23 +18,18 @@ index.
 
 ## Build
 
-No LaTeX is installed on this machine. Two ways to build it.
-
-Overleaf: upload `main.tex` and the `figures/` folder, keeping the folder name.
-
-WSL, after installing LaTeX once (this needs the user password):
-
-```bash
-sudo apt install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
-```
-
-Then:
+LaTeX is installed in WSL (`texlive-latex-recommended`,
+`texlive-fonts-recommended`, `texlive-latex-extra`). Build with:
 
 ```bash
 cd paper && pdflatex main.tex && pdflatex main.tex
 ```
 
-Run it twice so the table and figure references resolve.
+Run it twice so the table and figure references resolve. The last build gives
+10 pages with no overfull box and no unresolved reference.
+
+Overleaf works as well: upload `main.tex` and the `figures/` folder, keeping
+the folder name.
 
 ## Before submitting
 
