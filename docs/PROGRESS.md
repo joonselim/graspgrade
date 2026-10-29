@@ -1,6 +1,6 @@
 # GraspGrade 진행 상황
 
-마지막 갱신: 2026-10-29 (해커톤 Day 4). 마감 2026-11-04 정오 ET.
+마지막 갱신: 2026-10-30 (해커톤 Day 5). 마감 2026-11-04 정오 ET.
 
 ## 한 줄 상태
 
@@ -10,7 +10,9 @@
 
 숫자 2 held-out 최종 채점을 1회 했다 (EXP-40): 우리 점수 AUC 0.624 (0.589~0.661), Muse 단독 0.501, 물체 기준선 0.771, Muse + 우리 항목 0.624. 처음 보는 물체에서 우리 점수 0.571 vs 물체 기준선 0.5. 체크리스트 효과 R2-R1 +0.117 (0.073~0.166), 학습 효과 R3-R2 +0.005 (없음), 로컬+SAM 항목 +0.001 (없음). 물체 안 AUC 0.506. 비교 6은 라벨 5개부터 물체 비율 단독과 결합이 같다. 정답은 copyable v2 (EXP-16, held-out EXP-20)이고 체크리스트는 물체 항목 중심이다 (EXP-18, 19). 깊이 한도 보고 (EXP-41, 무료, 계획에 규칙 먼저): 5 mm로 배운 점수를 2 mm / 10 mm 라벨로 채점. 10 mm는 그림 유지 (우리 0.632, Muse 단독 0.541), 2 mm는 우리 0.521 (우연 수준), Muse 단독 0.417, 물체 기준선 0.761. 부드러운 물체 확인은 합격 못 했다 (EXP-42): soft 구간 51.7% 잡기 (합격선 70% 이상, 미달), HOT3D 보류 2.1% (합격선 10% 이하, 충족). 뷰어 Touch check 탭에 "Not validated"로 표시했다.
 
-무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "다음 할 일".
+남은 것은 제출 작업이다: 데모 영상 확정, Official Rules 확인, 저장소 공개 범위와 라이선스 (아래 "미해결" 4, 6).
+
+무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "실행 기록".
 
 유료 전 코드 점검 (2026-10-28, API 호출 없음): 회귀 기준값 저장 (`regression_check.py`, 11개 명령, 보고 수치 재현 확인). 수정 3개: (1) SAM 상태가 completed가 아니거나 Muse 답을 해석 못 하면 완료로 캐시하지 않고 `unparsed/` 또는 `.<status>` 파일로 남겨 재실행 시 다시 보냄, (2) `number2_score --final`은 등급이나 Muse 단독 답이 빈 클립이 있으면 멈춤 (전에는 그 항목을 조용히 뺐다), (3) arm C 캐시가 현재 B 구간과 프레임이 다르면 멈춤. 가짜 클라이언트 점검 24개 통과 (`check_paid_cache.py`), 수정 후 회귀 비교 11개 모두 바이트 동일. (해결 2026-10-28) 끝내 해석되지 않는 답: 측정 계획 "Replies that never parse"에 규칙 기록. 단계마다 전체 실행 후 같은 명령을 한 번 더 돌려 해석 안 된 것만 재전송, 그래도 안 되면 A는 그 호출의 프레임을 비접촉, C는 B 경계 유지, 체크리스트/기준선은 그 클립을 숫자 2 모든 행에서 제외. held-out에서 한 단계의 5% 넘게 남으면 사용자와 정하기 전까지 그 단계 결과를 보고하지 않음. API 오류는 해석 실패가 아니며 답이 올 때까지 재전송. `number2_score --final`이 Muse 답 없는 클립을 5%까지 빼고 넘으면 멈추도록 수정 (`dropped_no_muse_answer` 출력). 가짜 점검 46개 통과, 회귀 11개 동일.
 
@@ -71,7 +73,7 @@ git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private
 | 분할 고정 | OpenGraph 50/22, HOT3D 사람 6/3 | `splits/*.json` |
 | Meta API 스모크 테스트 | Muse Spark 6.0초 $0.0049, SAM 3.1 150프레임 25.6초 $0.03, 응답 파싱 성공 | `scripts/meta_smoke.py`, `out/meta_smoke/report.json` |
 
-브리프 1-7 설치 확인 순서 기준: 1~5번 완료. 6번(HOT3D 좌표 정렬)은 미완.
+브리프 1-7 설치 확인 순서 기준: 1~5번 완료. 6번(HOT3D 좌표 정렬)은 EXP-08, EXP-09로 해결.
 
 ## Meta API 측정 (2026-10-27)
 
@@ -126,9 +128,9 @@ SAM 3.1 응답 형식 (브리프 1-5와 일치):
 
 `.env` 문제: MODEL_API_KEY 줄이 `MODEL_API_KEY=MODEL_API_KEY=...`로 이름이 두 번 들어가 있어 401이 났다. 중복된 부분을 지워 고쳤다(Windows와 WSL 둘 다).
 
-## 접촉 자르기 (Day 3~4, 진행 중)
+## (이력) 접촉 자르기 파일럿 (EXP-06, 2026-10-27)
 
-파일럿 A(ep 0, 30, 53, $1.15)를 보냈다 (EXP-06). 다음은 B(튜닝 나머지 47개, $11.89, 승인 필요).
+파일럿 A(ep 0, 30, 53, $1.15)를 보냈다 (EXP-06). 이어진 B(튜닝 나머지 47개)와 C(held-out 22개)는 P2, P3으로 끝났다 (EXP-32, EXP-33).
 
 파일럿 결과:
 - SAM은 에피소드 전체(최대 146초)에서 손 id 2개를 끝까지 유지했다. 각 손은 자기 접촉 프레임의 97~100%에서 검출된다. 요청당 44~83초, 6개 병렬로 93초, 원문 출력 에피소드당 약 100 MB(gzip).
@@ -150,10 +152,10 @@ SAM 3.1 응답 형식 (브리프 1-5와 일치):
 | 단계 | 내용 | 프레임 | 비용 |
 | --- | --- | --- | --- |
 | A 파일럿 (완료, EXP-06) | 튜닝 ep 0, 30, 53 | 5,762 | $1.15 |
-| B 튜닝 나머지 | 튜닝 47개 | 59,444 | $11.89 |
-| C held-out | 22개, 최종 측정 때만 | 27,250 | $5.45 |
+| B 튜닝 나머지 (완료, EXP-32) | 튜닝 47개 | 59,444 | $11.89 |
+| C held-out (완료, EXP-33) | 22개, 최종 측정 때만 | 27,250 | $5.45 |
 
-Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따로 비용을 낸다.
+Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따로 보냈다 (P4 EXP-34, P5 EXP-35).
 
 ## HOT3D 클립 수와 숫자 2 비용 (EXP-07, $0)
 
@@ -190,13 +192,14 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - `viewer/` 정적 페이지 (index.html, app.js, style.css). 탭 2개: 클립 점수 (점수순 목록, 영상, 접촉 타임라인, 등급 카드와 가중치, Muse 이유, 프리셋 엄격 70+ / 균형 50+ / 물량 30+), 접촉 시점 (에피소드별 장갑 정답 vs B 타임라인, 클릭하면 영상 이동).
 - (2026-10-29 갱신) 데이터는 `scripts/viewer_data.py`가 최종 held-out 결과로 만든다. 클립 점수 탭: held-out 점수 상위 15개 + 하위 15개, 최종 실행과 같은 모델 (점수 일치 확인), 12개 등급과 가중치, 정답과 실패 원인, Muse 체크리스트 이유, Muse 단독 확률과 이유, 상단에 AUC 요약. 접촉 시점 탭: held-out 22개 에피소드, 손별 장갑 / A+보정 / B / C+보정 트랙, 에피소드별 F1과 IoU, 상단에 합산 요약. 영상 `viewer/media/` (WSL, 약 45 MB, 이전 튜닝 영상 포함)는 git에서 제외.
 - 로컬 확인: WSL에서 `cd ~/graspgrade/viewer && python3 -m http.server 8765` 후 http://localhost:8765. 두 탭 모두 동작 확인.
-- GitHub Pages 배포는 아직 안 했다 (원격 저장소 없음).
+- (2026-10-29) Touch check 탭(부드러운 물체 확인이 보류한 HOT3D 30클립, "Not validated")과 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`)를 추가했다.
+- 배포: 뷰어는 배포하지 않았다 (`viewer/media`가 git에 없음). 원격 저장소는 private (D3). 보고서 페이지(`index.html`, `en.html`, `logs.html`)와 라벨링 페이지는 보고서 세션이 Vercel 설정(`vercel.json`, noindex)으로 배포한다.
 
 ## 숫자 1 Muse 비교군 준비 (EXP-21, 무료)
 
 - `muse_contact.py`: A (Muse 단독, 5fps, 호출당 10프레임)와 C (B 경계마다 7프레임) 코드, `--send` 없으면 비용만. held-out A 약 $11.86, C 경계당 약 $0.013. 프롬프트 `scripts/prompts/number1_arm_a.txt`, `number1_arm_c.txt`.
 - 정답을 그대로 답하는 가상 Muse로 상한 측정 (파일럿 3개, 정리한 장갑): A 5fps 상한 F1(±5) 0.956 (5fps는 걸림돌 아님), C 상한 0.149 (B가 190개 중 52개 경계만 찾기 때문).
-- 결정 필요: C를 공정한 비교로 만들려면 (1) 튜닝 50개로 B 재현율을 올리거나 (SAM $11.89 필요), (2) C가 B의 긴 접촉 구간 안도 몇 fps로 훑게 한다 (Muse 호출 증가).
+- 결정 필요: C를 공정한 비교로 만들려면 (1) 튜닝 50개로 B 재현율을 올리거나 (SAM $11.89 필요), (2) C가 B의 긴 접촉 구간 안도 몇 fps로 훑게 한다 (Muse 호출 증가). (결정 D1, 2026-10-28: (1)로 했다.)
 
 ## 숫자 2 유료 실행 준비 (2026-10-27, 무료로 완료)
 
@@ -205,7 +208,7 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - `muse_hot3d.py` (Muse, `--send` 없으면 비용만): 체크리스트 $4.93 + $17.56, 기준선 $4.75 + $16.93 (추정, 프레임당 1,100 토큰). 응답은 클립별로 캐시, 다시 돌리면 빠진 것만 보낸다. 프롬프트 `scripts/prompts/number2_checklist.txt`, `number2_baseline.txt`.
 - `number2_sam_checks.py`: SAM 결과에서 가시성과 접촉 명확성 (OpenGraph 에피소드로 자체 점검 통과).
 - `number2_score.py --check`: 튜닝만으로 전체 코드 경로 점검 (대리 등급 사용, 결과 아님). `--final`은 유료 실행이 다 끝난 뒤 한 번.
-- 유료 순서 제안: SAM 파일럿 3윈도우 (약 $0.2) → Muse 체크리스트/기준선 파일럿 각 5클립 (약 $0.2) → 대리값과 비교 → 전체 실행.
+- 유료 순서 제안: SAM 파일럿 3윈도우 (약 $0.2) → Muse 체크리스트/기준선 파일럿 각 5클립 (약 $0.2) → 대리값과 비교 → 전체 실행. (이 순서대로 P1, P6, P7a, P7b로 실행했다.)
 
 ## 계획과 달랐던 사실 (자세한 내용은 DATA_NOTES.md)
 
@@ -226,7 +229,7 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 
 held-out은 최종 측정 전까지 튜닝에 쓰지 않는다.
 
-## 다음 할 일 (순서대로, MEASUREMENT_PLAN.md 기준)
+## 실행 기록 (MEASUREMENT_PLAN.md 기준)
 
 ### 지금 상태 요약 (2026-10-29)
 
@@ -300,8 +303,15 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 1. (해결, EXP-08) HOT3D 보정과 2D 박스는 Aria 원본 방향이다. preview는 원본을 시계 방향 90도 돌린 것: 원본 (u, v) → preview (1407 - v, u). preview 프레임 k = 스트림 214-1의 k번째 RGB 타임스탬프.
 2. (MANO 불필요, EXP-09) 손가락 끝은 UmeTrack 프로필 + 직접 짠 순운동학으로 얻는다. hand 0 = 왼손(프로필 그대로), hand 1 = 오른손(x축 반전). HOT3D 툴킷 / projectaria_tools 설치도 필요 없었다 (투영은 EXP-08 코드).
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다. one-pager는 2026-10-29에 GraspGrade 이름과 최종 결과로 갱신했다 (같은 링크 https://claude.ai/artifact/4so1DrQxogYfb5wsvTmBMv, 버전 2, 맨 위 그림은 held-out 에피소드 36 오른손 실제 트랙).
-4. 데모 영상 구성안: [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 녹화 준비 완료: 뷰어 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`), 영상용 그림 4장과 장면 1, 2, 6 글자 카드 3장(`scripts/demo_figures.py`, `docs/demo/`), `.claude/launch.json`의 `viewer` 서버. 녹화와 녹음은 아직 안 했다. 3:00, 장면 6개, 뷰어 녹화(에피소드 36, 7, HOT3D 클립 5개)와 영상용 그림 4장, 영어 내레이션 454단어. 영상 길이 규칙, HOT3D 영상 공개 가능 여부, 목소리는 사용자 결정. 루트 demo.html은 최종 결과와 맞지 않아 쓰지 않는다.
+4. 데모 영상: 구성안은 [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 3:00, 장면 6개, 뷰어 화면(에피소드 36, 7, HOT3D 클립 5개), 영상용 그림 4장, 글자 카드 3장(`scripts/demo_figures.py`, `docs/demo/`), 영어 내레이션 454단어. 영상은 `tools/demo_video.py`가 구성안대로 그렸다 (WSL `out/demo/graspgrade_demo.mp4`, 179.4초, 1920x1080, 자막 포함, 자막 없는 판 `graspgrade_demo_no_captions.mp4`). 목소리는 `tools/demo_voice.ps1`의 Windows 내장 합성 음성이다. 손으로 녹화할 때 쓰는 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`)와 `.claude/launch.json`의 `viewer` 서버도 남아 있다. 영상 길이 규칙, HOT3D 영상 공개 가능 여부, 합성 음성을 그대로 쓸지는 사용자 결정. 루트 demo.html은 최종 결과와 맞지 않아 쓰지 않는다.
 5. 측정 계획 대조 (2026-10-29): 약속했는데 빠진 보고 2개를 채웠다. EXP-40에 물체·사람 안 AUC(우리 점수 0.484)와 물체별 AUC 표(27개 물체, 우리 점수 14개가 0.5 초과)를 추가했다. 부드러운 물체 확인이 실패했으므로 뷰어에 Touch check 탭(보류 HOT3D 30클립, "Not validated")을 추가했다 (EXP-42 끝, viewer/data/touch.json). 마지막 재현 점검: regression_check compare 12개 모두 같음, check_paid_cache 53개 통과, number1_final_report / number2_depth / muse_soft score 다시 돌려 결과 파일 바이트 동일 (number2_score --final은 held-out 1회 원칙 때문에 다시 돌리지 않았고, viewer_data.py가 같은 모델로 점수를 다시 계산해 최종 파일과 일치함을 확인함).
+6. 제출 전 확인 (2026-10-30 점검, 모두 사용자 결정):
+   - Official Rules: 제출 항목, 영상 길이 제한, 사전 작성 코드 허용 여부, 팀 규모. 웹 검색으로는 원문을 찾지 못했다.
+   - 저장소 공개 범위: 지금 private (D3). git에 HOT3D 클립 33개와 OpenGraph 클립 71개(`label-media/*.mp4`, 라벨링 페이지용)와 `assets/clip.mp4`가 들어 있어, 공개하면 같이 공개된다. HOT3D 라이선스가 재배포를 허용하는지 확인하지 않았다. 데모 영상에도 HOT3D 영상이 나온다.
+   - 코드 LICENSE 파일이 없다. 벤치마크는 `benchmark/`에 데이터별 라이선스 안내가 있다.
+   - 루트 `demo.html`은 옛 결과("seven checks")이고 `vercel.json` 설정상 배포 대상에 들어간다. 지우거나 고쳐야 한다.
+   - 뷰어는 `viewer/media`가 git에 없어 심사자가 직접 열 수 없다.
+   - 제출 설명 글: 자르기는 "Muse Spark 단독 + 장갑으로 배운 보정"이 가장 좋았고, 라벨이 있는 물체는 물체 비율이 우리 점수보다 낫다는 결과대로 쓴다. 제안서의 "SAM이 자르고 Muse가 확인한다" 문장을 그대로 옮기지 않는다.
 
 ## 디스크
 
