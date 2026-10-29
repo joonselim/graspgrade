@@ -159,8 +159,9 @@ def touch_check():
     c, h = check["caught"], check["hot3d_held_back"]
     out = {"note": "Not validated. This check failed its pass rule (EXP-42), so these clips are listed for a "
                    "touch check but the list should not be trusted.",
-           "summary": (f"Soft object check, held-out. Soft OpenGraph segments held back: {100 * c['all']:.1f}% "
-                       f"({c['segments']} segments, pass rule at least 70%, not met). Rigid HOT3D clips held back: "
+           "summary": (f"Soft object check (EXP-42). Soft OpenGraph segments held back: {100 * c['all']:.1f}% "
+                       f"({round(c['all'] * c['segments'])} of {c['segments']} segments, pass rule at least 70%, not met). "
+                       f"Rigid HOT3D clips held back: "
                        f"{100 * h['all']:.1f}% ({len(clips)} of {h['clips']:,}, pass rule at most 10%, met). "
                        f"Our score AUC on the kept clips: {check['our_score_auc_hot3d']['kept']['auc']:.3f}."),
            "clips": clips}
