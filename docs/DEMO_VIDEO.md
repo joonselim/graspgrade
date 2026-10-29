@@ -116,19 +116,20 @@
 
 ## 녹화 준비
 
-1. 뷰어 데이터와 영상은 WSL에만 있다 (`~/graspgrade/viewer/media/`). WSL에서 서버를 띄우고 Windows 브라우저로 `http://localhost:8765`를 연다.
+1. 뷰어 데이터와 영상은 WSL에만 있다 (`~/graspgrade/viewer/media/`). WSL에서 서버를 띄우고 Windows 브라우저로 `http://localhost:8765`를 연다. 같은 명령이 `.claude/launch.json`의 `viewer`에도 있다.
 
    ```bash
    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cd ~/graspgrade/viewer && python3 -m http.server 8765'
    ```
 
-2. 화면 1920x1080, 브라우저 확대 125%, 라이트 테마. 장면마다 따로 녹화해 편집에서 잇는다.
-3. 내레이션은 장면별로 따로 녹음해 길이를 맞춘다. 자막은 내레이션 문구 그대로 쓴다.
-4. 루트의 `demo.html`은 쓰지 않는다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
+2. 장면마다 위의 링크(`#clip=`, `#episode=…&hand=right`, `#compare=`)로 바로 연다. 해시 없이 열면 예전처럼 첫 탭이 나온다.
+3. 화면 1920x1080, 브라우저 확대 100%, 라이트 테마, 전체 화면(F11). 이 크기에서 뷰어 화면 6개(클립 3개, 비교 1개, 에피소드 2개)가 모두 세로 1080 안에 들어가는 것을 확인했다. 확대하면 오른쪽 등급 목록이 잘린다. 장면마다 따로 녹화해 편집에서 잇는다.
+4. 내레이션은 장면별로 따로 녹음해 길이를 맞춘다. 자막은 내레이션 문구 그대로 쓴다.
+5. 루트의 `demo.html`은 쓰지 않는다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
 
 ## 사용자 결정 필요
 
-- 공식 규칙의 영상 길이 제한과 형식. 3분보다 짧으면 장면 5의 그림 EXP-42와 장면 3의 에피소드 7을 먼저 뺀다.
+- 공식 규칙의 영상 길이 제한과 형식. 3분보다 짧으면 장면 5의 그림 `demo_soft.png`와 장면 3의 에피소드 7을 먼저 뺀다.
 - HOT3D 영상을 공개 영상에 넣어도 되는지 (라이선스 미확인). 안 되면 장면 1, 4, 5의 HOT3D 화면을 그림과 트랙만으로 바꾼다.
 - 내레이션 목소리 (직접 녹음 또는 음성 합성).
 - 제안서 위험 10의 "직접 찍은 1인칭 영상"은 넣지 않았다. 넣으려면 SAM과 Muse 호출이 필요하고, 남은 크레딧은 $6.73이다.

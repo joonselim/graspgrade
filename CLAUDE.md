@@ -89,6 +89,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/number2_gate_noise.py` | 대리값 등급에 무작위 오류를 섞어 게이트 결과가 어떻게 떨어지는지 (EXP-26, API 호출 없음) |
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A 보정은 `--a-shift-episodes` 0,30,53, C 보정은 `--c-shift-episodes` 튜닝 50개에서 배워 적용, 짝지은 부트스트랩, EXP-36), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
+| `scripts/demo_figures.py` | 데모 영상용 그림 4장 (1920x1080, 최종 결과 파일에서): `out/demo/`, 사본 `docs/demo/`. API 호출 없음 |
 | `scripts/viewer_data.py` | 뷰어 데이터 (최종 held-out 결과, EXP-37, EXP-40): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외). 숫자 2 점수와 숫자 1 행이 최종 실행과 같은지 확인 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
