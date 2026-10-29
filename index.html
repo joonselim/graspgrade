@@ -493,94 +493,24 @@
   <section>
     <h2><span class="no">2</span>요약</h2>
     <ul class="summary">
-      <li><b>평가 1, 접촉 시점(검증 결과).</b> 장갑 압력이 정답으로 쓸 만함(데이터셋 라벨과 97~99% 일치, EXP-04). 검증 22개에서 Muse Spark 단독에 장갑으로 배운 시점 보정을 더한 방법이 가장 높음: 경계 F1 ±5 0.195, ±15 0.376, 접촉 IoU 0.850. 보정은 두 Muse Spark 방법 모두에 도움이 됨(구간이 0 위, EXP-37).</li>
-      <li>SAM 규칙(방법 B)은 손이 늘 물체 곁에 있어 연이은 접촉을 하나로 묶음. 가장 가까운 물체가 바뀌면 끊게 해도 경계의 개수보다 위치가 틀림(EXP-14, EXP-22, EXP-24). 검증에서도 경계를 약 3배 많이 내 F1 ±5 0.090, IoU 0.667. Muse Spark 경계 확인을 더하면 조금 나아지지만(+0.022) Muse Spark 단독 + 보정보다 낮음(EXP-32, EXP-37).</li>
-      <li>Muse Spark 단독(방법 A)은 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝냄. 튜닝에서 배운 이 보정이 검증에서 경계 F1 ±5를 0.074에서 0.195로 올림. 1초보다 짧게 손을 놓는 순간은 프롬프트를 고쳐도 거의 못 봄(EXP-29, EXP-30, EXP-37).</li>
-      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 첫 정답 라벨은 로봇이 아니라 사람 손을 로봇 손으로 옮기는 방식의 부작용을 측정함(EXP-15). 충돌과 도달을 검사하는 v2 라벨로 바꿈: 튜닝 47%, 검증 46.4%, 손 크기와 무관(EXP-16, EXP-20).</li>
-      <li>v2 라벨을 가르는 것은 영상 품질이 아니라 물체. 물체 종류만으로 AUC 0.74이고, 원래 체크리스트의 영상 항목은 0.01만 더함(EXP-17). 그래서 "물체 성질"을 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목으로 나눔(EXP-18, EXP-19).</li>
-      <li><b>평가 2 검증 결과.</b> Muse Spark에게 따라할 수 있는지 직접 물으면 AUC 0.501로 우연 수준이고, 우리 점수는 0.624. 이득은 체크리스트로 묻는 데서 오고(+0.117), 가중치 학습(+0.005)과 SAM·영상 계산 항목(+0.001)은 더하지 못함. 처음 보는 물체에서도 0.571을 유지함(EXP-40).</li>
-      <li>물체 이름만으로 0.771로 우리 점수보다 높음. 검증 사람도 같은 물체를 잡기 때문임. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움(EXP-40).</li>
-      <li><b>부드러운 물체 확인.</b> Muse Spark에게 물체가 부드러운지 물어 점수에서 빼는 단계는 미리 정한 기준에 미달함. soft 구간을 51.7%만 걸러냄(기준 70%), 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 잘못 걸러냄(EXP-42).</li>
-      <li><b>결과물.</b> 정답 라벨과 채점 코드를 묶어 두어, 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음(EXP-28).</li>
+      <li><b>평가 1, 접촉 시점.</b> 영상만으로 접촉의 시작과 끝을 찾는 데는 Muse Spark에 촉각 장갑으로 배운 시점 보정을 더한 방법이 가장 좋음: 경계 F1 ±5 0.195, 접촉 IoU 0.850. SAM 마스크 규칙은 경계를 실제보다 약 3배 많이 냄(EXP-37).</li>
+      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> Muse Spark에게 한 번에 물으면 우연 수준(AUC 0.501)이지만, 체크리스트로 쪼개 물으면 0.624, 처음 보는 물체에서도 0.571. 물체 이름만 아는 기준선(0.771)보다는 낮고, 점수는 잡기가 아니라 물체를 줄 세움(EXP-40).</li>
+      <li><b>부드러운 물체 확인.</b> 미리 정한 기준에 미달함. 부드러운 물체를 51.7%만 걸러냄(기준 70%), 주로 테이프를 놓침(EXP-42).</li>
+      <li><b>결과물.</b> 센서로 만든 두 정답을 라벨 파일과 채점 코드로 묶음(EXP-28).</li>
     </ul>
 
     <div class="viz viz-n1" data-chart="n1"></div>
     <div class="viz viz-dots" data-chart="n2"></div>
-
-    <div class="tbl">
-      <p class="cap">주요 지표</p>
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>지표</th><th class="n">값</th><th>기준</th></tr></thead>
-          <tbody>
-            <tr><td class="first">평가 1: 데이터셋 라벨과 장갑 압력 일치 (왼손 / 오른손)</td><td class="n">98.7% / 97.2%</td><td>138,629 프레임 (EXP-04)</td></tr>
-            <tr><td class="first">평가 1: Muse Spark + 보정 경계 F1 ±5 / ±15 / 접촉 IoU</td><td class="n">0.195 / 0.376 / 0.850</td><td>검증 22개, 정리한 장갑 (EXP-37)</td></tr>
-            <tr><td class="first">평가 1: Muse Spark 경계 F1 ±5, 보정 전 / 후</td><td class="n">0.074 / 0.195</td><td>검증 22개, 차이 +0.121 (0.062~0.172) (EXP-37)</td></tr>
-            <tr><td class="first">평가 1: SAM 규칙 / + Muse Spark 확인 + 보정, 경계 F1 ±5</td><td class="n">0.090 / 0.137</td><td>검증 22개 (EXP-37)</td></tr>
-            <tr><td class="first">평가 2: v2 라벨 "따라할 수 있음" 비율 (튜닝 / 검증)</td><td class="n">47.0% / 46.4%</td><td>클립 2,385 / 1,426 (EXP-16, EXP-20)</td></tr>
-            <tr><td class="first">평가 2: Muse Spark 단독 / 우리 점수 / 물체 이름 (AUC)</td><td class="n">0.501 / 0.624 / 0.771</td><td>검증 1,426개 (EXP-40)</td></tr>
-            <tr><td class="first">평가 2: 처음 보는 물체에서 우리 점수 (AUC)</td><td class="n">0.571</td><td>물체 이름은 0.5, 검증 (EXP-40)</td></tr>
-            <tr><td class="first">평가 2: 체크리스트의 몫 / 학습의 몫 (AUC 차이)</td><td class="n">+0.117 / +0.005</td><td>검증, 학습의 몫은 구간이 0을 포함 (EXP-40)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </section>
 
   <section id="s-measure">
     <h2><span class="no">3</span>측정 계획</h2>
-    <p>기준값, 가중치, 프롬프트는 튜닝 세트에서 정하고, 보고하는 수치는 검증 세트에서 냄. 입력은 영상뿐이고 장갑과 모션캡처는 채점에만 씀.</p>
-
-    <div class="tbl">
-      <p class="cap">평가 1: 영상만으로 접촉 시작과 끝을 찾는가</p>
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>비교 대상</th><th>내용</th><th>쓰는 모델</th></tr></thead>
-          <tbody>
-            <tr><td class="first">A. Muse Spark 단독</td><td>5fps 프레임을 보고 손별로 접촉 여부를 판단. SAM 없음</td><td>Muse Spark</td></tr>
-            <tr><td class="first">B. SAM 규칙</td><td>손과 물체 마스크의 겹침 + 동반 이동(카메라 움직임 제외). 기준값은 튜닝에서</td><td>SAM 3.1</td></tr>
-            <tr><td class="first">C. B + 경계 확인</td><td>B의 시작과 끝마다 주변 약 7프레임(30fps)을 Muse Spark가 보고 정확한 프레임과 근거를 냄</td><td>SAM 3.1, Muse Spark</td></tr>
-            <tr><td class="first">참고</td><td>"항상 접촉", "항상 비접촉"</td><td>없음</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <p class="note">정답은 깜빡임을 정리한 촉각 장갑(EXP-14). 지표는 경계 F1(±5, ±15프레임)과 접촉 IoU. 세 방법 모두 튜닝에서 배운 시점 보정을 받고 보정 전후를 함께 보고함(EXP-27, EXP-29).</p>
-
-    <div class="tbl" style="margin-top:18px">
-      <p class="cap">평가 2: 우리 점수가 로봇 손이 따라할 수 있는 클립을 고르는가</p>
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>비교</th><th>이유</th></tr></thead>
-          <tbody>
-            <tr><td class="first">우리 점수 대 Muse Spark 단독</td><td>체크리스트 없이 같은 질문을 받은 Muse Spark와의 비교. 지원서의 주 비교</td></tr>
-            <tr><td class="first">물체 기준선</td><td>물체별 "따라할 수 있음" 비율만으로 예측하는 참고값</td></tr>
-            <tr><td class="first">Muse Spark 대 Muse Spark + 12개 항목</td><td>GraspGrade가 기존 필터를 대체하지 않고 그 위에 더하는 구조인지 확인</td></tr>
-            <tr><td class="first">처음 보는 물체에서 위 비교 다시</td><td>검증 물체마다 그 물체 없이 다시 학습해 채점. 물체 이름으로는 처음 보는 물체를 채점할 수 없음(0.5)</td></tr>
-            <tr><td class="first">체크리스트 대 학습</td><td>Muse Spark 단독, 체크리스트 등급 단순 평균, 같은 등급의 학습 가중치를 비교해 체크리스트의 몫과 학습의 몫을 나눔</td></tr>
-            <tr><td class="first">물체 비율 추가 (비교 6)</td><td>물체의 라벨 클립이 0, 5, 20, 전체일 때 물체 비율을 우리 점수에 더함. 우리 점수가 기본, 물체 비율은 라벨이 있는 물체에만 더하는 값</td></tr>
-            <tr><td class="first">물체 안 AUC, 실패 원인별 AUC</td><td>같은 물체의 두 잡기를 구분하는지, 잡기·도달·충돌 중 어떤 실패를 보는지. 합격 기준 없이 보고</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <p class="note">정답은 v2 라벨: 사람 손가락 위치에 맞춘 Allegro 손이 잡기, 도달, 충돌 없음 세 조건을 만족하면 "따라할 수 있음"(EXP-16). 가중치는 튜닝 400개로 학습하고 AUC는 검증 1,426개에서 냄. 사람별 AUC와 시퀀스 단위 부트스트랩 구간을 함께 보고함.</p>
-
-    <div class="tbl" style="margin-top:18px">
-      <p class="cap">부드러운 물체 확인: 점수는 강체에만 매김</p>
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>항목</th><th>내용</th></tr></thead>
-          <tbody>
-            <tr><td class="first">질문</td><td>Muse Spark가 클립 프레임 3장을 보고 물체를 강체, 눌리는 물체, 부드러운 물체, 모름 중 하나로 답함. 부드러운 물체나 모름이면 점수 없이 "촉각 확인 필요"로 분류</td></tr>
-            <tr><td class="first">정답</td><td>HOT3D 물체 33개와 OpenGraph 물체 71개를 두 사람이 각자 라벨링한 뒤 합의. 일치 81.7%, kappa 0.613. 영상에 물체가 나오지 않은 OpenGraph 물체 4개는 실험에서 제외</td></tr>
-            <tr><td class="first">데이터</td><td>HOT3D 검증 1,426개, OpenGraph 검증 접촉 구간 286개와 부드러운 물체가 나오는 튜닝 구간</td></tr>
-            <tr><td class="first">합격</td><td>부드러운 물체 구간의 70% 이상을 걸러내고, HOT3D 검증 클립은 10% 이하만 보류</td></tr>
-            <tr><td class="first">결과</td><td>불합격. soft 구간 51.7% 보류, HOT3D 2.1% 보류(EXP-42)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <ul class="plain">
+      <li><b>평가 1.</b> 영상만으로 손별 접촉 시작과 끝을 찾음. 세 방법(A Muse Spark 단독, B SAM 규칙, C B + Muse Spark 경계 확인)을 촉각 장갑과 비교. 지표는 경계 F1(±5, ±15프레임)과 접촉 IoU.</li>
+      <li><b>평가 2.</b> 잡기 클립마다 로봇 손이 따라할 수 있는지 0~100점을 매김. 모션캡처로 만든 로봇 손 정답과 비교해 AUC를 냄. 주 비교는 같은 질문을 한 번에 받은 Muse Spark.</li>
+      <li><b>부드러운 물체 확인.</b> 부드러운 물체를 점수에서 빼는 단계. 두 사람이 라벨링한 정답과 비교.</li>
+      <li>기준값, 가중치, 프롬프트는 튜닝 데이터에서 정하고, 수치는 검증 데이터에서 한 번만 냄.</li>
+    </ul>
 
     <p class="cap" style="margin-top:18px">판정 기준과 계산식</p>
     <div class="eq eqs">
@@ -738,9 +668,8 @@
   <section id="k-intro">
     <h2><span class="no">1</span>두 가지 질문</h2>
     <ul class="plain">
-      <li><b>평가 1, 접촉 시점.</b> 1인칭 영상만으로 손이 물체에 닿는 순간과 떨어지는 순간을 찾음. 정답은 손바닥 압력을 재는 촉각 장갑(OpenGraph).</li>
-      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 잡기 클립마다 로봇 손이 그 잡기를 따라할 수 있는지 점수를 매김. 정답은 모션캡처로 기록한 사람 손과 물체를 Allegro 로봇 손에 옮겨 판정한 라벨(HOT3D).</li>
-      <li>두 평가 모두 영상에는 SAM 3.1과 Muse Spark만 사용하고, 센서 데이터는 채점에만 사용함. 방법은 튜닝 데이터에서 정하고, 검증 데이터는 마지막에 한 번만 사용함.</li>
+      <li><b>평가 1, 접촉 시점.</b> 1인칭 영상만으로 손이 물체에 닿고 떨어지는 순간을 찾음. 정답은 촉각 장갑(OpenGraph).</li>
+      <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 잡기 클립마다 로봇 손이 따라할 수 있는지 점수를 매김. 정답은 모션캡처 손을 Allegro 로봇 손에 옮겨 판정한 라벨(HOT3D).</li>
     </ul>
   </section>
 
@@ -748,21 +677,10 @@
     <h2><span class="no">2</span>평가 1: 접촉의 시작과 끝</h2>
 
     <div class="ch">
-      <h3>정답 확인: 촉각 장갑은 정답으로 쓸 수 있음</h3>
+      <h3>SAM 규칙: 연이은 접촉을 제대로 나누지 못함</h3>
       <ul class="plain">
-        <li>데이터셋의 접촉 라벨과 장갑 압력이 프레임 기준 97~99% 일치함(EXP-04). 장갑을 정답으로 사용할 수 있음.</li>
-        <li>단, 장갑 압력은 임계값 근처에서 깜빡여 0.1초 길이의 끊김과 조각이 생김. 영상으로는 볼 수 없는 경계이므로, 0.1초 이하 끊김은 잇고 짧은 조각은 버린 "정리한 장갑"을 주 정답으로 정함(EXP-14).</li>
-        <li>영상에 보이는 접촉은 장갑 압력보다 먼저 시작함(EXP-06). 따라서 모든 방법에 장갑으로 학습한 시점 보정을 적용하고, 보정 전후를 함께 보고하기로 함(EXP-27).</li>
-      </ul>
-    </div>
-
-    <div class="ch">
-      <h3>SAM 규칙: 마스크만으로는 연이은 접촉을 나누지 못함</h3>
-      <ul class="plain">
-        <li>손과 물체 마스크가 겹치고 함께 움직이면 접촉으로 판정하는 규칙(방법 B). 접촉 구간 IoU 0.75로 "항상 접촉"(0.67)보다 높지만, 손이 늘 어떤 물체 곁에 있어 연이은 접촉을 하나로 묶음. 실제 경계 190개 중 52개만 검출함(EXP-14).</li>
-        <li>가장 가까운 물체가 바뀌면 끊도록 하자 경계 F1이 두 배가 됐으나, 경계를 392개 검출해 과분할이 발생함(EXP-22). 새 물체가 3프레임 이상 유지될 때만 끊으면 IoU 0.72, F1 0.145(EXP-24).</li>
-        <li>경계 개수를 실제와 비슷하게 맞춰도 F1은 0.09. 문제는 경계의 개수보다 위치에 있음.</li>
-        <li>튜닝 50개 전체로 고른 규칙도 같은 그림. 에피소드 하나씩 빼고 IoU 0.683("항상 접촉" 0.623), 장갑 경계의 절반을 ±15프레임 안에서 찾지만 경계를 2.5배 많이 내 F1 ±5는 0.153. 50번 중 46번 같은 규칙을 골라 검증용으로 고정함(EXP-32).</li>
+        <li>손과 물체 마스크가 겹치고 함께 움직이면 접촉으로 봄. 손이 늘 물체 곁에 있어 연이은 접촉을 묶거나 너무 잘게 끊음(EXP-14, EXP-22, EXP-24).</li>
+        <li>튜닝 50개로 고른 규칙도 경계를 2.5배 많이 내 F1 ±5 0.153, IoU 0.683(EXP-32).</li>
       </ul>
       <figure>
         <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="에피소드 0, 30, 53의 손별 접촉 구간: 장갑 정답과 유지 3프레임 방법 B">
@@ -774,9 +692,8 @@
     <div class="ch">
       <h3>Muse Spark 단독: 접촉을 일찍 판정하고, 짧은 놓음을 놓침</h3>
       <ul class="plain">
-        <li>영상을 초당 5장씩 제시하고 프레임마다 접촉 여부를 물어도, 답이 완벽하면 경계 F1 0.96까지 도달 가능함(EXP-21). 프레임 수는 한계가 아님.</li>
-        <li>실제 Muse Spark는 접촉 시작을 장갑보다 약 7프레임(0.23초) 일찍, 끝을 7프레임 늦게 판정함. 장갑으로 학습한 보정을 적용하면 경계 F1이 0.06에서 0.13으로 두 배가 됨(EXP-29).</li>
-        <li>1초보다 짧게 손을 놓았다 다시 잡는 순간은 거의 검출하지 못함. 0.5~1초 놓음도 15%만 검출함. 프롬프트를 한 번 수정해도 답의 2%만 바뀜(EXP-30). 그 결과 IoU는 0.82로 가장 높으나 경계 F1은 낮음.</li>
+        <li>접촉 시작을 장갑보다 약 7프레임 일찍, 끝을 7프레임 늦게 판정함. 장갑으로 배운 보정이 경계 F1을 두 배로 올림(EXP-29).</li>
+        <li>1초보다 짧게 손을 놓는 순간은 거의 못 봄. 프롬프트를 고쳐도 그대로(EXP-30).</li>
       </ul>
       <figure>
         <img src="assets/exp29_arm_a_timelines.png" loading="lazy" width="1320" height="759" alt="에피소드 0, 30, 53의 손별 접촉: 장갑 정답, Muse Spark 단독, 보정한 Muse Spark">
@@ -788,11 +705,8 @@
     <div class="ch">
       <h3>검증 결과: Muse Spark + 장갑으로 배운 보정이 가장 높음</h3>
       <ul class="plain">
-        <li>튜닝에서 고정한 규칙, 프롬프트, 보정으로 검증 22개를 한 번 채점함. Muse Spark 단독에 보정을 더한 방법이 세 지표 모두 가장 높음: 경계 F1 ±5 0.195, ±15 0.376, 접촉 IoU 0.850(EXP-37).</li>
-        <li>장갑으로 배운 시점 보정은 미리 정한 판정대로 두 Muse Spark 방법 모두에 도움이 됨(A +0.121, C +0.025, 구간이 0 위).</li>
-        <li>Muse Spark 경계 확인은 SAM 규칙을 개선하지만(+0.022), SAM 규칙이 경계를 약 3배 많이 내고 C는 그 경계를 옮기기만 할 수 있어 A + 보정에 미치지 못함.</li>
-        <li>A와 B가 크게 엇갈렸던 짧은 에피소드의 왼손은 장갑 기준으로 Muse Spark가 맞았음(EXP-34, EXP-37).</li>
-        <li>±5프레임(0.167초)에서는 모든 방법이 낮음. 장갑은 영상으로 볼 수 없는 압력을 재기 때문임.</li>
+        <li>경계 F1 ±5 0.195, ±15 0.376, 접촉 IoU 0.850으로 세 지표 모두 가장 높음. 보정은 두 Muse Spark 방법 모두에 도움이 됨(EXP-37).</li>
+        <li>Muse Spark 경계 확인은 SAM 규칙을 조금 개선하지만(+0.022), SAM 규칙의 경계가 너무 많아 Muse Spark 단독에 미치지 못함.</li>
       </ul>
       <div class="viz viz-n1" data-chart="n1"></div>
     </div>
@@ -804,9 +718,8 @@
     <div class="ch">
       <h3>정답 라벨: 첫 라벨은 로봇이 아니라, 옮기는 방식을 측정함</h3>
       <ul class="plain">
-        <li>모션캡처 손 모델로 손가락 끝의 3D 위치를 계산한 결과, 잡는 동안 물체 표면에서 2.3mm(EXP-09). 정답을 만들 재료는 충분히 정확함.</li>
-        <li>첫 라벨은 사람 손을 손 크기 비율만큼 늘려 Allegro 손에 옮김. 그 결과 꽉 쥔 캔에서도 로봇 손가락 끝이 25mm 떠 "따라할 수 없음"으로 판정됨. 라벨이 로봇이 아니라 옮기는 방식의 부작용을 측정하고 있었음(EXP-10, EXP-15).</li>
-        <li>손가락 위치를 직접 맞추고, 로봇 손 표면 전체로 충돌을, 사람이 닿은 손가락마다 도달을 검사하는 v2 라벨을 계산 전에 정의함. 튜닝 47%, 손 크기와 무관(+0.04), 검증 46.4%(EXP-16, EXP-20).</li>
+        <li>첫 라벨은 사람 손을 로봇 손 크기로 늘려 옮기다 보니, 꽉 쥔 캔도 "따라할 수 없음"이 됨(EXP-10, EXP-15).</li>
+        <li>손가락 위치를 맞추고 충돌과 도달을 검사하는 v2 라벨로 바꿈. 47%가 따라할 수 있음, 손 크기와 무관(EXP-16, EXP-20).</li>
       </ul>
       <figure>
         <img src="assets/exp16_examples.jpg" loading="lazy" width="990" height="660" alt="결과별 튜닝 클립 두 개씩: 따라할 수 있음, 충돌, 도달 실패" style="max-width:720px">
@@ -818,29 +731,13 @@
     <div class="ch">
       <h3>판별 요인: 영상 품질이 아니라 물체</h3>
       <ul class="plain">
-        <li>v2 라벨은 물체 종류만으로 AUC 0.74. 기존 체크리스트의 영상 항목(카메라 흔들림, 손 모양 등)은 그 위에 0.01만 더함(EXP-17).</li>
-        <li>따라서 "물체 성질"을 구체적인 항목으로 세분화함. 3D 모델의 크기와 모양 수치만으로 0.695, 학습에 없던 물체에서도 0.673. 물체 이름으로는 처음 보는 물체를 판별할 수 없음(0.5, EXP-18).</li>
-        <li>손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목을 상·중·하로 거칠게 매겨도 0.683. 대부분은 손 대비 크기가 설명함(EXP-19).</li>
+        <li>물체 종류만으로 AUC 0.74. 카메라 흔들림 같은 영상 항목은 0.01만 더함(EXP-17).</li>
+        <li>그래서 체크리스트를 물체 성질(손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간) 중심으로 바꿈(EXP-18, EXP-19).</li>
       </ul>
       <figure>
         <img src="assets/exp18_object_geometry.png" loading="lazy" width="1625" height="550" alt="왼쪽은 물체 종류와 물체 형상의 AUC 막대, 오른쪽은 물체별 가장 긴 변과 가장 짧은 변 산점도">
         <div class="keys"><span class="key"><i style="--c:#868e96"></i>물체 종류</span><span class="key"><i style="--c:#1c7ed6"></i>물체 형상</span><span class="key"><i class="dash" style="--c:#479957"></i>통과선 0.65</span><span class="key"><i class="dash" style="--c:#d04646"></i>실패선 0.60</span><span class="key"><i class="dot" style="--c:#b71126"></i>따라할 수 있음 0%</span><span class="key"><i class="dot" style="--c:#fafdb8"></i>50%</span><span class="key"><i class="dot" style="--c:#036e3a"></i>100%</span></div>
         <figcaption>왼쪽: 사람 또는 물체를 하나씩 뺐을 때의 AUC. 오른쪽: 물체마다 가장 긴 변과 가장 짧은 변, 점 크기는 클립 수, 색은 따라할 수 있는 비율. 길거나 부피가 큰 물체(키보드, 보온병, 공룡 장난감, 그릇)는 대부분 따라할 수 없고, 손에 쥘 만한 작은 물체(거치대, 머그, 캔, 병)는 대부분 따라할 수 있음.</figcaption>
-      </figure>
-    </div>
-
-    <div class="ch">
-      <h3>실제 Muse Spark: 직접 질문에는 판별하지 못하고, 항목별 질문에는 판별함</h3>
-      <ul class="plain">
-        <li>"로봇 손이 이 잡기를 따라할 수 있는가"를 직접 물으면 AUC 0.52. 키보드나 그릇처럼 거의 실패하는 물체도 가능하다고 답함(EXP-29, EXP-30).</li>
-        <li>같은 Muse Spark에 체크리스트 항목별로 물으면 0.63~0.65로 상승함(+0.11, 구간이 0 위). 라벨로 가중치를 학습하는 이득은 +0.019로 잡음 범위 안(EXP-29).</li>
-        <li>학습에서 제외한 처음 보는 물체에서도 0.607 유지. 아는 물체에서는 물체 이름만으로 0.688이므로 이 기준선이 여전히 높음.</li>
-        <li>Muse Spark는 물체를 실제보다 작고 좁게 인식함. cm 단위로 묻도록 수정해도 점수는 오르지 않음(EXP-30).</li>
-      </ul>
-      <figure>
-        <img src="assets/exp29_number2_rows.png" loading="lazy" width="1020" height="432" alt="행별 사람 하나씩 빼기 AUC 막대와 처음 보는 물체 점">
-        <div class="keys"><span class="key"><i style="--c:#1971c2"></i>합친 AUC</span><span class="key"><i style="--c:#74c0fc"></i>사람별 평균</span><span class="key"><i class="dot" style="--c:#e8590c"></i>학습 가중치, 처음 보는 물체 (0.607)</span></div>
-        <figcaption>행별 사람 하나씩 빼기 AUC. 가로선이 0.5.</figcaption>
       </figure>
     </div>
 
@@ -852,22 +749,15 @@
         <div><b>등급 → 점수</b>상 1, 중 0.5, 하 0. 학습한 가중치로 더해 0~100점</div>
         <div><b>검증</b>로봇 손 정답 라벨과 비교해 AUC를 잼</div>
       </div>
-      <ul class="plain">
-        <li>"상"은 항상 큰 네 손가락 로봇 손(Allegro)에 쉬운 쪽. Muse Spark는 화면 속 사람 손(손목~중지 끝 약 19cm)을 자로 써서 답함.</li>
-        <li>Muse Spark에게 "로봇 손이 따라할 수 있는가"를 한 번에 물으면 판별하지 못함(0.501). 같은 판단을 아래 질문들로 쪼개 물으면 판별함(0.617~0.624).</li>
-      </ul>
       <div class="viz ckl" data-chart="ckl"></div>
     </div>
 
     <div class="ch">
       <h3>검증 결과: 체크리스트가 Muse Spark를 우연 수준에서 끌어올림</h3>
       <ul class="plain">
-        <li>튜닝에서 고정한 규칙으로 검증 1,426개를 한 번 채점함. Muse Spark 단독 AUC 0.501, 우리 점수 0.624(EXP-40).</li>
-        <li>이득은 Muse Spark에게 체크리스트로 묻는 데서 옴(+0.117, 구간이 0 위). 가중치 학습(+0.005)과 SAM·영상 계산 항목(+0.001)은 더하지 못함.</li>
-        <li>처음 보는 물체에서도 0.571을 유지함. 물체 이름만 쓰는 방법은 이런 물체를 판단할 수 없음(0.5).</li>
-        <li>아는 물체에서는 물체 이름만으로 0.771로 더 높고, 물체당 라벨 클립이 5개만 있어도 물체 비율이 우리 점수와의 결합과 같음. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움.</li>
-        <li>센서로 만든 정답이 Muse Spark가 모르는 정보, 즉 어떤 물체에서 로봇 손이 실패하는지를 드러냄. 체크리스트는 이 정보를 질문으로 바꿔 라벨이 없는 물체에도 쓸 수 있게 함.</li>
-        <li>이 결과는 정답의 허용 깊이에 달려 있음. 10mm에서도 유지되지만(우리 점수 0.632, Muse Spark 단독 0.541), 2mm로 엄하게 하면 우리 점수도 우연 수준(0.521)으로 내려감(EXP-41).</li>
+        <li>Muse Spark에게 한 번에 물으면 0.501, 체크리스트로 쪼개 물으면 0.624. 이득은 질문을 쪼갠 데서 오고, 가중치 학습은 거의 더하지 못함(EXP-40).</li>
+        <li>처음 보는 물체에서도 0.571. 아는 물체에서는 물체 이름만으로 0.771이 더 높고, 같은 물체 안에서는 우연 수준이라 점수는 물체를 줄 세움.</li>
+        <li>정답의 허용 깊이를 10mm로 늘려도 유지되지만, 2mm로 엄하게 하면 우연 수준으로 내려감(EXP-41).</li>
       </ul>
       <div class="viz viz-dots" data-chart="n2"></div>
     </div>
@@ -876,14 +766,12 @@
   <section id="k-soft">
     <h2><span class="no">4</span>부드러운 물체 확인: 기준 미달</h2>
     <ul class="plain">
-      <li>제안서는 점수를 강체에만 매기기로 함. Muse Spark에게 물체가 rigid, squeezable, soft, unsure 중 무엇인지 하나 더 묻고, soft나 unsure면 점수를 매기지 않음.</li>
-      <li>정답은 두 사람이 물체 104개를 각자 라벨링한 뒤 합의함(일치 81.7%, kappa 0.613). 영상에 물체가 나오지 않은 4개는 실험에서 제외.</li>
-      <li>Muse Spark는 단단한 HOT3D 클립은 거의 건드리지 않지만(2.1% 보류, 기준 10% 이하), soft로 라벨링한 구간은 절반만 걸러냄(51.7%, 기준 70%). 미리 정한 기준에 미달함(EXP-42).</li>
-      <li>놓친 것은 주로 테이프로, Muse Spark는 squeezable이나 rigid로 답함. 뽁뽁이, 장갑, 매트는 대부분 잡음. 보류된 HOT3D 클립을 빼도 평가 2의 AUC는 그대로(0.624 → 0.625).</li>
+      <li>부드러운 물체를 51.7%만 걸러냄(기준 70%). 단단한 HOT3D 클립은 2.1%만 잘못 걸러냄(EXP-42).</li>
+      <li>놓친 것은 주로 테이프. 뽁뽁이, 장갑, 매트는 대부분 잡음.</li>
     </ul>
     <figure>
       <img src="assets/exp42_soft_check.png" loading="lazy" width="1250" height="475" alt="soft로 라벨링한 OpenGraph 물체에서 Muse Spark의 답과 보류한 HOT3D 물체">
-      <figcaption>왼쪽: soft로 라벨링한 물체에서 Muse Spark의 답(빨강 soft, 주황 unsure, 회색 squeezable, 파랑 rigid). 오른쪽: 보류된 HOT3D 물체와 비율, 점선이 기준 10%(EXP-42).</figcaption>
+      <figcaption>왼쪽: 부드러운 물체에서 Muse Spark의 답(빨강 soft, 주황 unsure, 회색 squeezable, 파랑 rigid). 오른쪽: 걸러진 HOT3D 물체와 비율, 점선이 기준 10%.</figcaption>
     </figure>
   </section>
 
@@ -4113,7 +4001,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 12:40 KST
+    마지막 갱신 2026-10-29 13:21 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
