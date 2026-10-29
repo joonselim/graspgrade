@@ -2,13 +2,15 @@
 
     python scripts/viewer_data.py
 
-Writes viewer/data/number2.json, viewer/data/number1.json and short mp4s in
+Writes viewer/data/number2.json, number1.json, touch.json and short mp4s in
 viewer/media/ (not in git). Number 2: held-out clips, the score learned on the
 400 score_train clips (the same model as number2_score.py --final, checked
 against out/number2/final/number2_final_scores.csv), the twelve grades, the
 Muse Spark checklist reason and Muse Spark alone. Number 1: the 22 held-out
 episodes with the cleaned glove, arm A + shift, arm B and arm C + shift, with
 the shifts of the final run (out/number1/final/arms_score_held_out.json).
+Touch check: the HOT3D held-out clips the soft object check holds back
+(viewer/data/touch.json), marked as not validated because the check failed (EXP-42).
 """
 
 import json
@@ -128,9 +130,48 @@ def number1():
     return len(episodes)
 
 
+def touch_check():
+    """The HOT3D held-out clips the soft object check holds back (EXP-42). The check failed its pass
+    rule, so the plan asks the viewer to show this list marked as not validated."""
+    import muse_soft
+    lab = muse_soft.load_labels()
+    hot = muse_soft.items("hot3d", lab)
+    hot = hot.join(muse_soft.answers(hot["item"]), on="item")
+    held = hot[hot.softness.isin(muse_soft.HELD_BACK)]
+    scores = pd.read_csv(N2 / "final" / "number2_final_scores.csv").set_index("clip_id").our_score
+    fail = pd.read_csv(ROOT / "benchmark" / "number2" / "clips.csv").set_index("clip_id").failed_condition
+    labels = muse_soft.agreed(lab, "hot3d")
+    check = json.loads((muse_soft.OUT / "soft_check.json").read_text())
+    if len(held) != round(check["hot3d_held_back"]["all"] * check["hot3d_held_back"]["clips"]):
+        raise SystemExit("held-back clips differ from soft_check.json")
+    clips = []
+    for r in held.sort_values(["object", "item"]).itertuples():
+        src = next((ARIA / r.sequence).glob("*preview_rgb.mp4"))
+        name = f"{r.item}.mp4"
+        cut(src, int(r.clip_start), int(r.clip_frames), VIEW / "media" / name)
+        ans = json.loads(muse_soft.answer_path(r.item).read_text())["parsed"]
+        clips.append({
+            "id": r.item, "video": f"media/{name}", "object": r.object, "hand": r.hand, "person": r.person,
+            "label": labels.get(r.object, ""), "softness": ans["softness"], "muse_object": ans.get("object", ""),
+            "reason": ans.get("reason", ""), "score": round(100 * float(scores[r.item]), 1),
+            "copyable_truth": bool(r.copyable), "failed_condition": None if r.copyable else fail.get(r.item),
+            "duration": int(r.clip_frames) / 30})
+    c, h = check["caught"], check["hot3d_held_back"]
+    out = {"note": "Not validated. This check failed its pass rule (EXP-42), so these clips are listed for a "
+                   "touch check but the list should not be trusted.",
+           "summary": (f"Soft object check, held-out. Soft OpenGraph segments held back: {100 * c['all']:.1f}% "
+                       f"({c['segments']} segments, pass rule at least 70%, not met). Rigid HOT3D clips held back: "
+                       f"{100 * h['all']:.1f}% ({len(clips)} of {h['clips']:,}, pass rule at most 10%, met). "
+                       f"Our score AUC on the kept clips: {check['our_score_auc_hot3d']['kept']['auc']:.3f}."),
+           "clips": clips}
+    (VIEW / "data" / "touch.json").write_text(json.dumps(out, indent=1))
+    return len(clips)
+
+
 def main():
     print("number 2 clips:", number2())
     print("number 1 episodes:", number1())
+    print("touch check clips:", touch_check())
 
 
 if __name__ == "__main__":

@@ -15,6 +15,8 @@ function setTab(name) {
   document.getElementById("tab-clips").hidden = name !== "clips";
   document.getElementById("tab-contact").hidden = name !== "contact";
   document.getElementById("tab-compare").hidden = name !== "compare";
+  document.getElementById("tab-touch").hidden = name !== "touch";
+  document.getElementById("touch-summary").hidden = name !== "touch";
   document.getElementById("presets").style.visibility = name === "clips" ? "visible" : "hidden";
   document.getElementById("clips-summary").hidden = name !== "clips";
   document.getElementById("contact-summary").hidden = name !== "contact";
@@ -142,6 +144,34 @@ function showEpisode(e, li) {
     }).join("; ") + ". " + state.n1note + " Click a track to jump in the video.";
 }
 
+function renderTouch(clips) {
+  const list = document.getElementById("touch-list");
+  document.getElementById("touch-count").textContent = `${clips.length} clips`;
+  list.innerHTML = "";
+  clips.forEach((c, i) => {
+    const li = document.createElement("li");
+    li.className = "item";
+    li.dataset.id = c.id;
+    li.innerHTML = `<span>${c.object.replace(/_/g, " ")}</span><span class="pill">${c.softness}</span>` +
+      `<span class="sub">${c.hand} hand, ${c.person}</span>`;
+    li.onclick = () => showTouch(c, li);
+    list.appendChild(li);
+    if (i === 0) showTouch(c, li);
+  });
+}
+
+function showTouch(c, li) {
+  document.querySelectorAll("#touch-list li").forEach(x => x.classList.remove("active"));
+  li.classList.add("active");
+  document.getElementById("touch-video").src = c.video;
+  document.getElementById("touch-answer").innerHTML =
+    `Muse Spark answer: <b>${c.softness}</b>${c.muse_object ? ` (sees: ${c.muse_object})` : ""}`;
+  document.getElementById("touch-reason").textContent = c.reason;
+  document.getElementById("touch-label").textContent = c.label || "no label";
+  document.getElementById("touch-score").textContent = `Score ${c.score.toFixed(0)}. Ground truth: ` +
+    (c.copyable_truth ? "copyable" : `not copyable${c.failed_condition ? ` (fails: ${c.failed_condition})` : ""}`) + ".";
+}
+
 function showCompare(ids) {
   const box = document.getElementById("compare-grid");
   box.innerHTML = "";
@@ -201,6 +231,14 @@ async function main() {
     renderEpisodes();
   } catch (err) {
     document.getElementById("ep-note").textContent = "Could not load data/number1.json: " + err.message;
+  }
+  try {
+    const t = await load("data/touch.json");
+    document.getElementById("touch-summary").textContent = t.summary;
+    document.getElementById("touch-note").textContent = t.note;
+    renderTouch(t.clips);
+  } catch (err) {
+    document.getElementById("touch-note").textContent = "Could not load data/touch.json: " + err.message;
   }
   openFromHash();
   window.addEventListener("hashchange", openFromHash);

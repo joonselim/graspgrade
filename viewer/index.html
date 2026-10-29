@@ -12,12 +12,14 @@
   <nav class="tabs">
     <button data-tab="clips" class="active">Clip scores</button>
     <button data-tab="contact">Contact timing</button>
+    <button data-tab="touch">Touch check</button>
   </nav>
   <div class="presets" id="presets"></div>
 </header>
 
 <p class="summary" id="clips-summary"></p>
 <p class="summary" id="contact-summary" hidden></p>
+<p class="summary warn" id="touch-summary" hidden></p>
 
 <main id="tab-clips">
   <aside class="list">
@@ -54,6 +56,26 @@
     <div class="timeline tall" id="ep-timeline"></div>
     <p class="note" id="ep-note"></p>
   </section>
+</main>
+
+<main id="tab-touch" hidden>
+  <aside class="list">
+    <div class="list-head"><span id="touch-count"></span><span class="hint">held back, by object</span></div>
+    <ol id="touch-list"></ol>
+  </aside>
+  <section class="stage">
+    <video id="touch-video" controls muted playsinline loop></video>
+    <p class="note" id="touch-note"></p>
+  </section>
+  <aside class="cards">
+    <div class="score-box">
+      <div class="badge">Not validated</div>
+      <div class="truth" id="touch-answer"></div>
+    </div>
+    <div class="reason"><div class="reason-head">Muse Spark reason</div><p id="touch-reason"></p></div>
+    <div class="reason"><div class="reason-head">Object label (two team members)</div><p id="touch-label"></p></div>
+    <div class="reason"><div class="reason-head">If the clip were kept</div><p id="touch-score"></p></div>
+  </aside>
 </main>
 
 <main id="tab-compare" hidden>
