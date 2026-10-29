@@ -2,6 +2,7 @@
 
 Reads out/number1/final/number1_final_report.json (EXP-37),
 out/number2/final/number2_final.json (EXP-40) and out/soft/soft_check.json (EXP-42).
+Also draws the three text cards for scenes 1, 2 and 6 of docs/DEMO_VIDEO.md.
 Writes out/demo/*.png. No API call.
 
 Usage:
@@ -40,9 +41,12 @@ def canvas():
     return plt.figure(figsize=(19.2, 10.8), dpi=100, facecolor="white")
 
 
-def save(fig, name):
+def save(fig, name, transparent=False):
     OUT.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT / name, dpi=100, facecolor="white")
+    if transparent:
+        fig.savefig(OUT / name, dpi=100, transparent=True)
+    else:
+        fig.savefig(OUT / name, dpi=100, facecolor="white")
     plt.close(fig)
     print("wrote", OUT / name)
 
@@ -128,7 +132,56 @@ def soft():
     save(fig, "demo_soft.png")
 
 
+def box(fig, x, y, w, h, color, alpha=1.0):
+    fig.patches.append(plt.Rectangle((x, y), w, h, transform=fig.transFigure, facecolor=color,
+                                     edgecolor="none", alpha=alpha, zorder=0))
+
+
+def cards():
+    # Scene 1: text over the opening clip, so the PNG is transparent with a dark band.
+    fig = plt.figure(figsize=(19.2, 10.8), dpi=100)
+    box(fig, 0, 0.10, 1, 0.20, "#000000", alpha=0.55)
+    fig.text(0.5, 0.20, "Not every hand video can teach a robot hand.", ha="center", va="center",
+             fontsize=46, fontweight="bold", color="white")
+    save(fig, "demo_card_scene1.png", transparent=True)
+
+    # Scene 2: what goes in and what comes out.
+    fig = canvas()
+    fig.text(0.06, 0.84, "GraspGrade", fontsize=80, fontweight="bold")
+    box(fig, 0.06, 0.30, 0.30, 0.38, "#eef3fc")
+    fig.text(0.08, 0.62, "INPUT", fontsize=24, color=HI, fontweight="bold")
+    fig.text(0.08, 0.49, "First-person\nhand video", fontsize=46, fontweight="bold", va="center", linespacing=1.3)
+    fig.text(0.08, 0.35, "any length", fontsize=28, color=MUTED)
+    fig.text(0.415, 0.49, "→", fontsize=110, color=HI, ha="center", va="center")
+    fig.text(0.48, 0.62, "OUTPUT", fontsize=24, color=HI, fontweight="bold")
+    for i, line in enumerate(["Clips cut at each touch",
+                              "A 0 to 100 score: can a robot hand copy it?",
+                              "A one-line reason"]):
+        y = 0.52 - 0.10 * i
+        fig.text(0.48, y, str(i + 1), fontsize=36, fontweight="bold", color=HI, va="center")
+        fig.text(0.515, y, line, fontsize=32, va="center")
+    fig.text(0.06, 0.14, "SAM 3.1  ·  Muse Spark", fontsize=34, color=MUTED)
+    save(fig, "demo_card_scene2.png")
+
+    # Scene 6: what is open, and the data sources.
+    fig = canvas()
+    fig.text(0.5, 0.64, "GraspGrade", fontsize=110, fontweight="bold", ha="center")
+    fig.text(0.5, 0.54, "Find the hand videos a robot can learn from.", fontsize=40, ha="center", color=MUTED)
+    for x, title, sub in [(0.22, "Code", "every step,
+one script each"),
+                          (0.50, "Viewer", "held-out clips
+and episodes"),
+                          (0.78, "Benchmark", "both ground truths,
+standalone scorers")]:
+        fig.text(x, 0.36, title, fontsize=46, fontweight="bold", ha="center", color=HI)
+        fig.text(x, 0.33, sub, fontsize=28, ha="center", va="top", color=MUTED, linespacing=1.4)
+    fig.text(0.5, 0.10, "Data: OpenGraph Ego-Tactile (CC-BY-4.0)  ·  HOT3D (Meta)", fontsize=24,
+             ha="center", color=MUTED)
+    save(fig, "demo_card_scene6.png")
+
+
 if __name__ == "__main__":
     number1()
     number2()
     soft()
+    cards()
