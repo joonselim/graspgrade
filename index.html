@@ -455,6 +455,7 @@
   .res-flow { display: flex; align-items: stretch; gap: 6px; margin: 4px 0 10px; font-size: 12.5px; }
   .res-flow span { flex: 1; border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; background: var(--tint); color: var(--ink-2); line-height: 1.4; }
   .res-flow i { align-self: center; font-style: normal; color: var(--faint); }
+  .res-card.wide { grid-column: 1 / -1; }
   .res-card a.more { font-size: 12.5px; font-weight: 600; margin-top: 6px; }
   @media (max-width: 640px) { .res { grid-template-columns: 1fr; } .res-big { font-size: 26px; } }
   /* checklist */
@@ -601,7 +602,7 @@
             <tr class="minor"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</td><td>호출 2,852개 모두 첫 전송에서 답. 평가 2 클립 모두 두 답이 있음. Muse Spark 단독은 거의 0.1 근처나 0.85~0.9로만 답함. 채점은 최종 실행에서.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-40">EXP-40</a></td><td class="wrap-ok">평가 2 최종 결과: 검증 1,426개</td><td>우리 점수 AUC 0.624, Muse Spark 단독 0.501. 이득은 체크리스트에서 옴(+0.117), 학습은 +0.005. 물체 이름만으로 0.771. 처음 보는 물체에서 0.571(물체 이름 0.5). 같은 물체 안에서는 0.506.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-41">EXP-41</a></td><td class="wrap-ok">평가 2 검증 결과를 허용 깊이 2mm와 10mm에서 다시 봄</td><td>10mm에서는 유지(우리 점수 0.632, Muse Spark 단독 0.541). 2mm에서는 우리 점수가 우연 수준(0.521)이고 Muse Spark 단독은 0.417. 물체 기준선은 모든 깊이에서 0.76~0.77.</td></tr>
-            <tr class="core"><td class="first"><a href="#exp-42">EXP-42</a></td><td class="wrap-ok">부드러운 물체 확인</td><td>미리 정한 기준에 미달. soft 구간을 51.7%만 걸러냄(기준 70%), 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 보류(기준 10% 이하).</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-42">EXP-42</a></td><td class="wrap-ok">부드러운 물체 거르기와 적용 범위</td><td>Muse Spark가 soft 구간의 51.7%를 걸러냄(미리 정한 기준 70%), 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 보류(기준 10% 이하). 점수의 적용 범위를 단단한 물체로 정함.</td></tr>
           </tbody>
         </table>
       </div>
@@ -616,7 +617,7 @@
       <li>Muse Spark에게 그대로 물으면 센서 정답에 크게 못 미침. 접촉 시점을 바로 물으면 경계 F1 ±5가 0.074이고, 로봇 손이 따라할 수 있는 잡기인지 한 번에 물으면 AUC 0.501로 우연 수준임(EXP-37, EXP-40).</li>
       <li>센서 정답으로 모델을 쓰는 방식을 고치면 결과가 나아짐. 장갑으로 배운 시점 보정은 경계 F1 ±5를 0.195로 올렸고, 질문을 체크리스트로 쪼개면 AUC가 0.624로 오름(EXP-37, EXP-40).</li>
       <li>체크리스트 점수는 처음 보는 물체에서도 0.571을 유지하지만, 같은 물체의 잡기끼리는 구분하지 못함(0.506). 따라서 이 점수는 라벨이 없는 새 물체를 고르는 데 쓸 수 있고, 같은 물체 안에서 좋은 잡기를 고르는 데는 쓸 수 없음(EXP-40).</li>
-      <li>Muse Spark로 부드러운 물체를 거르는 단계는 미리 정한 기준에 미달해, 점수를 매기는 범위를 단단한 물체로 한정함(EXP-42).</li>
+      <li>점수는 단단한 물체를 대상으로 함. 부드러운 물체를 Muse Spark로 자동으로 거르는 방법은 아직 믿을 만하지 않아 범위 밖으로 둠(EXP-42).</li>
       <li>두 정답을 라벨 파일과 채점 코드로 공개해, 다른 방법도 같은 센서 기준으로 잴 수 있음(EXP-28).</li>
     </ul>
   </section>
@@ -687,11 +688,6 @@
               <td class="first">실험실 데이터의 한계</td>
               <td>두 데이터 모두 실험실 촬영. HOT3D는 어안 영상을 원본 그대로 씀(EXP-25)</td>
               <td>한계로 보고. 직접 촬영한 1인칭 영상 적용 예시를 데모에 포함</td>
-            </tr>
-            <tr>
-              <td class="first">부드러운 물체 단계가 기준 미달</td>
-              <td>Muse Spark가 soft 구간을 51.7%만 걸러냄(기준 70%). 테이프를 주로 놓치고, 단단한 OpenGraph 구간도 18% 보류(EXP-42)</td>
-              <td>제안서의 이 단계를 "검증했으나 기준 미달"로 보고. 점수 범위는 강체 물체로 한정한다고 적음</td>
             </tr>
           </tbody>
         </table>
@@ -807,10 +803,11 @@
   </section>
 
   <section id="k-soft">
-    <h2><span class="no">4</span>부드러운 물체 확인: 기준 미달</h2>
+    <h2><span class="no">4</span>적용 범위: 단단한 물체</h2>
     <ul class="plain">
-      <li>Muse Spark에게 물체가 부드러운지 물어 부드러운 물체를 점수에서 빼려 했으나, 부드러운 물체 구간의 51.7%만 걸러내 미리 정한 기준 70%에 못 미침. 단단한 HOT3D 클립을 잘못 걸러낸 비율은 2.1%로 기준(10% 이하) 안임(EXP-42).</li>
-      <li>놓친 것은 주로 테이프로, Muse Spark가 squeezable이나 rigid로 답함. 뽁뽁이, 장갑, 매트는 대부분 잡음.</li>
+      <li>점수는 단단한 물체를 대상으로 함. 평가 2의 HOT3D 물체 33개는 모두 강체로 추적되고, 두 사람의 라벨로도 짜는 병과 종이팩 5개만 squeezable이고 나머지는 rigid임.</li>
+      <li>부드러운 물체가 섞인 영상에 쓰려면 먼저 걸러야 함. Muse Spark에게 물체가 부드러운지 물어 거르는 방법은 부드러운 물체 구간의 51.7%를 걸러내 미리 정한 기준(70%)에 못 미쳤고, 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 잘못 걸러냄(EXP-42).</li>
+      <li>걸러진 HOT3D 클립을 빼도 평가 2의 AUC는 0.624에서 0.625로 같음.</li>
     </ul>
     <figure>
       <img src="assets/exp42_soft_check.png" loading="lazy" width="1250" height="475" alt="soft로 라벨링한 OpenGraph 물체에서 Muse Spark의 답과 보류한 HOT3D 물체">
@@ -4063,7 +4060,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 16:23 KST
+    마지막 갱신 2026-10-29 16:57 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4156,7 +4153,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "처음 보는 물체 0.571, 같은 물체 안 0.506 (EXP-40)"],
         ["done", "허용 깊이 재확인: 10mm 유지, 2mm 우연 수준 (EXP-41)"],
         ["done", "부드러운 물체 라벨링: 일치 81.7%, kappa 0.613, 4개 물체 제외"],
-        ["done", "부드러운 물체 확인: 기준 미달, soft 51.7% 보류 (EXP-42)"]
+        ["done", "부드러운 물체 거르기 확인: soft 51.7% 보류, 적용 범위를 단단한 물체로 정함 (EXP-42)"]
       ]
     },
     {
@@ -4763,11 +4760,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       v: ["warn", "개선, 한계 있음"], lo: 0.4, hi: 0.8, mark: 0.5,
       bars: [["Muse Spark에게 한 번에 물음", 0.501, "base"], ["체크리스트로 쪼개 물음", 0.624, "hi"], ["물체 이름 기준선", 0.771, "ref"]],
       t: "처음 보는 물체에서도 0.571(물체 이름 0.5). 같은 물체의 잡기끼리는 구분하지 못함(0.506, EXP-40)." },
-    { k: "부드러운 물체 확인", big: "51.7%", m: "부드러운 물체 구간을 걸러낸 비율. 세로선은 합격 기준",
-      v: ["bad", "기준 미달"], lo: 0, hi: 100,
-      bars: [["부드러운 물체 걸러냄, 기준 70% 이상", 51.7, "bad", 70], ["단단한 HOT3D 클립 잘못 보류, 기준 10% 이하", 2.1, "base", 10]],
-      t: "주로 테이프를 놓침. 그래서 점수는 단단한 물체에만 매김(EXP-42)." },
-    { k: "공개 벤치마크", big: "72 · 3,811", m: "장갑 정답 에피소드 · 로봇 손 정답 클립",
+    { k: "공개 벤치마크", wide: true, big: "72 · 3,811", m: "장갑 정답 에피소드 · 로봇 손 정답 클립",
       v: ["info", "채점 코드 포함"],
       flow: ["접촉 구간이나 클립 점수를 담은 결과 파일", "채점 코드", "센서 기준 F1, IoU, AUC"],
       t: "영상 선별 방법의 결과가 실제 접촉, 실제 로봇 재현과 얼마나 맞는지 잴 수 있음(EXP-28).", link: ["#k-bench", "사용법 보기 →"] }
@@ -4775,7 +4768,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   function chartRes(host) {
     RES.forEach(function (r) {
-      var c = el("div", "res-card");
+      var c = el("div", "res-card" + (r.wide ? " wide" : ""));
       var top = el("div", "res-top");
       top.appendChild(el("span", "res-k", r.k));
       top.appendChild(el("span", "res-v " + r.v[0], ({ good: "✓ ", warn: "△ ", bad: "✕ ", info: "" })[r.v[0]] + r.v[1]));
