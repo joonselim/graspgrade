@@ -65,16 +65,16 @@ def hbars(ax, labels, values, colors, ci=None, fmt="{:.3f}", xmax=1.0):
 def number1():
     rows = load("out/number1/final/number1_final_report.json")["pooled"]["tactile_clean"]
     order = [("arm_A", "Muse Spark alone (A)"), ("arm_A_shift", "A + timing shift"),
-             ("arm_B", "SAM rule (B)"), ("arm_C", "SAM rule + Muse check (C)"),
+             ("arm_B", "SAM rule (B)"), ("arm_C", "SAM rule + Muse (C)"),
              ("arm_C_shift", "C + timing shift"), ("always_in_contact", "Always in contact")]
     colors = [HI if k == "arm_A_shift" else HI2 if k == "arm_B" else BASE for k, _ in order]
     fig = canvas()
     fig.suptitle("When does a touch start and end?  22 held-out episodes, 574 glove boundaries",
                  fontsize=32, x=0.04, ha="left", y=0.95)
-    ax1 = fig.add_axes([0.25, 0.12, 0.33, 0.72])
+    ax1 = fig.add_axes([0.26, 0.12, 0.30, 0.70])
     hbars(ax1, [l for _, l in order], [rows[k]["boundary_f1_5"] for k, _ in order], colors, xmax=0.3)
-    ax1.set_title("Boundary F1 within 5 frames (0.17 s)", loc="left", pad=16)
-    ax2 = fig.add_axes([0.63, 0.12, 0.33, 0.72])
+    ax1.set_title("Boundary F1, within 5 frames", loc="left", pad=16)
+    ax2 = fig.add_axes([0.64, 0.12, 0.30, 0.70])
     hbars(ax2, [""] * len(order), [rows[k]["contact_iou"] for k, _ in order], colors, xmax=1.05)
     ax2.set_title("Contact overlap (IoU)", loc="left", pad=16)
     fig.text(0.04, 0.035, "Ground truth: touch-sensing glove. The timing shift is learned on tuning episodes only.",
@@ -92,12 +92,12 @@ def number2():
         fig = canvas()
         fig.suptitle("Can a robot hand copy this grasp?  1,426 held-out clips from 3 people",
                      fontsize=32, x=0.04, ha="left", y=0.95)
-        ax = fig.add_axes([0.30, 0.14, 0.62, 0.70])
+        ax = fig.add_axes([0.36, 0.14, 0.58, 0.70])
         hbars(ax, [r[0] for r in rows], [r[1]["auc"] for r in rows],
               [hi.get(i, BASE) for i in range(len(rows))],
               ci=[tuple(r[1]["ci95_by_sequence"]) for r in rows], xmax=1.0)
         ax.axvline(0.5, color=MUTED, lw=2, ls="--")
-        ax.text(0.5, -0.75, "chance", color=MUTED, ha="center", fontsize=22)
+        ax.text(0.505, len(rows) - 0.45, "chance", color=MUTED, fontsize=22)
         ax.set_xlim(0.3, 0.9)
         ax.set_xlabel("AUC against the robot copy label (bars: 95% interval over sequences)", labelpad=14)
         save(fig, name)
@@ -113,11 +113,12 @@ def soft():
              ("Rigid objects held back\n(%s HOT3D clips)" % f"{held['clips']:,}", held["all"], 0.10, "at most 10%",
               held["all"] <= 0.10)]
     for i, (label, value, line, rule, ok) in enumerate(items):
-        ax = fig.add_axes([0.06 + 0.48 * i, 0.16, 0.40, 0.62])
+        ax = fig.add_axes([0.07 + 0.48 * i, 0.12, 0.40, 0.58])
         ax.bar([0], [value], width=0.5, color="#2b8a3e" if ok else "#c92a2a")
         ax.axhline(line, color=TEXT, lw=3, ls="--")
         ax.text(0.33, line + 0.02, "pass rule: " + rule, fontsize=24)
-        ax.text(0, value + 0.02, f"{100 * value:.1f}%", ha="center", fontsize=40, fontweight="bold")
+        ty = line + 0.03 if 0 < line - value < 0.12 else value + 0.02
+        ax.text(0, ty, f"{100 * value:.1f}%", ha="center", fontsize=40, fontweight="bold")
         ax.set_ylim(0, 1)
         ax.set_xlim(-0.6, 1.2)
         ax.set_xticks([])
