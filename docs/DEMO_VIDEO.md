@@ -127,7 +127,7 @@
    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cd ~/graspgrade/viewer && python3 -m http.server 8765'
    ```
 
-2. 장면마다 위의 링크(`#clip=`, `#episode=…&hand=right`, `#compare=`)로 바로 연다. 해시 없이 열면 예전처럼 첫 탭이 나온다.
+2. 장면마다 위의 링크(`#clip=`, `#episode=…&hand=right`, `#compare=`)로 바로 연다. 해시 없이 열면 예전처럼 첫 탭이 나온다. `viewer_data.py`를 다시 돌린 뒤에는 캐시를 비우고 새로 고친다 (Ctrl+Shift+R). 안 그러면 예전 길이의 영상이 그대로 나온다.
 3. 화면 1920x1080, 브라우저 확대 100%, 라이트 테마, 전체 화면(F11). 이 크기에서 뷰어 화면 6개(클립 3개, 비교 1개, 에피소드 2개)가 모두 세로 1080 안에 들어가는 것을 확인했다. 확대하면 오른쪽 등급 목록이 잘린다. 장면마다 따로 녹화해 편집에서 잇는다.
 4. 내레이션은 장면별로 따로 녹음해 길이를 맞춘다. 자막은 내레이션 문구 그대로 쓴다.
 5. 루트의 `demo.html`은 쓰지 않는다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
