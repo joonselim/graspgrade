@@ -573,7 +573,7 @@
           <thead><tr><th>항목</th><th>내용</th></tr></thead>
           <tbody>
             <tr><td class="first">질문</td><td>Muse Spark가 클립 프레임 3장을 보고 물체를 강체, 눌리는 물체, 부드러운 물체, 모름 중 하나로 답함. 부드러운 물체나 모름이면 점수 없이 "촉각 확인 필요"로 분류</td></tr>
-            <tr><td class="first">정답</td><td>HOT3D 물체 33개와 OpenGraph 물체 71개를 두 사람이 각자 라벨링한 뒤 합의. 호출 전에 커밋</td></tr>
+            <tr><td class="first">정답</td><td>HOT3D 물체 33개와 OpenGraph 물체 71개를 두 사람이 각자 라벨링한 뒤 합의</td></tr>
             <tr><td class="first">데이터</td><td>HOT3D 검증 1,426개, OpenGraph 검증 접촉 구간 286개와 부드러운 물체가 나오는 튜닝 구간</td></tr>
             <tr><td class="first">합격</td><td>부드러운 물체 구간의 70% 이상을 걸러내고, HOT3D 검증 클립은 10% 이하만 보류</td></tr>
           </tbody>
@@ -3709,7 +3709,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>평가 2의 Muse Spark 답이 모두 모임. P7a 단가 그대로였고 해석 실패는 없음.</li>
         <li>검증 등급은 점수 학습용과 비슷하고, 빈 공간과 손가락 가림을 0으로 매긴 비율이 조금 적음.</li>
         <li>Muse Spark 단독은 거의 두 값 중 하나로만 답함(검증 중앙값 0.85, 0.90이 542개, 0.85가 336개). 클립 순위를 거칠게만 나눔.</li>
-        <li>다음: 검증 채점. 부드러운 물체 확인은 라벨 시트를 기다림.</li>
+        <li>다음: 검증 채점. 부드러운 물체 확인은 라벨링을 기다림.</li>
       </ul>
     </article>
 
@@ -3941,7 +3941,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>평가 2의 Muse Spark 체크리스트와 단독 답을 검증 1,426개에 보냄(<a href="#exp-39">EXP-39</a>, $28.56, 한도 $28.8 안). 호출 2,852개 모두 첫 전송에서 답이 있음. Muse Spark 단독은 거의 두 값으로만 답함.</li>
       <li>평가 2 검증 채점 완료(<a href="#exp-40">EXP-40</a>). 우리 점수 AUC 0.624, Muse Spark 단독 0.501, 물체 이름 0.771, 처음 보는 물체에서 우리 점수 0.571. 이득은 체크리스트에서 옴(+0.117).</li>
       <li>평가 2 결과를 허용 깊이 2mm, 10mm에서 다시 봄(<a href="#exp-41">EXP-41</a>). 10mm에서는 유지, 2mm에서는 우리 점수가 우연 수준.</li>
-      <li>다음: 부드러운 물체 확인. 두 사람의 라벨 시트를 채운 뒤 보냄.</li>
+      <li>다음: 부드러운 물체 라벨링(두 사람), 그 뒤 부드러운 물체 확인.</li>
     </ul>
   </section>
 
@@ -4034,7 +4034,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 11:15 KST
+    마지막 갱신 2026-10-29 02:46 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4151,7 +4151,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "10/28 제안서 규칙 고정: 비교 6, 물체 안·실패 원인별 AUC, 부드러운 물체 확인"],
         ["done", "물체 기준선의 물체 비율을 튜닝 2,385개로 수정"],
         ["done", "부드러운 물체 확인 코드와 프레임 준비 (OpenGraph 1,239구간, 라벨이 비면 전송 멈춤)"],
-        ["todo", "부드러운 물체 라벨 시트 (두 사람, 호출 전 커밋)"],
+        ["todo", "부드러운 물체 라벨링 (두 사람)"],
         ["todo", "부드러운 물체 확인: 파일럿 20개 → HOT3D 1,426개 + OpenGraph 약 330구간"],
         ["done", "비교 6과 물체 안·실패 원인별 AUC 코드 점검 (EXP-31)"],
         ["done", "비교 6과 물체 안·실패 원인별 AUC: 물체 안 0.506 (EXP-40)"]
