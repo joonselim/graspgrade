@@ -638,6 +638,10 @@ clips out of the score.
   All four have the agreed label rigid. The two labelers disagreed on all four
   (labeler 2: soft, soft, soft, squeezable). The object name "beige glove"
   (2 tuning segments, agreed soft) is a different name and stays in.
+- Note on one label (written 2026-10-29, before any call): "yellow sponge"
+  (9 tuning, 2 held-out segments) has the agreed label rigid. In the video it
+  is a whiteboard eraser, a rigid plastic block with a thin sponge pad under
+  it, not a sponge. It is labeled by how the object behaves in a grasp.
 - Why tuning segments too: held-out OpenGraph has about a dozen segments
   with soft looking objects (sponges, bubble wrap). The soft check learns
   nothing from labels. The prompt is fixed here, and the answer is used as
@@ -800,10 +804,10 @@ Estimates at measured prices, $150 in total.
 
 | Item | Cost |
 | --- | --- |
-| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a, one prompt revision on tuning, P2 SAM on 47 tuning episodes, P3 SAM on 22 held-out episodes, P4 arm A on 22 held-out episodes, P5 arm C tuning shift sample and 1,790 held-out boundaries, P6 number 2 SAM, P7b Muse Spark on 1,426 held-out clips) | $134.16 |
+| Spent so far (P1 pilot, arm A on 3 tuning episodes, P7a, one prompt revision on tuning, P2 SAM on 47 tuning episodes, P3 SAM on 22 held-out episodes, P4 arm A on 22 held-out episodes, P5 arm C tuning shift sample and 1,790 held-out boundaries, P6 number 2 SAM, P7b Muse Spark on 1,426 held-out clips, P7c soft object check) | $143.27 |
 | Number 2, Muse: checklist call and baseline call per clip, 1,826 clips (EXP-23 measured $0.0097 per call). P7a 400 tuning clips, then P7b 1,426 held-out clips unless the gate says stop | about $7.7 + $27.6 |
 | Soft object check: 1,426 HOT3D clips at about $0.0075 and about 330 OpenGraph segments at about $0.0094 (3 frames each), plus a pilot of 20 | about $14 |
-| Total (spent $134.16, still to send: soft check about $14) | about $148 |
+| Total (spent $143.27, nothing left to send) | $143.27 |
 
 Muse costs assume about 1,100 tokens per frame (measured on 720p OpenGraph
 frames). Each arm is first run on one tuning episode or a few clips to

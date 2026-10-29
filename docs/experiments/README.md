@@ -52,5 +52,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-39](exp39_number2_muse_held_out.md) | 2026-10-29 | Muse Spark checklist and Muse Spark alone on the 1,426 held-out clips (P7b) | $28.56 | All 2,852 calls parsed on the first pass, at the P7a price and under the $28.8 limit. Every number 2 clip has both answers. Muse Spark alone mostly answers 0.1 to 0.15 or 0.85 to 0.9. Not scored yet. |
 | [EXP-40](exp40_number2_final.md) | 2026-10-29 | Number 2 final result on the 1,426 held-out clips (P8) | $0 | Our score AUC 0.624 against Muse Spark alone 0.501. The gain comes from the checklist (+0.117), not from learning (+0.005). The object name alone reaches 0.771. On unseen objects our score keeps 0.571 (object reference 0.5). Inside one object it is at chance (0.506). |
 | [EXP-41](exp41_number2_depth.md) | 2026-10-29 | Number 2 held-out result at the depth limits 2 mm and 10 mm | $0 | Scores learned at 5 mm, judged at other depths. At 10 mm the picture holds (our score 0.632, Muse Spark alone 0.541). At 2 mm our score is at chance (0.521) and Muse Spark alone is below it (0.417). The object reference stays at 0.76 to 0.77. |
+| [EXP-42](exp42_soft_check.md) | 2026-10-29 | Soft object check (P7c) | $9.11 | Fails the rule fixed in advance. Muse Spark holds back only 51.7% of soft segments (rule 70%), mostly missing tape, while it holds back 2.1% of rigid HOT3D clips (rule at most 10%). |
 
-Total Meta API spend so far: about $134.16 of $150.
+Total Meta API spend so far: about $143.27 of $150.
