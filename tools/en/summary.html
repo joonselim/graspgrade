@@ -1,0 +1,225 @@
+  <div class="page" data-page="summary">
+  <header class="doc-head">
+    <h1 class="doc-title">GraspGrade progress</h1>
+    <p class="doc-sub">Cut first-person hand videos at the moment a hand touches an object, and score each segment from 0 to 100 for how well a robot hand could copy it.</p>
+  </header>
+
+  <section id="s-plan">
+    <h2><span class="no">1</span>Schedule</h2>
+    <div class="gantt" id="gantt"></div>
+    <div class="legend">
+      <span><i style="background:var(--done)"></i>Done</span>
+      <span><i style="background:var(--doing)"></i>In progress</span>
+      <span><i style="background:var(--todo)"></i>Planned</span>
+      <span><i style="background:color-mix(in srgb, var(--today) 30%, transparent)"></i>Today</span>
+    </div>
+
+    <details class="fold"><summary><span class="o">Show the details of each phase</span><span class="c">Hide</span></summary>
+      <div class="phases-wrap">
+        <div class="phases" id="phases"></div>
+      </div>
+    </details>
+  </section>
+
+  <section id="s-measure">
+    <h2><span class="no">2</span>Measurement plan</h2>
+    <ul class="plain">
+      <li><b>Test 1.</b> Find when each hand starts and stops touching an object, from video alone. Three methods (A Muse Spark alone, B a SAM rule, C B plus a Muse Spark boundary check) are compared with the OpenGraph tactile glove data. The metrics are boundary F1 (±5 and ±15 frames) and contact IoU.</li>
+      <li><b>Test 2.</b> Score each grasp clip from 0 to 100 for whether a robot hand could copy it. The score is compared with a robot hand ground truth built from HOT3D motion capture, and the result is an AUC. The main comparison is Muse Spark asked the same question in one go.</li>
+      <li><b>Soft object check.</b> A step that asks Muse Spark whether the object is soft and leaves soft objects out of the score. It is compared with labels that two people gave to each object.</li>
+      <li>Thresholds, weights and prompts are set on the tuning data. The numbers are measured once on the held-out data.</li>
+    </ul>
+
+    <details class="fold"><summary><span class="o">Show the rules and formulas</span><span class="c">Hide</span></summary>
+    <div class="eq eqs">
+      <div class="eqn"><span>Test 1 ground truth&emsp;<i>y<sub>t</sub></i> = 1[ &Sigma;<sub><i>i</i>=1</sub><sup>80</sup> <i>p<sub>i,t</sub></i> &gt; 800 ]</span><b>(1)</b></div>
+      <div class="eqn"><span>Test 1 method B&emsp;<i>&#x1D49E;</i> = { <i>R</i> &isin; runs( <i>d<sub>t</sub></i> &le; <i>&tau;<sub>d</sub></i> ) : &exist; <i>t</i> &isin; <i>R</i>, <i>m<sub>t</sub></i> &ge; <i>&tau;<sub>m</sub></i> &and; <i>&kappa;<sub>t</sub></i> &le; <i>&tau;<sub>&kappa;</sub></i> }</span><b>(2)</b></div>
+      <div class="eqn"><span>Timing shift&emsp;<i>&scirc;</i> &larr; <i>&scirc;</i> &minus; med<sub><i>j</i></sub>( <i>&scirc;<sub>j</sub></i> &minus; <i>s<sub>j</sub></i> ),&ensp; <i>&ecirc;</i> &larr; <i>&ecirc;</i> &minus; med<sub><i>j</i></sub>( <i>&ecirc;<sub>j</sub></i> &minus; <i>e<sub>j</sub></i> )</span><b>(3)</b></div>
+      <div class="eqn"><span>Test 2 ground truth&emsp;<i>y</i> = 1[ &exist; <i>u</i> &isin; <i>U</i> : grip(<i>u</i>) &and; reach(<i>u</i>) &and; &not;collide(<i>u</i>) ]</span><b>(4)</b></div>
+      <div class="eqn"><span>Test 2 score&emsp;<i>S</i> = 100 &middot; &sigma;( <i>w</i><sub>0</sub> + &Sigma;<sub><i>i</i>=1</sub><sup>12</sup> <i>w<sub>i</sub> g<sub>i</sub></i> ),&ensp; <i>g<sub>i</sub></i> = <i>Q</i>(<i>x<sub>i</sub></i>) &isin; {0, &frac12;, 1}</span><b>(5)</b></div>
+    </div>
+    <p class="note eqdef">Here <i>p<sub>i,t</sub></i> is the pressure of glove sensor <i>i</i> at frame <i>t</i>. <i>d<sub>t</sub></i> is the distance in pixels between the SAM hand mask and the nearest object mask. <i>m<sub>t</sub></i> is the object motion with the camera motion removed. <i>&kappa;<sub>t</sub></i> is the difference between hand and object motion (0 means they move together). <i>&scirc;<sub>j</sub></i> and <i>s<sub>j</sub></i> are a predicted start and the matched glove start on tuning data. <i>U</i> is the set of hand shifts on a 1 cm grid within 2 cm. <i>x<sub>i</sub></i> is the raw value of item <i>i</i> (camera shake, SAM visibility, a Muse Spark answer and so on), and <i>Q</i> turns it into a grade by tuning tertiles. <i>&tau;</i> and <i>w</i> are set on tuning data only.</p>
+    <p class="more"><a href="#k-calc">All formulas and thresholds →</a></p>
+    </details>
+  </section>
+
+  <section>
+    <h2><span class="no">3</span>Experiments</h2>
+    <div class="tbl foldable" id="exp-list">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>ID</th><th>Topic</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr class="minor extra"><td class="first"><a href="#exp-01">EXP-01</a></td><td class="wrap-ok">Meta API smoke test</td><td>SAM 3.1 and Muse Spark both work on OpenGraph video. The reply formats are known.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-02">EXP-02</a></td><td class="wrap-ok">Object prompts, small container</td><td>Only <code>small object</code> works as a generic prompt. 2D overlap cannot tell contact.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-03">EXP-03</a></td><td class="wrap-ok">Object prompts, spray bottle</td><td><code>small object</code> also finds a large object in every frame. It is our object prompt.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-04">EXP-04</a></td><td class="wrap-ok">Data checks without any API call</td><td>Labels match the tactile threshold 800. The head IMU measures camera shake.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-05">EXP-05</a></td><td class="wrap-ok">Input at 30 fps vs 10 fps</td><td>Hand and grasped object masks are the same. We use 10 fps.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-06">EXP-06</a></td><td class="wrap-ok">Contact cutting pilot</td><td>Hand tracking holds over whole episodes. Boundary F1 0.18 (±5) shows masks alone are not enough. This logistic regression later became an appendix.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-07">EXP-07</a></td><td class="wrap-ok">HOT3D grasp clip count</td><td>2,152 usable clips. For sizing only. The real clip set is cut again in EXP-11.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-08">EXP-08</a></td><td class="wrap-ok">HOT3D camera calibration direction</td><td>Calibration and 2D boxes use the raw image direction. Video needs a 90 degree clockwise turn.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-09">EXP-09</a></td><td class="wrap-ok">HOT3D fingertip 3D positions</td><td>UmeTrack alone gives the fingertips, with a median of 2.3 mm from the surface during grasps. MANO is not needed.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-10">EXP-10</a></td><td class="wrap-ok">Robot ground truth label and bias check</td><td>54% "copyable" with the Allegro hand. EXP-15 showed this label mostly measures retargeting side effects, so it was replaced by v2.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-11">EXP-11</a></td><td class="wrap-ok">Test 2 clips and held-out labels</td><td>Clips cut with motion capture: 2,385 tuning and 1,426 held-out. 52% of held-out clips are "copyable".</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-12">EXP-12</a></td><td class="wrap-ok">Signal of the video items and the object baseline</td><td>The three video items measure well but do not predict "copyable" (AUC 0.49 to 0.53). The object alone gives 0.70. With the v2 label, object 0.74 and video items 0.53 (EXP-17).</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-13">EXP-13</a></td><td class="wrap-ok">Retargeting item replaced by hand shape</td><td>Video hand shape 0.63, with the object 0.72 (object alone 0.69). With the v2 label the signal is gone at 0.52 (EXP-17).</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-14">EXP-14</a></td><td class="wrap-ok">Method B (SAM rule) pilot</td><td>The code works. IoU 0.75 beats "always in contact" (0.67), but it joins back-to-back contacts and finds only 52 boundaries.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-15">EXP-15</a></td><td class="wrap-ok">Check of the ground truth label method</td><td>The EXP-10 label mostly measures retargeting side effects (fingertips 31 mm off). A faithful transfer makes 94 to 96% "copyable". No method passed the rule set in advance. Replaced by v2 (EXP-16).</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-16">EXP-16</a></td><td class="wrap-ok">Ground truth label v2 (mesh collision, contact reach)</td><td>Passes the rule set in advance: 47% "copyable", hand size correlation +0.04. Failures are mostly collision (25.5%) and reach (10.9%). Sensitive to the depth limit.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-17">EXP-17</a></td><td class="wrap-ok">What predicts the v2 label</td><td>The object alone gives 0.74. Video hand shape loses its signal (0.52, it had learned retargeting side effects). Video items add only about 0.01 on top of the object.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-18">EXP-18</a></td><td class="wrap-ok">Object geometry check (option A)</td><td>Seven size and shape numbers from the 3D models give 0.695 (object name 0.742), and 0.673 on unseen objects. Passes the rule set in advance, so we go with option A.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-19">EXP-19</a></td><td class="wrap-ok">Six object items, stand-in grade check</td><td>Six high, mid, low items give 0.683, and 0.666 on unseen objects. They keep almost all of the exact size signal and pass. Size relative to the hand explains most of it.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-20">EXP-20</a></td><td class="wrap-ok">v2 labels on held-out clips</td><td>With the fixed rule, 46.4% held-out (47.0% tuning), 43 to 51% per person. Per object rates match tuning with rank correlation 0.85. Labels only, no scoring yet.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-21">EXP-21</a></td><td class="wrap-ok">Best possible score of each Test 1 method</td><td>With perfect answers, A at 5 fps reaches boundary F1 0.96 at ±5, so 5 fps is not the limit. C is tied to the boundaries B finds and tops out at 0.15.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-22">EXP-22</a></td><td class="wrap-ok">Method B that cuts when the object changes</td><td>Boundary F1 doubles (±5 0.15, ±15 0.32), and the best C rises to 0.32. But it makes 392 boundaries (190 real), cuts too often, and IoU is 0.66.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-23">EXP-23</a></td><td class="wrap-ok">Test 2 pilot</td><td>SAM finds the grasped object in 99% of contact frames, and our code picks it in 92%. Muse Spark object grades match the stand-in grades in 27 of 30.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-24">EXP-24</a></td><td class="wrap-ok">Method B that cuts only when a new object stays</td><td>Waiting 3 frames lifts IoU from 0.66 to 0.72, but F1 ±5 goes from 0.151 to 0.145. Even with the right number of boundaries F1 is 0.09, so their positions are wrong. The option stays in the 50 episode tuning grid.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-25">EXP-25</a></td><td class="wrap-ok">Does undoing the fisheye help MediaPipe</td><td>No. Undistorted frames find hands 10 points less often (70.6% to 60.3%) and 2D points get worse. We use the raw frames and report the fisheye as a limit.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-26">EXP-26</a></td><td class="wrap-ok">Code check of the Muse Spark gate and the unseen object comparison</td><td>The code works as planned. The gate is strict: even perfect grades pass only at 0.657, and the pilot match rate would give "weak". On unseen objects our score is 0.675 and the object baseline 0.5.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-27">EXP-27</a></td><td class="wrap-ok">Code check of the timing shift and "checklist vs learning", power</td><td>The learned shift undoes a 6 frame delay (C 0.149 to 0.307). On tuning data learned weights beat a plain average by +0.067. A 3 person held-out set detects this 95% of the time (77% with grade errors).</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-28">EXP-28</a></td><td class="wrap-ok">The ground truth as a reusable benchmark</td><td>Both ground truths are packed with label files and independent scorers. The public scorers reproduce the project numbers exactly. Test 1 is CC BY 4.0, Test 2 is CC BY-NC-SA 4.0.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-29">EXP-29</a></td><td class="wrap-ok">First real Muse Spark answers on tuning data</td><td>Muse Spark sees contact about 7 frames early, and the shift doubles F1. Asked directly, Muse Spark gives 0.52, through the checklist 0.63 to 0.65. The gain from learning weights (+0.019) is within noise. 0.607 on unseen objects.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-30">EXP-30</a></td><td class="wrap-ok">Where Muse Spark goes wrong on tuning data, and one prompt revision</td><td>Muse Spark sees objects smaller and narrower than they are and almost never sees a release shorter than 1 s. One prompt revision did not raise the score, so both prompts stay at version 1.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-31">EXP-31</a></td><td class="wrap-ok">Code check of the object rate add-on and within object AUC</td><td>The code follows the plan and earlier outputs are unchanged. On tuning stand-in grades our score adds to the object rate only with 5 labels, and within an object it is near chance (0.574).</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-32">EXP-32</a></td><td class="wrap-ok">Method B (SAM rule) fixed on 50 tuning episodes</td><td>Leave one episode out: F1 ±5 0.153, ±15 0.294, IoU 0.683 (always in contact 0.623). It makes 2.5 times too many boundaries. The same rule won 46 of 50 times and is fixed for held-out.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-33">EXP-33</a></td><td class="wrap-ok">SAM on the 22 held-out episodes and the fixed method B</td><td>All 44 SAM requests finished. The tuning rule gives 1,790 held-out boundaries (78.9 per minute, tuning 90.0). Scoring is in the final run.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-34">EXP-34</a></td><td class="wrap-ok">Method A (Muse Spark alone) on the 22 held-out episodes</td><td>All 693 calls answered (1 resent, no fallback). On 9 short episodes it marks almost no left hand contact, very unlike method B. Scoring is in the final run.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-35">EXP-35</a></td><td class="wrap-ok">Method C tuning shift sample and held-out boundaries</td><td>All 200 tuning and 1,790 held-out calls answered on the first send. On held-out it moves 42% of the B boundaries. All Test 1 held-out answers are in, scoring is in the final run.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-36">EXP-36</a></td><td class="wrap-ok">Learning the A and C timing shifts separately</td><td>The scorer had set the C shift from one boundary. Fixed: the C shift comes from 31 tuning samples, start +6, end −4 frames. A stays at +7, −7.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-37">EXP-37</a></td><td class="wrap-ok">Test 1 final result: 22 held-out episodes</td><td>Muse Spark alone plus the glove learned shift is best: F1 ±5 0.195, ±15 0.376, IoU 0.850. The shift helps both A (+0.121) and C (+0.025). C beats B (+0.022) but stays below A plus the shift.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-38">EXP-38</a></td><td class="wrap-ok">Test 2 SAM: 400 score training clips and 1,426 held-out clips</td><td>All 1,020 SAM requests finished. All 1,826 clips have visibility and contact clarity grades. About 70% of visibility values are 1, so it has only two grades. Scoring is in the final run.</td></tr>
+            <tr class="minor extra"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">Test 2 Muse Spark: checklist and direct answers on 1,426 held-out clips</td><td>All 2,852 calls answered on the first send. Every Test 2 clip has both answers. Muse Spark alone answers almost only near 0.1 or 0.85 to 0.9. Scoring is in the final run.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-40">EXP-40</a></td><td class="wrap-ok">Test 2 final result: 1,426 held-out clips</td><td>Our score AUC 0.624, Muse Spark alone 0.501. The gain comes from the checklist (+0.117), learning adds +0.005. The object name alone gives 0.771. On unseen objects 0.571 (object name 0.5). Within an object 0.506.</td></tr>
+            <tr class="core extra"><td class="first"><a href="#exp-41">EXP-41</a></td><td class="wrap-ok">Test 2 held-out result at depth limits of 2 mm and 10 mm</td><td>At 10 mm the picture holds (our score 0.632, Muse Spark alone 0.541). At 2 mm our score is at chance (0.521) and Muse Spark alone is 0.417. The object baseline is 0.76 to 0.77 at every depth.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-42">EXP-42</a></td><td class="wrap-ok">Soft object filter and scope</td><td>Muse Spark holds back 51.7% of soft segments (rule set in advance: 70%), mostly missing tape. Only 2.1% of rigid HOT3D clips are held back (rule: 10% or less). The score is scoped to rigid objects.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button class="fold-btn" type="button" data-target="exp-list" data-more="Show all 42 experiments" data-less="Show key experiments only"></button>
+    <p class="more"><a href="#story">Read the key experiments →</a> &nbsp; <a href="logs.html">Full experiment log →</a></p>
+  </section>
+
+  <section id="s-concl">
+    <h2><span class="no">4</span>Conclusion</h2>
+    <p class="lead">When models that only see video are corrected with sensor ground truth, they pick out contact timing and robot copyable grasps in first-person video more accurately.</p>
+    <dl class="brief">
+      <dt>Problem</dt>
+      <dd>To train robots on first-person human video, you need to find when a hand touches and leaves an object, and which grasps a robot hand could copy. Today this selection is done by looking at the video only, and there is no way to check it against real contact or a real robot.</dd>
+
+      <dt>What we solved</dt>
+      <dd>We built ground truth for both questions from tactile gloves (OpenGraph) and motion capture (HOT3D), and scored selection methods made with SAM 3.1 and Muse Spark against it. The ground truth and the scoring code are packed as a benchmark (EXP-28).</dd>
+
+      <dt>Numbers</dt>
+      <dd>
+        <div class="tbl">
+          <div class="wrap">
+            <table class="min">
+              <thead><tr><th>Question</th><th>Metric</th><th>Muse Spark asked directly</th><th>Our method</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="first">Contact timing<br><span class="note">22 held-out episodes</span></td><td>Boundary F1 ±5 frames</td><td class="n">0.074</td><td class="n"><b>0.195</b></td><td>Contact IoU 0.821 → 0.850 (EXP-37)</td></tr>
+                <tr><td class="first">Copyable grasps<br><span class="note">1,426 held-out clips</span></td><td>AUC (0.5 is chance)</td><td class="n">0.501</td><td class="n"><b>0.624</b></td><td>Unseen objects 0.571. Object name baseline 0.771 (EXP-40)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </dd>
+
+      <dt>Conditions</dt>
+      <dd>
+        <ul class="plain">
+          <li>The score is for rigid objects. Filtering out soft objects automatically is not yet reliable (EXP-42).</li>
+          <li>The grasp score works at the object level. It can pick objects it has not seen, but it cannot rank grasps of the same object (0.506). For objects that already have labels, the per object rate is more accurate.</li>
+          <li>With a strict 2 mm depth limit in the ground truth, the grasp score drops to chance (0.521, EXP-41). Both datasets were recorded in a lab.</li>
+        </ul>
+      </dd>
+
+      <dt>Use on other video</dt>
+      <dd>The same steps apply to first-person video without sensors. All it needs is the video and calls to SAM 3.1 and Muse Spark, and it uses the timing shift and checklist weights learned here. Data with sensor ground truth can be measured with the same metrics using the benchmark scorers.</dd>
+
+      <dt>Method</dt>
+      <dd>
+        <ol class="steps">
+          <li>Take frames at 5 per second and ask Muse Spark, for each hand, whether it touches an object.</li>
+          <li>Move each contact start 7 frames (about 0.23 s) later and each end 7 frames earlier. This shift was learned from the tactile gloves.</li>
+          <li>Cut a grasp clip for each contact and get hand and object masks from SAM 3.1.</li>
+          <li>Grade the 12 checklist items of each clip (7 from Muse Spark, 2 from SAM masks, 3 computed from video) as high, mid or low, and turn them into a 0 to 100 score with the learned weights.</li>
+          <li>Use the clips with high scores for robot training. The formulas and thresholds are in <a href="#k-calc">Rules and formulas</a> on the key experiments page.</li>
+        </ol>
+      </dd>
+    </dl>
+
+    <div class="viz viz-n1" data-chart="n1"></div>
+    <div class="viz viz-dots" data-chart="n2"></div>
+  </section>
+
+  <section>
+    <h2><span class="no">5</span>Open problems</h2>
+    <div class="tbl foldable" id="open-list">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>Problem</th><th>Status</th><th>Response</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">Ranking grasps of the same object (Test 2)</td>
+              <td>All 33 objects have both copyable and not copyable grasps, and 24 are between 20 and 80%. The object explains only about a quarter of the label variance. On held-out data the within object AUC is 0.506, so the score works only at the object level (EXP-40)</td>
+              <td>Reported as a limit. AUC by failure type: collision 0.611, reach 0.636, grip 0.682 (EXP-40)</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Position of contact boundaries (Test 1)</td>
+              <td>Even the best held-out method has boundary F1 ±5 of 0.195. The SAM rule makes about 3 times too many boundaries (EXP-37), and Muse Spark almost never sees a release shorter than 1 s (EXP-30)</td>
+              <td>Held-out measurement done (EXP-37). The claim rests on the differences between methods and the effect of the timing shift (A +0.121, C +0.025), not on the absolute value</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Muse Spark judging object size (Test 2)</td>
+              <td>Agreement with stand-in grades: size 75%, wrap width 49%. It sees objects smaller and narrower than they are (EXP-29, EXP-30)</td>
+              <td>Asking in cm did not raise the score, so version 1 stays (EXP-30). On held-out data the checklist still beats Muse Spark alone by +0.117 (EXP-40)</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Gain from learning weights (Test 2)</td>
+              <td>On held-out data learned weights beat a plain average by only +0.005, and the interval includes 0 (EXP-40)</td>
+              <td>Reported as is. The gain comes from asking through the checklist (+0.117)</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Depth sensitivity of the v2 label (Test 2)</td>
+              <td>With a 2 mm depth limit 20% are "copyable", with 10 mm 65%. The held-out result holds at 5 mm and 10 mm, but at 2 mm our score is at chance (0.521, EXP-41)</td>
+              <td>The 5 mm threshold was fixed before computing and stays. Results at each depth are reported together and noted as a limit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button class="fold-btn" type="button" data-target="open-list" data-more="Show 4 more" data-less="Hide"></button>
+  </section>
+
+  <section>
+    <h2><span class="no">6</span>Risks</h2>
+    <div class="tbl foldable" id="risk-list">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>Risk</th><th>Detail</th><th>Response</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="first">Lab data only</td>
+              <td>Both datasets were recorded in a lab. HOT3D fisheye video is used as recorded (EXP-25)</td>
+              <td>Reported as a limit. The demo includes an example on first-person video we recorded ourselves</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Low Test 1 boundary scores</td>
+              <td>The glove measures pressure and video cannot see pressure, so boundary F1 at ±5 frames is low (best held-out 0.195, EXP-37)</td>
+              <td>Contact IoU (0.850) and ±15 frame F1 (0.376) are reported together. The claim rests on the effect of the sensor based timing shift (EXP-37)</td>
+            </tr>
+            <tr class="extra">
+              <td class="first">Small held-out set</td>
+              <td>3 HOT3D persons, 22 OpenGraph episodes</td>
+              <td>Bootstrap intervals by sequence and episode, and AUC per person, are reported together</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button class="fold-btn" type="button" data-target="risk-list" data-more="Show 2 more" data-less="Hide"></button>
+  </section>
+
+  </div>
+

@@ -1,0 +1,250 @@
+  <div class="page" data-page="story" hidden>
+  <header class="doc-head">
+    <h1 class="doc-title">Key experiments</h1>
+  </header>
+
+  <section id="k-intro">
+    <h2><span class="no">1</span>Two questions</h2>
+    <ul class="plain">
+      <li><b>Test 1, contact timing.</b> From first-person video alone, find the moment a hand touches an object and the moment it lets go. The ground truth is tactile glove data that measures palm pressure in the OpenGraph dataset.</li>
+      <li><b>Test 2, grasps a robot can copy.</b> Score each grasp clip for whether a robot hand could copy that grasp. The ground truth comes from moving the motion capture hand in the HOT3D dataset onto an Allegro robot hand and checking whether the robot hand can make the same grasp.</li>
+    </ul>
+  </section>
+
+  <section id="k-n1">
+    <h2><span class="no">2</span>Test 1: when contact starts and ends</h2>
+
+    <div class="ch">
+      <h3>SAM rule: back-to-back contacts are not split correctly</h3>
+      <ul class="plain">
+        <li>A rule that calls it contact when the hand and object SAM masks overlap and move together. Because the hand is always next to some object, it joins back-to-back contacts into one or cuts them into too many pieces (EXP-14, EXP-22, EXP-24).</li>
+        <li>The final rule, chosen on 50 tuning episodes, still makes 2.5 times too many boundaries, with boundary F1 ±5 of 0.153 and contact IoU of 0.683 (EXP-32).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp24_sam_rule_persist.png" loading="lazy" width="1440" height="684" alt="Contact segments per hand in episodes 0, 30 and 53: glove ground truth and method B with a 3 frame wait">
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>Cleaned glove (main ground truth)</span><span class="key"><i style="--c:#e8590c"></i>Method B, rule chosen on the other two episodes (3 frame wait)</span></div>
+        <figcaption>The left hand in episode 0 is still broken into pieces during a long hold, but less than in the experiment before (EXP-22).</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>Muse Spark alone: calls contact early and misses short releases</h3>
+      <ul class="plain">
+        <li>Muse Spark calls the start of contact about 7 frames (0.23 s) earlier than the glove and the end 7 frames later. Learning this difference from the glove data and shifting by it doubles boundary F1 (EXP-29).</li>
+        <li>It almost never notices a hand that lets go for less than 1 s and grasps again. One prompt revision did not help (EXP-30).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp29_arm_a_timelines.png" loading="lazy" width="1320" height="759" alt="Contact per hand in episodes 0, 30 and 53: glove ground truth, Muse Spark alone, shifted Muse Spark">
+        <div class="keys"><span class="key"><i style="--c:#2b8a3e"></i>Cleaned glove (main ground truth)</span><span class="key"><i style="--c:#1971c2"></i>Muse Spark alone</span><span class="key"><i style="--c:#e8590c"></i>With the shift learned on the other two episodes</span></div>
+        <figcaption>Where short contacts follow each other, as for the right hand in episode 0, Muse Spark calls one long contact.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>Held-out result: Muse Spark plus the glove learned shift is best</h3>
+      <ul class="plain">
+        <li>On 22 held-out episodes, Muse Spark alone plus the timing shift learned from the glove is best on all three metrics: boundary F1 ±5 0.195, ±15 0.376, contact IoU 0.850. The shift helps both methods that use Muse Spark (EXP-37).</li>
+        <li>Adding a Muse Spark boundary check to the SAM rule helps a little (+0.022), but the SAM rule makes too many boundaries, so it stays below Muse Spark alone.</li>
+      </ul>
+      <div class="viz viz-n1" data-chart="n1"></div>
+    </div>
+  </section>
+
+  <section id="k-n2">
+    <h2><span class="no">3</span>Test 2: grasps a robot hand can copy</h2>
+
+    <div class="ch">
+      <h3>Ground truth: the first label measured the transfer, not the robot</h3>
+      <ul class="plain">
+        <li>The first ground truth label stretched the human hand to the size of the robot hand. In the process the robot fingers lifted off the object, so even a firmly held can was judged "not copyable". The label measured a side effect of the transfer, not a limit of the robot (EXP-10, EXP-15).</li>
+        <li>We switched to a v2 label that puts the robot fingers at the human finger positions and checks whether the robot hand goes into the object (collision) and whether its fingers reach where the human touched (reach). 47% of clips are "copyable", with no link to human hand size (EXP-16, EXP-20).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp16_examples.jpg" loading="lazy" width="990" height="660" alt="Two tuning clips for each outcome: copyable, collision, reach failure" style="max-width:720px">
+        <div class="keys"><span class="key"><i style="--c:#10cc10"></i>Object model</span><span class="key"><i class="dot light" style="--c:#ffffff"></i>Human hand points</span><span class="key"><i class="dot" style="--c:#ffa500"></i>Allegro mesh points</span><span class="key"><i class="dot" style="--c:#ff0000"></i>Mesh points more than 5 mm inside the object</span></div>
+        <figcaption>Two tuning clips for each outcome. Left: copyable (eraser, parmesan can). Middle: collision, the larger Allegro fingers go into the keyboard and the spatula. Right: reach failure, on a wide bowl and a plate the Allegro hand cannot spread its fingertips the way the human does.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>What decides it: the object, not video quality</h3>
+      <ul class="plain">
+        <li>Knowing only which object it is predicts the label with AUC 0.74. Video quality items such as camera shake add only 0.01 to that (EXP-17).</li>
+        <li>So the checklist moved from video quality to questions about the object: size relative to the hand, shape, thickness, wrap width, handle and free space (EXP-18, EXP-19).</li>
+      </ul>
+      <figure>
+        <img src="assets/exp18_object_geometry.png" loading="lazy" width="1625" height="550" alt="Left, AUC bars for object identity and object geometry. Right, scatter of the longest and shortest side of each object">
+        <div class="keys"><span class="key"><i style="--c:#868e96"></i>Object identity</span><span class="key"><i style="--c:#1c7ed6"></i>Object geometry</span><span class="key"><i class="dash" style="--c:#479957"></i>Pass line 0.65</span><span class="key"><i class="dash" style="--c:#d04646"></i>Fail line 0.60</span><span class="key"><i class="dot" style="--c:#b71126"></i>Copyable 0%</span><span class="key"><i class="dot" style="--c:#fafdb8"></i>50%</span><span class="key"><i class="dot" style="--c:#036e3a"></i>100%</span></div>
+        <figcaption>Left: AUC when one person or one object is left out. Right: longest and shortest side of each object, dot size is the number of clips, color is the copyable rate. Long or bulky objects (keyboard, thermos, dino toy, bowl) are mostly not copyable, and small objects that fit the hand (holder, mug, can, bottle) are mostly copyable.</figcaption>
+      </figure>
+    </div>
+
+    <div class="ch">
+      <h3>Checklist: 12 questions per clip give the score</h3>
+      <div class="flow">
+        <div><b>Grasp clip</b>A few seconds of video from just before the hand touches the object to just after it lets go</div>
+        <div><b>12 questions</b>7 to Muse Spark, 2 from SAM masks, 3 computed from video. Each is answered high, mid or low</div>
+        <div><b>Grades to score</b>High 1, mid 0.5, low 0. Summed with learned weights into 0 to 100</div>
+        <div><b>Check</b>AUC against the robot hand ground truth label</div>
+      </div>
+      <div class="viz ckl" data-chart="ckl"></div>
+    </div>
+
+    <div class="ch">
+      <h3>Held-out result: the checklist lifts Muse Spark from chance</h3>
+      <ul class="plain">
+        <li>On 1,426 held-out clips, asking Muse Spark "can a robot hand copy this" in one go gives AUC 0.501, which is chance. Splitting it into the checklist questions raises it to 0.624. The gain comes from splitting the question, and learning the weights adds almost nothing (EXP-40).</li>
+        <li>It holds at 0.571 on objects that were not in training. But for known objects the object name alone gives a higher 0.771, and our score cannot rank grasps of the same object either, so the score ranks objects rather than grasps.</li>
+        <li>The result holds when the depth the robot hand may go into the object in the ground truth is raised from 5 mm to 10 mm, but drops to chance with a strict 2 mm (EXP-41).</li>
+      </ul>
+      <div class="viz viz-dots" data-chart="n2"></div>
+    </div>
+  </section>
+
+  <section id="k-soft">
+    <h2><span class="no">4</span>Scope: rigid objects</h2>
+    <ul class="plain">
+      <li>The score is for rigid objects. All 33 HOT3D objects in Test 2 are tracked as rigid bodies, and in the labels of two people only 5 squeeze bottles and cartons are squeezable and the rest are rigid.</li>
+      <li>To use it on video with soft objects, those need to be filtered out first. Asking Muse Spark whether the object is soft held back 51.7% of soft object segments, below the 70% rule set in advance, and mostly missed tape. Only 2.1% of rigid HOT3D clips were held back by mistake (EXP-42).</li>
+      <li>Leaving out the held-back HOT3D clips keeps the Test 2 AUC the same, 0.624 to 0.625.</li>
+    </ul>
+    <figure>
+      <img src="assets/exp42_soft_check.png" loading="lazy" width="1250" height="475" alt="Muse Spark answers on OpenGraph objects labeled soft, and the held-back HOT3D objects">
+      <figcaption>Left: Muse Spark answers on soft objects (red soft, orange unsure, gray squeezable, blue rigid). Right: held-back HOT3D objects and their rates, the dotted line is the 10% rule.</figcaption>
+    </figure>
+  </section>
+
+  <section id="k-calc">
+    <h2><span class="no">5</span>Rules and formulas</h2>
+
+    <div class="ch">
+      <h3>Test 1 ground truth: cleaned glove</h3>
+      <div class="eq">
+        <div><i>c<sub>t</sub></i> = 1[ &Sigma;<sub><i>i</i>=1..80</sub> <i>p<sub>i,t</sub></i> &gt; 800 ]<span class="c">80 pressure sensors per hand, 30 fps</span></div>
+      </div>
+      <ul class="plain">
+        <li>Gaps of 0.1 s (3 frames) or less are joined, and pieces shorter than 0.1 s are dropped (EXP-14).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 1 method B: SAM mask rule (10 fps)</h3>
+      <div class="eq">
+        <div><i>near<sub>t</sub></i> = [ <i>d<sub>t</sub></i> &le; <i>&tau;<sub>d</sub></i> ]<span class="c"><i>d<sub>t</sub></i>: distance in pixels between the hand mask and the nearest object mask</span></div>
+        <div><i>m<sub>t</sub></i> = max( &Vert;&Delta;<i>o</i><sub><i>t</i>&minus;3&rarr;<i>t</i></sub>&Vert;, &Vert;&Delta;<i>o</i><sub><i>t</i>&rarr;<i>t</i>+3</sub>&Vert; ) / &radic;<i>A<sub>o</sub></i><span class="c">object motion in units of object size</span></div>
+        <div><i>&kappa;<sub>t</sub></i> = &Vert;&Delta;<i>o</i> &minus; &Delta;<i>h</i>&Vert; / ( &Vert;&Delta;<i>o</i>&Vert; + &Vert;&Delta;<i>h</i>&Vert; + 5 )<span class="c">near 0 means hand and object move together</span></div>
+        <div><i>move<sub>t</sub></i> = <i>near<sub>t</sub></i> &and; <i>hand<sub>t</sub></i> &and; <i>m<sub>t</sub></i> &ge; <i>&tau;<sub>m</sub></i> &and; <i>&kappa;<sub>t</sub></i> &le; <i>&tau;<sub>&kappa;</sub></i></div>
+        <div>contact segment = a <i>near</i> run that contains <i>move<sub>t</sub></i> in at least one frame</div>
+      </div>
+      <ul class="plain">
+        <li>&Delta;<i>o</i> and &Delta;<i>h</i> are the motion of the object and hand mask centers with the camera motion removed. The camera motion is the median motion of the other objects over the same span. <i>A<sub>o</sub></i> is the median object mask area.</li>
+        <li>Gaps of <i>f</i> frames or less are joined and segments shorter than 0.2 s are dropped. A segment is cut when the nearest object changes and the new one stays for <i>q</i> frames or more (EXP-22, EXP-24).</li>
+        <li>Thresholds come from a grid search on tuning episodes: (<i>&tau;<sub>d</sub></i>, <i>&tau;<sub>m</sub></i>, <i>&tau;<sub>&kappa;</sub></i>, <i>f</i>, <i>q</i>) = argmax [ F1<sub>&plusmn;15</sub> + IoU ], <i>&tau;<sub>d</sub></i> &isin; {2, 4, 8, 12} px, <i>&tau;<sub>m</sub></i> &isin; {0.05, 0.1, 0.2}, <i>&tau;<sub>&kappa;</sub></i> &isin; {0.5, 0.7}, <i>f</i> &isin; {0, 1, 2}, <i>q</i> &isin; {1, 3, 5}.</li>
+        <li>Values chosen on 50 tuning episodes: <i>&tau;<sub>d</sub></i> = 2 px, <i>&tau;<sub>m</sub></i> = 0.05, <i>&tau;<sub>&kappa;</sub></i> = 0.7, <i>f</i> = 0, <i>q</i> = 3, shift <i>&delta;<sub>s</sub></i> = +4, <i>&delta;<sub>e</sub></i> = &minus;1 frame (EXP-32).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 1 timing shift (all three methods)</h3>
+      <div class="eq">
+        <div><i>&delta;<sub>s</sub></i> = &minus;median( <i>&scirc;</i> &minus; <i>s</i> ),&ensp; <i>&delta;<sub>e</sub></i> = &minus;median( <i>&ecirc;</i> &minus; <i>e</i> )</div>
+        <div><i>&scirc;</i>&prime; = <i>&scirc;</i> + <i>&delta;<sub>s</sub></i>,&ensp; <i>&ecirc;</i>&prime; = <i>&ecirc;</i> + <i>&delta;<sub>e</sub></i></div>
+      </div>
+      <ul class="plain">
+        <li><i>&scirc;</i> and <i>&ecirc;</i> are the predicted contact start and end, <i>s</i> and <i>e</i> the glove start and end. The medians are computed on tuning episodes.</li>
+        <li>For Muse Spark alone, <i>&delta;<sub>s</sub></i> = +7 and <i>&delta;<sub>e</sub></i> = &minus;7 frames. Boundary F1 &plusmn;5 rises from 0.06 to 0.13 (EXP-29). Method C learns only from tuning boundaries that Muse Spark moved, <i>&delta;<sub>s</sub></i> = +6 and <i>&delta;<sub>e</sub></i> = &minus;4 frames (EXP-36).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 1 metrics</h3>
+      <div class="eq">
+        <div>Predicted and glove boundaries are matched one to one within |<i>&scirc;</i> &minus; <i>s</i>| &le; <i>k</i></div>
+        <div><i>P</i> = matches / predicted boundaries,&ensp; <i>R</i> = matches / glove boundaries,&ensp; F1<sub>&plusmn;<i>k</i></sub> = 2<i>PR</i> / (<i>P</i> + <i>R</i>)</div>
+        <div>IoU = |predicted contact frames &cap; glove contact frames| / |predicted contact frames &cup; glove contact frames|</div>
+      </div>
+      <ul class="plain">
+        <li><i>k</i> = 5 and 15 frames (0.17 s and 0.5 s).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 2 ground truth: v2 label</h3>
+      <div class="eq">
+        <div><i>copyable</i> = &exist; <i>u</i> &isin; <i>U</i> : <i>grip</i>(<i>u</i>) &and; <i>reach</i>(<i>u</i>) &and; &not;<i>collide</i>(<i>u</i>)<span class="c"><i>U</i>: shifts of the whole hand, 1 cm grid, within 2 cm</span></div>
+        <div><i>grip</i>: the Allegro thumb tip and at least one other fingertip are within 1.5 cm of the object surface</div>
+        <div><i>reach</i>: for every human finger that touches the object, the matching Allegro fingertip is within 2 cm</div>
+        <div><i>collide</i>: some point on the Allegro hand surface is more than 5 mm inside the object</div>
+      </div>
+      <ul class="plain">
+        <li>The Allegro hand is fitted to the positions of the motion capture fingertips. The thresholds were fixed before computing (EXP-16).</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 2 item grades</h3>
+      <div class="eq">
+        <div><i>g</i>(<i>x</i>) = 1 (<i>x</i> &ge; <i>q</i><sub>2/3</sub>),&ensp; 0.5 (<i>q</i><sub>1/3</sub> &le; <i>x</i> &lt; <i>q</i><sub>2/3</sub>),&ensp; 0 (<i>x</i> &lt; <i>q</i><sub>1/3</sub>)<span class="c"><i>q</i>: tertiles on tuning clips</span></div>
+      </div>
+      <ul class="plain">
+        <li>Camera stability: <i>x</i> = &minus;(90th percentile of camera motion during the clip).</li>
+        <li>Hand shape: <i>x</i> = logistic regression probability on 10 MediaPipe hand features (trained on the tuning training clips).</li>
+        <li>Visibility: <i>x</i> = share of frames where SAM finds both the hand and the object.</li>
+        <li>Contact clarity: <i>x</i> = share of contact frames with <i>d<sub>t</sub></i> &le; 3 px minus the same share in reach and release frames.</li>
+        <li>Motion completeness (fixed rule): <i>g</i> = &frac12;( [hand visible &ge; 50% in the 1 s reach &and; wrist moves &ge; 3% of the frame] + [the same in the 1 s release] ).</li>
+        <li>Seven Muse Spark items (finger occlusion, size relative to the hand, shape, thickness, wrap width, handle, free space): the three level answer becomes 1, 0.5 or 0.</li>
+      </ul>
+    </div>
+
+    <div class="ch">
+      <h3>Test 2 score and comparisons</h3>
+      <div class="eq">
+        <div><i>S</i> = 100 &middot; &sigma;( <i>w</i><sub>0</sub> + &Sigma;<sub><i>i</i></sub> <i>w<sub>i</sub> g<sub>i</sub></i> ),&ensp; &sigma;(<i>z</i>) = 1 / (1 + <i>e</i><sup>&minus;<i>z</i></sup>)<span class="c">our score, all items</span></div>
+        <div>R1 = the "copyable" probability Muse Spark answers</div>
+        <div>R2 = (1/7) &Sigma;<sub><i>i</i>&isin;Muse</sub> <i>g<sub>i</sub></i><span class="c">plain average of the Muse grades, no learning</span></div>
+        <div>R3 = &sigma;( <i>w</i><sub>0</sub> + &Sigma;<sub><i>i</i>&isin;Muse</sub> <i>w<sub>i</sub> g<sub>i</sub></i> )<span class="c">same grades, learned weights</span></div>
+        <div><i>r</i>(<i>o</i>) = "copyable" rate of object <i>o</i> on tuning clips<span class="c">object name baseline</span></div>
+        <div>AUC = P( <i>S</i><sup>+</sup> &gt; <i>S</i><sup>&minus;</sup> ) + &frac12; P( <i>S</i><sup>+</sup> = <i>S</i><sup>&minus;</sup> )</div>
+      </div>
+      <ul class="plain">
+        <li><i>w</i> is learned on 400 tuning clips with L2 logistic regression (<i>C</i> = 0.5). 95% intervals come from a bootstrap over sequences.</li>
+        <li>Unseen objects: for each object <i>o</i>, the hand shape model, tertiles and <i>w</i> are learned again on clips without <i>o</i>, and then the clips of <i>o</i> are scored. The object name baseline then gives every clip the same value, so its AUC is 0.5.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="k-bench">
+    <h2><span class="no">6</span>Public benchmark: score video selection against sensors</h2>
+    <p>Training robots on human video needs a rule that picks the segments to use. This benchmark compares the segments or scores such a rule produces with ground truth built from tactile gloves and motion capture, and returns a score.</p>
+    <div class="flow" style="grid-template-columns:repeat(3,1fr)">
+      <div><b>Make a result file</b>Test 1: for each episode, a list of contact segments [start, end] per hand. Test 2: one score per clip.</div>
+      <div><b>Run the scorer</b><code>python score_number1.py my_segments.json</code> or <code>python score_number2.py my_scores.csv</code></div>
+      <div><b>Sensor based score</b>Test 1: boundary F1 (±5, ±15 frames) and contact IoU. Test 2: AUC and AUC per person.</div>
+    </div>
+    <div class="tbl">
+      <div class="wrap">
+        <table class="min">
+          <thead><tr><th>Ground truth</th><th>Size</th><th>Built from</th><th>Reference scores</th></tr></thead>
+          <tbody>
+            <tr><td class="first">Test 1, contact timing</td><td>72 OpenGraph episodes (22 held-out)</td><td>Contact segments per hand set by tactile glove pressure</td><td>Answering "always in contact" gives F1 ±5 0.042 and IoU 0.600. The best method in this project gives 0.195 and 0.850</td></tr>
+            <tr><td class="first">Test 2, robot hand copy</td><td>3,811 HOT3D grasp clips (1,426 held-out)</td><td>Labels from moving the motion capture hand onto an Allegro robot hand, with the first condition that fails</td><td>Object name baseline AUC 0.771, the checklist score of this project 0.624</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>The public scorers were written apart from the project code and reproduce the numbers on this page exactly (EXP-28).</li>
+      <li>In Test 2 the same objects appear in tuning and held-out data, so the object name baseline is strong. A video method should also be checked on objects it has not seen.</li>
+    </ul>
+  </section>
+  </div>
+
+  <div class="page" data-page="detail" hidden>
+  <header class="doc-head">
+    <h1 class="doc-title">Experiment detail</h1>
+  </header>
+  <section>
+    <p>The full English write-up of every experiment, with all images and numbers, is in the <a href="logs.html">experiment log</a>.</p>
+  </section>
+  </div>
+
