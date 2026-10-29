@@ -500,8 +500,8 @@
       <li>v2 라벨을 가르는 것은 영상 품질이 아니라 물체. 물체 종류만으로 AUC 0.74이고, 원래 체크리스트의 영상 항목은 0.01만 더함(EXP-17). 그래서 "물체 성질"을 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목으로 나눔(EXP-18, EXP-19).</li>
       <li><b>평가 2 검증 결과.</b> Muse Spark에게 따라할 수 있는지 직접 물으면 AUC 0.501로 우연 수준이고, 우리 점수는 0.624. 이득은 체크리스트로 묻는 데서 오고(+0.117), 가중치 학습(+0.005)과 SAM·영상 계산 항목(+0.001)은 더하지 못함. 처음 보는 물체에서도 0.571을 유지함(EXP-40).</li>
       <li>물체 이름만으로 0.771로 우리 점수보다 높음. 검증 사람도 같은 물체를 잡기 때문임. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움(EXP-40).</li>
+      <li><b>부드러운 물체 확인.</b> Muse Spark에게 물체가 부드러운지 물어 점수에서 빼는 단계는 미리 정한 기준에 미달함. soft 구간을 51.7%만 걸러냄(기준 70%), 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 잘못 걸러냄(EXP-42).</li>
       <li><b>결과물.</b> 정답 라벨과 채점 코드를 묶어 두어, 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음(EXP-28).</li>
-      <li><b>남은 것.</b> 부드러운 물체 확인을 검증 세트에서 한 번 측정함.</li>
     </ul>
 
     <div class="viz viz-n1" data-chart="n1"></div>
@@ -576,6 +576,7 @@
             <tr><td class="first">정답</td><td>HOT3D 물체 33개와 OpenGraph 물체 71개를 두 사람이 각자 라벨링한 뒤 합의. 일치 81.7%, kappa 0.613. 영상에 물체가 나오지 않은 OpenGraph 물체 4개는 실험에서 제외</td></tr>
             <tr><td class="first">데이터</td><td>HOT3D 검증 1,426개, OpenGraph 검증 접촉 구간 286개와 부드러운 물체가 나오는 튜닝 구간</td></tr>
             <tr><td class="first">합격</td><td>부드러운 물체 구간의 70% 이상을 걸러내고, HOT3D 검증 클립은 10% 이하만 보류</td></tr>
+            <tr><td class="first">결과</td><td>불합격. soft 구간 51.7% 보류, HOT3D 2.1% 보류(EXP-42)</td></tr>
           </tbody>
         </table>
       </div>
@@ -641,6 +642,7 @@
             <tr class="minor"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</td><td>호출 2,852개 모두 첫 전송에서 답. 평가 2 클립 모두 두 답이 있음. Muse Spark 단독은 거의 0.1 근처나 0.85~0.9로만 답함. 채점은 최종 실행에서.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-40">EXP-40</a></td><td class="wrap-ok">평가 2 최종 결과: 검증 1,426개</td><td>우리 점수 AUC 0.624, Muse Spark 단독 0.501. 이득은 체크리스트에서 옴(+0.117), 학습은 +0.005. 물체 이름만으로 0.771. 처음 보는 물체에서 0.571(물체 이름 0.5). 같은 물체 안에서는 0.506.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-41">EXP-41</a></td><td class="wrap-ok">평가 2 검증 결과를 허용 깊이 2mm와 10mm에서 다시 봄</td><td>10mm에서는 유지(우리 점수 0.632, Muse Spark 단독 0.541). 2mm에서는 우리 점수가 우연 수준(0.521)이고 Muse Spark 단독은 0.417. 물체 기준선은 모든 깊이에서 0.76~0.77.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-42">EXP-42</a></td><td class="wrap-ok">부드러운 물체 확인</td><td>미리 정한 기준에 미달. soft 구간을 51.7%만 걸러냄(기준 70%), 주로 테이프를 놓침. 단단한 HOT3D 클립은 2.1%만 보류(기준 10% 이하).</td></tr>
           </tbody>
         </table>
       </div>
@@ -714,6 +716,11 @@
               <td class="first">실험실 데이터의 한계</td>
               <td>두 데이터 모두 실험실 촬영. HOT3D는 어안 영상을 원본 그대로 씀(EXP-25)</td>
               <td>한계로 보고. 직접 촬영한 1인칭 영상 적용 예시를 데모에 포함</td>
+            </tr>
+            <tr>
+              <td class="first">부드러운 물체 단계가 기준 미달</td>
+              <td>Muse Spark가 soft 구간을 51.7%만 걸러냄(기준 70%). 테이프를 주로 놓치고, 단단한 OpenGraph 구간도 18% 보류(EXP-42)</td>
+              <td>제안서의 이 단계를 "검증했으나 기준 미달"로 보고. 점수 범위는 강체 물체로 한정한다고 적음</td>
             </tr>
           </tbody>
         </table>
@@ -866,8 +873,22 @@
     </div>
   </section>
 
+  <section id="k-soft">
+    <h2><span class="no">4</span>부드러운 물체 확인: 기준 미달</h2>
+    <ul class="plain">
+      <li>제안서는 점수를 강체에만 매기기로 함. Muse Spark에게 물체가 rigid, squeezable, soft, unsure 중 무엇인지 하나 더 묻고, soft나 unsure면 점수를 매기지 않음.</li>
+      <li>정답은 두 사람이 물체 104개를 각자 라벨링한 뒤 합의함(일치 81.7%, kappa 0.613). 영상에 물체가 나오지 않은 4개는 실험에서 제외.</li>
+      <li>Muse Spark는 단단한 HOT3D 클립은 거의 건드리지 않지만(2.1% 보류, 기준 10% 이하), soft로 라벨링한 구간은 절반만 걸러냄(51.7%, 기준 70%). 미리 정한 기준에 미달함(EXP-42).</li>
+      <li>놓친 것은 주로 테이프로, Muse Spark는 squeezable이나 rigid로 답함. 뽁뽁이, 장갑, 매트는 대부분 잡음. 보류된 HOT3D 클립을 빼도 평가 2의 AUC는 그대로(0.624 → 0.625).</li>
+    </ul>
+    <figure>
+      <img src="assets/exp42_soft_check.png" loading="lazy" width="1250" height="475" alt="soft로 라벨링한 OpenGraph 물체에서 Muse Spark의 답과 보류한 HOT3D 물체">
+      <figcaption>왼쪽: soft로 라벨링한 물체에서 Muse Spark의 답(빨강 soft, 주황 unsure, 회색 squeezable, 파랑 rigid). 오른쪽: 보류된 HOT3D 물체와 비율, 점선이 기준 10%(EXP-42).</figcaption>
+    </figure>
+  </section>
+
   <section id="k-calc">
-    <h2><span class="no">4</span>판정 기준과 계산식</h2>
+    <h2><span class="no">5</span>판정 기준과 계산식</h2>
 
     <div class="ch">
       <h3>평가 1 정답: 정리한 장갑</h3>
@@ -966,7 +987,7 @@
   </section>
 
   <section id="k-bench">
-    <h2><span class="no">5</span>결과물: 정답 벤치마크</h2>
+    <h2><span class="no">6</span>결과물: 정답 벤치마크</h2>
     <ul class="plain">
       <li>정답 라벨과 채점 코드를 묶어 두어, 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음. 평가 1은 에피소드 72개의 접촉 구간, 평가 2는 클립 3,811개의 라벨과 처음 실패하는 조건. 공개용 채점 코드가 프로젝트 수치를 그대로 재현함(EXP-28).</li>
     </ul>
@@ -977,7 +998,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#exp-40">EXP-40</a><a href="#exp-41">EXP-41</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#exp-40">EXP-40</a><a href="#exp-41">EXP-41</a><a href="#exp-42">EXP-42</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3867,6 +3888,63 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>평가 2 결과는 허용 깊이에 달려 있음. 미리 정한 5mm와 더 느슨한 10mm에서는 유지되고, 더 엄한 2mm에서는 유지되지 않음.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-42">
+      <div class="exp-h"><span class="id">EXP-42</span><span class="t">부드러운 물체 확인</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>10/28 제안서는 점수를 강체에만 매기기로 함. 클립마다 Muse Spark에게 물체가 rigid, squeezable, soft, unsure 중 무엇인지 하나 더 묻고, soft나 unsure면 점수를 매기지 않음. Muse Spark가 부드러운 물체를 걸러내고, 단단한 HOT3D 클립은 그대로 두는가.</dd>
+        <dt>입력</dt><dd>정답은 두 사람이 각자 라벨링한 뒤 합의한 물체 104개(일치 81.7%, kappa 0.613). HOT3D rigid 28, squeezable 5. OpenGraph rigid 52, squeezable 10, soft 9. 영상에 물체가 나오지 않은 OpenGraph 물체 4개는 실험에서 제외. HOT3D 검증 1,426개, OpenGraph 검증 접촉 구간 280개와 부드러운 물체의 튜닝 구간 56개, 각 3프레임. $9.11.</dd>
+        <dt>방법</dt><dd>호출 전에 측정 계획에 고정: soft나 unsure면 보류. 합격은 soft 구간 70% 이상 보류, HOT3D 클립 10% 이하 보류. 파일럿 20개를 먼저 보내 단가를 확인한 뒤 전체를 보냄. 모든 답이 해석됨.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">판정</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>지표</th><th class="n">값</th><th>합격 기준</th><th>충족</th></tr></thead>
+            <tbody>
+              <tr><td class="first">soft 구간 보류</td><td class="n">51.7% (60개 중 31, 물체 9개), 물체 단위 구간 30.8~74.4%</td><td>70% 이상</td><td>아님</td></tr>
+              <tr><td class="first">HOT3D 클립 보류</td><td class="n">2.1% (1,426개 중 30)</td><td>10% 이하</td><td>충족</td></tr>
+              <tr><td class="first"><b>판정</b></td><td class="n"><b>불합격</b></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">soft로 라벨링한 물체에서 Muse Spark의 답</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>물체</th><th class="n">구간</th><th class="n">soft</th><th class="n">unsure</th><th class="n">squeezable</th><th class="n">rigid</th><th class="n">보류</th></tr></thead>
+            <tbody>
+              <tr><td class="first">pink bubble wrap</td><td class="n">20</td><td class="n">10</td><td class="n">5</td><td class="n">5</td><td class="n">0</td><td class="n">75%</td></tr>
+              <tr><td class="first">brown tape</td><td class="n">19</td><td class="n">5</td><td class="n">0</td><td class="n">8</td><td class="n">6</td><td class="n">26%</td></tr>
+              <tr><td class="first">beige paper tape</td><td class="n">9</td><td class="n">4</td><td class="n">0</td><td class="n">3</td><td class="n">2</td><td class="n">44%</td></tr>
+              <tr><td class="first">beige tape</td><td class="n">4</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td class="n">2</td><td class="n">0%</td></tr>
+              <tr><td class="first">clear bubble wrap</td><td class="n">3</td><td class="n">2</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">67%</td></tr>
+              <tr><td class="first">beige glove</td><td class="n">2</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">100%</td></tr>
+              <tr><td class="first">black mat</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">100%</td></tr>
+              <tr><td class="first">bubble wrap</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">100%</td></tr>
+              <tr><td class="first">dark blue mat</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">100%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">검증 구간만 보면 soft 4개 중 1개(25%) 보류. OpenGraph 검증에서 rigid로 라벨링한 구간의 18.1%(193개 중 35), squeezable의 1.2%를 보류함. HOT3D에서 가장 많이 보류한 물체는 spatula_red 27.8%, food_vegetables 14.3%, coffee_pot 12.0%, holder_black 10.0%. 판정 뒤 추가한 기술 통계: 테이프 세 이름이 soft 구간 60개 중 32개이고 그중 9개(28%)만 보류. 나머지 soft 물체 여섯은 28개 중 22개(79%) 보류. 테이프 두 이름은 라벨러끼리도 squeezable과 soft로 갈렸음.</p>
+
+      <figure>
+        <img src="assets/exp42_soft_check.png" loading="lazy" width="1250" height="475" alt="soft로 라벨링한 OpenGraph 물체에서 Muse Spark의 답과 보류한 HOT3D 물체">
+        <div class="keys"><span class="key"><i style="--c:#e8534f"></i>soft</span><span class="key"><i style="--c:#f28e2b"></i>unsure</span><span class="key"><i style="--c:#b9aea6"></i>squeezable</span><span class="key"><i style="--c:#4a78a8"></i>rigid</span></div>
+        <figcaption>왼쪽: soft로 라벨링한 OpenGraph 물체에서 Muse Spark의 답(soft나 unsure면 보류). 뽁뽁이, 장갑, 매트는 대부분 잡지만 테이프는 squeezable이나 rigid로 봄. 오른쪽: 보류된 클립이 있는 HOT3D 물체와 보류 비율. 점선은 기준 10%.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>미리 정한 기준에 미달함. Muse Spark는 단단한 HOT3D 클립은 거의 건드리지 않지만(2.1% 보류), soft로 라벨링한 구간은 절반만 잡음(51.7%, 기준 70%).</li>
+        <li>놓친 것은 주로 테이프로, Muse Spark는 squeezable이나 rigid로 답함. 뽁뽁이, 장갑, 매트는 대부분 잡음. 단단한 OpenGraph 구간도 18%를 보류함.</li>
+        <li>제안서의 부드러운 물체 단계는 이대로는 근거가 없음. Muse Spark의 "soft 또는 unsure" 답만으로는 부드러운 물체를 점수에서 빼기에 부족함.</li>
+        <li>보류된 HOT3D 클립을 빼도 평가 2의 AUC는 그대로(1,426개 0.624, 남은 1,396개 0.625).</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3942,7 +4020,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>평가 2 검증 채점 완료(<a href="#exp-40">EXP-40</a>). 우리 점수 AUC 0.624, Muse Spark 단독 0.501, 물체 이름 0.771, 처음 보는 물체에서 우리 점수 0.571. 이득은 체크리스트에서 옴(+0.117).</li>
       <li>평가 2 결과를 허용 깊이 2mm, 10mm에서 다시 봄(<a href="#exp-41">EXP-41</a>). 10mm에서는 유지, 2mm에서는 우리 점수가 우연 수준.</li>
       <li>부드러운 물체 라벨링 완료. 두 사람 일치 81.7%(HOT3D 97.0%, OpenGraph 74.6%), kappa 0.613. 합의 결과 rigid 80, squeezable 15, soft 9. 영상에 물체가 나오지 않은 OpenGraph 물체 4개(white glove, beige gloves, white bubble wrap, green plant)는 호출 전에 실험에서 제외해 검증 구간은 280개. soft는 9개 물체, 60구간.</li>
-      <li>다음: 부드러운 물체 확인(파일럿 20개 뒤 전체).</li>
+      <li>부드러운 물체 확인 완료(<a href="#exp-42">EXP-42</a>, $9.11). 미리 정한 기준에 미달: soft 구간 51.7% 보류(기준 70%), HOT3D 2.1% 보류(기준 10% 이하). 평가 2의 측정은 모두 끝남.</li>
     </ul>
   </section>
 
@@ -4035,7 +4113,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 12:26 KST
+    마지막 갱신 2026-10-29 12:40 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4122,7 +4200,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       ]
     },
     {
-      title: "점수 학습 · 평가 2", from: 7, to: 7, status: "doing",
+      title: "점수 학습 · 평가 2", from: 7, to: 7, status: "done",
       req: [
         "클립마다 12개 항목 등급과 0~100점",
         "튜닝 클립 400개로 로지스틱 회귀 학습, 가중치 공개",
@@ -4153,7 +4231,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "물체 기준선의 물체 비율을 튜닝 2,385개로 수정"],
         ["done", "부드러운 물체 확인 코드와 프레임 준비 (OpenGraph 1,239구간, 라벨이 비면 전송 멈춤)"],
         ["done", "부드러운 물체 라벨링: 일치 81.7%, kappa 0.613, 4개 물체 제외"],
-        ["todo", "부드러운 물체 확인: 파일럿 20개 → HOT3D 1,426개 + OpenGraph 약 330구간"],
+        ["done", "부드러운 물체 확인: 기준 미달, soft 51.7% 보류 (EXP-42)"],
         ["done", "비교 6과 물체 안·실패 원인별 AUC 코드 점검 (EXP-31)"],
         ["done", "비교 6과 물체 안·실패 원인별 AUC: 물체 안 0.506 (EXP-40)"]
       ]
