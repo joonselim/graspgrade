@@ -148,18 +148,18 @@ def cards():
     # Scene 2: what goes in and what comes out.
     fig = canvas()
     fig.text(0.06, 0.84, "GraspGrade", fontsize=80, fontweight="bold")
-    box(fig, 0.06, 0.30, 0.30, 0.38, "#eef3fc")
+    box(fig, 0.06, 0.30, 0.26, 0.38, "#eef3fc")
     fig.text(0.08, 0.62, "INPUT", fontsize=24, color=HI, fontweight="bold")
     fig.text(0.08, 0.49, "First-person\nhand video", fontsize=46, fontweight="bold", va="center", linespacing=1.3)
     fig.text(0.08, 0.35, "any length", fontsize=28, color=MUTED)
-    fig.text(0.415, 0.49, "→", fontsize=110, color=HI, ha="center", va="center")
-    fig.text(0.48, 0.62, "OUTPUT", fontsize=24, color=HI, fontweight="bold")
+    fig.text(0.37, 0.49, "→", fontsize=110, color=HI, ha="center", va="center")
+    fig.text(0.42, 0.62, "OUTPUT", fontsize=24, color=HI, fontweight="bold")
     for i, line in enumerate(["Clips cut at each touch",
                               "A 0 to 100 score: can a robot hand copy it?",
                               "A one-line reason"]):
         y = 0.52 - 0.10 * i
-        fig.text(0.48, y, str(i + 1), fontsize=36, fontweight="bold", color=HI, va="center")
-        fig.text(0.515, y, line, fontsize=32, va="center")
+        fig.text(0.42, y, str(i + 1), fontsize=36, fontweight="bold", color=HI, va="center")
+        fig.text(0.455, y, line, fontsize=32, va="center")
     fig.text(0.06, 0.14, "SAM 3.1  ·  Muse Spark", fontsize=34, color=MUTED)
     save(fig, "demo_card_scene2.png")
 
