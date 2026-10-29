@@ -129,6 +129,12 @@ def agreed(lab, dataset):
     return lab[(lab.dataset == dataset) & lab.agreed.isin(LABEL_VALUES)].set_index("object").agreed.to_dict()
 
 
+def excluded(lab, dataset):
+    """Object names the sheet marks in its `exclude` column (plan: not found in the video), never sent or scored."""
+    col = lab["exclude"].fillna("").astype(str) if "exclude" in lab else pd.Series("", index=lab.index)
+    return set(lab[(lab.dataset == dataset) & (col.str.strip() != "")].object)
+
+
 def hot3d_clips(role):
     d = pd.read_csv(N2 / "clips_final.csv")
     d = d[d.role == role].rename(columns={"clip_id": "item"})
@@ -138,8 +144,10 @@ def hot3d_clips(role):
 def items(name, lab):
     """The clips or segments of one set. OpenGraph tuning segments need the labels."""
     if name == "hot3d":
-        return hot3d_clips("held_out")
+        hot = hot3d_clips("held_out")
+        return hot[~hot.object.isin(excluded(lab, "hot3d"))]
     og = pd.read_csv(OUT / "opengraph_segments.csv")
+    og = og[~og.object.isin(excluded(lab, "opengraph"))]
     og_lab = og.object.map(agreed(lab, "opengraph"))
     if name == "opengraph":
         return og[(og.split == "held_out") | ((og.split == "tune") & (og_lab == "soft"))]

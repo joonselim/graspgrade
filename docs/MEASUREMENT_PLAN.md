@@ -629,6 +629,15 @@ clips out of the score.
   or "no object" are left out.
   - all 286 held-out segments,
   - plus every tuning segment whose object is labeled soft.
+- Excluded objects (written 2026-10-29, after labeling, before any call):
+  the label sheet marks 4 OpenGraph names "excluded from the experiment" in
+  its `exclude` column, because the labelers did not find the object in the
+  video: white glove (2 tuning segments), beige gloves (1 tuning), white
+  bubble wrap (5 held-out) and green plant (2 tuning, 1 held-out). Their
+  segments are not sent and not scored, so the held-out set is 280 segments.
+  All four have the agreed label rigid. The two labelers disagreed on all four
+  (labeler 2: soft, soft, soft, squeezable). The object name "beige glove"
+  (2 tuning segments, agreed soft) is a different name and stays in.
 - Why tuning segments too: held-out OpenGraph has about a dozen segments
   with soft looking objects (sponges, bubble wrap). The soft check learns
   nothing from labels. The prompt is fixed here, and the answer is used as

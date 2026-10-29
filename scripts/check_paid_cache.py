@@ -323,6 +323,14 @@ def check_soft(tmp):
     res.append(expect("soft metrics: every HOT3D clip held back -> fail", m["verdict"] == "fail"))
     res.append(expect("soft labels: an empty agreed cell blocks sending",
                       muse_soft.labels_complete(lab) and not muse_soft.labels_complete(lab.assign(agreed=["rigid", ""] * 3 + [""]))))
+    segs = pd.DataFrame({"item": [f"og_{k}" for k in range(6)], "dataset": "opengraph",
+                         "split": ["held_out", "held_out", "held_out", "tune", "tune", "tune"],
+                         "object": ["cup", "plant", "sponge", "plant", "sponge", "cup"]})
+    segs.to_csv(muse_soft.OUT / "opengraph_segments.csv", index=False)
+    marked = lab.assign(exclude=[None] * 5 + ["excluded from the experiment", None])
+    res.append(expect("soft exclude: excluded object never sent or scored, NaN cells kept",
+                      sorted(muse_soft.items("opengraph", marked)["item"]) == ["og_0", "og_2", "og_4"]
+                      and sorted(muse_soft.items("opengraph", lab)["item"]) == ["og_0", "og_1", "og_2", "og_3", "og_4"]))
     return res
 
 

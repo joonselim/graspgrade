@@ -248,7 +248,7 @@ P1 결과 (EXP-23, $0.20): SAM이 HOT3D 접촉 프레임의 98.8%에서 잡은 �
 | P6 (완료, EXP-38) | 숫자 2 SAM 전체 (1,020요청 모두 completed, 견적과 같은 단가) → `number2_sam_checks.py`로 1,826클립 모두 가시성, 접촉 명확성 등급. 채점 안 함 | `sam_hot3d.py --role score_train/held_out --send`, `number2_sam_checks.py` (30분) | $8.72 + $17.76 |
 | P7a (완료, EXP-29) | 숫자 2 Muse 체크리스트 + 기준선, score_train 400개 → 게이트 weak (0.636 / 0.601), 결정대로 P7b 진행 | `muse_hot3d.py --task checklist/baseline --role score_train --send` | $7.98 |
 | P7b (완료, EXP-39) | 숫자 2 Muse 체크리스트 + 기준선, held-out 1,426개 (2,852호출, 해석 실패 0, $28.8 한도 안). 채점 안 함 | `muse_hot3d.py --task checklist/baseline --role held_out --send` | $14.66 + $13.90 |
-| P7c | 부드러운 물체 확인: 라벨 시트 완료·커밋 후 파일럿 20개 → HOT3D held-out 1,426개 + OpenGraph held-out 286구간 + 튜닝 soft 구간 | `muse_soft.py send --set pilot --send` → `--set hot3d --send`, `--set opengraph --send` → `score` | $10.46 + $2.60 + 1달러 미만 |
+| P7c | 부드러운 물체 확인 (라벨 완료 0ced28f, 일치 81.7%, kappa 0.613, 제외 4개 물체는 계획에 기록하고 코드에서 뺌, held-out 280구간 + 튜닝 soft 56구간, soft 60구간 9개 물체): 파일럿 20개 → HOT3D held-out 1,426개 + OpenGraph held-out 286구간 + 튜닝 soft 구간 | `muse_soft.py send --set pilot --send` → `--set hot3d --send`, `--set opengraph --send` → `score` | $10.46 + $2.60 + 1달러 미만 |
 | P8 (완료, EXP-40) | 숫자 2 최종 (물체 하나씩 빼기, 비교 6, extra 포함). 우리 점수 0.624, Muse 단독 0.501, 물체 기준선 0.771, 처음 보는 물체 0.571 | `number2_sam_checks.py` → `number2_score.py --final` | $0 |
 
 P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400개에서 Muse 물체 항목 6개 등급으로 로지스틱 회귀, v2 라벨. (1) 사람 하나씩 빼기 6명 평균 AUC, (2) 물체 하나씩 빼기 AUC (시퀀스 부트스트랩 95% 구간). 둘 다 0.65 이상이면 P7b, 하나라도 0.60 미만이면 P7b를 보내지 않고 사용자와 정한다. 그 사이(weak)면 P7b를 보낸다 (사용자 결정 2026-10-28, P7a 전). 같이 보고하되 게이트에는 안 쓰는 것: 같은 400개의 대리값 AUC, Muse 단독 사람별 AUC, 항목별 Muse-대리값 일치율. SAM 결과 없이 판단할 수 있어 P6과 순서가 무관하다.
