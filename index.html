@@ -436,9 +436,10 @@
       <li>Muse Spark 단독(방법 A)은 접촉을 장갑보다 약 7프레임 일찍 시작하고 7프레임 늦게 끝냄. 튜닝에서 배운 이 보정이 검증에서 경계 F1 ±5를 0.074에서 0.195로 올림. 1초보다 짧게 손을 놓는 순간은 프롬프트를 고쳐도 거의 못 봄(EXP-29, EXP-30, EXP-37).</li>
       <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 첫 정답 라벨은 로봇이 아니라 사람 손을 로봇 손으로 옮기는 방식의 부작용을 측정함(EXP-15). 충돌과 도달을 검사하는 v2 라벨로 바꿈: 튜닝 47%, 검증 46.4%, 손 크기와 무관(EXP-16, EXP-20).</li>
       <li>v2 라벨을 가르는 것은 영상 품질이 아니라 물체. 물체 종류만으로 AUC 0.74이고, 원래 체크리스트의 영상 항목은 0.01만 더함(EXP-17). 그래서 "물체 성질"을 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간 6개 항목으로 나눔(EXP-18, EXP-19).</li>
-      <li>실제 Muse Spark에게 따라할 수 있는지 직접 물으면 0.52로 우연 수준이고, 같은 모델에게 체크리스트 항목별로 물으면 0.63~0.65. 학습에서 뺀 처음 보는 물체에서도 0.607을 유지함. 아는 물체에서는 물체 이름만으로 0.688이라 이 기준선이 아직 높음(EXP-29, 튜닝).</li>
+      <li><b>평가 2 검증 결과.</b> Muse Spark에게 따라할 수 있는지 직접 물으면 AUC 0.501로 우연 수준이고, 우리 점수는 0.624. 이득은 체크리스트로 묻는 데서 오고(+0.117), 가중치 학습(+0.005)과 SAM·무료 항목(+0.001)은 더하지 못함. 처음 보는 물체에서도 0.571을 유지함(EXP-40).</li>
+      <li>물체 이름만으로 0.771로 우리 점수보다 높음. 검증 사람도 같은 물체를 잡기 때문임. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움(EXP-40).</li>
       <li><b>결과물.</b> 정답 라벨과 채점 코드를 묶어 두어, 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음(EXP-28).</li>
-      <li><b>남은 것.</b> 검증 세트에서 평가 2의 여섯 비교와 부드러운 물체 확인을 한 번 측정함. 위 평가 2 수치 중 튜닝이라고 적은 것은 확정이 아님.</li>
+      <li><b>남은 것.</b> 부드러운 물체 확인을 검증 세트에서 한 번 측정함.</li>
     </ul>
 
     <div class="tbl">
@@ -452,8 +453,9 @@
             <tr><td class="first">평가 1: Muse Spark 경계 F1 ±5, 보정 전 / 후</td><td class="n">0.074 / 0.195</td><td>검증 22개, 차이 +0.121 (0.062~0.172) (EXP-37)</td></tr>
             <tr><td class="first">평가 1: SAM 규칙 / + Muse Spark 확인 + 보정, 경계 F1 ±5</td><td class="n">0.090 / 0.137</td><td>검증 22개 (EXP-37)</td></tr>
             <tr><td class="first">평가 2: v2 라벨 "따라할 수 있음" 비율 (튜닝 / 검증)</td><td class="n">47.0% / 46.4%</td><td>클립 2,385 / 1,426 (EXP-16, EXP-20)</td></tr>
-            <tr><td class="first">평가 2: Muse Spark 단독 / 체크리스트 / 물체 이름</td><td class="n">0.52 / 0.65 / 0.69</td><td>튜닝 400개, 사람 하나씩 빼기 AUC (EXP-29)</td></tr>
-            <tr><td class="first">평가 2: 처음 보는 물체에서 체크리스트 점수</td><td class="n">0.607</td><td>물체 이름은 0.5 (EXP-29)</td></tr>
+            <tr><td class="first">평가 2: Muse Spark 단독 / 우리 점수 / 물체 이름 (AUC)</td><td class="n">0.501 / 0.624 / 0.771</td><td>검증 1,426개 (EXP-40)</td></tr>
+            <tr><td class="first">평가 2: 처음 보는 물체에서 우리 점수 (AUC)</td><td class="n">0.571</td><td>물체 이름은 0.5, 검증 (EXP-40)</td></tr>
+            <tr><td class="first">평가 2: 체크리스트의 몫 / 학습의 몫 (AUC 차이)</td><td class="n">+0.117 / +0.005</td><td>검증, 학습의 몫은 구간이 0을 포함 (EXP-40)</td></tr>
           </tbody>
         </table>
       </div>
@@ -572,6 +574,7 @@
             <tr class="core"><td class="first"><a href="#exp-37">EXP-37</a></td><td class="wrap-ok">평가 1 최종 결과: 검증 22개</td><td>Muse Spark 단독 + 장갑으로 배운 보정이 가장 높음: F1 ±5 0.195, ±15 0.376, IoU 0.850. 보정은 A(+0.121)와 C(+0.025) 모두에 도움. C는 B보다 낫지만(+0.022) A + 보정보다 낮음.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-38">EXP-38</a></td><td class="wrap-ok">평가 2 SAM: 점수 학습용 400개와 검증 1,426개</td><td>SAM 요청 1,020개 모두 완료. 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%가 1이라 등급이 둘뿐. 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</td><td>호출 2,852개 모두 첫 전송에서 답. 평가 2 클립 모두 두 답이 있음. Muse Spark 단독은 거의 0.1 근처나 0.85~0.9로만 답함. 채점은 최종 실행에서.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-40">EXP-40</a></td><td class="wrap-ok">평가 2 최종 결과: 검증 1,426개</td><td>우리 점수 AUC 0.624, Muse Spark 단독 0.501. 이득은 체크리스트에서 옴(+0.117), 학습은 +0.005. 물체 이름만으로 0.771. 처음 보는 물체에서 0.571(물체 이름 0.5). 같은 물체 안에서는 0.506.</td></tr>
           </tbody>
         </table>
       </div>
@@ -595,17 +598,17 @@
             <tr>
               <td class="first">Muse Spark의 물체 크기 판단 (평가 2)</td>
               <td>대리 등급과 같은 비율: 크기 75%, 감쌀 폭 49%. 물체를 실제보다 작고 좁게 봄(EXP-29, EXP-30)</td>
-              <td>cm로 묻는 수정은 점수가 오르지 않아 1판 유지(EXP-30). 검증에서 같은 비교로 확인</td>
+              <td>cm로 묻는 수정은 점수가 오르지 않아 1판 유지(EXP-30). 검증에서도 체크리스트가 Muse Spark 단독보다 +0.117(EXP-40)</td>
             </tr>
             <tr>
               <td class="first">가중치 학습의 이득 (평가 2)</td>
-              <td>체크리스트 등급의 학습 가중치가 단순 평균보다 +0.019, 구간이 0을 포함함(EXP-29)</td>
-              <td>검증 1,426개에서 같은 비교로 확인하고 결과를 그대로 보고</td>
+              <td>검증에서도 학습 가중치가 단순 평균보다 +0.005, 구간이 0을 포함함(EXP-40)</td>
+              <td>그대로 보고. 이득은 체크리스트로 묻는 데서 옴(+0.117)</td>
             </tr>
             <tr>
               <td class="first">같은 물체 안의 잡기 순위 (평가 2)</td>
-              <td>물체 33개 모두 따라할 수 있는 잡기와 없는 잡기가 섞여 있고, 24개는 20~80%. 물체가 라벨 분산의 약 4분의 1만 설명함. 튜닝 점검에서 같은 물체 안 AUC 0.574로 점수는 물체 단위로 작동함(EXP-31)</td>
-              <td>검증에서 물체 안 AUC와 실패 원인별 AUC를 보고(계산 전에 규칙 고정)</td>
+              <td>물체 33개 모두 따라할 수 있는 잡기와 없는 잡기가 섞여 있고, 24개는 20~80%. 물체가 라벨 분산의 약 4분의 1만 설명함. 검증에서 같은 물체 안 AUC 0.506으로 점수는 물체 단위로만 작동함(EXP-40)</td>
+              <td>한계로 보고. 실패 원인별 AUC는 충돌 0.611, 도달 0.636, 잡기 0.682(EXP-40)</td>
             </tr>
             <tr>
               <td class="first">v2 라벨의 깊이 민감도 (평가 2)</td>
@@ -628,8 +631,8 @@
           <tbody>
             <tr>
               <td class="first">주 비교에서 물체 이름 기준선에 짐</td>
-              <td>아는 물체에서 물체 이름만으로 0.688, 체크리스트 0.646(EXP-29). 검증 사람도 튜닝 사람과 같은 물체를 잡음(EXP-20)</td>
-              <td>처음 보는 물체 비교를 주 결과 옆에 둠(체크리스트 0.607, 물체 이름 0.5). Muse Spark 단독 대비 체크리스트의 이득(+0.11)을 함께 보고</td>
+              <td>검증에서 물체 이름 0.771, 우리 점수 0.624로 실제로 짐. 검증 사람도 튜닝 사람과 같은 물체를 잡음(EXP-20, EXP-40)</td>
+              <td>처음 보는 물체 비교를 주 결과 옆에 둠(우리 점수 0.571, 물체 이름 0.5). 라벨이 있는 물체에는 물체 비율을 쓰고, 우리 점수는 라벨 없는 물체에 씀(비교 6)</td>
             </tr>
             <tr>
               <td class="first">평가 1 경계 점수가 낮음</td>
@@ -773,12 +776,18 @@
     </div>
 
     <div class="ch">
-      <h3>평가 2의 현재 결론</h3>
+      <h3>검증 결과: 체크리스트가 Muse Spark를 우연 수준에서 끌어올림</h3>
       <ul class="plain">
-        <li>센서로 만든 정답이 Muse Spark가 모르는 정보, 즉 어떤 물체에서 로봇 손이 실패하는지를 드러냄. 체크리스트는 이 정보를 질문으로 바꿔 Muse Spark의 판별력을 우연 수준에서 0.65로 높임.</li>
-        <li>처음 보는 물체에도 적용됨. 물체 이름만 사용하는 방법으로는 불가능함.</li>
-        <li>남은 작업: 검증 1,426개에서 같은 비교, 물체 비율을 더하는 비교, 부드러운 물체 확인(유료). 위 수치는 모두 튜닝 결과로 확정이 아님.</li>
+        <li>튜닝에서 고정한 규칙으로 검증 1,426개를 한 번 채점함. Muse Spark 단독 AUC 0.501, 우리 점수 0.624(EXP-40).</li>
+        <li>이득은 Muse Spark에게 체크리스트로 묻는 데서 옴(+0.117, 구간이 0 위). 가중치 학습(+0.005)과 SAM·무료 항목(+0.001)은 더하지 못함.</li>
+        <li>처음 보는 물체에서도 0.571을 유지함. 물체 이름만 쓰는 방법은 이런 물체를 판단할 수 없음(0.5).</li>
+        <li>아는 물체에서는 물체 이름만으로 0.771로 더 높고, 물체당 라벨 클립이 5개만 있어도 물체 비율이 우리 점수와의 결합과 같음. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움.</li>
+        <li>센서로 만든 정답이 Muse Spark가 모르는 정보, 즉 어떤 물체에서 로봇 손이 실패하는지를 드러냄. 체크리스트는 이 정보를 질문으로 바꿔 라벨이 없는 물체에도 쓸 수 있게 함.</li>
       </ul>
+      <figure>
+        <img src="assets/exp40_number2_final.png" loading="lazy" width="1000" height="525" alt="검증 1,426개에서 행별 AUC와 95% 구간">
+        <figcaption>검증 1,426개에서 행별 AUC와 시퀀스 단위 95% 구간(EXP-40). 가는 세로선이 우연 수준(0.5).</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -893,7 +902,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#exp-40">EXP-40</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3628,6 +3637,105 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>다음: 검증 채점(P8, 유료 호출 없음). 부드러운 물체 확인(P7c)은 라벨 시트를 기다림.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-40">
+      <div class="exp-h"><span class="id">EXP-40</span><span class="t">평가 2 최종 결과: 검증 1,426개</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>우리 점수가 로봇 손이 따라할 수 있는 클립을 고르는가. 점수는 12개 등급의 로지스틱 회귀: 무료 항목 3개(카메라 안정성, 동작 완결성, 손 모양), SAM 항목 2개(가시성, 접촉 명확성), Muse Spark 체크리스트 7개. 가중치는 점수 학습용 400개로 학습. 모든 비교와 규칙은 이 실행 전에 측정 계획에 적음.</dd>
+        <dt>입력</dt><dd>검증 클립 1,426개(3명, 시퀀스 51개, 46.4%가 "따라할 수 있음"), v2 라벨(EXP-16, EXP-20). 이미 받은 답(EXP-29, EXP-38, EXP-39)만 사용해 유료 호출 없음. 채점은 한 번만 실행함. Muse Spark 답이 없어 빠진 클립은 없음.</dd>
+        <dt>방법</dt><dd>AUC와 95% 구간은 검증 시퀀스 51개 단위 부트스트랩. 짝지은 차이는 두 행에 같은 시퀀스를 씀.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">주 비교 (AUC)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행</th><th class="n">AUC</th><th class="n">95% 구간</th><th class="n">P0001</th><th class="n">P0010</th><th class="n">P0012</th><th class="n">상위 20% 중 따라할 수 있음 (기준 46.4%)</th><th class="n">한 손 클립</th></tr></thead>
+            <tbody>
+              <tr><td class="first"><b>우리 점수</b></td><td class="n"><b>0.624</b></td><td class="n">0.589~0.661</td><td class="n">0.638</td><td class="n">0.625</td><td class="n">0.603</td><td class="n">59.4%</td><td class="n">0.588</td></tr>
+              <tr><td class="first">1. Muse Spark 단독</td><td class="n">0.501</td><td class="n">0.469~0.529</td><td class="n">0.469</td><td class="n">0.510</td><td class="n">0.525</td><td class="n">46.9%</td><td class="n">0.477</td></tr>
+              <tr><td class="first">2. 물체 기준선 (물체 이름, 튜닝 비율)</td><td class="n">0.771</td><td class="n">0.744~0.792</td><td class="n">0.787</td><td class="n">0.786</td><td class="n">0.747</td><td class="n">79.4%</td><td class="n">0.742</td></tr>
+              <tr><td class="first">3. Muse Spark 단독 + 우리 항목</td><td class="n">0.624</td><td class="n">0.590~0.661</td><td class="n">0.632</td><td class="n">0.631</td><td class="n">0.606</td><td class="n">62.6%</td><td class="n">0.583</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp40_number2_final.png" loading="lazy" width="1000" height="525" alt="검증 1,426개에서 행별 AUC와 95% 구간">
+        <figcaption>검증 1,426개에서 행별 AUC와 시퀀스 51개 단위 95% 구간. 가는 세로선이 우연 수준(0.5).</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <p class="cap">비교 4: 처음 보는 물체 (학습하는 부분을 모두 그 물체 없이 다시 맞춤)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행</th><th class="n">AUC</th><th class="n">95% 구간</th></tr></thead>
+            <tbody>
+              <tr><td class="first">우리 점수</td><td class="n"><b>0.571</b></td><td class="n">0.534~0.609</td></tr>
+              <tr><td class="first">물체 기준선</td><td class="n">0.500</td><td class="n">정의상</td></tr>
+              <tr><td class="first">Muse Spark 단독</td><td class="n">0.501</td><td class="n">0.469~0.529</td></tr>
+              <tr><td class="first">Muse Spark 단독 + 우리 항목</td><td class="n">0.571</td><td class="n">0.536~0.609</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">비교 5: 체크리스트 대 학습 (Muse Spark 등급만)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행 또는 차이</th><th class="n">AUC 또는 차이</th><th class="n">95% 구간</th><th>계획 규칙상 이득</th></tr></thead>
+            <tbody>
+              <tr><td class="first">R1 Muse Spark 단독</td><td class="n">0.501</td><td class="n">0.469~0.529</td><td></td></tr>
+              <tr><td class="first">R2 체크리스트, 같은 가중치</td><td class="n">0.617</td><td class="n">0.579~0.659</td><td></td></tr>
+              <tr><td class="first">R3 체크리스트, 학습 가중치</td><td class="n">0.622</td><td class="n">0.588~0.661</td><td></td></tr>
+              <tr><td class="first"><b>R2 − R1 (체크리스트)</b></td><td class="n"><b>+0.117</b></td><td class="n">0.073~0.166</td><td>있음</td></tr>
+              <tr><td class="first">R3 − R1</td><td class="n">+0.122</td><td class="n">0.081~0.166</td><td>있음</td></tr>
+              <tr><td class="first">R3 − R2 (학습)</td><td class="n">+0.005</td><td class="n">−0.019~0.032</td><td>없음</td></tr>
+              <tr><td class="first">우리 점수 − R3 (무료·SAM 항목)</td><td class="n">+0.001</td><td class="n">−0.011~0.013</td><td>없음</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">비교 6: 물체 비율을 더할 때 (튜닝 2,385개에서 뽑음, 20회)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>물체당 라벨 클립</th><th class="n">물체 비율만</th><th class="n">우리 점수와 결합</th><th class="n">결합 − 물체 비율</th><th class="n">결합 − 우리 점수</th></tr></thead>
+            <tbody>
+              <tr><td class="first">0 (우리 점수)</td><td class="n"></td><td class="n">0.624</td><td class="n"></td><td class="n"></td></tr>
+              <tr><td class="first">5</td><td class="n">0.718</td><td class="n">0.722</td><td class="n">+0.004 (−0.004~0.013), 이득 없음</td><td class="n">+0.099 (0.063~0.130)</td></tr>
+              <tr><td class="first">20</td><td class="n">0.762</td><td class="n">0.760</td><td class="n">−0.001 (−0.005~0.001), 이득 없음</td><td class="n">+0.137 (0.100~0.167)</td></tr>
+              <tr><td class="first">전체</td><td class="n">0.774</td><td class="n">0.771</td><td class="n">−0.003 (−0.006~0.000), 이득 없음</td><td class="n">+0.147 (0.112~0.176)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">보고 행: 실패 원인별 AUC (따라할 수 있는 클립 662개 대 그 원인으로 실패한 클립)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>실패 원인</th><th class="n">우리 점수</th><th class="n">물체 기준선</th><th class="n">체크리스트 학습</th><th class="n">Muse Spark 단독</th></tr></thead>
+            <tbody>
+              <tr><td class="first">충돌 (538)</td><td class="n">0.611 (0.575~0.647)</td><td class="n">0.790</td><td class="n">0.618</td><td class="n">0.477</td></tr>
+              <tr><td class="first">도달 (146)</td><td class="n">0.636 (0.568~0.718)</td><td class="n">0.688</td><td class="n">0.601</td><td class="n">0.581</td></tr>
+              <tr><td class="first">잡기 (80)</td><td class="n">0.682 (0.584~0.770)</td><td class="n">0.797</td><td class="n">0.694</td><td class="n">0.516</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">같은 물체 안의 AUC(같은 물체 클립 쌍 13,524개, 전체 쌍의 2.7%): 우리 점수 0.506(0.461~0.544), 체크리스트 학습 0.457, Muse Spark 단독 0.532, 물체 기준선 0.5(정의상). 학습한 가중치(큰 순): 모양 1.252, 감쌀 폭 0.922, 손가락 가림 0.481, 손 모양 0.434, 손 대비 크기 0.391, 두께 −0.342, 동작 완결성 −0.331, 손잡이 0.258, 접촉 명확성 0.237, 빈 공간 −0.171, 가시성 0.043, 카메라 안정성 −0.030.</p>
+
+      <ul class="plain concl">
+        <li>Muse Spark 단독은 따라할 수 있는 클립을 가려내지 못함(AUC 0.501). 우리 점수는 0.624.</li>
+        <li>이득은 Muse Spark에게 체크리스트로 묻는 데서 옴(+0.117). 가중치 학습(+0.005)과 무료·SAM 항목(+0.001)은 더하지 못함.</li>
+        <li>물체 이름만으로 0.771로 우리 점수보다 높음. 검증 사람도 튜닝 사람과 같은 물체를 잡기 때문임. 처음 보는 물체에서는 우리 점수가 0.571을 유지하고 물체 기준선은 판단할 수 없음(0.5).</li>
+        <li>같은 물체 안에서는 우연 수준(0.506)이라 점수는 잡기가 아니라 물체를 줄 세움. 물체당 라벨 클립이 5개 이상 있으면 물체 비율만으로 결합과 같음.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3700,7 +3808,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>평가 1 검증 채점 완료(<a href="#exp-37">EXP-37</a>). Muse Spark 단독 + 보정이 F1 ±5 0.195, ±15 0.376, IoU 0.850으로 가장 높음. 보정은 A와 C 모두에 도움이 됨.</li>
       <li>평가 2의 SAM 구간을 모두 보냄(<a href="#exp-38">EXP-38</a>, $26.48). 요청 1,020개 모두 완료, 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%의 클립에서 1이라 등급이 둘뿐.</li>
       <li>평가 2의 Muse Spark 체크리스트와 단독 답을 검증 1,426개에 보냄(<a href="#exp-39">EXP-39</a>, $28.56, 한도 $28.8 안). 호출 2,852개 모두 첫 전송에서 답이 있음. Muse Spark 단독은 거의 두 값으로만 답함.</li>
-      <li>다음: 평가 2 점수 학습과 검증 채점(유료 호출 없음). 부드러운 물체 확인은 두 사람의 라벨 시트를 채운 뒤 보냄.</li>
+      <li>평가 2 검증 채점 완료(<a href="#exp-40">EXP-40</a>). 우리 점수 AUC 0.624, Muse Spark 단독 0.501, 물체 이름 0.771, 처음 보는 물체에서 우리 점수 0.571. 이득은 체크리스트에서 옴(+0.117).</li>
+      <li>다음: 부드러운 물체 확인. 두 사람의 라벨 시트를 채운 뒤 보냄.</li>
     </ul>
   </section>
 
@@ -3793,7 +3902,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 10:28 KST
+    마지막 갱신 2026-10-29 10:49 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -3903,17 +4012,17 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "체크리스트 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
         ["done", "Muse Spark 검증 1,426개: 체크리스트와 단독 모두 답 (EXP-39)"],
         ["done", "Muse Spark 손가락 가림 항목과 Muse Spark 단독 (EXP-39)"],
-        ["todo", "분산 없는 항목 점검"],
-        ["todo", "로지스틱 회귀 학습 (튜닝 400개)"],
-        ["todo", "AUC와 부트스트랩 구간, 사람별 AUC, 상위 20% 비율 (검증)"],
-        ["todo", "처음 보는 물체 비교 (검증 물체마다 다시 학습)"],
+        ["done", "분산 없는 항목 점검"],
+        ["done", "로지스틱 회귀 학습 (튜닝 400개)"],
+        ["done", "검증 AUC: 우리 점수 0.624, Muse Spark 단독 0.501, 물체 이름 0.771 (EXP-40)"],
+        ["done", "처음 보는 물체 비교 (검증 물체마다 다시 학습)"],
         ["done", "10/28 제안서 규칙 고정: 비교 6, 물체 안·실패 원인별 AUC, 부드러운 물체 확인"],
         ["done", "물체 기준선의 물체 비율을 튜닝 2,385개로 수정"],
         ["done", "부드러운 물체 확인 코드와 프레임 준비 (OpenGraph 1,239구간, 라벨이 비면 전송 멈춤)"],
         ["todo", "부드러운 물체 라벨 시트 (두 사람, 호출 전 커밋)"],
         ["todo", "부드러운 물체 확인: 파일럿 20개 → HOT3D 1,426개 + OpenGraph 약 330구간"],
         ["done", "비교 6과 물체 안·실패 원인별 AUC 코드 점검 (EXP-31)"],
-        ["todo", "비교 6과 물체 안·실패 원인별 AUC (검증)"]
+        ["done", "비교 6과 물체 안·실패 원인별 AUC: 물체 안 0.506 (EXP-40)"]
       ]
     },
     {
