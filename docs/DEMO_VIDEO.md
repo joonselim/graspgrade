@@ -1,0 +1,130 @@
+# 데모 영상 구성안
+
+길이 목표 3:00. 공식 규칙의 길이 제한은 아직 확인하지 않았다 (사용자 확인 항목).
+화면은 뷰어(`viewer/`) 녹화와 실험 그림 3장이 전부다. 새 계산이나 API 호출은 없다.
+내레이션과 화면 글자는 영어(쉬운 영어, em-dash, 축약형, 세미콜론 없음). 내레이션은 454단어로, 분당 150단어로 읽으면 약 3분이다.
+
+## 장면 순서
+
+| # | 시간 | 장면 | 화면 |
+| --- | --- | --- | --- |
+| 1 | 0:00-0:15 | 문제 | HOT3D 클립 2개 전체 화면 (컵, 키보드) |
+| 2 | 0:15-0:35 | GraspGrade가 하는 일 | 제목 카드, 입력과 출력 3줄 |
+| 3 | 0:35-1:25 | 숫자 1: 접촉 시점 | 뷰어 Contact timing, 에피소드 36과 7, 그림 EXP-37 |
+| 4 | 1:25-2:25 | 숫자 2: 로봇 손 점수 | 뷰어 Clip scores, 클립 3개, 그림 EXP-40 |
+| 5 | 2:25-2:48 | 안 되는 것 | 같은 물체 컵 클립 2개 나란히, 그림 EXP-42 |
+| 6 | 2:48-3:00 | 공개하는 것, 마무리 | 끝 카드 |
+
+## 보여줄 클립과 에피소드
+
+모두 held-out이다. 숫자는 `viewer/data/*.json`과 최종 기록(EXP-37, EXP-40)에서 옮겼다.
+
+### 숫자 1 (OpenGraph, 뷰어 Contact timing 탭)
+
+| 에피소드 | 길이 | 장갑 접촉 수 (왼/오) | F1 ±5: A+shift / B / C+shift | 쓰는 이유 |
+| --- | --- | --- | --- | --- |
+| 36 | 68.8 s | 8 / 12 | 0.229 / 0.065 / 0.163 | 전체 순위(A+shift > C+shift > B)와 같다. one-pager 그림과 같은 에피소드 |
+| 7 | 77.8 s | 4 / 34 | 0.040 / 0.197 / 0.250 | 짧은 접촉이 많으면 순위가 뒤집힌다. 정직한 반례 |
+
+### 숫자 2 (HOT3D, 뷰어 Clip scores 탭)
+
+| 클립 | 물체 | 점수 | 정답 | Muse Spark 단독 | 쓰는 이유 |
+| --- | --- | --- | --- | --- | --- |
+| `P0010_99385ad8_left_00073` | mug_white | 78.3 | copyable | 0.85 | 기본 예시. 등급 12개와 가중치를 보여 준다 |
+| `P0012_d6272ce1_left_00290` | keyboard | 9.8 | 실패 (collision) | 0.85 | 우리 점수는 맞고 Muse 단독은 틀림 |
+| `P0001_b2bcbe28_left_03432` | aria_small (안경) | 77.6 | copyable | 0.05 | 반대 방향으로 Muse 단독이 틀림 |
+| `P0010_1573a837_right_02542` | mug_patterned | 74.1 | copyable | 0.90 | 장면 5. 아래 클립과 짝 |
+| `P0001_b2bcbe28_left_01861` | mug_patterned | 74.6 | 실패 (grip) | 0.85 | 장면 5. 등급이 위 클립과 거의 같은데 정답이 다름 (물체 안에서는 우연 수준) |
+
+참고: 뷰어 상위 15개 중 11개가 copyable, 하위 15개 중 14개가 실패다. 이 30개는 극단값이라 영상에서는 이 비율 대신 전체 수치(상위 20% 중 59.4%, 기준 46.4%)를 쓴다.
+
+### 그림
+
+- `docs/experiments/img/exp37_number1_final.png`: 숫자 1 팔별 막대
+- `docs/experiments/img/exp40_number2_final.png`: 숫자 2 AUC 막대
+- `docs/experiments/img/exp42_soft_check.png`: 부드러운 물체 확인
+
+## 장면별 화면과 내레이션
+
+### 1. 문제 (0:00-0:15)
+
+화면: `P0010_99385ad8_left_00073` (컵) 재생, 이어서 `P0012_d6272ce1_left_00290` (키보드). 소리 없음.
+
+화면 글자: **Not every hand video can teach a robot hand.**
+
+> Robot hands can learn to grasp by watching people. But much hand video cannot teach a robot hand. The fingers are hidden, or the grasp is one a robot hand cannot copy.
+
+### 2. GraspGrade가 하는 일 (0:15-0:35)
+
+화면: 제목 카드. 왼쪽 "Input: first-person hand video", 오른쪽 3줄 "Clips cut at each touch", "A 0 to 100 score: can a robot hand copy it?", "A one-line reason". 아래에 "SAM 3.1 · Muse Spark".
+
+> GraspGrade takes first-person hand video, cuts it into clips at the moment of touch, and gives each clip a score from 0 to 100 for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a short checklist about each clip. We check both steps against real sensor data.
+
+### 3. 숫자 1: 접촉 시점 (0:35-1:25)
+
+화면 순서:
+1. 뷰어 Contact timing 탭, 에피소드 36 선택. 오른손 트랙 4줄(glove, A + shift, B, C + shift)이 보이게 둔다.
+2. glove 구간 하나를 클릭해 영상이 그 접촉으로 넘어가는 것을 보여 준다.
+3. 그림 EXP-37 (5초).
+4. 에피소드 7로 바꿔 오른손 트랙을 보여 준다 (5초).
+
+화면 글자: **Held-out: 22 episodes, 574 glove boundaries**
+
+> First, when does a touch start and end? We check this against a touch-sensing glove. The top track is the glove. Below it are three methods: Muse Spark alone, our SAM rule, and the SAM rule checked by Muse Spark.
+>
+> Video shows a touch before the glove feels pressure, so we learn one timing shift, on tuning episodes only. On 22 held-out episodes, Muse Spark with the shift is best. Its boundary F1 within five frames is 0.195, against 0.090 for the SAM rule.
+>
+> All methods are low at five frames, because the glove measures pressure and video cannot see pressure. When touches are many and short, like in this episode, the SAM rule checked by Muse Spark does better.
+
+### 4. 숫자 2: 로봇 손 점수 (1:25-2:25)
+
+화면 순서:
+1. 뷰어 Clip scores 탭, `P0010_99385ad8_left_00073` (컵, 78.3). 등급 12개와 가중치 목록이 보이게 스크롤.
+2. `P0012_d6272ce1_left_00290` (키보드, 9.8). 정답 "collision"과 Muse Spark alone 0.85 칸을 확대.
+3. `P0001_b2bcbe28_left_03432` (안경, 77.6). Muse Spark alone 0.05 칸을 확대.
+4. 그림 EXP-40 (8초). "Our score"와 "Muse Spark alone (R1)" 막대를 강조.
+
+화면 글자: **Held-out: 1,426 clips from 3 people**
+
+> Second, can a robot hand copy this grasp? The ground truth comes from motion capture in the HOT3D dataset from Meta. We place an Allegro robot hand on each human grasp and check if it reaches the same contact points without passing through the object.
+>
+> This mug clip scores 78, and the robot hand can copy it. The score is a logistic regression on twelve grades, so every weight is visible.
+>
+> This keyboard clip scores 10. The robot hand would pass through the keyboard. Asked alone, Muse Spark said yes, at 85 percent. This glasses clip scores 78 and is copyable. Muse Spark alone said 5 percent.
+>
+> On 1,426 held-out clips from three people, our score reaches an AUC of 0.624. Muse Spark alone, asked the same question, is at 0.501, which is chance. The gain comes from asking a checklist instead of one question.
+
+### 5. 안 되는 것 (2:25-2:48)
+
+화면 순서:
+1. 컵 클립 2개 나란히: `P0010_1573a837_right_02542` (74.1, copyable)와 `P0001_b2bcbe28_left_01861` (74.6, grip 실패).
+2. 그림 EXP-42 (4초).
+
+화면 글자: **Rules written before held-out scoring. Held-out scored once.**
+
+> We also show what does not work. When an object was seen in training, its name alone does better, at 0.771. On new objects our score keeps 0.571. Inside one object it is at chance. These two mugs get almost the same grades, but only one grasp is copyable. Our soft object filter also failed its pass rule. Every rule was written before we scored the held-out data, and we scored it once.
+
+### 6. 공개하는 것, 마무리 (2:48-3:00)
+
+화면: 끝 카드. "Code · Viewer · Benchmark with standalone scorers". 아래 작은 글씨로 데이터 출처 "OpenGraph Ego-Tactile (CC-BY-4.0) · HOT3D (Meta)".
+
+> The code, the viewer, and both ground truths are open, as a benchmark with its own scorers. GraspGrade finds the hand videos a robot can learn from.
+
+## 녹화 준비
+
+1. 뷰어 데이터와 영상은 WSL에만 있다 (`~/graspgrade/viewer/media/`). WSL에서 서버를 띄우고 Windows 브라우저로 `http://localhost:8765`를 연다.
+
+   ```bash
+   MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cd ~/graspgrade/viewer && python3 -m http.server 8765'
+   ```
+
+2. 화면 1920x1080, 브라우저 확대 125%, 라이트 테마. 장면마다 따로 녹화해 편집에서 잇는다.
+3. 내레이션은 장면별로 따로 녹음해 길이를 맞춘다. 자막은 내레이션 문구 그대로 쓴다.
+4. 루트의 `demo.html`은 쓰지 않는다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
+
+## 사용자 결정 필요
+
+- 공식 규칙의 영상 길이 제한과 형식. 3분보다 짧으면 장면 5의 그림 EXP-42와 장면 3의 에피소드 7을 먼저 뺀다.
+- HOT3D 영상을 공개 영상에 넣어도 되는지 (라이선스 미확인). 안 되면 장면 1, 4, 5의 HOT3D 화면을 그림과 트랙만으로 바꾼다.
+- 내레이션 목소리 (직접 녹음 또는 음성 합성).
+- 제안서 위험 10의 "직접 찍은 1인칭 영상"은 넣지 않았다. 넣으려면 SAM과 Muse 호출이 필요하고, 남은 크레딧은 $6.73이다.

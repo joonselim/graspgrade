@@ -230,6 +230,14 @@
     border: 1px solid var(--rule); background: var(--sheet); padding: 14px 16px 12px;
   }
   .phase { cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+  .phases { align-items: flex-start; }
+  .phase.wide { flex-basis: min(600px, 92%); }
+  .phase.wide .chk { columns: 2; column-gap: 20px; }
+  .phase.wide .chk li { break-inside: avoid; margin: 0 0 6px; }
+  @media (max-width: 560px) {
+    .phase.wide { flex-basis: 84%; }
+    .phase.wide .chk { columns: 1; }
+  }
   .phase:hover { border-color: var(--muted); }
   .phase.sel { border-color: var(--ink); background: color-mix(in srgb, var(--done) 5%, var(--sheet)); }
   .phase .ph-top {
@@ -581,8 +589,20 @@
   </section>
 
   <!-- 5 -->
+  <section id="s-concl">
+    <h2><span class="no">5</span>결론</h2>
+    <ul class="plain">
+      <li>Muse Spark에게 그대로 물으면 센서 정답에 크게 못 미침. 접촉 시점을 바로 물으면 경계 F1 ±5가 0.074이고, 로봇 손이 따라할 수 있는 잡기인지 한 번에 물으면 AUC 0.501로 우연 수준임(EXP-37, EXP-40).</li>
+      <li>센서 정답으로 모델을 쓰는 방식을 고치면 결과가 나아짐. 장갑으로 배운 시점 보정은 경계 F1 ±5를 0.195로 올렸고, 질문을 체크리스트로 쪼개면 AUC가 0.624로 오름(EXP-37, EXP-40).</li>
+      <li>체크리스트 점수는 처음 보는 물체에서도 0.571을 유지하지만, 같은 물체의 잡기끼리는 구분하지 못함(0.506). 따라서 이 점수는 라벨이 없는 새 물체를 고르는 데 쓸 수 있고, 같은 물체 안에서 좋은 잡기를 고르는 데는 쓸 수 없음(EXP-40).</li>
+      <li>Muse Spark로 부드러운 물체를 거르는 단계는 미리 정한 기준에 미달해, 점수를 매기는 범위를 단단한 물체로 한정함(EXP-42).</li>
+      <li>두 정답을 라벨 파일과 채점 코드로 공개해, 다른 방법도 같은 센서 기준으로 잴 수 있음(EXP-28).</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
   <section>
-    <h2><span class="no">5</span>열린 문제</h2>
+    <h2><span class="no">6</span>열린 문제</h2>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -619,9 +639,9 @@
     </div>
   </section>
 
-  <!-- 8 -->
+  <!-- 7 -->
   <section>
-    <h2><span class="no">6</span>위험 요소</h2>
+    <h2><span class="no">7</span>위험 요소</h2>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -4001,7 +4021,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 14:41 KST
+    마지막 갱신 2026-10-29 14:52 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4043,25 +4063,15 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         "A Muse Spark 단독, B SAM 규칙, C B + Muse Spark 경계 확인을 같은 기준으로 비교"
       ],
       chk: [
-        ["done", "SAM 입력 결정 (small object, 10fps)"],
-        ["done", "72개 에피소드 10fps 클립 준비, SAM 출력 디코더 고속화"],
         ["done", "파일럿 3개로 전 과정 확인 (EXP-06)"],
         ["done", "측정 계획 고정 (비교 대상 3가지)"],
         ["done", "주 정답 확정: 깜빡임을 정리한 촉각 장갑"],
-        ["done", "방법 B와 참고 행 구현, 파일럿 3개로 점검 (EXP-14)"],
-        ["done", "A·C 코드 완성, 최고 점수 측정: A 0.96, C 0.15 (EXP-21)"],
-        ["done", "B에 물체 바뀜 끊기 선택지 추가: 파일럿 F1 두 배, 과분할 (EXP-22)"],
-        ["done", "결정: 튜닝 50개로 B 재현율을 올림, C는 B 경계만 확인"],
-        ["done", "B에 유지 선택지 추가: IoU 0.72, F1은 조금 내려감 (EXP-24)"],
-        ["done", "A·C 시점 보정 코드 점검: 6프레임 지연을 되돌림 (EXP-27)"],
-        ["done", "A 튜닝 3개 실제 호출: Muse Spark가 7프레임 일찍, 보정으로 F1 두 배 (EXP-29)"],
+        ["done", "방법 B와 참고 행 구현 (EXP-14)"],
+        ["done", "B에 물체 바뀜 끊기와 유지 선택지 추가 (EXP-22, EXP-24)"],
+        ["done", "A 튜닝 실제 호출: Muse Spark가 7프레임 일찍, 보정으로 F1 두 배 (EXP-29)"],
         ["done", "A 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
-        ["done", "튜닝 나머지 47개 SAM 실행 (EXP-32)"],
-        ["done", "B SAM 규칙 기준값과 보정 확정: F1 ±5 0.153, IoU 0.683 (튜닝 50개, EXP-32)"],
-        ["done", "검증 22개 SAM 실행, B 적용: 경계 1,790개 (EXP-33)"],
-        ["done", "A Muse Spark 단독 검증 22개: 693호출 모두 답 (EXP-34)"],
-        ["done", "C 보정용 튜닝 표본 200개: 95개를 옮김 (EXP-35)"],
-        ["done", "C Muse Spark 경계 확인 검증 1,790개: 모두 답, 42%를 옮김 (EXP-35)"],
+        ["done", "B 확정: F1 ±5 0.153, IoU 0.683 (튜닝 50개, EXP-32)"],
+        ["done", "검증 22개에 A, B, C 실행 (EXP-33, EXP-34, EXP-35)"],
         ["done", "검증 22개로 세 방법 채점: A + 보정 F1 ±5 0.195, IoU 0.850 (EXP-37)"]
       ]
     },
@@ -4073,18 +4083,14 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         "양손 모두 처리"
       ],
       chk: [
-        ["done", "카메라 보정 기준 방향 확인 (원본 기준, 영상은 시계 90°)"],
-        ["done", "손가락 끝 3D 위치 확보 (UmeTrack, MANO 불필요)"],
-        ["done", "모션캡처로 잡기 클립 수 집계 (2,152개, 규모 가늠용)"],
+        ["done", "손가락 끝 3D 위치 확보 (UmeTrack)"],
         ["done", "정답 있는 136개 시퀀스 영상 수집"],
-        ["done", "Allegro 로봇 손으로 옮긴 손가락 끝과 물체 표면 거리 기준 설정"],
-        ["done", "재현 가능 비율 점검 후 기준 고정 (튜닝 54%, 이후 보류)"],
-        ["done", "검증 세트에 같은 기준으로 라벨 생성 (이후 보류)"],
         ["done", "평가 2 클립 자르기 (튜닝 2,385, 검증 1,426)"],
+        ["done", "첫 라벨: 손가락 끝과 물체 표면 거리로 판정, 튜닝 54% (EXP-10)"],
         ["done", "라벨 방법 점검: 세 방식 모두 기준 실패, 라벨 보류 (EXP-15)"],
         ["done", "새 정의 고정: 위치 맞춤 + 링크 메쉬 충돌 + 접촉점 도달"],
         ["done", "튜닝 v2 라벨: 47%, 손 크기 상관 +0.04로 통과 (EXP-16)"],
-        ["done", "검증 클립 v2 라벨: 46.4%, 사람별 43~51% (EXP-20)"]
+        ["done", "검증 v2 라벨: 46.4%, 사람별 43~51% (EXP-20)"]
       ]
     },
     {
@@ -4096,32 +4102,19 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         "부드러운 물체는 점수 없이 촉각 확인 목록으로 분류"
       ],
       chk: [
-        ["done", "영상에서 계산하는 항목 3개의 단독 AUC 점검 (신호 없음, EXP-12)"],
-        ["done", "리타게팅 항목을 손 모양 적합도로 교체 (EXP-13)"],
+        ["done", "영상 계산 항목 3개의 단독 AUC 점검: 신호 없음 (EXP-12)"],
         ["done", "v2 라벨로 다시 잼: 물체 0.74, 영상 항목은 약 0.01 더함 (EXP-17)"],
-        ["done", "평가 2 방향 결정: 물체 항목으로 늘림 (형상만으로 0.695, EXP-18)"],
-        ["done", "Muse Spark 물체 항목 6개와 상·중·하 기준 작성"],
-        ["done", "물체 항목 대리 등급 점검 통과: 0.683, 처음 보는 물체 0.666 (EXP-19)"],
-        ["done", "실행 준비: 클립 세트, SAM 구간 513개, 프레임, 채점 코드 점검"],
+        ["done", "방향 결정: 물체 항목으로 늘림 (형상만으로 0.695, EXP-18)"],
+        ["done", "Muse Spark 물체 항목 6개와 상·중·하 기준: 대리 등급 0.683 (EXP-19)"],
         ["done", "SAM·Muse Spark 파일럿: 잡은 물체 99%, 등급 일치 27/30 (EXP-23)"],
-        ["done", "게이트와 처음 보는 물체 비교 코드 점검 (EXP-26)"],
-        ["done", "체크리스트 대 학습 코드와 검정력 점검 (EXP-27)"],
-        ["done", "SAM 전체: 점수 학습 400개, 검증 1,426개 모두 등급 (EXP-38)"],
-        ["done", "Muse Spark 튜닝 400개 → 게이트 약함(0.636, 0.601), 검증 진행 (EXP-29)"],
+        ["done", "Muse Spark 튜닝 400개: 게이트 약함(0.636, 0.601), 검증 진행 (EXP-29)"],
         ["done", "체크리스트 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
-        ["done", "Muse Spark 검증 1,426개: 체크리스트와 단독 모두 답 (EXP-39)"],
-        ["done", "Muse Spark 손가락 가림 항목과 Muse Spark 단독 (EXP-39)"],
-        ["done", "분산 없는 항목 점검"],
-        ["done", "로지스틱 회귀 학습 (튜닝 400개)"],
+        ["done", "검증 1,426개의 SAM과 Muse Spark 답 수집 (EXP-38, EXP-39)"],
         ["done", "검증 AUC: 우리 점수 0.624, Muse Spark 단독 0.501, 물체 이름 0.771 (EXP-40)"],
-        ["done", "처음 보는 물체 비교 (검증 물체마다 다시 학습)"],
-        ["done", "10/28 제안서 규칙 고정: 비교 6, 물체 안·실패 원인별 AUC, 부드러운 물체 확인"],
-        ["done", "물체 기준선의 물체 비율을 튜닝 2,385개로 수정"],
-        ["done", "부드러운 물체 확인 코드와 프레임 준비 (OpenGraph 1,239구간, 라벨이 비면 전송 멈춤)"],
+        ["done", "처음 보는 물체 0.571, 같은 물체 안 0.506 (EXP-40)"],
+        ["done", "허용 깊이 재확인: 10mm 유지, 2mm 우연 수준 (EXP-41)"],
         ["done", "부드러운 물체 라벨링: 일치 81.7%, kappa 0.613, 4개 물체 제외"],
-        ["done", "부드러운 물체 확인: 기준 미달, soft 51.7% 보류 (EXP-42)"],
-        ["done", "비교 6과 물체 안·실패 원인별 AUC 코드 점검 (EXP-31)"],
-        ["done", "비교 6과 물체 안·실패 원인별 AUC: 물체 안 0.506 (EXP-40)"]
+        ["done", "부드러운 물체 확인: 기준 미달, soft 51.7% 보류 (EXP-42)"]
       ]
     },
     {
@@ -4131,23 +4124,25 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         "데모 영상과 README"
       ],
       chk: [
-        ["doing", "뷰어 뼈대: 클립 점수 탭(점수순 목록, 영상, 접촉 타임라인, 등급과 가중치, Muse Spark 이유), 접촉 시점 탭(장갑 정답 대 B 타임라인). 튜닝 데이터와 대리 점수로만 동작"],
-        ["doing", "프리셋 3종 (엄격 70+, 균형 50+, 물량 30+)"],
+        ["done", "뷰어: 클립 점수 탭(검증 점수 상위·하위 15개), 접촉 시점 탭(검증 22개, 장갑 대 세 방법)"],
+        ["done", "프리셋 3종 (엄격 70+, 균형 50+, 물량 30+)"],
+        ["done", "README (주요 결과, 실행 방법)"],
+        ["done", "데모 영상 구성안: 3분, 장면 6개, 뷰어 녹화와 결과 그림 3장"],
         ["todo", "직접 촬영한 1인칭 영상 적용 예시"],
-        ["todo", "데모 영상"],
-        ["doing", "README (현황, 주요 발견, 실행 방법)"]
+        ["todo", "데모 영상 녹화"]
       ]
     },
     {
-      title: "최종 측정 · 제출", from: 10, to: 10, status: "todo",
+      title: "최종 측정 · 제출", from: 10, to: 10, status: "doing",
       req: [
         "검증 세트로 최종 수치 1회 측정",
         "11/04 12:00 ET 전 제출"
       ],
       chk: [
-        ["todo", "검증 세트 최종 측정"],
-        ["todo", "수치 반영, 최종 점검"],
-        ["done", "정답을 벤치마크로 묶음: 라벨 파일, 라이선스 안내, 독립 채점 코드, 프로젝트 수치 재현 (EXP-28)"],
+        ["done", "검증 세트 최종 측정 (EXP-37, EXP-40, EXP-42)"],
+        ["done", "수치 반영 (보고서, README)"],
+        ["done", "정답을 벤치마크로 묶음: 라벨 파일과 독립 채점 코드 (EXP-28)"],
+        ["todo", "최종 점검"],
         ["todo", "제출"]
       ]
     }
@@ -4277,7 +4272,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     var host = document.getElementById("phases");
     host.innerHTML = "";
     PHASES.forEach(function (p, i) {
-      var c = el("article", "phase " + p.status);
+      var c = el("article", "phase " + p.status + (p.chk.length > 7 ? " wide" : ""));
       var top = el("div", "ph-top");
       top.appendChild(el("span", null, "단계 " + (i + 1)));
       top.appendChild(el("span", null, dates(p)));
