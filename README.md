@@ -142,6 +142,18 @@ cd viewer && python3 -m http.server 8765    # then open http://localhost:8765
 `viewer/media/` is not in git. It is cut from the datasets, so it needs the
 data folders described below.
 
+## Demo video
+
+`tools/demo_video.py` renders the 3 minute demo video from the viewer data,
+the viewer videos and the demo figures, following the scene plan in
+`docs/DEMO_VIDEO.md`. No API call. The narration is a synthesized voice
+(`tools/demo_voice.ps1`) with captions on screen.
+
+```bash
+.venv/bin/python scripts/demo_figures.py   # figures and title cards, out/demo/
+.venv/bin/python tools/demo_video.py       # out/demo/graspgrade_demo.mp4
+```
+
 ## Layout
 
 | Path | What |
@@ -154,6 +166,11 @@ data folders described below.
 | `splits/` | fixed tuning and held-out splits (seed 20261026), soft object labels |
 | `benchmark/` | ground truth label files and standalone scorers |
 | `viewer/` | static viewer, reads `viewer/data/*.json` |
+| `docs/DEMO_VIDEO.md`, `docs/demo/` | demo video plan, its figures and title cards |
+| `tools/` | report page builders (`build_en.py`, `build_logs.py`), demo video (`demo_video.py`, `demo_voice.ps1`), labeling page media (`label_media.py`) |
+| `index.html`, `en.html`, `logs.html`, `assets/` | report pages (Korean, English, every experiment page in full) and their images |
+| `label.html`, `api/`, `label-media/`, `middleware.js` | password protected page the two labelers used for the soft object labels |
+| `vercel.json`, `package.json` | hosting setup for the report and labeling pages |
 
 ## Running it
 
