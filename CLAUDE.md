@@ -40,7 +40,7 @@ Git Bash에서:
 
 Windows 사본을 WSL로 동기화:
 
-    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cp -r /mnt/c/Users/USER/Documents/works/hackathon_meta/{scripts,docs,splits,viewer,CLAUDE.md,README.md,requirements.txt} ~/graspgrade/'
+    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-24.04 -e bash -c 'cp -r /mnt/c/Users/USER/Documents/works/hackathon_meta/{scripts,tools,docs,splits,viewer,CLAUDE.md,README.md,requirements.txt} ~/graspgrade/'
 
 ## 스크립트
 
@@ -96,4 +96,9 @@ Windows 사본을 WSL로 동기화:
 | `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 12개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)과 빈 C 폴더로 돌아 50개 B 출력을 덮어쓰지 않는다. `score_tune50`은 진짜 튜닝 C 답으로 최종과 같은 보정 |
 | `scripts/number1_final_report.py` | 숫자 1 held-out 최종 보고 (EXP-37): `score` 결과와 같은 행을 다시 만들어 일치 확인, 참고 행 2개, 손별, B 지연, 사후 비교 (C-B, A+보정 - C+보정), 짧은 에피소드 9개 왼손. API 호출 없음 |
 | `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단, 보정 에피소드에 held-out이 있으면 중단). API 호출 없음 |
+| `tools/demo_video.py` | 데모 영상 3분을 docs/DEMO_VIDEO.md대로 합성 (뷰어 데이터와 영상, `out/demo/` 그림과 카드). WSL에서 실행, 결과 `out/demo/graspgrade_demo.mp4`. `--only 3a`는 샷 하나, `--voice-text`는 샷별 내레이션 문구만 씀. 샷별 WAV가 있으면 길이를 맞추고 소리를 섞음. API 호출 없음 |
+| `tools/demo_voice.ps1` | 샷별 내레이션을 Windows 내장 합성 음성으로 WAV로 만듦 (PowerShell, WSL `out/demo/voice/`) |
+| `tools/build_en.py` | 영어 보고서 페이지 `en.html`을 `index.html`과 `tools/en/`에서 만듦 |
+| `tools/build_logs.py` | 실험 기록 전체 페이지 `logs.html`을 `docs/experiments/`에서 만들고 그림을 `assets/logs/`로 복사 |
+| `tools/label_media.py` | 부드러운 물체 라벨링 페이지용 물체별 사진과 짧은 클립 (`label-media/`) |
 | `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |
