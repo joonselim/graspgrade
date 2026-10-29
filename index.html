@@ -640,6 +640,7 @@
             <tr class="minor"><td class="first"><a href="#exp-38">EXP-38</a></td><td class="wrap-ok">평가 2 SAM: 점수 학습용 400개와 검증 1,426개</td><td>SAM 요청 1,020개 모두 완료. 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%가 1이라 등급이 둘뿐. 채점은 최종 실행에서.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</td><td>호출 2,852개 모두 첫 전송에서 답. 평가 2 클립 모두 두 답이 있음. Muse Spark 단독은 거의 0.1 근처나 0.85~0.9로만 답함. 채점은 최종 실행에서.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-40">EXP-40</a></td><td class="wrap-ok">평가 2 최종 결과: 검증 1,426개</td><td>우리 점수 AUC 0.624, Muse Spark 단독 0.501. 이득은 체크리스트에서 옴(+0.117), 학습은 +0.005. 물체 이름만으로 0.771. 처음 보는 물체에서 0.571(물체 이름 0.5). 같은 물체 안에서는 0.506.</td></tr>
+            <tr class="core"><td class="first"><a href="#exp-41">EXP-41</a></td><td class="wrap-ok">평가 2 검증 결과를 허용 깊이 2mm와 10mm에서 다시 봄</td><td>10mm에서는 유지(우리 점수 0.632, Muse Spark 단독 0.541). 2mm에서는 우리 점수가 우연 수준(0.521)이고 Muse Spark 단독은 0.417. 물체 기준선은 모든 깊이에서 0.76~0.77.</td></tr>
           </tbody>
         </table>
       </div>
@@ -677,8 +678,8 @@
             </tr>
             <tr>
               <td class="first">v2 라벨의 깊이 민감도 (평가 2)</td>
-              <td>허용 깊이 2mm면 18%, 10mm면 66%가 "따라할 수 있음"(EXP-16)</td>
-              <td>기준값은 계산 전에 고정했으므로 유지. 깊이별 곡선을 결과와 함께 보고</td>
+              <td>허용 깊이 2mm면 20%, 10mm면 65%가 "따라할 수 있음". 검증 결과는 5mm와 10mm에서는 유지되지만 2mm에서는 우리 점수가 우연 수준(0.521)(EXP-41)</td>
+              <td>기준값 5mm는 계산 전에 고정했으므로 유지. 깊이별 결과를 함께 보고하고 한계로 적음</td>
             </tr>
           </tbody>
         </table>
@@ -859,6 +860,7 @@
         <li>처음 보는 물체에서도 0.571을 유지함. 물체 이름만 쓰는 방법은 이런 물체를 판단할 수 없음(0.5).</li>
         <li>아는 물체에서는 물체 이름만으로 0.771로 더 높고, 물체당 라벨 클립이 5개만 있어도 물체 비율이 우리 점수와의 결합과 같음. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움.</li>
         <li>센서로 만든 정답이 Muse Spark가 모르는 정보, 즉 어떤 물체에서 로봇 손이 실패하는지를 드러냄. 체크리스트는 이 정보를 질문으로 바꿔 라벨이 없는 물체에도 쓸 수 있게 함.</li>
+        <li>이 결과는 정답의 허용 깊이에 달려 있음. 10mm에서도 유지되지만(우리 점수 0.632, Muse Spark 단독 0.541), 2mm로 엄하게 하면 우리 점수도 우연 수준(0.521)으로 내려감(EXP-41).</li>
       </ul>
       <div class="viz viz-dots" data-chart="n2"></div>
     </div>
@@ -975,7 +977,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#exp-40">EXP-40</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#exp-40">EXP-40</a><a href="#exp-41">EXP-41</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3809,6 +3811,62 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>같은 물체 안에서는 우연 수준(0.506)이라 점수는 잡기가 아니라 물체를 줄 세움. 물체당 라벨 클립이 5개 이상 있으면 물체 비율만으로 결합과 같음.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-41">
+      <div class="exp-h"><span class="id">EXP-41</span><span class="t">평가 2 검증 결과를 허용 깊이 2mm와 10mm에서 다시 봄</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>v2 라벨은 Allegro 손이 물체 안으로 5mm까지 들어가는 것을 허용함. "따라할 수 있음" 비율이 이 기준에 크게 좌우되고, 측정 계획은 2mm와 10mm 결과도 보고하기로 함. EXP-40의 그림이 기준을 엄하게 하거나 느슨하게 해도 유지되는가.</dd>
+        <dt>입력</dt><dd>EXP-40의 검증 클립 1,426개. 유료 호출 없음.</dd>
+        <dt>방법</dt><dd>계산 전에 측정 계획에 적음. 아무것도 다시 학습하지 않음: 가중치, 손 모양 모델, Muse Spark 행은 모두 5mm 라벨로 학습한 그대로. 채점에 쓰는 검증 라벨만 2mm, 10mm로 바꿈. 물체 기준선은 같은 깊이의 튜닝 비율을 씀. 5mm 행이 EXP-40과 같은지 코드가 확인함.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">허용 깊이별 AUC (시퀀스 51개 단위 95% 구간)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>행</th><th class="n">2mm</th><th class="n">5mm (주, EXP-40)</th><th class="n">10mm</th></tr></thead>
+            <tbody>
+              <tr><td class="first">검증 "따라할 수 있음" 비율</td><td class="n">19.9%</td><td class="n">46.4%</td><td class="n">64.7%</td></tr>
+              <tr><td class="first"><b>우리 점수</b></td><td class="n">0.521 (0.484~0.559)</td><td class="n"><b>0.624</b> (0.589~0.661)</td><td class="n"><b>0.632</b> (0.592~0.677)</td></tr>
+              <tr><td class="first">Muse Spark 단독 (R1)</td><td class="n">0.417 (0.380~0.459)</td><td class="n">0.501 (0.469~0.529)</td><td class="n">0.541 (0.504~0.571)</td></tr>
+              <tr><td class="first">물체 기준선</td><td class="n">0.761 (0.724~0.793)</td><td class="n">0.771 (0.744~0.792)</td><td class="n">0.774 (0.742~0.804)</td></tr>
+              <tr><td class="first">Muse Spark 단독 + 우리 항목</td><td class="n">0.508</td><td class="n">0.624</td><td class="n">0.640</td></tr>
+              <tr><td class="first">체크리스트, 같은 가중치 (R2)</td><td class="n">0.488</td><td class="n">0.617</td><td class="n">0.624</td></tr>
+              <tr><td class="first">체크리스트, 학습 (R3)</td><td class="n">0.506</td><td class="n">0.622</td><td class="n">0.629</td></tr>
+              <tr><td class="first">처음 보는 물체: 우리 점수</td><td class="n">0.504</td><td class="n">0.571</td><td class="n">0.585</td></tr>
+              <tr><td class="first">같은 물체 안: 우리 점수</td><td class="n">0.505</td><td class="n">0.506</td><td class="n">0.504</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <p class="cap">짝지은 차이 (95% 구간, 0 위면 이득)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>차이</th><th class="n">2mm</th><th class="n">5mm</th><th class="n">10mm</th></tr></thead>
+            <tbody>
+              <tr><td class="first">우리 점수 − Muse Spark 단독</td><td class="n">+0.104 (0.041~0.163)</td><td class="n">+0.123 (0.081~0.168)</td><td class="n">+0.091 (0.037~0.152)</td></tr>
+              <tr><td class="first">R2 − R1 (체크리스트)</td><td class="n">+0.071 (0.010~0.124)</td><td class="n">+0.117 (0.073~0.166)</td><td class="n">+0.082 (0.019~0.148)</td></tr>
+              <tr><td class="first">R3 − R2 (학습)</td><td class="n">+0.018 (−0.009~0.047)</td><td class="n">+0.005 (−0.019~0.032)</td><td class="n">+0.005 (−0.021~0.034)</td></tr>
+              <tr><td class="first">우리 점수 − R3 (무료·SAM 항목)</td><td class="n">+0.015 (−0.001~0.029)</td><td class="n">+0.001 (−0.011~0.013)</td><td class="n">+0.003 (−0.011~0.018)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp41_number2_depth.png" loading="lazy" width="800" height="475" alt="허용 깊이 2mm, 5mm, 10mm에서 행별 검증 AUC" style="max-width:640px">
+        <figcaption>허용 깊이별 검증 AUC, 점수는 모두 5mm에서 학습. 회색은 물체 기준선, 파랑은 우리 점수, 빨강은 Muse Spark 단독. 2mm에서는 우리 점수가 우연 수준으로 내려가고 Muse Spark 단독은 0.5 아래로 떨어짐.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>10mm에서는 EXP-40의 그림이 유지됨: 우리 점수 0.632, Muse Spark 단독 0.541, 체크리스트가 Muse Spark 단독에 더하고 학습은 더하지 못함.</li>
+        <li>2mm에서는 "따라할 수 있음"이 20%뿐이고 우리 점수가 우연 수준(0.521, 구간이 0.5 포함). Muse Spark 단독은 순서를 거꾸로 매김(0.417). 우리 점수가 Muse Spark 단독보다 높은 것은 Muse Spark 단독이 우연 아래이기 때문임.</li>
+        <li>물체 기준선은 모든 깊이에서 0.76~0.77.</li>
+        <li>평가 2 결과는 허용 깊이에 달려 있음. 미리 정한 5mm와 더 느슨한 10mm에서는 유지되고, 더 엄한 2mm에서는 유지되지 않음.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3882,6 +3940,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>평가 2의 SAM 구간을 모두 보냄(<a href="#exp-38">EXP-38</a>, $26.48). 요청 1,020개 모두 완료, 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%의 클립에서 1이라 등급이 둘뿐.</li>
       <li>평가 2의 Muse Spark 체크리스트와 단독 답을 검증 1,426개에 보냄(<a href="#exp-39">EXP-39</a>, $28.56, 한도 $28.8 안). 호출 2,852개 모두 첫 전송에서 답이 있음. Muse Spark 단독은 거의 두 값으로만 답함.</li>
       <li>평가 2 검증 채점 완료(<a href="#exp-40">EXP-40</a>). 우리 점수 AUC 0.624, Muse Spark 단독 0.501, 물체 이름 0.771, 처음 보는 물체에서 우리 점수 0.571. 이득은 체크리스트에서 옴(+0.117).</li>
+      <li>평가 2 결과를 허용 깊이 2mm, 10mm에서 다시 봄(<a href="#exp-41">EXP-41</a>). 10mm에서는 유지, 2mm에서는 우리 점수가 우연 수준.</li>
       <li>다음: 부드러운 물체 확인. 두 사람의 라벨 시트를 채운 뒤 보냄.</li>
     </ul>
   </section>
@@ -3975,7 +4034,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 11:12 KST
+    마지막 갱신 2026-10-29 11:13 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
