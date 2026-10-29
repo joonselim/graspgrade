@@ -38,14 +38,17 @@
 
 참고: 뷰어 상위 15개 중 11개가 copyable, 하위 15개 중 14개가 실패다. 이 30개는 극단값이라 영상에서는 이 비율 대신 전체 수치(상위 20% 중 59.4%, 기준 46.4%)를 쓴다.
 
-### 그림 (영상용 1920x1080)
+### 그림과 카드 (영상용 1920x1080)
 
-`scripts/demo_figures.py`가 최종 결과 파일(EXP-37, EXP-40, EXP-42)에서 다시 그린다. 원본은 WSL `out/demo/`, 사본은 `docs/demo/`.
+`scripts/demo_figures.py`가 최종 결과 파일(EXP-37, EXP-40, EXP-42)에서 그림 4장을 다시 그리고, 글자 카드 3장도 그린다. 원본은 WSL `out/demo/`, 사본은 `docs/demo/`.
 
 - `docs/demo/demo_number1.png`: 숫자 1. 경계 F1 ±5와 IoU, A + shift(파랑)와 B(주황) 강조
 - `docs/demo/demo_number2_ours.png`: 숫자 2 AUC. 우리 점수(파랑)와 Muse Spark 단독(주황) 강조
 - `docs/demo/demo_number2_limits.png`: 같은 막대. 물체 이름(주황)과 처음 보는 물체(파랑) 강조
 - `docs/demo/demo_soft.png`: 부드러운 물체 확인. 합격선 대비 51.7%(미달), 2.1%(충족)
+- `docs/demo/demo_card_scene1.png`: 장면 1 화면 글자. 배경이 투명한 PNG이고, 아래쪽 반투명 검은 띠 위에 흰 글자. 영상 위에 겹친다
+- `docs/demo/demo_card_scene2.png`: 장면 2 제목 카드. 입력 상자, 화살표, 출력 3줄, 아래에 "SAM 3.1 · Muse Spark"
+- `docs/demo/demo_card_scene6.png`: 장면 6 끝 카드. 이름, 한 줄 소개 "Find the hand videos a robot can learn from.", Code / Viewer / Benchmark, 데이터 출처. 저장소 주소는 공개 범위가 정해지지 않아 넣지 않았다
 
 ## 장면별 화면과 내레이션
 
@@ -53,13 +56,13 @@
 
 화면: `P0010_99385ad8_left_00073` (컵) 재생, 이어서 `P0012_d6272ce1_left_00290` (키보드). 소리 없음.
 
-화면 글자: **Not every hand video can teach a robot hand.**
+화면 글자: **Not every hand video can teach a robot hand.** (`demo_card_scene1.png`를 영상 위에 겹침)
 
 > Robot hands can learn to grasp by watching people. But much hand video cannot teach a robot hand. The fingers are hidden, or the grasp is one a robot hand cannot copy.
 
 ### 2. GraspGrade가 하는 일 (0:15-0:35)
 
-화면: 제목 카드. 왼쪽 "Input: first-person hand video", 오른쪽 3줄 "Clips cut at each touch", "A 0 to 100 score: can a robot hand copy it?", "A one-line reason". 아래에 "SAM 3.1 · Muse Spark".
+화면: `demo_card_scene2.png`. 왼쪽 입력 "First-person hand video", 오른쪽 출력 3줄 "Clips cut at each touch", "A 0 to 100 score: can a robot hand copy it?", "A one-line reason". 아래에 "SAM 3.1 · Muse Spark".
 
 > GraspGrade takes first-person hand video, cuts it into clips at the moment of touch, and gives each clip a score from 0 to 100 for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a short checklist about each clip. We check both steps against real sensor data.
 
@@ -110,7 +113,7 @@
 
 ### 6. 공개하는 것, 마무리 (2:48-3:00)
 
-화면: 끝 카드. "Code · Viewer · Benchmark with standalone scorers". 아래 작은 글씨로 데이터 출처 "OpenGraph Ego-Tactile (CC-BY-4.0) · HOT3D (Meta)".
+화면: `demo_card_scene6.png`. "Code", "Viewer", "Benchmark"와 각 한 줄 설명, 아래 작은 글씨로 데이터 출처 "OpenGraph Ego-Tactile (CC-BY-4.0) · HOT3D (Meta)".
 
 > The code, the viewer, and both ground truths are open, as a benchmark with its own scorers. GraspGrade finds the hand videos a robot can learn from.
 
