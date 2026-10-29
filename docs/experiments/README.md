@@ -48,5 +48,6 @@ EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
 | [EXP-35](exp35_arm_c.md) | 2026-10-29 | Arm C, tuning shift sample and held-out (P5) | $30.28 | All 200 tuning and 1,790 held-out boundaries have a parsed pick on the first pass. Muse Spark moved 42% of the held-out boundaries. Calls cost about 17% more than the first estimate because replies are longer. Not scored yet. |
 | [EXP-36](exp36_shift_episodes.md) | 2026-10-29 | Separate tuning episodes for the arm A and arm C timing shifts | $0 | The score used episodes 0, 30, 53 for both shifts, so the arm C shift would have come from 1 boundary. Now it uses the whole tuning sample: +6 / -4 from 31 boundaries. Arm A stays +7 / -7. Regression and fake checks pass. |
 | [EXP-37](exp37_number1_final.md) | 2026-10-29 | Number 1 final result on the 22 held-out episodes | $0 | Muse Spark alone with the glove-learned shift is best: F1 0.195 at ±5, 0.376 at ±15, IoU 0.850. The shift adds value to A (+0.121) and C (+0.025). C beats B (+0.022) but stays below A + shift, because the SAM rule makes about 3 times too many boundaries. |
+| [EXP-38](exp38_number2_sam.md) | 2026-10-29 | SAM on the number 2 windows, score_train and held-out (P6) | $26.48 | All 1,020 requests completed at the estimated price. Visibility and contact clarity grades exist for all 1,826 clips. Visibility is 1 for about 70% of clips, so it has only two grades. Not scored yet. |
 
-Total Meta API spend so far: about $79.12 of $150.
+Total Meta API spend so far: about $105.60 of $150.
