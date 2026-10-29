@@ -54,19 +54,21 @@ video { width: 100%; max-height: 60vh; background: #000; border-radius: 6px; }
 .bar { position: absolute; top: 0; bottom: 0; background: var(--truth); border-radius: 3px; opacity: 0.85; }
 .cursor { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); pointer-events: none; }
 .note { color: var(--muted); font-size: 12px; }
-.score-box { text-align: center; padding: 8px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.score-box { text-align: center; padding: 4px 0 8px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
 .score { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .score-label { color: var(--muted); font-size: 12px; }
 .truth { margin-top: 6px; font-size: 12px; }
 #grade-cards { list-style: none; margin: 0; padding: 0; }
-#grade-cards li { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); gap: 8px; }
+#grade-cards li { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--line); gap: 8px; }
 .grade { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; color: #fff; }
 .grade.high { background: var(--good); }
 .grade.mid { background: var(--mid); }
 .grade.low { background: var(--bad); }
 .weight { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
-.reason-head { margin-top: 12px; font-weight: 600; }
+.reason-head { margin-top: 8px; font-weight: 600; }
+.reason p { margin: 4px 0; }
 #tab-compare { grid-template-columns: 1fr; }
+#compare-grid video { max-height: 46vh; }
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .compare-head { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-weight: 600; }
 .compare-grades { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
