@@ -1468,7 +1468,39 @@
 <tr><td>All</td><td>0.774</td><td>0.771</td><td>-0.003 (-0.006 to 0.000), no gain</td><td>+0.147 (0.112 to 0.176)</td></tr>
 </tbody></table></div>
 <p>Extra rows:</p>
-<ul><li>AUC inside each object (only pairs of clips of the same object, 13,524 pairs, 2.7% of all pairs): our score 0.506 (0.461 to 0.544), checklist learned 0.457 (0.412 to 0.500), Muse Spark alone 0.532 (0.483 to 0.575), object reference 0.5 by construction.</li><li>AUC for each failure reason (copyable clips against clips that fail for that reason; held-out: 662 copyable, 538 collision, 146 reach, 80 grip):</li></ul>
+<ul><li>AUC inside each object (only pairs of clips of the same object, 13,524 pairs, 2.7% of all pairs): our score 0.506 (0.461 to 0.544), checklist learned 0.457 (0.412 to 0.500), Muse Spark alone 0.532 (0.483 to 0.575), object reference 0.5 by construction.</li><li>AUC inside each object and person (only pairs of clips of the same object from the same person): our score 0.484, checklist learned 0.455, Muse Spark alone 0.535, object reference 0.5 by construction.</li><li>AUC inside each object, per object, for the 27 of 33 held-out objects with 5 or more clips of each kind (table below, added to this page on 2026-10-29 from the same result file, as the measurement plan asks). No interval per object, because each object has only 18 to 86 clips. Our score is above 0.5 for 14 of 27 objects (median 0.502, range 0.358 to 0.640). Muse Spark alone is above 0.5 for 13 of 27 (median 0.487), with its two highest values on the two mugs (0.858 and 0.797).</li></ul>
+<div class="wrap"><table>
+<thead><tr><th>Object</th><th>Clips</th><th>Copyable</th><th>Our score</th><th>Checklist learned</th><th>Muse Spark alone</th></tr></thead>
+<tbody>
+<tr><td>aria_small</td><td>76</td><td>51</td><td>0.595</td><td>0.496</td><td>0.487</td></tr>
+<tr><td>bottle_bbq</td><td>20</td><td>14</td><td>0.417</td><td>0.286</td><td>0.363</td></tr>
+<tr><td>bottle_mustard</td><td>36</td><td>12</td><td>0.408</td><td>0.361</td><td>0.668</td></tr>
+<tr><td>bottle_ranch</td><td>21</td><td>13</td><td>0.404</td><td>0.534</td><td>0.558</td></tr>
+<tr><td>bowl</td><td>34</td><td>5</td><td>0.579</td><td>0.631</td><td>0.372</td></tr>
+<tr><td>can_parmesan</td><td>28</td><td>16</td><td>0.490</td><td>0.482</td><td>0.339</td></tr>
+<tr><td>can_soup</td><td>25</td><td>19</td><td>0.640</td><td>0.482</td><td>0.461</td></tr>
+<tr><td>can_tomato_sauce</td><td>46</td><td>24</td><td>0.511</td><td>0.474</td><td>0.482</td></tr>
+<tr><td>carton_milk</td><td>47</td><td>14</td><td>0.470</td><td>0.450</td><td>0.506</td></tr>
+<tr><td>carton_oj</td><td>46</td><td>9</td><td>0.411</td><td>0.300</td><td>0.523</td></tr>
+<tr><td>cellphone</td><td>84</td><td>27</td><td>0.502</td><td>0.524</td><td>0.573</td></tr>
+<tr><td>coffee_pot</td><td>50</td><td>13</td><td>0.557</td><td>0.494</td><td>0.342</td></tr>
+<tr><td>dino_toy</td><td>18</td><td>5</td><td>0.554</td><td>0.485</td><td>0.715</td></tr>
+<tr><td>dvd_remote</td><td>33</td><td>17</td><td>0.456</td><td>0.487</td><td>0.312</td></tr>
+<tr><td>food_vegetables</td><td>35</td><td>20</td><td>0.585</td><td>0.672</td><td>0.435</td></tr>
+<tr><td>food_waffles</td><td>21</td><td>10</td><td>0.491</td><td>0.464</td><td>0.436</td></tr>
+<tr><td>mouse</td><td>56</td><td>22</td><td>0.599</td><td>0.663</td><td>0.531</td></tr>
+<tr><td>mug_patterned</td><td>72</td><td>49</td><td>0.510</td><td>0.296</td><td>0.858</td></tr>
+<tr><td>mug_white</td><td>86</td><td>72</td><td>0.495</td><td>0.304</td><td>0.797</td></tr>
+<tr><td>plate_bamboo</td><td>29</td><td>13</td><td>0.377</td><td>0.423</td><td>0.534</td></tr>
+<tr><td>potato_masher</td><td>31</td><td>23</td><td>0.587</td><td>0.465</td><td>0.378</td></tr>
+<tr><td>puzzle_toy</td><td>83</td><td>29</td><td>0.391</td><td>0.427</td><td>0.413</td></tr>
+<tr><td>spatula_red</td><td>18</td><td>13</td><td>0.477</td><td>0.446</td><td>0.523</td></tr>
+<tr><td>spoon_wooden</td><td>22</td><td>12</td><td>0.358</td><td>0.529</td><td>0.538</td></tr>
+<tr><td>vase</td><td>56</td><td>9</td><td>0.509</td><td>0.548</td><td>0.405</td></tr>
+<tr><td>whiteboard_eraser</td><td>55</td><td>23</td><td>0.552</td><td>0.533</td><td>0.535</td></tr>
+<tr><td>whiteboard_marker</td><td>65</td><td>52</td><td>0.547</td><td>0.331</td><td>0.433</td></tr>
+</tbody></table></div>
+<ul><li>AUC for each failure reason (copyable clips against clips that fail for that reason; held-out: 662 copyable, 538 collision, 146 reach, 80 grip):</li></ul>
 <div class="wrap"><table>
 <thead><tr><th>Failure reason</th><th>Our score</th><th>Object reference</th><th>Checklist learned</th><th>Muse Spark alone</th></tr></thead>
 <tbody>

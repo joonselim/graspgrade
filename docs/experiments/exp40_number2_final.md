@@ -73,6 +73,47 @@ Extra rows:
   pairs, 2.7% of all pairs): our score 0.506 (0.461 to 0.544), checklist
   learned 0.457 (0.412 to 0.500), Muse Spark alone 0.532 (0.483 to 0.575),
   object reference 0.5 by construction.
+- AUC inside each object and person (only pairs of clips of the same object
+  from the same person): our score 0.484, checklist learned 0.455, Muse
+  Spark alone 0.535, object reference 0.5 by construction.
+- AUC inside each object, per object, for the 27 of 33 held-out objects with
+  5 or more clips of each kind (table below, added to this page on
+  2026-10-29 from the same result file, as the measurement plan asks). No
+  interval per object, because each object has only 18 to 86 clips. Our
+  score is above 0.5 for 14 of 27 objects (median 0.502, range 0.358 to
+  0.640). Muse Spark alone is above 0.5 for 13 of 27 (median 0.487), with
+  its two highest values on the two mugs (0.858 and 0.797).
+
+| Object | Clips | Copyable | Our score | Checklist learned | Muse Spark alone |
+| --- | --- | --- | --- | --- | --- |
+| aria_small | 76 | 51 | 0.595 | 0.496 | 0.487 |
+| bottle_bbq | 20 | 14 | 0.417 | 0.286 | 0.363 |
+| bottle_mustard | 36 | 12 | 0.408 | 0.361 | 0.668 |
+| bottle_ranch | 21 | 13 | 0.404 | 0.534 | 0.558 |
+| bowl | 34 | 5 | 0.579 | 0.631 | 0.372 |
+| can_parmesan | 28 | 16 | 0.490 | 0.482 | 0.339 |
+| can_soup | 25 | 19 | 0.640 | 0.482 | 0.461 |
+| can_tomato_sauce | 46 | 24 | 0.511 | 0.474 | 0.482 |
+| carton_milk | 47 | 14 | 0.470 | 0.450 | 0.506 |
+| carton_oj | 46 | 9 | 0.411 | 0.300 | 0.523 |
+| cellphone | 84 | 27 | 0.502 | 0.524 | 0.573 |
+| coffee_pot | 50 | 13 | 0.557 | 0.494 | 0.342 |
+| dino_toy | 18 | 5 | 0.554 | 0.485 | 0.715 |
+| dvd_remote | 33 | 17 | 0.456 | 0.487 | 0.312 |
+| food_vegetables | 35 | 20 | 0.585 | 0.672 | 0.435 |
+| food_waffles | 21 | 10 | 0.491 | 0.464 | 0.436 |
+| mouse | 56 | 22 | 0.599 | 0.663 | 0.531 |
+| mug_patterned | 72 | 49 | 0.510 | 0.296 | 0.858 |
+| mug_white | 86 | 72 | 0.495 | 0.304 | 0.797 |
+| plate_bamboo | 29 | 13 | 0.377 | 0.423 | 0.534 |
+| potato_masher | 31 | 23 | 0.587 | 0.465 | 0.378 |
+| puzzle_toy | 83 | 29 | 0.391 | 0.427 | 0.413 |
+| spatula_red | 18 | 13 | 0.477 | 0.446 | 0.523 |
+| spoon_wooden | 22 | 12 | 0.358 | 0.529 | 0.538 |
+| vase | 56 | 9 | 0.509 | 0.548 | 0.405 |
+| whiteboard_eraser | 55 | 23 | 0.552 | 0.533 | 0.535 |
+| whiteboard_marker | 65 | 52 | 0.547 | 0.331 | 0.433 |
+
 - AUC for each failure reason (copyable clips against clips that fail for
   that reason; held-out: 662 copyable, 538 collision, 146 reach, 80 grip):
 
