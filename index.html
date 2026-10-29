@@ -400,7 +400,7 @@
   tr.minor td a { opacity: 0.8; }
 
   /* ---------- result charts ---------- */
-  .viz, .res { --v-hi: #2a78d6; --v-base: #9aa2ae; --v-ref: #eb6834; --v-pos: #2a78d6; --v-neg: #eb6834; --v-track: #eef0f3; margin: 14px 0 22px; }
+  .viz { --v-hi: #2a78d6; --v-base: #9aa2ae; --v-ref: #eb6834; --v-pos: #2a78d6; --v-neg: #eb6834; --v-track: #eef0f3; margin: 14px 0 22px; }
   .viz-cap { font-size: 13.5px; font-weight: 650; color: var(--ink); margin: 0 0 4px; }
   .viz-sub { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
   .viz-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
@@ -431,33 +431,20 @@
   .viz-tip { position: fixed; z-index: 60; pointer-events: none; max-width: 260px; padding: 7px 10px; font-size: 12.5px; line-height: 1.5;
     color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); opacity: 0; transition: opacity 0.1s; }
   .viz-tip.on { opacity: 1; }
-  /* headline result cards */
-  .res { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 6px 0 24px;
-    --good: #1f7a3f; --warn: #a86400; --bad: #c0392b; }
-  .res-card { border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px 12px; background: var(--sheet); display: flex; flex-direction: column; }
-  .res-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .res-k { font-size: 12px; font-weight: 700; color: var(--muted); }
-  .res-v { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap;
-    color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
-  .res-v.good { --c: var(--good); } .res-v.warn { --c: var(--warn); } .res-v.bad { --c: var(--bad); } .res-v.info { --c: var(--done); }
-  .res-big { font-size: 30px; font-weight: 750; line-height: 1.15; margin: 8px 0 0; font-variant-numeric: tabular-nums; color: var(--ink); }
-  .res-big .from { color: var(--faint); font-weight: 600; }
-  .res-big .arr { color: var(--faint); font-weight: 400; margin: 0 6px; font-size: 22px; }
-  .res-m { font-size: 12.5px; color: var(--muted); margin: 2px 0 10px; }
-  .res-bars { display: grid; gap: 7px; margin: 0 0 10px; }
-  .res-bar .lab { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--ink-2); margin-bottom: 2px; }
-  .res-bar .lab b { font-variant-numeric: tabular-nums; }
-  .res-bar.hi .lab { color: var(--ink); font-weight: 650; }
-  .res-bar .tr { position: relative; height: 8px; background: var(--v-track); border-radius: 2px; }
-  .res-bar .fl { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: var(--c); }
-  .res-bar .mk { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink); }
-  .res-t { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin: auto 0 0; }
-  .res-flow { display: flex; align-items: stretch; gap: 6px; margin: 4px 0 10px; font-size: 12.5px; }
-  .res-flow span { flex: 1; border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; background: var(--tint); color: var(--ink-2); line-height: 1.4; }
-  .res-flow i { align-self: center; font-style: normal; color: var(--faint); }
-  .res-card.wide { grid-column: 1 / -1; }
-  .res-card a.more { font-size: 12.5px; font-weight: 600; margin-top: 6px; }
-  @media (max-width: 640px) { .res { grid-template-columns: 1fr; } .res-big { font-size: 26px; } }
+  /* conclusion brief */
+  .lead { font-size: 16px; font-weight: 650; color: var(--ink); line-height: 1.6; margin: 0 0 16px; padding-left: 12px; border-left: 3px solid var(--ink); }
+  .brief { display: grid; grid-template-columns: 110px minmax(0, 1fr); margin: 0 0 20px; border-bottom: 1px solid var(--rule); }
+  .brief dt, .brief dd { margin: 0; padding: 12px 0; border-top: 1px solid var(--rule); }
+  .brief dt { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .brief dd { color: var(--ink-2); line-height: 1.65; }
+  .brief dd .tbl { margin: 0; }
+  .brief dd ul.plain { margin: 0; }
+  .brief ol.steps { margin: 0; padding-left: 1.3em; }
+  .brief ol.steps li { margin: 2px 0; }
+  @media (max-width: 560px) {
+    .brief { grid-template-columns: minmax(0, 1fr); }
+    .brief dd { border-top: 0; padding-top: 0; }
+  }
   /* checklist */
   .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0 18px; counter-reset: flow; }
   .flow > div { position: relative; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; font-size: 13px; color: var(--ink-2); background: var(--sheet); }
@@ -508,18 +495,9 @@
     <p class="doc-sub">1인칭 손 조작 영상을 손이 물체에 닿는 순간 기준으로 자르고, 각 구간에 로봇 손이 따라할 수 있는 정도를 0~100점으로 매긴다.</p>
   </header>
 
-  <!-- 1 -->
-  <section>
-    <h2><span class="no">1</span>결과 요약</h2>
-    <div class="res" data-chart="res"></div>
-
-    <div class="viz viz-n1" data-chart="n1"></div>
-    <div class="viz viz-dots" data-chart="n2"></div>
-  </section>
-
   <!-- 2 -->
   <section id="s-plan">
-    <h2><span class="no">2</span>일정</h2>
+    <h2><span class="no">1</span>일정</h2>
     <div class="gantt" id="gantt"></div>
     <div class="legend">
       <span><i style="background:var(--done)"></i>완료</span>
@@ -534,7 +512,7 @@
   </section>
 
   <section id="s-measure">
-    <h2><span class="no">3</span>측정 계획</h2>
+    <h2><span class="no">2</span>측정 계획</h2>
     <ul class="plain">
       <li><b>평가 1.</b> 영상만으로 손별 접촉 시작과 끝을 찾음. 세 방법(A Muse Spark 단독, B SAM 규칙, C B + Muse Spark 경계 확인)의 결과를 OpenGraph의 촉각 장갑 데이터와 비교함. 지표는 경계 F1(±5, ±15프레임)과 접촉 IoU.</li>
       <li><b>평가 2.</b> 잡기 클립마다 로봇 손이 따라할 수 있는지 0~100점을 매김. HOT3D 모션캡처로 만든 로봇 손 정답과 비교해 AUC를 냄. 주 비교 대상은 같은 질문을 한 번에 받은 Muse Spark.</li>
@@ -555,7 +533,7 @@
   </section>
 
   <section>
-    <h2><span class="no">4</span>실험 목록</h2>
+    <h2><span class="no">3</span>실험 목록</h2>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -612,19 +590,61 @@
 
   <!-- 5 -->
   <section id="s-concl">
-    <h2><span class="no">5</span>결론</h2>
-    <ul class="plain">
-      <li>Muse Spark에게 그대로 물으면 센서 정답에 크게 못 미침. 접촉 시점을 바로 물으면 경계 F1 ±5가 0.074이고, 로봇 손이 따라할 수 있는 잡기인지 한 번에 물으면 AUC 0.501로 우연 수준임(EXP-37, EXP-40).</li>
-      <li>센서 정답으로 모델을 쓰는 방식을 고치면 결과가 나아짐. 장갑으로 배운 시점 보정은 경계 F1 ±5를 0.195로 올렸고, 질문을 체크리스트로 쪼개면 AUC가 0.624로 오름(EXP-37, EXP-40).</li>
-      <li>체크리스트 점수는 처음 보는 물체에서도 0.571을 유지하지만, 같은 물체의 잡기끼리는 구분하지 못함(0.506). 따라서 이 점수는 라벨이 없는 새 물체를 고르는 데 쓸 수 있고, 같은 물체 안에서 좋은 잡기를 고르는 데는 쓸 수 없음(EXP-40).</li>
-      <li>점수는 단단한 물체를 대상으로 함. 부드러운 물체를 Muse Spark로 자동으로 거르는 방법은 아직 믿을 만하지 않아 범위 밖으로 둠(EXP-42).</li>
-      <li>두 정답을 라벨 파일과 채점 코드로 공개해, 다른 방법도 같은 센서 기준으로 잴 수 있음(EXP-28).</li>
-    </ul>
+    <h2><span class="no">4</span>결론</h2>
+    <p class="lead">영상만 보는 모델을 센서 정답으로 보정하면, 1인칭 영상에서 접촉 시점과 로봇이 따라할 수 있는 잡기를 더 정확하게 골라낼 수 있음.</p>
+    <dl class="brief">
+      <dt>문제</dt>
+      <dd>사람의 1인칭 영상으로 로봇을 학습시키려면, 손이 물체에 닿고 떨어지는 순간과 로봇 손이 따라할 수 있는 잡기를 골라내야 함. 지금은 이 선별을 영상만 보고 하며, 실제 접촉이나 실제 로봇 재현과 맞는지 확인할 방법이 없음.</dd>
+
+      <dt>해결한 것</dt>
+      <dd>촉각 장갑(OpenGraph)과 모션캡처(HOT3D)로 두 질문의 정답을 만들고, SAM 3.1과 Muse Spark로 만든 선별 방법을 이 정답으로 채점함. 정답과 채점 코드는 벤치마크로 묶음(EXP-28).</dd>
+
+      <dt>수치</dt>
+      <dd>
+        <div class="tbl">
+          <div class="wrap">
+            <table class="min">
+              <thead><tr><th>질문</th><th>지표</th><th>Muse Spark에 바로 물음</th><th>우리 방법</th><th>참고</th></tr></thead>
+              <tbody>
+                <tr><td class="first">접촉 시점<br><span class="note">검증 에피소드 22개</span></td><td>경계 F1 ±5프레임</td><td class="n">0.074</td><td class="n"><b>0.195</b></td><td>접촉 구간 IoU 0.821 → 0.850(EXP-37)</td></tr>
+                <tr><td class="first">따라할 수 있는 잡기<br><span class="note">검증 클립 1,426개</span></td><td>AUC (0.5는 우연)</td><td class="n">0.501</td><td class="n"><b>0.624</b></td><td>처음 보는 물체 0.571. 물체 이름만 아는 기준선 0.771(EXP-40)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </dd>
+
+      <dt>조건</dt>
+      <dd>
+        <ul class="plain">
+          <li>단단한 물체를 대상으로 함. 부드러운 물체를 자동으로 거르는 방법은 아직 믿을 만하지 않음(EXP-42).</li>
+          <li>잡기 점수는 물체 단위로 작동함. 처음 보는 물체를 고르는 데는 쓸 수 있지만, 같은 물체의 잡기끼리는 구분하지 못함(0.506). 이미 라벨이 있는 물체는 물체별 비율이 더 정확함.</li>
+          <li>정답의 허용 깊이를 2mm로 엄하게 하면 잡기 점수가 우연 수준(0.521)으로 내려감(EXP-41). 두 데이터 모두 실험실에서 촬영함.</li>
+        </ul>
+      </dd>
+
+      <dt>다른 영상에 적용</dt>
+      <dd>센서가 없는 1인칭 영상에도 같은 절차를 그대로 쓸 수 있음. 필요한 것은 영상과 SAM 3.1, Muse Spark 호출뿐이고, 시점 보정값과 체크리스트 가중치는 이번 실험에서 배운 값을 씀. 센서 정답이 있는 데이터라면 벤치마크 채점 코드로 같은 지표를 잴 수 있음.</dd>
+
+      <dt>방법</dt>
+      <dd>
+        <ol class="steps">
+          <li>영상을 초당 5프레임으로 뽑아 Muse Spark에게 손별로 물체에 닿아 있는지 물음.</li>
+          <li>답에서 접촉 시작을 7프레임(약 0.23초) 늦추고 끝을 7프레임 앞당겨 접촉 구간을 정함. 이 보정값은 촉각 장갑에서 배움.</li>
+          <li>접촉 구간마다 잡기 클립을 만들고, SAM 3.1로 손과 물체 마스크를 얻음.</li>
+          <li>클립마다 체크리스트 12개 항목(Muse Spark 7개, SAM 마스크 2개, 영상 계산 3개)에 상·중·하 등급을 매기고, 학습한 가중치로 0~100점을 계산함.</li>
+          <li>점수가 높은 클립을 로봇 학습에 씀. 계산식과 기준값은 핵심 실험의 <a href="#k-calc">판정 기준과 계산식</a>에 있음.</li>
+        </ol>
+      </dd>
+    </dl>
+
+    <div class="viz viz-n1" data-chart="n1"></div>
+    <div class="viz viz-dots" data-chart="n2"></div>
   </section>
 
   <!-- 6 -->
   <section>
-    <h2><span class="no">6</span>열린 문제</h2>
+    <h2><span class="no">5</span>열린 문제</h2>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -663,7 +683,7 @@
 
   <!-- 7 -->
   <section>
-    <h2><span class="no">7</span>위험 요소</h2>
+    <h2><span class="no">6</span>위험 요소</h2>
     <div class="tbl">
       <div class="wrap">
         <table class="min">
@@ -708,8 +728,6 @@
       <li><b>평가 1, 접촉 시점.</b> 1인칭 영상만으로 손이 물체에 닿는 순간과 떨어지는 순간을 찾음. OpenGraph 데이터셋에서 손바닥 압력을 잰 촉각 장갑 데이터를 정답으로 씀.</li>
       <li><b>평가 2, 로봇이 따라할 수 있는 잡기.</b> 잡기 클립마다 로봇 손이 그 잡기를 따라할 수 있는지 점수를 매김. HOT3D 데이터셋의 모션캡처 손을 Allegro 로봇 손에 옮겨 보고, 로봇 손이 같은 잡기를 할 수 있는지 판정한 결과를 정답으로 씀.</li>
     </ul>
-    <p class="cap" style="margin-top:18px">핵심 결과</p>
-    <div class="res" data-chart="res"></div>
   </section>
 
   <section id="k-n1">
@@ -4060,7 +4078,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 16:57 KST
+    마지막 갱신 2026-10-29 17:08 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4750,72 +4768,9 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     host.appendChild(g);
   }
 
-  // Headline results: one card per question, the same on the summary and key experiments pages.
-  var RES = [
-    { k: "평가 1 · 접촉 시점", from: "0.074", to: "0.195", m: "경계 F1 ±5프레임, 검증 22개",
-      v: ["good", "2.6배"], lo: 0, hi: 0.25,
-      bars: [["Muse Spark 단독", 0.074, "base"], ["Muse Spark + 장갑으로 배운 시점 보정", 0.195, "hi"], ["SAM 마스크 규칙", 0.090, "base"]],
-      t: "촉각 장갑으로 배운 시점 보정이 경계 F1을 2.6배로 올림. 접촉 구간 IoU는 0.850(EXP-37)." },
-    { k: "평가 2 · 로봇 손이 따라할 수 있는 잡기", from: "0.501", to: "0.624", m: "AUC, 검증 1,426개. 세로선은 우연 수준 0.5",
-      v: ["warn", "개선, 한계 있음"], lo: 0.4, hi: 0.8, mark: 0.5,
-      bars: [["Muse Spark에게 한 번에 물음", 0.501, "base"], ["체크리스트로 쪼개 물음", 0.624, "hi"], ["물체 이름 기준선", 0.771, "ref"]],
-      t: "처음 보는 물체에서도 0.571(물체 이름 0.5). 같은 물체의 잡기끼리는 구분하지 못함(0.506, EXP-40)." },
-    { k: "공개 벤치마크", wide: true, big: "72 · 3,811", m: "장갑 정답 에피소드 · 로봇 손 정답 클립",
-      v: ["info", "채점 코드 포함"],
-      flow: ["접촉 구간이나 클립 점수를 담은 결과 파일", "채점 코드", "센서 기준 F1, IoU, AUC"],
-      t: "영상 선별 방법의 결과가 실제 접촉, 실제 로봇 재현과 얼마나 맞는지 잴 수 있음(EXP-28).", link: ["#k-bench", "사용법 보기 →"] }
-  ];
-
-  function chartRes(host) {
-    RES.forEach(function (r) {
-      var c = el("div", "res-card" + (r.wide ? " wide" : ""));
-      var top = el("div", "res-top");
-      top.appendChild(el("span", "res-k", r.k));
-      top.appendChild(el("span", "res-v " + r.v[0], ({ good: "✓ ", warn: "△ ", bad: "✕ ", info: "" })[r.v[0]] + r.v[1]));
-      c.appendChild(top);
-      var big = el("div", "res-big");
-      if (r.from) {
-        big.appendChild(el("span", "from", r.from));
-        big.appendChild(el("span", "arr", "→"));
-        big.appendChild(el("span", null, r.to));
-      } else big.textContent = r.big;
-      c.appendChild(big);
-      c.appendChild(el("div", "res-m", r.m));
-      if (r.bars) {
-        var bs = el("div", "res-bars");
-        r.bars.forEach(function (b) {
-          var row = el("div", "res-bar" + (b[2] === "hi" ? " hi" : ""));
-          var lab = el("div", "lab");
-          lab.appendChild(el("span", null, b[0]));
-          lab.appendChild(el("b", null, r.hi === 100 ? b[1].toFixed(1) + "%" : b[1].toFixed(3)));
-          row.appendChild(lab);
-          var tr = el("div", "tr");
-          var pos = function (x) { return Math.max(0, Math.min(100, (x - r.lo) / (r.hi - r.lo) * 100)); };
-          var fl = el("div", "fl");
-          fl.style.width = pos(b[1]) + "%";
-          fl.style.setProperty("--c", { hi: "var(--v-hi)", base: "var(--v-base)", ref: "var(--v-ref)", bad: "var(--bad)" }[b[2]]);
-          tr.appendChild(fl);
-          var m = b[3] !== undefined ? b[3] : r.mark;
-          if (m !== undefined) { var mk = el("div", "mk"); mk.style.left = pos(m) + "%"; tr.appendChild(mk); }
-          row.appendChild(tr);
-          bs.appendChild(row);
-        });
-        c.appendChild(bs);
-      }
-      if (r.flow) {
-        var f = el("div", "res-flow");
-        r.flow.forEach(function (x, i) { if (i) f.appendChild(el("i", null, "→")); f.appendChild(el("span", null, x)); });
-        c.appendChild(f);
-      }
-      c.appendChild(el("p", "res-t", r.t));
-      if (r.link) { var a = el("a", "more", r.link[1]); a.href = r.link[0]; c.appendChild(a); }
-      host.appendChild(c);
-    });
-  }
-
   function renderViz() {
     document.querySelectorAll("[data-chart]").forEach(function (h) {
-      ({ n1: chartN1, n2: chartN2, ckl: chartCkl, res: chartRes })[h.dataset.chart](h);
+      ({ n1: chartN1, n2: chartN2, ckl: chartCkl })[h.dataset.chart](h);
     });
   }
 
