@@ -390,6 +390,68 @@
   tr.core td { background: color-mix(in srgb, var(--ink) 4.5%, transparent); }
   tr.minor td { color: color-mix(in srgb, var(--ink) 74%, transparent); }
   tr.minor td a { opacity: 0.8; }
+
+  /* ---------- result charts ---------- */
+  .viz { --v-hi: #2a78d6; --v-base: #9aa2ae; --v-ref: #eb6834; --v-pos: #2a78d6; --v-neg: #eb6834; --v-track: #eef0f3; margin: 14px 0 22px; }
+  .viz-cap { font-size: 13.5px; font-weight: 650; color: var(--ink); margin: 0 0 4px; }
+  .viz-sub { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
+  .viz-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .viz-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+  .viz-grid { display: grid; gap: 6px 12px; align-items: center; font-size: 13px; }
+  .viz-grid .hd { font-size: 11.5px; color: var(--muted); }
+  .viz-row { display: contents; }
+  .viz-row > * { padding: 3px 0; }
+  .viz-row:hover > *, .viz-row:focus > * { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+  .viz-row:focus { outline: none; }
+  .viz-lab { color: var(--ink-2); line-height: 1.35; }
+  .viz-lab b { color: var(--ink); }
+  .viz-cell { display: grid; grid-template-columns: 1fr 40px; align-items: center; gap: 6px; }
+  .viz-track { position: relative; height: 10px; background: var(--v-track); border-radius: 2px; }
+  .viz-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: var(--c); }
+  .viz-val { font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--ink-2); text-align: right; }
+  .viz-val.hi { color: var(--ink); font-weight: 700; }
+  /* dot + interval chart */
+  .viz-dots .viz-grid { grid-template-columns: minmax(120px, 210px) 1fr 44px; }
+  .viz-plot { position: relative; height: 22px; }
+  .viz-axis { position: relative; height: 18px; font-size: 11px; color: var(--muted); }
+  .viz-axis span { position: absolute; transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+  .viz-gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+  .viz-gl.chance { background: var(--ink-2); width: 1px; opacity: 0.55; }
+  .viz-ci { position: absolute; top: 50%; height: 2px; margin-top: -1px; background: var(--c); opacity: 0.55; border-radius: 1px; }
+  .viz-dot { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px var(--sheet); }
+  .viz-grp { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); padding-top: 6px; border-top: 1px solid var(--rule); }
+  .viz-tip { position: fixed; z-index: 60; pointer-events: none; max-width: 260px; padding: 7px 10px; font-size: 12.5px; line-height: 1.5;
+    color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); opacity: 0; transition: opacity 0.1s; }
+  .viz-tip.on { opacity: 1; }
+  /* checklist */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0 18px; counter-reset: flow; }
+  .flow > div { position: relative; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; font-size: 13px; color: var(--ink-2); background: var(--sheet); }
+  .flow > div b { display: block; color: var(--ink); font-size: 13.5px; margin-bottom: 2px; }
+  .flow > div::before { counter-increment: flow; content: counter(flow); position: absolute; top: -9px; left: 10px; font-size: 11px; font-weight: 700; background: var(--sheet); color: var(--muted); padding: 0 4px; }
+  @media (max-width: 720px) { .flow { grid-template-columns: 1fr 1fr; } }
+  .ckl .viz-grid { grid-template-columns: 74px minmax(180px, 1.3fr) minmax(140px, 1fr); }
+  .ckl .src { font-size: 11.5px; color: var(--muted); }
+  .ckl .q { font-size: 12.5px; color: var(--muted); display: block; margin-top: 1px; }
+  .ckl .hi-rule { font-size: 12.5px; color: var(--done); display: block; margin-top: 1px; }
+  .wbar { position: relative; height: 12px; }
+  .wbar .zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink-2); opacity: 0.5; }
+  .wbar .fill { position: absolute; top: 0; bottom: 0; background: var(--c); }
+  .wbar .fill.pos { border-radius: 0 4px 4px 0; }
+  .wbar .fill.neg { border-radius: 4px 0 0 4px; }
+  .wcell { display: grid; grid-template-columns: 1fr 42px; gap: 6px; align-items: center; }
+  @media (max-width: 560px) {
+    .viz-dots .viz-grid { grid-template-columns: 1fr 44px; row-gap: 0; }
+    .viz-dots .viz-lab { grid-column: 1 / -1; padding-top: 6px; }
+    .viz-dots .viz-grid > div:nth-last-child(3) { display: none; }
+    .viz-n1 .viz-grid { grid-template-columns: repeat(3, 1fr) !important; row-gap: 0; }
+    .viz-n1 .viz-lab { grid-column: 1 / -1; padding-top: 8px; }
+    .viz-n1 .viz-grid > .hd:first-child { display: none; }
+    .viz-cell { grid-template-columns: 1fr 36px; }
+  }
+  @media (max-width: 720px) {
+    .ckl .viz-grid { grid-template-columns: minmax(150px, 1.2fr) minmax(110px, 1fr); }
+    .ckl .src { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -441,6 +503,9 @@
       <li><b>결과물.</b> 정답 라벨과 채점 코드를 묶어 두어, 영상 선별 결과를 넣으면 센서 기준 점수를 받을 수 있음(EXP-28).</li>
       <li><b>남은 것.</b> 부드러운 물체 확인을 검증 세트에서 한 번 측정함.</li>
     </ul>
+
+    <div class="viz viz-n1" data-chart="n1"></div>
+    <div class="viz viz-dots" data-chart="n2"></div>
 
     <div class="tbl">
       <p class="cap">주요 지표</p>
@@ -721,11 +786,7 @@
         <li>A와 B가 크게 엇갈렸던 짧은 에피소드의 왼손은 장갑 기준으로 Muse Spark가 맞았음(EXP-34, EXP-37).</li>
         <li>±5프레임(0.167초)에서는 모든 방법이 낮음. 장갑은 영상으로 볼 수 없는 압력을 재기 때문임.</li>
       </ul>
-      <figure>
-        <img src="assets/exp37_number1_final.png" loading="lazy" width="1125" height="475" alt="검증 22개에서 방법별 경계 F1 ±5, ±15와 접촉 IoU">
-        <div class="keys"><span class="key"><i style="--c:#4c72b0"></i>경계 F1 ±5</span><span class="key"><i style="--c:#72b6b0"></i>경계 F1 ±15</span><span class="key"><i style="--c:#f28e2b"></i>접촉 IoU</span></div>
-        <figcaption>검증 22개, 정리한 장갑 기준. A는 Muse Spark 단독, B는 SAM 규칙, C는 B + Muse Spark 경계 확인, "+ shift"는 장갑으로 배운 시점 보정(EXP-37).</figcaption>
-      </figure>
+      <div class="viz viz-n1" data-chart="n1"></div>
     </div>
   </section>
 
@@ -776,6 +837,21 @@
     </div>
 
     <div class="ch">
+      <h3>체크리스트: 클립 하나에 질문 12개를 던져 점수를 매김</h3>
+      <div class="flow">
+        <div><b>잡기 클립</b>손이 물체에 닿기 직전부터 놓은 직후까지의 몇 초 영상</div>
+        <div><b>질문 12개</b>Muse Spark 7개, SAM 마스크 2개, 영상 계산 3개. 각각 상·중·하로 답함</div>
+        <div><b>등급 → 점수</b>상 1, 중 0.5, 하 0. 학습한 가중치로 더해 0~100점</div>
+        <div><b>검증</b>로봇 손 정답 라벨과 비교해 AUC를 잼</div>
+      </div>
+      <ul class="plain">
+        <li>"상"은 항상 큰 네 손가락 로봇 손(Allegro)에 쉬운 쪽. Muse Spark는 화면 속 사람 손(손목~중지 끝 약 19cm)을 자로 써서 답함.</li>
+        <li>Muse Spark에게 "로봇 손이 따라할 수 있는가"를 한 번에 물으면 판별하지 못함(0.501). 같은 판단을 아래 질문들로 쪼개 물으면 판별함(0.617~0.624).</li>
+      </ul>
+      <div class="viz ckl" data-chart="ckl"></div>
+    </div>
+
+    <div class="ch">
       <h3>검증 결과: 체크리스트가 Muse Spark를 우연 수준에서 끌어올림</h3>
       <ul class="plain">
         <li>튜닝에서 고정한 규칙으로 검증 1,426개를 한 번 채점함. Muse Spark 단독 AUC 0.501, 우리 점수 0.624(EXP-40).</li>
@@ -784,10 +860,7 @@
         <li>아는 물체에서는 물체 이름만으로 0.771로 더 높고, 물체당 라벨 클립이 5개만 있어도 물체 비율이 우리 점수와의 결합과 같음. 같은 물체 안에서는 우리 점수도 우연 수준(0.506)이라, 점수는 잡기가 아니라 물체를 줄 세움.</li>
         <li>센서로 만든 정답이 Muse Spark가 모르는 정보, 즉 어떤 물체에서 로봇 손이 실패하는지를 드러냄. 체크리스트는 이 정보를 질문으로 바꿔 라벨이 없는 물체에도 쓸 수 있게 함.</li>
       </ul>
-      <figure>
-        <img src="assets/exp40_number2_final.png" loading="lazy" width="1000" height="525" alt="검증 1,426개에서 행별 AUC와 95% 구간">
-        <figcaption>검증 1,426개에서 행별 AUC와 시퀀스 단위 95% 구간(EXP-40). 가는 세로선이 우연 수준(0.5).</figcaption>
-      </figure>
+      <div class="viz viz-dots" data-chart="n2"></div>
     </div>
   </section>
 
@@ -3902,7 +3975,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 10:49 KST
+    마지막 갱신 2026-10-29 11:12 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -4454,7 +4527,176 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     setTimeout(update, 50);
   }
 
+  // ---------- result charts ----------
+  var N1 = [
+    { k: "A. Muse Spark 단독", v: [0.074, 0.273, 0.821] },
+    { k: "A + 장갑으로 배운 보정", v: [0.195, 0.376, 0.850], hi: true },
+    { k: "B. SAM 규칙", v: [0.090, 0.214, 0.667] },
+    { k: "C. B + Muse Spark 확인", v: [0.112, 0.227, 0.679] },
+    { k: "C + 장갑으로 배운 보정", v: [0.137, 0.266, 0.690] },
+    { k: "참고: 항상 접촉", v: [0.042, 0.042, 0.600], ref: true }
+  ];
+  var N1M = ["경계 F1 ±5프레임", "경계 F1 ±15프레임", "접촉 구간 IoU"];
+  var N2 = [
+    { g: "아는 물체 (검증 1,426개)" },
+    { k: "Muse Spark에게 한 번에 묻기", a: 0.501, lo: 0.469, hi: 0.529, c: "base", note: "\"로봇 손이 따라할 수 있는가\" 한 질문" },
+    { k: "체크리스트, 같은 가중치", a: 0.617, lo: 0.579, hi: 0.659, c: "hi", note: "Muse Spark 질문 7개의 단순 평균" },
+    { k: "체크리스트, 학습한 가중치", a: 0.622, lo: 0.588, hi: 0.661, c: "hi", note: "같은 7개를 로지스틱 회귀로" },
+    { k: "우리 점수 (질문 12개)", a: 0.624, lo: 0.589, hi: 0.661, c: "hi", b: true, note: "Muse Spark 7 + SAM 2 + 영상 계산 3" },
+    { k: "물체 이름만 (튜닝 비율)", a: 0.771, lo: 0.744, hi: 0.792, c: "ref", note: "물체마다 튜닝에서 잰 성공 비율. 라벨이 있는 물체에만 쓸 수 있음" },
+    { g: "처음 보는 물체 (그 물체 없이 다시 학습)" },
+    { k: "우리 점수", a: 0.571, lo: 0.534, hi: 0.609, c: "hi", b: true, note: "학습에 없던 물체에서도 판별함" },
+    { k: "물체 이름만", a: 0.500, c: "ref", note: "처음 보는 물체는 비율이 없어 판단할 수 없음(정의상 0.5)" }
+  ];
+  var CKL = [
+    { s: "Muse Spark", k: "모양", q: "중간 변 / 가장 긴 변", r: "0.6 이상, 뭉툭함", w: 1.252 },
+    { s: "Muse Spark", k: "감쌀 폭", q: "손이 감싸야 하는 중간 변", r: "8cm 이하", w: 0.922 },
+    { s: "Muse Spark", k: "손가락 가림", q: "잡는 동안 손가락 끝이 보이는가", r: "손가락 끝이 대부분 보임", w: 0.481 },
+    { s: "영상 계산", k: "손 모양", q: "MediaPipe 손 특징 10개의 로지스틱 회귀", r: "튜닝 상위 1/3", w: 0.434 },
+    { s: "Muse Spark", k: "손 대비 크기", q: "물체의 가장 긴 변", r: "15cm 이하", w: 0.391 },
+    { s: "Muse Spark", k: "손잡이", q: "쥐도록 만든 부분이 있는가", r: "있음", w: 0.258 },
+    { s: "SAM", k: "접촉 명확성", q: "접촉 중에만 손이 물체 곁에 있는가", r: "튜닝 상위 1/3", w: 0.237 },
+    { s: "SAM", k: "가시성", q: "손과 물체가 모두 보이는 프레임 비율", r: "튜닝 상위 1/3", w: 0.043 },
+    { s: "영상 계산", k: "카메라 안정성", q: "클립 동안 카메라 이동", r: "튜닝 상위 1/3", w: -0.030 },
+    { s: "Muse Spark", k: "빈 공간", q: "잡는 곳과 가장 가까운 다른 물체 사이", r: "10cm 이상", w: -0.171 },
+    { s: "영상 계산", k: "동작 완결성", q: "뻗기와 놓기가 영상에 보이는가", r: "둘 다 보임", w: -0.331 },
+    { s: "Muse Spark", k: "두께", q: "가장 짧은 변", r: "4cm 이상", w: -0.342 }
+  ];
+
+  function vizTip() {
+    var t = document.querySelector(".viz-tip");
+    if (!t) { t = el("div", "viz-tip"); document.body.appendChild(t); }
+    return t;
+  }
+  function tipOn(node, html) {
+    function show(e) {
+      var t = vizTip(); t.innerHTML = html; t.classList.add("on");
+      var r = node.getBoundingClientRect();
+      var x = e && e.clientX != null ? e.clientX : r.left + 40, y = e && e.clientY != null ? e.clientY : r.top;
+      t.style.left = Math.min(x + 14, innerWidth - t.offsetWidth - 8) + "px";
+      t.style.top = Math.max(8, y - t.offsetHeight - 10) + "px";
+    }
+    function hide() { vizTip().classList.remove("on"); }
+    node.tabIndex = 0;
+    node.addEventListener("mousemove", show);
+    node.addEventListener("mouseleave", hide);
+    node.addEventListener("focus", function () { show(null); });
+    node.addEventListener("blur", hide);
+  }
+  function f3(x) { return x.toFixed(3).replace(/^0/, "0"); }
+
+  function chartN1(host) {
+    host.innerHTML = '<p class="viz-cap">평가 1: 영상만으로 찾은 접촉 시작과 끝 (검증 22개, 장갑 기준)</p>' +
+      '<p class="viz-sub">막대가 길수록 장갑과 잘 맞음. 1이 완벽.</p>' +
+      '<div class="viz-legend"><span><i style="--c:var(--v-hi)"></i>가장 높은 방법</span><span><i style="--c:var(--v-base)"></i>나머지 방법</span></div>';
+    var g = el("div", "viz-grid");
+    g.style.gridTemplateColumns = "minmax(104px, 170px) repeat(3, minmax(64px, 1fr))";
+    g.appendChild(el("div", "hd", ""));
+    N1M.forEach(function (m) { g.appendChild(el("div", "hd", m)); });
+    N1.forEach(function (r) {
+      var row = el("div", "viz-row");
+      var lab = el("div", "viz-lab");
+      lab.innerHTML = r.hi ? "<b>" + r.k + "</b>" : r.k;
+      row.appendChild(lab);
+      r.v.forEach(function (v) {
+        var c = el("div", "viz-cell");
+        var tr = el("div", "viz-track"), f = el("div", "viz-fill");
+        f.style.width = (v * 100) + "%";
+        f.style.setProperty("--c", r.hi ? "var(--v-hi)" : "var(--v-base)");
+        if (r.ref) f.style.opacity = "0.5";
+        tr.appendChild(f); c.appendChild(tr);
+        c.appendChild(el("span", "viz-val" + (r.hi ? " hi" : ""), f3(v)));
+        row.appendChild(c);
+      });
+      tipOn(row, "<b>" + r.k + "</b><br>" + N1M.map(function (m, i) { return m + ": " + f3(r.v[i]); }).join("<br>"));
+      g.appendChild(row);
+    });
+    host.appendChild(g);
+    host.appendChild(el("p", "viz-sub", "±5프레임은 0.17초, ±15프레임은 0.5초 안에서 맞춘 경계의 비율(F1). IoU는 접촉이라고 본 프레임이 장갑과 겹치는 정도. 자세한 수치는 EXP-37."));
+  }
+
+  function chartN2(host) {
+    var lo = 0.4, hi = 0.85;
+    function x(v) { return ((v - lo) / (hi - lo) * 100) + "%"; }
+    host.innerHTML = '<p class="viz-cap">평가 2: 로봇 손이 따라할 수 있는 클립을 골라내는가 (검증, AUC)</p>' +
+      '<p class="viz-sub">점이 오른쪽일수록 잘 골라냄. 0.5는 동전 던지기, 가로선은 95% 구간.</p>' +
+      '<div class="viz-legend"><span><i style="--c:var(--v-base)"></i>Muse Spark에게 한 번에 묻기</span><span><i style="--c:var(--v-hi)"></i>체크리스트로 쪼개 묻기</span><span><i style="--c:var(--v-ref)"></i>물체 이름 기준선</span></div>';
+    var g = el("div", "viz-grid");
+    var color = { base: "var(--v-base)", hi: "var(--v-hi)", ref: "var(--v-ref)" };
+    var ticks = [0.4, 0.5, 0.6, 0.7, 0.8];
+    function grid(plot) {
+      ticks.forEach(function (t) {
+        var l = el("div", "viz-gl" + (t === 0.5 ? " chance" : ""));
+        l.style.left = x(t); plot.appendChild(l);
+      });
+    }
+    N2.forEach(function (r) {
+      if (r.g) { g.appendChild(el("div", "viz-grp", r.g)); return; }
+      var row = el("div", "viz-row");
+      var lab = el("div", "viz-lab");
+      lab.innerHTML = r.b ? "<b>" + r.k + "</b>" : r.k;
+      row.appendChild(lab);
+      var plot = el("div", "viz-plot");
+      grid(plot);
+      if (r.lo != null) {
+        var ci = el("div", "viz-ci");
+        ci.style.left = x(r.lo); ci.style.width = "calc(" + x(r.hi) + " - " + x(r.lo) + ")";
+        ci.style.setProperty("--c", color[r.c]);
+        plot.appendChild(ci);
+      }
+      var d = el("div", "viz-dot");
+      d.style.left = x(r.a); d.style.setProperty("--c", color[r.c]);
+      plot.appendChild(d);
+      row.appendChild(plot);
+      row.appendChild(el("span", "viz-val" + (r.b ? " hi" : ""), f3(r.a)));
+      tipOn(row, "<b>" + r.k + "</b><br>AUC " + f3(r.a) + (r.lo != null ? " (" + f3(r.lo) + "~" + f3(r.hi) + ")" : "") + "<br>" + r.note);
+      g.appendChild(row);
+    });
+    var axl = el("div"), ax = el("div", "viz-axis"), axr = el("div");
+    ticks.forEach(function (t) { var s = el("span", null, t.toFixed(1)); s.style.left = x(t); ax.appendChild(s); });
+    g.appendChild(axl); g.appendChild(ax); g.appendChild(axr);
+    host.appendChild(g);
+    host.appendChild(el("p", "viz-sub", "AUC는 따라할 수 있는 클립과 없는 클립을 하나씩 뽑았을 때 앞쪽에 더 높은 점수를 줄 확률. 자세한 수치는 EXP-40."));
+  }
+
+  function chartCkl(host) {
+    var max = 1.3, min = -0.4, span = max - min, zero = (-min / span) * 100;
+    host.innerHTML = '<p class="viz-cap">질문 12개와 학습한 가중치 (점수 학습용 400개)</p>' +
+      '<p class="viz-sub">가중치가 클수록 그 항목이 "상"일 때 점수가 많이 오름. 음수는 다른 항목을 함께 볼 때 그 항목이 "상"이면 점수를 내리는 쪽으로 학습된 것.</p>' +
+      '<div class="viz-legend"><span><i style="--c:var(--v-pos)"></i>점수를 올림</span><span><i style="--c:var(--v-neg)"></i>점수를 내림</span></div>';
+    var g = el("div", "viz-grid");
+    ["출처", "항목, 무엇을 보나, \"상\"(로봇 손에 쉬움) 기준", "가중치"].forEach(function (h, i) {
+      g.appendChild(el("div", "hd" + (i === 0 ? " src" : ""), h));
+    });
+    CKL.forEach(function (r) {
+      var row = el("div", "viz-row");
+      row.appendChild(el("div", "src", r.s));
+      var lab = el("div", "viz-lab");
+      lab.innerHTML = "<b>" + r.k + "</b><span class=\"q\">" + r.q + "</span><span class=\"hi-rule\">상: " + r.r + "</span>";
+      row.appendChild(lab);
+      var c = el("div", "wcell"), bar = el("div", "wbar");
+      var z = el("div", "zero"); z.style.left = zero + "%"; bar.appendChild(z);
+      var f = el("div", "fill " + (r.w >= 0 ? "pos" : "neg"));
+      var w = Math.abs(r.w) / span * 100;
+      f.style.left = (r.w >= 0 ? zero : zero - w) + "%"; f.style.width = w + "%";
+      f.style.setProperty("--c", r.w >= 0 ? "var(--v-pos)" : "var(--v-neg)");
+      bar.appendChild(f); c.appendChild(bar);
+      c.appendChild(el("span", "viz-val", (r.w > 0 ? "+" : "") + r.w.toFixed(2)));
+      row.appendChild(c);
+      tipOn(row, "<b>" + r.k + "</b> (" + r.s + ")<br>" + r.q + "<br>상: " + r.r + "<br>가중치 " + (r.w > 0 ? "+" : "") + r.w.toFixed(3));
+      g.appendChild(row);
+    });
+    host.appendChild(g);
+  }
+
+  function renderViz() {
+    document.querySelectorAll("[data-chart]").forEach(function (h) {
+      ({ n1: chartN1, n2: chartN2, ckl: chartCkl })[h.dataset.chart](h);
+    });
+  }
+
   function render() {
+    renderViz();
     renderGantt();
     renderPhases();
     renderChart();
