@@ -10,9 +10,9 @@
 | --- | --- | --- | --- |
 | 1 | 0:00-0:15 | 문제 | HOT3D 클립 2개 전체 화면 (컵, 키보드) |
 | 2 | 0:15-0:35 | GraspGrade가 하는 일 | 제목 카드, 입력과 출력 3줄 |
-| 3 | 0:35-1:25 | 숫자 1: 접촉 시점 | 뷰어 Contact timing, 에피소드 36과 7, 그림 EXP-37 |
-| 4 | 1:25-2:25 | 숫자 2: 로봇 손 점수 | 뷰어 Clip scores, 클립 3개, 그림 EXP-40 |
-| 5 | 2:25-2:48 | 안 되는 것 | 같은 물체 컵 클립 2개 나란히, 그림 EXP-42 |
+| 3 | 0:35-1:25 | 숫자 1: 접촉 시점 | 뷰어 Contact timing, 에피소드 36과 7, 그림 `demo_number1.png` |
+| 4 | 1:25-2:25 | 숫자 2: 로봇 손 점수 | 뷰어 Clip scores, 클립 3개, 그림 `demo_number2_ours.png` |
+| 5 | 2:25-2:48 | 안 되는 것 | 같은 물체 컵 클립 2개 나란히, 그림 `demo_number2_limits.png`, `demo_soft.png` |
 | 6 | 2:48-3:00 | 공개하는 것, 마무리 | 끝 카드 |
 
 ## 보여줄 클립과 에피소드
@@ -34,15 +34,18 @@
 | `P0012_d6272ce1_left_00290` | keyboard | 9.8 | 실패 (collision) | 0.85 | 우리 점수는 맞고 Muse 단독은 틀림 |
 | `P0001_b2bcbe28_left_03432` | aria_small (안경) | 77.6 | copyable | 0.05 | 반대 방향으로 Muse 단독이 틀림 |
 | `P0010_1573a837_right_02542` | mug_patterned | 74.1 | copyable | 0.90 | 장면 5. 아래 클립과 짝 |
-| `P0001_b2bcbe28_left_01861` | mug_patterned | 74.6 | 실패 (grip) | 0.85 | 장면 5. 등급이 위 클립과 거의 같은데 정답이 다름 (물체 안에서는 우연 수준) |
+| `P0001_b2bcbe28_left_01861` | mug_patterned | 74.6 | 실패 (grip) | 0.85 | 장면 5. 점수는 위 클립과 거의 같은데 정답이 다름 (물체 안에서는 우연 수준). 등급 12개 중 9개가 같다 |
 
 참고: 뷰어 상위 15개 중 11개가 copyable, 하위 15개 중 14개가 실패다. 이 30개는 극단값이라 영상에서는 이 비율 대신 전체 수치(상위 20% 중 59.4%, 기준 46.4%)를 쓴다.
 
-### 그림
+### 그림 (영상용 1920x1080)
 
-- `docs/experiments/img/exp37_number1_final.png`: 숫자 1 팔별 막대
-- `docs/experiments/img/exp40_number2_final.png`: 숫자 2 AUC 막대
-- `docs/experiments/img/exp42_soft_check.png`: 부드러운 물체 확인
+`scripts/demo_figures.py`가 최종 결과 파일(EXP-37, EXP-40, EXP-42)에서 다시 그린다. 원본은 WSL `out/demo/`, 사본은 `docs/demo/`.
+
+- `docs/demo/demo_number1.png`: 숫자 1. 경계 F1 ±5와 IoU, A + shift(파랑)와 B(주황) 강조
+- `docs/demo/demo_number2_ours.png`: 숫자 2 AUC. 우리 점수(파랑)와 Muse Spark 단독(주황) 강조
+- `docs/demo/demo_number2_limits.png`: 같은 막대. 물체 이름(주황)과 처음 보는 물체(파랑) 강조
+- `docs/demo/demo_soft.png`: 부드러운 물체 확인. 합격선 대비 51.7%(미달), 2.1%(충족)
 
 ## 장면별 화면과 내레이션
 
@@ -63,10 +66,10 @@
 ### 3. 숫자 1: 접촉 시점 (0:35-1:25)
 
 화면 순서:
-1. 뷰어 Contact timing 탭, 에피소드 36 선택. 오른손 트랙 4줄(glove, A + shift, B, C + shift)이 보이게 둔다.
+1. `http://localhost:8765/#episode=36&hand=right`: 에피소드 36, 오른손 트랙 4줄(glove, A + shift, B, C + shift)만 보인다.
 2. glove 구간 하나를 클릭해 영상이 그 접촉으로 넘어가는 것을 보여 준다.
-3. 그림 EXP-37 (5초).
-4. 에피소드 7로 바꿔 오른손 트랙을 보여 준다 (5초).
+3. 그림 `demo_number1.png` (5초).
+4. `http://localhost:8765/#episode=7&hand=right`: 에피소드 7 오른손 (5초).
 
 화면 글자: **Held-out: 22 episodes, 574 glove boundaries**
 
@@ -79,10 +82,10 @@
 ### 4. 숫자 2: 로봇 손 점수 (1:25-2:25)
 
 화면 순서:
-1. 뷰어 Clip scores 탭, `P0010_99385ad8_left_00073` (컵, 78.3). 등급 12개와 가중치 목록이 보이게 스크롤.
-2. `P0012_d6272ce1_left_00290` (키보드, 9.8). 정답 "collision"과 Muse Spark alone 0.85 칸을 확대.
-3. `P0001_b2bcbe28_left_03432` (안경, 77.6). Muse Spark alone 0.05 칸을 확대.
-4. 그림 EXP-40 (8초). "Our score"와 "Muse Spark alone (R1)" 막대를 강조.
+1. `http://localhost:8765/#clip=P0010_99385ad8_left_00073` (컵, 78). 오른쪽에 등급 12개와 가중치가 보인다.
+2. `http://localhost:8765/#clip=P0012_d6272ce1_left_00290` (키보드, 10). 편집에서 정답 "collision"과 "85% copyable" 칸을 확대.
+3. `http://localhost:8765/#clip=P0001_b2bcbe28_left_03432` (안경, 78). 편집에서 "5% copyable" 칸을 확대.
+4. 그림 `demo_number2_ours.png` (8초).
 
 화면 글자: **Held-out: 1,426 clips from 3 people**
 
@@ -97,12 +100,13 @@
 ### 5. 안 되는 것 (2:25-2:48)
 
 화면 순서:
-1. 컵 클립 2개 나란히: `P0010_1573a837_right_02542` (74.1, copyable)와 `P0001_b2bcbe28_left_01861` (74.6, grip 실패).
-2. 그림 EXP-42 (4초).
+1. 그림 `demo_number2_limits.png` (6초).
+2. `http://localhost:8765/#compare=P0010_1573a837_right_02542,P0001_b2bcbe28_left_01861`: 컵 클립 2개 나란히, 74점 copyable과 75점 grip 실패.
+3. 그림 `demo_soft.png` (4초).
 
 화면 글자: **Rules written before held-out scoring. Held-out scored once.**
 
-> We also show what does not work. When an object was seen in training, its name alone does better, at 0.771. On new objects our score keeps 0.571. Inside one object it is at chance. These two mugs get almost the same grades, but only one grasp is copyable. Our soft object filter also failed its pass rule. Every rule was written before we scored the held-out data, and we scored it once.
+> We also show what does not work. When an object was seen in training, its name alone does better, at 0.771. On new objects our score keeps 0.571. Inside one object it is at chance. These two mugs get almost the same score, but only one grasp is copyable. Our soft object filter also failed its pass rule. Every rule was written before we scored the held-out data, and we scored it once.
 
 ### 6. 공개하는 것, 마무리 (2:48-3:00)
 
