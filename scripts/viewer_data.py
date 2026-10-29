@@ -30,6 +30,9 @@ VIEW = ROOT / "viewer"
 N2 = ROOT / "out" / "number2"
 N1 = ROOT / "out" / "number1"
 N_EACH = 15  # highest and lowest scored held-out clips
+DEMO_PAD = 90  # frames of extra video on both sides of the demo video clips
+DEMO_CLIPS = {"P0010_99385ad8_left_00073", "P0012_d6272ce1_left_00290",   # scene 1 of docs/DEMO_VIDEO.md
+              "P0010_1573a837_right_02542", "P0001_b2bcbe28_left_01861"}  # scene 5, side by side
 LABELS = {"grade_camera_stability": "Camera stability", "grade_completeness": "Action completeness",
           "grade_hand_shape_fit": "Hand shape fit", "finger_occlusion": "Finger visibility",
           "object_size": "Object size next to the hand", "object_shape": "Object shape",
@@ -46,6 +49,26 @@ def cut(src, start, frames, dst, fps=30, size=704, crf=26):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start / fps:.4f}", "-i", str(src),
                     "-frames:v", str(frames), "-vf", f"scale={size}:-2", "-c:v", "libx264", "-preset", "veryfast",
                     "-crf", str(crf), "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(dst)], check=True)
+
+
+def source_frames(src):
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                          "stream=nb_frames", "-of", "csv=p=0", str(src)],
+                         capture_output=True, text=True, check=True).stdout.strip()
+    return int(out)
+
+
+def window(clip_id, src, start, frames):
+    """The clip as it was cut, or with DEMO_PAD frames on both sides for the demo video clips.
+
+    The clips of scenes 1 and 5 are shorter than the scenes that show them, so the demo needs more
+    video around the grasp. The contact interval the viewer draws moves with the new start.
+    """
+    if clip_id not in DEMO_CLIPS:
+        return start, frames
+    before = min(DEMO_PAD, start)
+    after = min(DEMO_PAD, source_frames(src) - start - frames)
+    return start - before, frames + before + after
 
 
 def muse_reply(task, clip_id):
@@ -70,15 +93,16 @@ def number2():
     for r in pick.sort_values("score", ascending=False).itertuples():
         src = next((ARIA / r.sequence).glob("*preview_rgb.mp4"))
         name = f"{r.clip_id}.mp4"
-        cut(src, int(r.clip_start), int(r.clip_frames), VIEW / "media" / name)
+        start, frames = window(r.clip_id, src, int(r.clip_start), int(r.clip_frames))
+        cut(src, start, frames, VIEW / "media" / name)
         check, base = muse_reply("checklist", r.clip_id), muse_reply("baseline", r.clip_id)
         clips.append({
             "id": r.clip_id, "video": f"media/{name}", "object": r.object, "hand": r.hand, "person": r.person,
             "score": round(float(r.score), 1), "copyable_truth": bool(r.copyable),
             "failed_condition": None if r.copyable else r.failed_condition,
-            "contact": [(int(r.contact_start) - int(r.clip_start)) / 30,
-                        (int(r.contact_start) + int(r.contact_frames) - int(r.clip_start)) / 30],
-            "duration": int(r.clip_frames) / 30,
+            "contact": [(int(r.contact_start) - start) / 30,
+                        (int(r.contact_start) + int(r.contact_frames) - start) / 30],
+            "duration": frames / 30,
             "grades": [{"name": LABELS.get(c, c), "value": float(getattr(r, c)), "weight": round(weights[c], 2)}
                        for c in items],
             "muse_reason": check["reason"] if check else "",
@@ -148,14 +172,15 @@ def touch_check():
     for r in held.sort_values(["object", "item"]).itertuples():
         src = next((ARIA / r.sequence).glob("*preview_rgb.mp4"))
         name = f"{r.item}.mp4"
-        cut(src, int(r.clip_start), int(r.clip_frames), VIEW / "media" / name)
+        start, frames = window(r.item, src, int(r.clip_start), int(r.clip_frames))
+        cut(src, start, frames, VIEW / "media" / name)
         ans = json.loads(muse_soft.answer_path(r.item).read_text())["parsed"]
         clips.append({
             "id": r.item, "video": f"media/{name}", "object": r.object, "hand": r.hand, "person": r.person,
             "label": labels.get(r.object, ""), "softness": ans["softness"], "muse_object": ans.get("object", ""),
             "reason": ans.get("reason", ""), "score": round(100 * float(scores[r.item]), 1),
             "copyable_truth": bool(r.copyable), "failed_condition": None if r.copyable else fail.get(r.item),
-            "duration": int(r.clip_frames) / 30})
+            "duration": frames / 30})
     c, h = check["caught"], check["hot3d_held_back"]
     out = {"note": "Not validated. This check failed its pass rule (EXP-42), so these clips are listed for a "
                    "touch check but the list should not be trusted.",
