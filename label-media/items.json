@@ -1,0 +1,834 @@
+[
+ {
+  "id": "hot3d_000",
+  "dataset": "hot3d",
+  "object": "aria_small",
+  "hand": "right",
+  "tune": 103,
+  "held_out": 76
+ },
+ {
+  "id": "hot3d_001",
+  "dataset": "hot3d",
+  "object": "birdhouse_toy",
+  "hand": "left",
+  "tune": 48,
+  "held_out": 18
+ },
+ {
+  "id": "hot3d_002",
+  "dataset": "hot3d",
+  "object": "bottle_bbq",
+  "hand": "right",
+  "tune": 53,
+  "held_out": 20
+ },
+ {
+  "id": "hot3d_003",
+  "dataset": "hot3d",
+  "object": "bottle_mustard",
+  "hand": "right",
+  "tune": 46,
+  "held_out": 36
+ },
+ {
+  "id": "hot3d_004",
+  "dataset": "hot3d",
+  "object": "bottle_ranch",
+  "hand": "right",
+  "tune": 65,
+  "held_out": 21
+ },
+ {
+  "id": "hot3d_005",
+  "dataset": "hot3d",
+  "object": "bowl",
+  "hand": "left",
+  "tune": 92,
+  "held_out": 34
+ },
+ {
+  "id": "hot3d_006",
+  "dataset": "hot3d",
+  "object": "can_parmesan",
+  "hand": "left",
+  "tune": 73,
+  "held_out": 28
+ },
+ {
+  "id": "hot3d_007",
+  "dataset": "hot3d",
+  "object": "can_soup",
+  "hand": "left",
+  "tune": 69,
+  "held_out": 25
+ },
+ {
+  "id": "hot3d_008",
+  "dataset": "hot3d",
+  "object": "can_tomato_sauce",
+  "hand": "left",
+  "tune": 84,
+  "held_out": 46
+ },
+ {
+  "id": "hot3d_009",
+  "dataset": "hot3d",
+  "object": "carton_milk",
+  "hand": "right",
+  "tune": 86,
+  "held_out": 47
+ },
+ {
+  "id": "hot3d_010",
+  "dataset": "hot3d",
+  "object": "carton_oj",
+  "hand": "left",
+  "tune": 73,
+  "held_out": 46
+ },
+ {
+  "id": "hot3d_011",
+  "dataset": "hot3d",
+  "object": "cellphone",
+  "hand": "right",
+  "tune": 85,
+  "held_out": 84
+ },
+ {
+  "id": "hot3d_012",
+  "dataset": "hot3d",
+  "object": "coffee_pot",
+  "hand": "right",
+  "tune": 91,
+  "held_out": 50
+ },
+ {
+  "id": "hot3d_013",
+  "dataset": "hot3d",
+  "object": "dino_toy",
+  "hand": "right",
+  "tune": 38,
+  "held_out": 18
+ },
+ {
+  "id": "hot3d_014",
+  "dataset": "hot3d",
+  "object": "dumbbell_5lb",
+  "hand": "right",
+  "tune": 59,
+  "held_out": 22
+ },
+ {
+  "id": "hot3d_015",
+  "dataset": "hot3d",
+  "object": "dvd_remote",
+  "hand": "right",
+  "tune": 39,
+  "held_out": 33
+ },
+ {
+  "id": "hot3d_016",
+  "dataset": "hot3d",
+  "object": "flask",
+  "hand": "left",
+  "tune": 57,
+  "held_out": 26
+ },
+ {
+  "id": "hot3d_017",
+  "dataset": "hot3d",
+  "object": "food_vegetables",
+  "hand": "right",
+  "tune": 40,
+  "held_out": 35
+ },
+ {
+  "id": "hot3d_018",
+  "dataset": "hot3d",
+  "object": "food_waffles",
+  "hand": "left",
+  "tune": 50,
+  "held_out": 21
+ },
+ {
+  "id": "hot3d_019",
+  "dataset": "hot3d",
+  "object": "holder_black",
+  "hand": "left",
+  "tune": 70,
+  "held_out": 50
+ },
+ {
+  "id": "hot3d_020",
+  "dataset": "hot3d",
+  "object": "holder_gray",
+  "hand": "left",
+  "tune": 67,
+  "held_out": 29
+ },
+ {
+  "id": "hot3d_021",
+  "dataset": "hot3d",
+  "object": "keyboard",
+  "hand": "left",
+  "tune": 76,
+  "held_out": 88
+ },
+ {
+  "id": "hot3d_022",
+  "dataset": "hot3d",
+  "object": "mouse",
+  "hand": "right",
+  "tune": 59,
+  "held_out": 56
+ },
+ {
+  "id": "hot3d_023",
+  "dataset": "hot3d",
+  "object": "mug_patterned",
+  "hand": "left",
+  "tune": 97,
+  "held_out": 72
+ },
+ {
+  "id": "hot3d_024",
+  "dataset": "hot3d",
+  "object": "mug_white",
+  "hand": "left",
+  "tune": 118,
+  "held_out": 86
+ },
+ {
+  "id": "hot3d_025",
+  "dataset": "hot3d",
+  "object": "plate_bamboo",
+  "hand": "right",
+  "tune": 117,
+  "held_out": 29
+ },
+ {
+  "id": "hot3d_026",
+  "dataset": "hot3d",
+  "object": "potato_masher",
+  "hand": "left",
+  "tune": 56,
+  "held_out": 31
+ },
+ {
+  "id": "hot3d_027",
+  "dataset": "hot3d",
+  "object": "puzzle_toy",
+  "hand": "left",
+  "tune": 123,
+  "held_out": 83
+ },
+ {
+  "id": "hot3d_028",
+  "dataset": "hot3d",
+  "object": "spatula_red",
+  "hand": "left",
+  "tune": 87,
+  "held_out": 18
+ },
+ {
+  "id": "hot3d_029",
+  "dataset": "hot3d",
+  "object": "spoon_wooden",
+  "hand": "right",
+  "tune": 77,
+  "held_out": 22
+ },
+ {
+  "id": "hot3d_030",
+  "dataset": "hot3d",
+  "object": "vase",
+  "hand": "right",
+  "tune": 65,
+  "held_out": 56
+ },
+ {
+  "id": "hot3d_031",
+  "dataset": "hot3d",
+  "object": "whiteboard_eraser",
+  "hand": "right",
+  "tune": 83,
+  "held_out": 55
+ },
+ {
+  "id": "hot3d_032",
+  "dataset": "hot3d",
+  "object": "whiteboard_marker",
+  "hand": "right",
+  "tune": 39,
+  "held_out": 65
+ },
+ {
+  "id": "opengraph_033",
+  "dataset": "opengraph",
+  "object": "a small clear plastic container",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_034",
+  "dataset": "opengraph",
+  "object": "beige glove",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_035",
+  "dataset": "opengraph",
+  "object": "beige gloves",
+  "hand": "right",
+  "tune": 1,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_036",
+  "dataset": "opengraph",
+  "object": "beige paper tape",
+  "hand": "right",
+  "tune": 9,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_037",
+  "dataset": "opengraph",
+  "object": "beige tape",
+  "hand": "left",
+  "tune": 4,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_038",
+  "dataset": "opengraph",
+  "object": "black box cutter",
+  "hand": "left",
+  "tune": 7,
+  "held_out": 6
+ },
+ {
+  "id": "opengraph_039",
+  "dataset": "opengraph",
+  "object": "black circular object",
+  "hand": "right",
+  "tune": 29,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_040",
+  "dataset": "opengraph",
+  "object": "black container",
+  "hand": "right",
+  "tune": 24,
+  "held_out": 10
+ },
+ {
+  "id": "opengraph_041",
+  "dataset": "opengraph",
+  "object": "black cutter",
+  "hand": "left",
+  "tune": 5,
+  "held_out": 5
+ },
+ {
+  "id": "opengraph_042",
+  "dataset": "opengraph",
+  "object": "black magnetic eraser",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_043",
+  "dataset": "opengraph",
+  "object": "black marker",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_044",
+  "dataset": "opengraph",
+  "object": "black mat",
+  "hand": "left",
+  "tune": 1,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_045",
+  "dataset": "opengraph",
+  "object": "black plastic container",
+  "hand": "right",
+  "tune": 10,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_046",
+  "dataset": "opengraph",
+  "object": "blue plastic spray bottle",
+  "hand": "right",
+  "tune": 7,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_047",
+  "dataset": "opengraph",
+  "object": "blue spray bottle",
+  "hand": "left",
+  "tune": 46,
+  "held_out": 22
+ },
+ {
+  "id": "opengraph_048",
+  "dataset": "opengraph",
+  "object": "brown tape",
+  "hand": "right",
+  "tune": 16,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_049",
+  "dataset": "opengraph",
+  "object": "bubble wrap",
+  "hand": "right",
+  "tune": 1,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_050",
+  "dataset": "opengraph",
+  "object": "clear bubble wrap",
+  "hand": "right",
+  "tune": 3,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_051",
+  "dataset": "opengraph",
+  "object": "clear lid",
+  "hand": "right",
+  "tune": 12,
+  "held_out": 22
+ },
+ {
+  "id": "opengraph_052",
+  "dataset": "opengraph",
+  "object": "clear plastic container",
+  "hand": "left",
+  "tune": 204,
+  "held_out": 29
+ },
+ {
+  "id": "opengraph_053",
+  "dataset": "opengraph",
+  "object": "clear plastic containers",
+  "hand": "right",
+  "tune": 11,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_054",
+  "dataset": "opengraph",
+  "object": "clear plastic cup",
+  "hand": "left",
+  "tune": 38,
+  "held_out": 15
+ },
+ {
+  "id": "opengraph_055",
+  "dataset": "opengraph",
+  "object": "clear plastic lid",
+  "hand": "right",
+  "tune": 62,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_056",
+  "dataset": "opengraph",
+  "object": "clear spray bottle",
+  "hand": "left",
+  "tune": 7,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_057",
+  "dataset": "opengraph",
+  "object": "dark blue mat",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_058",
+  "dataset": "opengraph",
+  "object": "gold pen",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_059",
+  "dataset": "opengraph",
+  "object": "gray eraser",
+  "hand": "left",
+  "tune": 0,
+  "held_out": 2
+ },
+ {
+  "id": "opengraph_060",
+  "dataset": "opengraph",
+  "object": "green cap",
+  "hand": "left",
+  "tune": 31,
+  "held_out": 17
+ },
+ {
+  "id": "opengraph_061",
+  "dataset": "opengraph",
+  "object": "green cap bottle",
+  "hand": "left",
+  "tune": 0,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_062",
+  "dataset": "opengraph",
+  "object": "green flip-top cap",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 5
+ },
+ {
+  "id": "opengraph_063",
+  "dataset": "opengraph",
+  "object": "green plant",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_064",
+  "dataset": "opengraph",
+  "object": "green sriracha bottle",
+  "hand": "left",
+  "tune": 8,
+  "held_out": 13
+ },
+ {
+  "id": "opengraph_065",
+  "dataset": "opengraph",
+  "object": "green sriracha cap",
+  "hand": "right",
+  "tune": 6,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_066",
+  "dataset": "opengraph",
+  "object": "ketchup bottle",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_067",
+  "dataset": "opengraph",
+  "object": "orange box",
+  "hand": "right",
+  "tune": 9,
+  "held_out": 6
+ },
+ {
+  "id": "opengraph_068",
+  "dataset": "opengraph",
+  "object": "orange cardboard box",
+  "hand": "left",
+  "tune": 52,
+  "held_out": 22
+ },
+ {
+  "id": "opengraph_069",
+  "dataset": "opengraph",
+  "object": "pink bubble wrap",
+  "hand": "right",
+  "tune": 20,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_070",
+  "dataset": "opengraph",
+  "object": "pink circular object",
+  "hand": "right",
+  "tune": 4,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_071",
+  "dataset": "opengraph",
+  "object": "pink object",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_072",
+  "dataset": "opengraph",
+  "object": "red ketchup bottle",
+  "hand": "right",
+  "tune": 39,
+  "held_out": 16
+ },
+ {
+  "id": "opengraph_073",
+  "dataset": "opengraph",
+  "object": "red sauce bottle",
+  "hand": "right",
+  "tune": 31,
+  "held_out": 17
+ },
+ {
+  "id": "opengraph_074",
+  "dataset": "opengraph",
+  "object": "red sauce bottle with the white cap",
+  "hand": "left",
+  "tune": 0,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_075",
+  "dataset": "opengraph",
+  "object": "red sriracha bottle",
+  "hand": "right",
+  "tune": 23,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_076",
+  "dataset": "opengraph",
+  "object": "silver metal object",
+  "hand": "right",
+  "tune": 16,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_077",
+  "dataset": "opengraph",
+  "object": "silver object",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 2
+ },
+ {
+  "id": "opengraph_078",
+  "dataset": "opengraph",
+  "object": "small black object",
+  "hand": "right",
+  "tune": 8,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_079",
+  "dataset": "opengraph",
+  "object": "small circular metallic objects",
+  "hand": "right",
+  "tune": 8,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_080",
+  "dataset": "opengraph",
+  "object": "small clear plastic container",
+  "hand": "right",
+  "tune": 20,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_081",
+  "dataset": "opengraph",
+  "object": "small clear plastic containers",
+  "hand": "right",
+  "tune": 3,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_082",
+  "dataset": "opengraph",
+  "object": "small round object with QR code",
+  "hand": "right",
+  "tune": 22,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_083",
+  "dataset": "opengraph",
+  "object": "small white disc",
+  "hand": "right",
+  "tune": 8,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_084",
+  "dataset": "opengraph",
+  "object": "sriracha sauce bottle",
+  "hand": "left",
+  "tune": 0,
+  "held_out": 2
+ },
+ {
+  "id": "opengraph_085",
+  "dataset": "opengraph",
+  "object": "the white circular object wrapped in pink bubble wrap",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_086",
+  "dataset": "opengraph",
+  "object": "white bubble wrap",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 5
+ },
+ {
+  "id": "opengraph_087",
+  "dataset": "opengraph",
+  "object": "white cap",
+  "hand": "right",
+  "tune": 14,
+  "held_out": 11
+ },
+ {
+  "id": "opengraph_088",
+  "dataset": "opengraph",
+  "object": "white circular containers",
+  "hand": "right",
+  "tune": 7,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_089",
+  "dataset": "opengraph",
+  "object": "white circular object",
+  "hand": "right",
+  "tune": 20,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_090",
+  "dataset": "opengraph",
+  "object": "white cup",
+  "hand": "right",
+  "tune": 1,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_091",
+  "dataset": "opengraph",
+  "object": "white device",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_092",
+  "dataset": "opengraph",
+  "object": "white electronic component",
+  "hand": "right",
+  "tune": 1,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_093",
+  "dataset": "opengraph",
+  "object": "white flip-top cap",
+  "hand": "right",
+  "tune": 0,
+  "held_out": 3
+ },
+ {
+  "id": "opengraph_094",
+  "dataset": "opengraph",
+  "object": "white glove",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_095",
+  "dataset": "opengraph",
+  "object": "white ketchup cap",
+  "hand": "right",
+  "tune": 5,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_096",
+  "dataset": "opengraph",
+  "object": "white plastic container",
+  "hand": "right",
+  "tune": 7,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_097",
+  "dataset": "opengraph",
+  "object": "white plastic lid",
+  "hand": "right",
+  "tune": 19,
+  "held_out": 8
+ },
+ {
+  "id": "opengraph_098",
+  "dataset": "opengraph",
+  "object": "whiteboard",
+  "hand": "right",
+  "tune": 2,
+  "held_out": 1
+ },
+ {
+  "id": "opengraph_099",
+  "dataset": "opengraph",
+  "object": "whiteboard eraser",
+  "hand": "right",
+  "tune": 33,
+  "held_out": 17
+ },
+ {
+  "id": "opengraph_100",
+  "dataset": "opengraph",
+  "object": "whiteboard marker",
+  "hand": "right",
+  "tune": 1,
+  "held_out": 0
+ },
+ {
+  "id": "opengraph_101",
+  "dataset": "opengraph",
+  "object": "yellow eraser",
+  "hand": "right",
+  "tune": 7,
+  "held_out": 2
+ },
+ {
+  "id": "opengraph_102",
+  "dataset": "opengraph",
+  "object": "yellow sponge",
+  "hand": "right",
+  "tune": 9,
+  "held_out": 2
+ },
+ {
+  "id": "opengraph_103",
+  "dataset": "opengraph",
+  "object": "yellow sponge eraser",
+  "hand": "right",
+  "tune": 6,
+  "held_out": 6
+ }
+]

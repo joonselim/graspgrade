@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light only">
+<title>GraspGrade 라벨링</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --page: #eef0f3; --sheet: #ffffff; --ink: #1a1d23; --ink-2: #3b4250; --muted: #6a7382; --faint: #9aa2ae;
+    --rule: #dde1e7; --tint: #f5f6f8; --done: #2350c9; --warn: #d08a00; --bad: #d0342c;
+    --rigid: #2a78d6; --squeezable: #1baf7a; --soft: #eb6834;
+    --pad: 40px; color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink); font-size: 15px; line-height: 1.6;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    word-break: keep-all; overflow-wrap: anywhere;
+  }
+  a { color: var(--done); }
+  .sheet { max-width: 920px; margin: 28px auto 56px; background: var(--sheet); border: 1px solid var(--rule); padding: var(--pad); }
+  @media (max-width: 720px) { :root { --pad: 16px; } .sheet { margin: 0; border: 0; } }
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 18px; }
+  .bar { position: sticky; top: 0; z-index: 10; background: var(--sheet); margin: 0 calc(var(--pad) * -1); padding: 10px var(--pad);
+    border-bottom: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 13.5px; }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+  .seg button { font: inherit; border: 0; background: var(--sheet); padding: 5px 12px; cursor: pointer; color: var(--ink-2); }
+  .seg button + button { border-left: 1px solid var(--rule); }
+  .seg button.on { background: var(--ink); color: #fff; }
+  .prog { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .prog b { color: var(--ink); }
+  .save { margin-left: auto; font-size: 12.5px; color: var(--muted); }
+  .save.err { color: var(--bad); font-weight: 600; }
+  .defs { border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; margin: 16px 0; font-size: 13.5px; color: var(--ink-2); background: var(--tint); }
+  .defs b { color: var(--ink); }
+  .defs ul { margin: 4px 0 0; padding-left: 1.1em; }
+  .grp { font-size: 13px; font-weight: 700; color: var(--muted); margin: 26px 0 8px; }
+  .row { display: grid; grid-template-columns: 200px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid var(--rule); }
+  .row.done .name::after { content: "✓"; color: var(--squeezable); margin-left: 6px; font-weight: 700; }
+  .row img { width: 200px; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; background: var(--tint); cursor: zoom-in; display: block; }
+  .row img.tall { aspect-ratio: 1; }
+  .name { font-weight: 700; font-size: 15.5px; }
+  .meta { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+  .meta a { margin-left: 8px; }
+  .pick { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pick button { font: inherit; font-size: 13.5px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink-2); cursor: pointer; }
+  .pick button:hover { border-color: var(--faint); }
+  .pick button.on { color: #fff; border-color: transparent; background: var(--c); font-weight: 650; }
+  .pick button.clear { color: var(--muted); border-style: dashed; }
+  .theirs { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .theirs b { color: var(--ink); }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 110px 1fr; gap: 10px; }
+    .row img { width: 110px; }
+  }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 10px 0 4px; font-size: 13.5px; }
+  .stats div b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--muted); font-size: 14px; padding: 20px 0; }
+  .zoom { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.82); display: none; place-items: center; cursor: zoom-out; }
+  .zoom.on { display: grid; }
+  .zoom img { max-width: 94vw; max-height: 90vh; }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <h1>부드러운 물체 라벨링</h1>
+  <p class="sub">물체마다 보통으로 잡았을 때 모양이 어떻게 되는지 고름. 사진으로 모르겠으면 영상을 받아서 봄.</p>
+
+  <div class="bar">
+    <span>라벨러</span>
+    <span class="seg" id="who"><button data-who="l1">라벨러 1</button><button data-who="l2">라벨러 2</button></span>
+    <span class="seg" id="view"><button data-view="todo">남은 것</button><button data-view="all">전체</button><button data-view="agree">합의</button></span>
+    <span class="prog" id="prog"></span>
+    <span class="save" id="save"></span>
+  </div>
+
+  <div class="defs">
+    <b>정의</b> (측정 계획과 같은 문장)
+    <ul>
+      <li><b>rigid</b>: 보통으로 잡아도 모양이 그대로임 (캔, 머그, 단단한 플라스틱 상자, 도구)</li>
+      <li><b>squeezable</b>: 모양은 유지하지만 세게 쥐면 벽이 조금 들어감 (짜는 플라스틱 병, 종이팩, 얇은 플라스틱 컵)</li>
+      <li><b>soft</b>: 보통으로 잡아도 모양이 바뀜 (스펀지, 천, 장갑, 뽁뽁이, 봉지, 식물)</li>
+    </ul>
+    두 사람은 각자 따로 고름. 둘 다 104개를 끝내기 전에는 상대 라벨이 보이지 않음.
+  </div>
+
+  <div id="list"></div>
+</main>
+<div class="zoom" id="zoom"><img alt=""></div>
+
+<script>
+(function () {
+  var VALUES = [["rigid", "rigid"], ["squeezable", "squeezable"], ["soft", "soft"]];
+  var COLOR = { rigid: "var(--rigid)", squeezable: "var(--squeezable)", soft: "var(--soft)" };
+  var NAME = { l1: "라벨러 1", l2: "라벨러 2", agreed: "합의" };
+  var S = { who: null, view: "todo", data: null };
+
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function saveMsg(t, err) { var s = document.getElementById("save"); s.textContent = t; s.classList.toggle("err", !!err); }
+
+  function load() {
+    saveMsg("불러오는 중");
+    return fetch("/api/label?who=" + encodeURIComponent(S.who || ""), { credentials: "same-origin" })
+      .then(function (r) { if (r.status === 401) { location.reload(); throw new Error("401"); } return r.json(); })
+      .then(function (d) { S.data = d; saveMsg(""); render(); })
+      .catch(function () { saveMsg("불러오지 못함. 새로고침", true); });
+  }
+
+  function post(who, id, label, tries) {
+    tries = tries || 0;
+    saveMsg("저장 중");
+    return fetch("/api/label", {
+      method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ who: who, id: id, label: label })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      saveMsg("저장됨");
+    }).catch(function () {
+      if (tries < 3) return new Promise(function (ok) { setTimeout(ok, 1500 * (tries + 1)); }).then(function () { return post(who, id, label, tries + 1); });
+      saveMsg("저장 실패. 다시 눌러 주세요", true);
+      throw new Error("save");
+    });
+  }
+
+  function setLabel(id, label) {
+    var who = S.view === "agree" ? "agreed" : S.who;
+    var bucket = S.view === "agree" ? S.data.all.agreed : S.data.mine;
+    var before = bucket[id];
+    if (label) bucket[id] = label; else delete bucket[id];
+    if (who !== "agreed") S.data.counts[who] = Object.keys(bucket).length;
+    render();
+    post(who, id, label || "").then(function () {
+      if (who !== "agreed" && S.data.counts[who] === S.data.items.length) load();
+    }).catch(function () {
+      if (before) bucket[id] = before; else delete bucket[id];
+      if (who !== "agreed") S.data.counts[who] = Object.keys(bucket).length;
+      render();
+    });
+  }
+
+  function kappa(a, b) {
+    var keys = Object.keys(a).filter(function (k) { return b[k]; });
+    var n = keys.length; if (!n) return null;
+    var agree = 0, pa = {}, pb = {};
+    keys.forEach(function (k) { if (a[k] === b[k]) agree++; pa[a[k]] = (pa[a[k]] || 0) + 1; pb[b[k]] = (pb[b[k]] || 0) + 1; });
+    var po = agree / n, pe = 0;
+    VALUES.forEach(function (v) { pe += ((pa[v[0]] || 0) / n) * ((pb[v[0]] || 0) / n); });
+    return { n: n, agree: agree, po: po, kappa: pe === 1 ? 1 : (po - pe) / (1 - pe) };
+  }
+
+  function row(it, current, extra) {
+    var r = el("div", "row" + (current ? " done" : ""));
+    var img = el("img"); img.src = "/label-media/" + it.id + ".jpg"; img.loading = "lazy"; img.alt = it.object;
+    if (it.dataset === "hot3d") img.classList.add("tall");
+    img.addEventListener("click", function () { var z = document.getElementById("zoom"); z.querySelector("img").src = img.src; z.classList.add("on"); });
+    r.appendChild(img);
+    var box = el("div");
+    box.appendChild(el("div", "name", it.object));
+    var m = el("div", "meta", (it.dataset === "hot3d" ? "HOT3D" : "OpenGraph") + " · 튜닝 " + it.tune + " · 검증 " + it.held_out + (it.hand ? " · " + (it.hand === "left" ? "왼손" : "오른손") : ""));
+    var a = el("a", null, "영상 받기"); a.href = "/label-media/" + it.id + ".mp4"; a.setAttribute("download", it.id + ".mp4");
+    m.appendChild(a);
+    box.appendChild(m);
+    var p = el("div", "pick");
+    VALUES.forEach(function (v) {
+      var b = el("button", current === v[0] ? "on" : "", v[1]);
+      b.style.setProperty("--c", COLOR[v[0]]);
+      b.addEventListener("click", function () { setLabel(it.id, current === v[0] ? "" : v[0]); });
+      p.appendChild(b);
+    });
+    box.appendChild(p);
+    if (extra) box.appendChild(extra);
+    r.appendChild(box);
+    return r;
+  }
+
+  function render() {
+    document.querySelectorAll("#who button").forEach(function (b) { b.classList.toggle("on", b.dataset.who === S.who); });
+    document.querySelectorAll("#view button").forEach(function (b) { b.classList.toggle("on", b.dataset.view === S.view); });
+    var list = document.getElementById("list"); list.innerHTML = "";
+    var d = S.data;
+    if (!d) return;
+    var n = d.items.length;
+    document.getElementById("prog").innerHTML = "라벨러 1 <b>" + d.counts.l1 + "</b>/" + n + " · 라벨러 2 <b>" + d.counts.l2 + "</b>/" + n;
+    if (!S.who) { list.appendChild(el("p", "empty", "위에서 라벨러를 고르세요.")); return; }
+
+    if (S.view === "agree") {
+      if (!d.reveal) { list.appendChild(el("p", "empty", "두 사람이 모두 104개를 끝내면 합의 화면이 열림.")); return; }
+      var k = kappa(d.all.l1, d.all.l2);
+      var st = el("div", "stats");
+      st.innerHTML = "<div>일치<b>" + k.agree + " / " + k.n + "</b></div><div>일치율<b>" + (k.po * 100).toFixed(1) + "%</b></div><div>Cohen's kappa<b>" + k.kappa.toFixed(3) + "</b></div>";
+      list.appendChild(st);
+      var dis = d.items.filter(function (it) { return d.all.l1[it.id] !== d.all.l2[it.id]; });
+      var left = dis.filter(function (it) { return !d.all.agreed[it.id]; }).length;
+      list.appendChild(el("p", "sub", "불일치 " + dis.length + "개, 합의 남은 것 " + left + "개. 일치한 물체는 그 라벨이 그대로 합의 값이 됨."));
+      if (!dis.length) list.appendChild(el("p", "empty", "불일치가 없음. CSV를 받으면 됨."));
+      dis.forEach(function (it) {
+        var t = el("div", "theirs");
+        t.innerHTML = "라벨러 1 <b>" + d.all.l1[it.id] + "</b> · 라벨러 2 <b>" + d.all.l2[it.id] + "</b>";
+        list.appendChild(row(it, d.all.agreed[it.id], t));
+      });
+      var ex = el("p", "sub"); var a = el("a", null, "CSV 받기 (softness_labels.csv)"); a.href = "/api/label?export=1"; ex.appendChild(a);
+      list.appendChild(ex);
+      return;
+    }
+
+    var items = d.items.filter(function (it) { return S.view === "all" || !d.mine[it.id]; });
+    if (!items.length) list.appendChild(el("p", "empty", S.view === "todo" ? "모두 끝냄. 상대가 끝나면 합의 화면이 열림." : ""));
+    var last = null;
+    items.forEach(function (it) {
+      if (it.dataset !== last) { list.appendChild(el("div", "grp", it.dataset === "hot3d" ? "HOT3D 물체" : "OpenGraph 물체")); last = it.dataset; }
+      var extra = null;
+      if (d.reveal) {
+        var other = S.who === "l1" ? "l2" : "l1";
+        extra = el("div", "theirs"); extra.innerHTML = NAME[other] + " <b>" + (d.all[other][it.id] || "-") + "</b>";
+      }
+      list.appendChild(row(it, d.mine[it.id], extra));
+    });
+  }
+
+  document.querySelectorAll("#who button").forEach(function (b) {
+    b.addEventListener("click", function () { S.who = b.dataset.who; store("gg-label-who", S.who); load(); });
+  });
+  document.querySelectorAll("#view button").forEach(function (b) {
+    b.addEventListener("click", function () { S.view = b.dataset.view; render(); window.scrollTo(0, 0); });
+  });
+  document.getElementById("zoom").addEventListener("click", function () { this.classList.remove("on"); });
+
+  S.who = store("gg-label-who") || null;
+  if (S.who !== "l1" && S.who !== "l2") S.who = null;
+  load();
+})();
+</script>
+</body>
+</html>

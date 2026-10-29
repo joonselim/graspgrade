@@ -1,60 +1,32 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "demo.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "logs.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/**",
-      "use": "@vercel/static"
-    }
+  "cleanUrls": true,
+  "functions": {
+    "api/label.js": { "includeFiles": "label-media/items.json" }
+  },
+  "rewrites": [
+    { "source": "/((?!api/|label|assets/|demo|logs).*)", "destination": "/index.html" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1",
-      "headers": {
-        "X-Robots-Tag": "noindex, nofollow",
-        "Referrer-Policy": "no-referrer",
-        "Cache-Control": "public, max-age=3600"
-      }
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     },
     {
-      "src": "/demo(\\.html)?",
-      "dest": "/demo.html",
-      "headers": {
-        "X-Robots-Tag": "noindex, nofollow",
-        "Referrer-Policy": "no-referrer",
-        "Cache-Control": "no-store"
-      }
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
     },
     {
-      "src": "/logs(\\.html)?",
-      "dest": "/logs.html",
-      "headers": {
-        "X-Robots-Tag": "noindex, nofollow",
-        "Referrer-Policy": "no-referrer",
-        "Cache-Control": "no-store"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "X-Robots-Tag": "noindex, nofollow",
-        "Referrer-Policy": "no-referrer",
-        "Cache-Control": "no-store"
-      }
+      "source": "/label-media/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, max-age=3600" }
+      ]
     }
   ]
 }

@@ -1,0 +1,12 @@
+# Deploy only the site. Docs, scripts, splits and the rest of the repository stay out.
+/*
+!index.html
+!demo.html
+!logs.html
+!label.html
+!assets
+!label-media
+!api
+!middleware.js
+!package.json
+!vercel.json
