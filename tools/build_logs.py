@@ -203,6 +203,7 @@ CSS = """
   .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
   .topnav a:hover { color: var(--ink); text-decoration: none; }
   .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  .topnav a.lang { padding: 3px 8px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); position: sticky; right: 0; background: var(--sheet); }
   .doc-head { border-bottom: 2px solid var(--rule-strong); padding-bottom: 16px; }
   .doc-title { font-size: 30px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; margin: 0; }
   @media (max-width: 720px) { .doc-title { font-size: 25px; } }
@@ -252,34 +253,34 @@ def main():
 
     jump = "".join(f'<a href="#exp-{p.name[3:5]}">EXP-{p.name[3:5]}</a>' for p in pages)
     page = f"""<!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light only">
-<title>GraspGrade 실험 기록</title>
+<title>GraspGrade experiment log</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>{CSS}</style>
 </head>
 <body>
 <main class="sheet">
-  <nav class="topnav" aria-label="페이지">
+  <nav class="topnav" aria-label="Pages">
     <span class="brand">GraspGrade</span>
-    <a href="index.html#summary">요약</a>
-    <a href="index.html#story">핵심 실험</a>
-    <a href="index.html#detail">실험 상세</a>
-    <a href="demo.html">데모</a>
-    <a href="logs.html" class="on">기록</a>
+    <a href="en.html#summary">Summary</a>
+    <a href="en.html#story">Key experiments</a>
+    <a href="logs.html" class="on">Experiment log</a>
+    <a href="demo.html">Demo</a>
+    <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
   <header class="doc-head">
-    <h1 class="doc-title">실험 기록 전체</h1>
-    <nav class="jump" aria-label="실험 바로가기">{jump}</nav>
+    <h1 class="doc-title">Experiment log</h1>
+    <nav class="jump" aria-label="Jump to an experiment">{jump}</nav>
   </header>
-  <h2 class="sec">목록</h2>
+  <h2 class="sec">All experiments</h2>
   {"".join(idx)}
 {chr(10).join(arts)}
-  <footer>영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
+  <footer>Video sources: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
 </main>
 </body>
 </html>

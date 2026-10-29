@@ -12,6 +12,11 @@ Run in WSL from ~/graspgrade:
     .venv/bin/python tools/demo_video.py --only 3a  # one scene, for checking
 
 Output: out/demo/video/ (scene files, captions) and out/demo/graspgrade_demo.mp4.
+
+With a voice: write the text with --voice-text, synthesize one WAV per shot with
+tools/demo_voice.ps1 (Windows built-in voice), then run this again. When
+out/demo/voice/<shot>.wav exists, each shot is as long as its voice plus a short
+pause, the captions follow the voice, and the voice is mixed under the video.
 """
 import argparse
 import json
@@ -25,6 +30,8 @@ ROOT = Path(__file__).resolve().parent.parent
 VIEW = ROOT / "viewer"
 FIG = ROOT / "out" / "demo"
 WORK = FIG / "video"
+VOICE = FIG / "voice"
+LEAD, TAIL = 0.4, 0.5  # silence before and after the voice in each shot
 W, H, FPS = 1920, 1080, 30
 CAP_H = 130  # bottom band kept free for captions
 
@@ -117,13 +124,13 @@ def ts(t, sep):
 
 
 def write_captions(scenes):
-    """Spread each shot's narration over the shot, by length of text."""
+    """Spread each shot's narration over its voice (or the shot), by length of text."""
     events, t0 = [], 0.0
-    for key, dur in scenes:
+    for key, dur, voice in scenes:
         chunks = caption_chunks(NARRATION[key])
         total = sum(len(c) + 12 for c in chunks)
-        t = t0 + 0.3
-        span = dur - 0.6
+        t = t0 + (LEAD if voice else 0.3)
+        span = voice if voice else dur - 0.6
         for c in chunks:
             d = span * (len(c) + 12) / total
             events.append((t, t + d - 0.05, c))
@@ -140,7 +147,7 @@ def write_captions(scenes):
            "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"]
     ass += [f"Dialogue: 0,{ts(a, '.')},{ts(b, '.')},Cap,,0,0,0,,{c}" for a, b, c in events]
     (WORK / "captions.ass").write_text("\n".join(ass) + "\n", encoding="utf-8")
-    script = "\n\n".join(f"Shot {k} ({d:.0f} s)\n{NARRATION[k]}" for k, d in scenes)
+    script = "\n\n".join(f"Shot {k} ({d:.0f} s)\n{NARRATION[k]}" for k, d, _ in scenes)
     (WORK / "narration.txt").write_text(script + "\n", encoding="utf-8")
 
 
@@ -328,6 +335,10 @@ def build(only=None):
         ("5c", "5", 6, lambda o, d: still(save(scope_card(), "s5_scope.png"), o, d)),
         ("6", "6", 12, lambda o, d: still(FIG / "demo_card_scene6.png", o, d)),
     ]
+    voice = {k: wav_len(VOICE / f"{k}.wav") for k, *_ in parts if (VOICE / f"{k}.wav").exists()}
+    if voice:
+        # each shot as long as its voice, but never shorter than the plan
+        parts = [(k, g, round(max(d * 0.6, LEAD + voice[k] + TAIL), 2), fn) for k, g, d, fn in parts]
     for key, _, dur, fn in parts:
         if only and key != only:
             continue
@@ -335,21 +346,46 @@ def build(only=None):
         print("scene", key, dur, "s")
     if only:
         return
-    write_captions([(k, dur) for k, _, dur, _ in parts])
+    write_captions([(k, dur, voice.get(k)) for k, _, dur, _ in parts])
     (WORK / "list.txt").write_text("".join(f"file 'scene_{k}.mp4'\n" for k, *_ in parts))
     joined = WORK / "joined.mp4"
     run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(WORK / "list.txt"),
          "-c", "copy", str(joined)])
+    audio = []
+    if voice:
+        # one voice track: each shot's WAV after a short lead, padded to the shot length
+        ins, chains = [], []
+        for i, (k, _, dur, _) in enumerate(parts):
+            ins += ["-i", str(VOICE / f"{k}.wav")]
+            chains.append(f"[{i}:a]aresample=48000,adelay={int(LEAD * 1000)},apad,atrim=0:{dur}[a{i}]")
+        graph = ";".join(chains) + ";" + "".join(f"[a{i}]" for i in range(len(parts))) + \
+            f"concat=n={len(parts)}:v=0:a=1,loudnorm=I=-16:TP=-1.5[a]"
+        track = WORK / "voice.m4a"
+        run(["ffmpeg", "-y", "-loglevel", "error"] + ins + ["-filter_complex", graph, "-map", "[a]",
+             "-c:a", "aac", "-b:a", "160k", str(track)])
+        audio = ["-i", str(track), "-map", "0:v", "-map", "1:a", "-c:a", "copy", "-shortest"]
     final = FIG / "graspgrade_demo.mp4"
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined), "-vf", f"subtitles={WORK / 'captions.ass'}",
-         "-c:v", "libx264", "-crf", "19", "-preset", "medium", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-         str(final)])
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined), "-c", "copy", "-movflags", "+faststart",
-         str(FIG / "graspgrade_demo_no_captions.mp4")])
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined)] + audio +
+        ["-vf", f"subtitles={WORK / 'captions.ass'}", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
+         "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(final)])
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined)] + audio +
+        ["-c:v", "copy", "-movflags", "+faststart", str(FIG / "graspgrade_demo_no_captions.mp4")])
     print("wrote", final, sum(p[2] for p in parts), "s")
+
+
+def wav_len(path):
+    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)],
+                         capture_output=True, text=True, check=True).stdout
+    return float(out)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--only")
-    build(ap.parse_args().only)
+    ap.add_argument("--voice-text", action="store_true", help="write out/demo/voice/narration.json and stop")
+    a = ap.parse_args()
+    if a.voice_text:
+        VOICE.mkdir(parents=True, exist_ok=True)
+        (VOICE / "narration.json").write_text(json.dumps(NARRATION, indent=1), encoding="utf-8")
+    else:
+        build(a.only)
