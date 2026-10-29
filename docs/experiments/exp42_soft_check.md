@@ -95,3 +95,9 @@ caught. It also holds back 18% of rigid OpenGraph segments. So the soft
 object step of the proposal is not supported as it stands: a "soft or unsure"
 answer from Muse Spark is not enough to keep soft objects out of the score.
 Dropping the held-back HOT3D clips leaves the number 2 AUC unchanged.
+
+As the measurement plan asks for a failed check, the viewer has a Touch check
+tab (added 2026-10-29, `scripts/viewer_data.py`, no call). It lists the 30
+held-back HOT3D held-out clips, marked as not validated: 28 answered soft and
+2 unsure, from 12 objects, led by coffee_pot (6), food_vegetables (5),
+holder_black (5) and spatula_red (5). All 12 objects are labeled rigid.

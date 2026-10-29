@@ -112,7 +112,7 @@ AUC unchanged (0.625).
 
 ## Viewer
 
-`viewer/` is a static page with two tabs, built from the final held-out
+`viewer/` is a static page with three tabs, built from the final held-out
 results.
 
 - **Clip scores** (number 2): the 15 highest and 15 lowest scored held-out
@@ -124,6 +124,13 @@ results.
 - **Contact timing** (number 1): the 22 held-out episodes. For each hand, one
   track each for the glove, A + shift, B and C + shift, with F1 and IoU per
   episode. Click a track to jump in the video.
+- **Touch check** (soft object check): the 30 HOT3D held-out clips the soft
+  object check holds back, with the Muse Spark answer and reason and the
+  object label. Marked as not validated, because the check failed its pass
+  rule (EXP-42).
+
+Direct links open one view: `#clip=ID`, `#episode=36&hand=right`,
+`#compare=ID1,ID2`.
 
 Build the data and the short videos (no API call), then serve the page:
 

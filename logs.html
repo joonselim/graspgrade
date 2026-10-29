@@ -1592,6 +1592,7 @@
 <figure><img src="assets/logs/exp42_soft_check.png" alt="Muse Spark answers on soft OpenGraph objects, and HOT3D objects held back" loading="lazy"></figure>
 <h3>Conclusion</h3>
 <p>The soft object check fails the rule fixed in advance. Muse Spark leaves rigid HOT3D clips alone (2.1% held back) but catches only half of the segments labeled soft (51.7%, rule 70%). Most misses are tape, which Muse Spark calls squeezable or rigid. Bubble wrap, gloves and mats are mostly caught. It also holds back 18% of rigid OpenGraph segments. So the soft object step of the proposal is not supported as it stands: a "soft or unsure" answer from Muse Spark is not enough to keep soft objects out of the score. Dropping the held-back HOT3D clips leaves the number 2 AUC unchanged.</p>
+<p>As the measurement plan asks for a failed check, the viewer has a Touch check tab (added 2026-10-29, <code>scripts/viewer_data.py</code>, no call). It lists the 30 held-back HOT3D held-out clips, marked as not validated: 28 answered soft and 2 unsure, from 12 objects, led by coffee_pot (6), food_vegetables (5), holder_black (5) and spatula_red (5). All 12 objects are labeled rigid.</p>
 </article>
   <footer>영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
 </main>
