@@ -571,6 +571,7 @@
             <tr class="minor"><td class="first"><a href="#exp-36">EXP-36</a></td><td class="wrap-ok">방법 A와 C의 시점 보정을 따로 배우도록 수정</td><td>채점 코드가 C 보정을 경계 1개로 정하게 되어 있던 것을 고침. C 보정은 튜닝 표본 31개로 시작 +6, 끝 −4프레임. A는 +7, −7 그대로.</td></tr>
             <tr class="core"><td class="first"><a href="#exp-37">EXP-37</a></td><td class="wrap-ok">평가 1 최종 결과: 검증 22개</td><td>Muse Spark 단독 + 장갑으로 배운 보정이 가장 높음: F1 ±5 0.195, ±15 0.376, IoU 0.850. 보정은 A(+0.121)와 C(+0.025) 모두에 도움. C는 B보다 낫지만(+0.022) A + 보정보다 낮음.</td></tr>
             <tr class="minor"><td class="first"><a href="#exp-38">EXP-38</a></td><td class="wrap-ok">평가 2 SAM: 점수 학습용 400개와 검증 1,426개</td><td>SAM 요청 1,020개 모두 완료. 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%가 1이라 등급이 둘뿐. 채점은 최종 실행에서.</td></tr>
+            <tr class="minor"><td class="first"><a href="#exp-39">EXP-39</a></td><td class="wrap-ok">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</td><td>호출 2,852개 모두 첫 전송에서 답. 평가 2 클립 모두 두 답이 있음. Muse Spark 단독은 거의 0.1 근처나 0.85~0.9로만 답함. 채점은 최종 실행에서.</td></tr>
           </tbody>
         </table>
       </div>
@@ -892,7 +893,7 @@
   <header class="doc-head">
     <h1 class="doc-title">실험 상세</h1>
     <nav class="jump" aria-label="실험 바로가기">
-      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#s-now">진행 중</a>
+      <a href="#exp-01">EXP-01</a><a href="#exp-02">EXP-02</a><a href="#exp-03">EXP-03</a><a href="#exp-04">EXP-04</a><a href="#exp-05">EXP-05</a><a href="#exp-06">EXP-06</a><a href="#exp-07">EXP-07</a><a href="#exp-08">EXP-08</a><a href="#exp-09">EXP-09</a><a href="#exp-10">EXP-10</a><a href="#exp-11">EXP-11</a><a href="#exp-12">EXP-12</a><a href="#exp-13">EXP-13</a><a href="#exp-14">EXP-14</a><a href="#exp-15">EXP-15</a><a href="#exp-16">EXP-16</a><a href="#exp-17">EXP-17</a><a href="#exp-18">EXP-18</a><a href="#exp-19">EXP-19</a><a href="#exp-20">EXP-20</a><a href="#exp-21">EXP-21</a><a href="#exp-22">EXP-22</a><a href="#exp-23">EXP-23</a><a href="#exp-24">EXP-24</a><a href="#exp-25">EXP-25</a><a href="#exp-26">EXP-26</a><a href="#exp-27">EXP-27</a><a href="#exp-28">EXP-28</a><a href="#exp-29">EXP-29</a><a href="#exp-30">EXP-30</a><a href="#exp-31">EXP-31</a><a href="#exp-32">EXP-32</a><a href="#exp-33">EXP-33</a><a href="#exp-34">EXP-34</a><a href="#exp-35">EXP-35</a><a href="#exp-36">EXP-36</a><a href="#exp-37">EXP-37</a><a href="#exp-38">EXP-38</a><a href="#exp-39">EXP-39</a><a href="#s-now">진행 중</a>
     </nav>
   </header>
 
@@ -3573,6 +3574,60 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         <li>가시성은 대부분의 클립에서 1이라 SAM이 손이나 물체를 놓친 클립만 걸러낼 수 있음.</li>
       </ul>
     </article>
+
+    <article class="exp" id="exp-39">
+      <div class="exp-h"><span class="id">EXP-39</span><span class="t">평가 2 Muse Spark: 검증 1,426개의 체크리스트와 단독 답</span><span class="d">10/29</span></div>
+      <dl class="spec">
+        <dt>질문</dt><dd>평가 2는 검증 클립마다 Muse Spark 답 두 개가 필요함: 체크리스트(물체 항목 6개와 손가락 가림, 1판 프롬프트, EXP-30)와 Muse Spark 단독(따라할 수 있을 확률). 게이트는 "약함"이었고, 미리 정한 결정대로 이 단계를 진행함(EXP-29).</dd>
+        <dt>입력</dt><dd>검증 클립 1,426개에 체크리스트와 단독 호출을 하나씩, 2,852개. 보내기 전에 사용자가 P7a 단가 기준 약 $28.8을 한도로 정함. 체크리스트를 먼저 보내고, 실제 비용에 단독 예상($13.83)을 더해 한도 안일 때 단독을 보냄. $28.56. 라벨로는 채점하지 않음.</dd>
+        <dt>방법</dt><dd>측정 계획의 "해석되지 않는 답" 규칙대로 전체 실행 뒤 같은 명령을 한 번 더 보내고 남은 호출 수를 셈.</dd>
+      </dl>
+
+      <div class="tbl">
+        <p class="cap">전송</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>호출</th><th class="n">보낸 호출</th><th class="n">해석 실패</th><th class="n">API 오류</th><th class="n">비용</th><th class="n">호출당 (P7a)</th></tr></thead>
+            <tbody>
+              <tr><td class="first">체크리스트</td><td class="n">1,426</td><td class="n">0</td><td class="n">0</td><td class="n">$14.66</td><td class="n">$0.01028 ($0.01051)</td></tr>
+              <tr><td class="first">단독</td><td class="n">1,426</td><td class="n">0</td><td class="n">0</td><td class="n">$13.90</td><td class="n">$0.00975 ($0.00970)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">합계 $28.56로 한도 $28.8 안. 재전송할 호출은 없었음. 평가 2 클립 1,826개(점수 학습용 400, 검증 1,426) 모두 두 답이 있어 빠지는 클립이 없음.</p>
+
+      <div class="tbl">
+        <p class="cap">라벨 없이 본 체크리스트 등급 비율 (0 / 0.5 / 1)</p>
+        <div class="wrap">
+          <table class="min">
+            <thead><tr><th>항목</th><th class="n">점수 학습용</th><th class="n">검증</th></tr></thead>
+            <tbody>
+              <tr><td class="first">손가락 가림</td><td class="n">39% / 47% / 14%</td><td class="n">27% / 55% / 18%</td></tr>
+              <tr><td class="first">손 대비 크기</td><td class="n">20% / 13% / 67%</td><td class="n">15% / 13% / 72%</td></tr>
+              <tr><td class="first">모양</td><td class="n">8% / 36% / 56%</td><td class="n">10% / 43% / 47%</td></tr>
+              <tr><td class="first">두께</td><td class="n">23% / 15% / 62%</td><td class="n">23% / 21% / 57%</td></tr>
+              <tr><td class="first">감쌀 폭</td><td class="n">10% / 18% / 72%</td><td class="n">5% / 22% / 73%</td></tr>
+              <tr><td class="first">손잡이</td><td class="n">71% / 1% / 28%</td><td class="n">65% / 1% / 33%</td></tr>
+              <tr><td class="first">빈 공간</td><td class="n">21% / 13% / 66%</td><td class="n">11% / 9% / 80%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/exp39_number2_muse.png" loading="lazy" width="1250" height="450" alt="Muse Spark 체크리스트 등급 비율과 Muse Spark 단독 확률 분포, 점수 학습용과 검증">
+        <div class="keys"><span class="key"><i style="--c:#e8534f"></i>등급 0</span><span class="key"><i style="--c:#b9aea6"></i>등급 0.5</span><span class="key"><i style="--c:#4a78a8"></i>등급 1</span></div>
+        <figcaption>왼쪽: 항목별 등급 비율, 위 막대는 점수 학습용 400개, 아래 막대는 검증 1,426개. 오른쪽: Muse Spark 단독이 답한 "따라할 수 있을 확률"의 분포. 0.05~0.2와 0.85~0.95 두 무리로만 답함.</figcaption>
+      </figure>
+
+      <ul class="plain concl">
+        <li>평가 2의 Muse Spark 답이 모두 모임. P7a 단가 그대로였고 해석 실패는 없음.</li>
+        <li>검증 등급은 점수 학습용과 비슷하고, 빈 공간과 손가락 가림을 0으로 매긴 비율이 조금 적음.</li>
+        <li>Muse Spark 단독은 거의 두 값 중 하나로만 답함(검증 중앙값 0.85, 0.90이 542개, 0.85가 336개). 클립 순위를 거칠게만 나눔.</li>
+        <li>다음: 검증 채점(P8, 유료 호출 없음). 부드러운 물체 확인(P7c)은 라벨 시트를 기다림.</li>
+      </ul>
+    </article>
   </section>
 
   <section id="s-now">
@@ -3644,7 +3699,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <li>채점 코드가 방법 A와 C의 시점 보정을 같은 에피소드(0, 30, 53)로 배우게 되어 있어 C 보정이 경계 1개로 정해질 뻔한 것을 검증 채점 전에 고침(<a href="#exp-36">EXP-36</a>). C 보정은 튜닝 표본에서 옮긴 경계 31개로 시작 +6, 끝 −4프레임.</li>
       <li>평가 1 검증 채점 완료(<a href="#exp-37">EXP-37</a>). Muse Spark 단독 + 보정이 F1 ±5 0.195, ±15 0.376, IoU 0.850으로 가장 높음. 보정은 A와 C 모두에 도움이 됨.</li>
       <li>평가 2의 SAM 구간을 모두 보냄(<a href="#exp-38">EXP-38</a>, $26.48). 요청 1,020개 모두 완료, 클립 1,826개 모두 가시성과 접촉 명확성 등급이 있음. 가시성은 약 70%의 클립에서 1이라 등급이 둘뿐.</li>
-      <li>다음: Muse Spark 검증 1,426개, 부드러운 물체 라벨 시트(두 사람) 뒤 부드러운 물체 확인, 그 뒤 점수 학습과 검증 채점.</li>
+      <li>평가 2의 Muse Spark 체크리스트와 단독 답을 검증 1,426개에 보냄(<a href="#exp-39">EXP-39</a>, $28.56, 한도 $28.8 안). 호출 2,852개 모두 첫 전송에서 답이 있음. Muse Spark 단독은 거의 두 값으로만 답함.</li>
+      <li>다음: 평가 2 점수 학습과 검증 채점(유료 호출 없음). 부드러운 물체 확인은 두 사람의 라벨 시트를 채운 뒤 보냄.</li>
     </ul>
   </section>
 
@@ -3737,7 +3793,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    마지막 갱신 2026-10-29 09:40 KST
+    마지막 갱신 2026-10-29 10:28 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
@@ -3845,8 +3901,8 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
         ["done", "SAM 전체: 점수 학습 400개, 검증 1,426개 모두 등급 (EXP-38)"],
         ["done", "Muse Spark 튜닝 400개 → 게이트 약함(0.636, 0.601), 검증 진행 (EXP-29)"],
         ["done", "체크리스트 프롬프트 한 번 수정: 나아지지 않아 1판 유지 (EXP-30)"],
-        ["todo", "게이트가 멈춤이 아니면 Muse Spark 검증 1,426개"],
-        ["todo", "Muse Spark 항목 2개와 Muse Spark 단독 (유료 호출 보류)"],
+        ["done", "Muse Spark 검증 1,426개: 체크리스트와 단독 모두 답 (EXP-39)"],
+        ["done", "Muse Spark 손가락 가림 항목과 Muse Spark 단독 (EXP-39)"],
         ["todo", "분산 없는 항목 점검"],
         ["todo", "로지스틱 회귀 학습 (튜닝 400개)"],
         ["todo", "AUC와 부트스트랩 구간, 사람별 AUC, 상위 20% 비율 (검증)"],
