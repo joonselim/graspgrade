@@ -90,7 +90,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/muse_contact.py` | 숫자 1 Muse 비교군 A, C. `a`, `c` (`--send` 없으면 비용만, `--sample N`은 C 보정용 튜닝 경계), `score` (A 보정은 `--a-shift-episodes` 0,30,53, C 보정은 `--c-shift-episodes` 튜닝 50개에서 배워 적용, 짝지은 부트스트랩, EXP-36), `selftest` (가상 Muse로 상한, `--lag`는 보정 점검) |
 | `scripts/contact_cut.py rule-apply` | 튜닝에서 고른 B를 다른 에피소드에 적용해 구간 내보내기 (C의 입력). `--train tune --apply held_out` |
 | `scripts/demo_figures.py` | 데모 영상용 그림 4장(최종 결과 파일에서)과 장면 1, 2, 6 글자 카드 3장 (1920x1080): `out/demo/`, 사본 `docs/demo/`. API 호출 없음 |
-| `scripts/viewer_data.py` | 뷰어 데이터 (최종 held-out 결과, EXP-37, EXP-40): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외). 숫자 2 점수와 숫자 1 행이 최종 실행과 같은지 확인 |
+| `scripts/viewer_data.py` | 뷰어 데이터 (최종 held-out 결과, EXP-37, EXP-40, 보류 목록 EXP-42): `viewer/data/*.json`, `viewer/media/*.mp4` (git 제외). 숫자 2 점수와 숫자 1 행이 최종 실행과 같은지 확인 |
 | `scripts/refine_check.py` | API 없는 점검: 촉각 임계값 vs 라벨, 짧은 구간, 머리 IMU 흔들림, 10fps 비용 |
 | `scripts/refine_plots.py` | refine_check 그림을 `docs/experiments/img/`에 저장 |
 | `scripts/regression_check.py` | 회귀 점검: 보고한 수치의 무료 명령 12개를 돌려 `out/regression/baseline/`과 바이트 비교. `save` / `compare [--only ...]`. 코드 정리 전후에 쓴다. 숫자 1은 파일럿 3개 전용 파일(`rule_pilot_*`)과 빈 C 폴더로 돌아 50개 B 출력을 덮어쓰지 않는다. `score_tune50`은 진짜 튜닝 C 답으로 최종과 같은 보정 |

@@ -699,6 +699,8 @@ clips out of the score.
   given.
 - If it does not pass: the viewer still shows the touch check list, marked
   as not validated, and the summary does not claim that the check works.
+  Done (2026-10-29): the viewer Touch check tab lists the 30 held-back HOT3D
+  held-out clips under a "Not validated" mark (EXP-42).
 - Code (2026-10-28, no call): `scripts/muse_soft.py` (`segments`, `frames`,
   `send --set pilot|hot3d|opengraph`, `score`), prompt in
   `scripts/prompts/soft_object.txt`. Sending stops until every label is

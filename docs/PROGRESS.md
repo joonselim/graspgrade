@@ -297,6 +297,7 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 2. (MANO 불필요, EXP-09) 손가락 끝은 UmeTrack 프로필 + 직접 짠 순운동학으로 얻는다. hand 0 = 왼손(프로필 그대로), hand 1 = 오른손(x축 반전). HOT3D 툴킷 / projectaria_tools 설치도 필요 없었다 (투영은 EXP-08 코드).
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다. one-pager는 2026-10-29에 GraspGrade 이름과 최종 결과로 갱신했다 (같은 링크 https://claude.ai/artifact/4so1DrQxogYfb5wsvTmBMv, 버전 2, 맨 위 그림은 held-out 에피소드 36 오른손 실제 트랙).
 4. 데모 영상 구성안: [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 녹화 준비 완료: 뷰어 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`), 영상용 그림 4장과 장면 1, 2, 6 글자 카드 3장(`scripts/demo_figures.py`, `docs/demo/`), `.claude/launch.json`의 `viewer` 서버. 녹화와 녹음은 아직 안 했다. 3:00, 장면 6개, 뷰어 녹화(에피소드 36, 7, HOT3D 클립 5개)와 영상용 그림 4장, 영어 내레이션 454단어. 영상 길이 규칙, HOT3D 영상 공개 가능 여부, 목소리는 사용자 결정. 루트 demo.html은 최종 결과와 맞지 않아 쓰지 않는다.
+5. 측정 계획 대조 (2026-10-29): 약속했는데 빠진 보고 2개를 채웠다. EXP-40에 물체·사람 안 AUC(우리 점수 0.484)와 물체별 AUC 표(27개 물체, 우리 점수 14개가 0.5 초과)를 추가했다. 부드러운 물체 확인이 실패했으므로 뷰어에 Touch check 탭(보류 HOT3D 30클립, "Not validated")을 추가했다 (EXP-42 끝, viewer/data/touch.json). 마지막 회귀 점검: REGRESSION_RESULT.
 
 ## 디스크
 
