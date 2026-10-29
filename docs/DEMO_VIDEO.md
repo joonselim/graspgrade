@@ -106,7 +106,7 @@
 
 화면 순서:
 1. 그림 `demo_number2_limits.png` (6초).
-2. `http://localhost:8765/#compare=P0010_1573a837_right_02542,P0001_b2bcbe28_left_01861`: 컵 클립 2개 나란히, 74점 copyable과 75점 grip 실패. 나란히 재생이라 길이는 긴 쪽인 10.3초다.
+2. `http://localhost:8765/#compare=P0010_1573a837_right_02542,P0001_b2bcbe28_left_01861`: 컵 클립 2개 나란히, 74점 copyable과 75점 grip 실패. 나란히 재생이라 길이는 긴 쪽인 10.3초다. 장면에 배정된 약 13초보다 짧으므로 편집에서 마지막 프레임을 멈춰 맞춘다 (결정 2026-10-29).
 3. 그림 `demo_soft.png` (4초).
 
 화면 글자: **Rules written before held-out scoring. Held-out scored once.**
