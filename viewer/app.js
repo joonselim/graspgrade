@@ -1,5 +1,6 @@
 // GraspGrade viewer: reads data/number2.json (clip scores) and data/number1.json (contact timing).
-const state = { clips: [], presets: {}, preset: null, episodes: [], arms: {}, n1note: "" };
+// Direct links for recording: #clip=ID, #episode=36&hand=right, #compare=ID1,ID2.
+const state = { clips: [], presets: {}, preset: null, episodes: [], arms: {}, n1note: "", hand: null };
 
 const gradeName = v => (v >= 1 ? "high" : v >= 0.5 ? "mid" : "low");
 
@@ -13,6 +14,7 @@ function setTab(name) {
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
   document.getElementById("tab-clips").hidden = name !== "clips";
   document.getElementById("tab-contact").hidden = name !== "contact";
+  document.getElementById("tab-compare").hidden = name !== "compare";
   document.getElementById("presets").style.visibility = name === "clips" ? "visible" : "hidden";
   document.getElementById("clips-summary").hidden = name !== "clips";
   document.getElementById("contact-summary").hidden = name !== "contact";
@@ -44,6 +46,7 @@ function renderClipList() {
   clips.forEach((c, i) => {
     const li = document.createElement("li");
     li.className = "item";
+    li.dataset.id = c.id;
     li.innerHTML = `<span>${c.object.replace(/_/g, " ")}</span><span class="pill">${c.score.toFixed(0)}</span>` +
       `<span class="sub">${c.hand} hand, ${c.person}, ${c.copyable_truth ? "copyable" : "not copyable"}</span>`;
     li.onclick = () => showClip(c, li);
@@ -90,6 +93,7 @@ function renderEpisodes() {
   state.episodes.forEach((e, i) => {
     const li = document.createElement("li");
     li.className = "item";
+    li.dataset.episode = e.episode;
     const f = k => e.scores[k].boundary_f1_15.toFixed(2);
     li.innerHTML = `<span>Episode ${e.episode}</span><span class="pill">${f("arm_A_shift")} / ${f("arm_C_shift")}</span>` +
       `<span class="sub">${Math.round(e.duration)} s</span>`;
@@ -108,7 +112,7 @@ function showEpisode(e, li) {
   tl.innerHTML = "";
   const tracks = [["glove", "truth", "glove (ground truth)"],
     ...Object.entries(state.arms).map(([key, label]) => [key, key, label])];
-  ["left", "right"].forEach(hand => {
+  (state.hand ? [state.hand] : ["left", "right"]).forEach(hand => {
     tracks.forEach(([key, cls, label]) => {
       const t = document.createElement("div");
       t.className = "track";
@@ -138,6 +142,43 @@ function showEpisode(e, li) {
     }).join("; ") + ". " + state.n1note + " Click a track to jump in the video.";
 }
 
+function showCompare(ids) {
+  const box = document.getElementById("compare-grid");
+  box.innerHTML = "";
+  ids.map(id => state.clips.find(c => c.id === id)).filter(Boolean).forEach(c => {
+    const card = document.createElement("section");
+    card.className = "stage";
+    card.innerHTML = `<video src="${c.video}" controls muted playsinline loop></video>` +
+      `<div class="compare-head"><span>${c.object.replace(/_/g, " ")}, ${c.hand} hand, ${c.person}</span>` +
+      `<span class="score">${c.score.toFixed(0)}</span></div>` +
+      `<div class="truth">Ground truth: <b style="color:var(${c.copyable_truth ? "--good" : "--bad"})">` +
+      `${c.copyable_truth ? "copyable" : "not copyable"}</b>${c.failed_condition ? ` (fails: ${c.failed_condition})` : ""}</div>` +
+      `<ul class="compare-grades">${c.grades.map(g => `<li><span>${g.name}</span>` +
+        `<span class="grade ${gradeName(g.value)}">${gradeName(g.value)}</span></li>`).join("")}</ul>`;
+    box.appendChild(card);
+  });
+  box.querySelectorAll("video").forEach(v => v.play().catch(() => {}));
+}
+
+// Opens the view named in the hash. Without a hash the page starts on the first tab as before.
+function openFromHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (p.has("clip")) {
+    setTab("clips");
+    if (state.preset) { state.preset = null; renderPresets(); renderClipList(); }
+    const li = document.querySelector(`#clip-list li[data-id="${p.get("clip")}"]`);
+    if (li) { li.click(); li.scrollIntoView({ block: "nearest" }); }
+  } else if (p.has("episode")) {
+    setTab("contact");
+    state.hand = ["left", "right"].includes(p.get("hand")) ? p.get("hand") : null;
+    const li = document.querySelector(`#episode-list li[data-episode="${p.get("episode")}"]`);
+    if (li) { li.click(); li.scrollIntoView({ block: "nearest" }); }
+  } else if (p.has("compare")) {
+    setTab("compare");
+    showCompare(p.get("compare").split(","));
+  }
+}
+
 async function main() {
   document.querySelectorAll(".tabs button").forEach(b => (b.onclick = () => setTab(b.dataset.tab)));
   try {
@@ -161,6 +202,8 @@ async function main() {
   } catch (err) {
     document.getElementById("ep-note").textContent = "Could not load data/number1.json: " + err.message;
   }
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
 }
 
 main();
