@@ -1,8 +1,17 @@
 # 데모 영상 구성안
 
 길이 목표 3:00. 공식 규칙의 길이 제한은 아직 확인하지 않았다 (사용자 확인 항목).
-화면은 뷰어(`viewer/`) 녹화와 실험 그림 3장이 전부다. 새 계산이나 API 호출은 없다.
+화면은 뷰어 데이터와 영상(`viewer/data`, `viewer/media`), 영상용 그림 4장, 글자 카드 3장이 전부다. 새 계산이나 API 호출은 없다.
 내레이션과 화면 글자는 영어(쉬운 영어, em-dash, 축약형, 세미콜론 없음). 내레이션은 454단어로, 분당 150단어로 읽으면 약 3분이다.
+
+## 만든 영상
+
+`tools/demo_video.py`가 이 구성안대로 영상을 그렸다 (보고서 세션, 2026-10-29). 브라우저 녹화가 아니라, 뷰어 데이터와 영상, 그림, 카드를 화면 크기에 맞춰 직접 합성한다.
+
+- 결과: WSL `out/demo/graspgrade_demo.mp4` (179.4초, 1920x1080, 30fps, 자막을 화면에 넣음). 자막 없는 판 `out/demo/graspgrade_demo_no_captions.mp4`. 장면별 파일과 자막(`captions.srt`), 내레이션 원문(`narration.txt`)은 `out/demo/video/`.
+- 장면은 샷 13개로 나뉜다: 1, 2, 3a~3c, 4a~4d, 5a~5c, 6. 내레이션은 아래 문구를 샷별로 나눈 것이다.
+- 목소리: `--voice-text`로 샷별 문구를 쓰고, `tools/demo_voice.ps1`가 Windows 내장 합성 음성(기본값 Microsoft David Desktop)으로 샷마다 WAV를 만든 뒤, 다시 돌리면 샷 길이를 목소리에 맞추고 소리를 섞는다. 그래서 장면 시간은 아래 표의 계획 시간과 조금 다를 수 있다.
+- 다시 만들기 (WSL `~/graspgrade`): `.venv/bin/python scripts/demo_figures.py` → `.venv/bin/python tools/demo_video.py` (`--only 3a`는 샷 하나만).
 
 ## 장면 순서
 
@@ -119,7 +128,9 @@
 
 > The code, the viewer, and both ground truths are open, as a benchmark with its own scorers. GraspGrade finds the hand videos a robot can learn from.
 
-## 녹화 준비
+## 녹화 준비 (손으로 녹화할 때만)
+
+위 "만든 영상"을 쓰면 필요 없다. 뷰어를 브라우저에서 직접 녹화해 바꿀 때를 위해 남긴다.
 
 1. 뷰어 데이터와 영상은 WSL에만 있다 (`~/graspgrade/viewer/media/`). WSL에서 서버를 띄우고 Windows 브라우저로 `http://localhost:8765`를 연다. 같은 명령이 `.claude/launch.json`의 `viewer`에도 있다.
 
@@ -136,5 +147,5 @@
 
 - 공식 규칙의 영상 길이 제한과 형식. 3분보다 짧으면 장면 5의 그림 `demo_soft.png`와 장면 3의 에피소드 7을 먼저 뺀다.
 - HOT3D 영상을 공개 영상에 넣어도 되는지 (라이선스 미확인). 안 되면 장면 1, 4, 5의 HOT3D 화면을 그림과 트랙만으로 바꾼다.
-- 내레이션 목소리 (직접 녹음 또는 음성 합성).
+- 내레이션 목소리. 지금 영상은 Windows 내장 합성 음성이다. 그대로 쓸지, 직접 녹음해 샷별 WAV를 바꿀지 정한다.
 - 제안서 위험 10의 "직접 찍은 1인칭 영상"은 넣지 않았다. 넣으려면 SAM과 Muse 호출이 필요하고, 남은 크레딧은 $6.73이다.
