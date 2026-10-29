@@ -34,7 +34,7 @@ hot3d,whiteboard_eraser,83,55,rigid,rigid,rigid,
 hot3d,whiteboard_marker,39,65,rigid,rigid,rigid,
 opengraph,a small clear plastic container,2,0,rigid,rigid,rigid,
 opengraph,beige glove,2,0,squeezable,soft,soft,
-opengraph,beige gloves,1,0,rigid,soft,rigid,object not in the video
+opengraph,beige gloves,1,0,rigid,soft,rigid,excluded from the experiment
 opengraph,beige paper tape,9,0,squeezable,soft,soft,
 opengraph,beige tape,4,0,squeezable,soft,soft,
 opengraph,black box cutter,7,6,rigid,rigid,rigid,
@@ -62,7 +62,7 @@ opengraph,gray eraser,0,2,rigid,rigid,rigid,
 opengraph,green cap,31,17,squeezable,rigid,rigid,
 opengraph,green cap bottle,0,3,squeezable,squeezable,squeezable,
 opengraph,green flip-top cap,0,5,squeezable,rigid,rigid,
-opengraph,green plant,2,1,rigid,squeezable,rigid,object not in the video
+opengraph,green plant,2,1,rigid,squeezable,rigid,excluded from the experiment
 opengraph,green sriracha bottle,8,13,squeezable,squeezable,squeezable,
 opengraph,green sriracha cap,6,0,squeezable,rigid,rigid,
 opengraph,ketchup bottle,0,3,squeezable,squeezable,squeezable,
@@ -85,7 +85,7 @@ opengraph,small round object with QR code,22,0,rigid,rigid,rigid,
 opengraph,small white disc,8,0,rigid,rigid,rigid,
 opengraph,sriracha sauce bottle,0,2,squeezable,squeezable,squeezable,
 opengraph,the white circular object wrapped in pink bubble wrap,2,0,rigid,soft,rigid,
-opengraph,white bubble wrap,0,5,rigid,soft,rigid,object not in the video
+opengraph,white bubble wrap,0,5,rigid,soft,rigid,excluded from the experiment
 opengraph,white cap,14,11,squeezable,rigid,rigid,
 opengraph,white circular containers,7,0,rigid,rigid,rigid,
 opengraph,white circular object,20,3,rigid,rigid,rigid,
@@ -93,7 +93,7 @@ opengraph,white cup,1,1,rigid,rigid,rigid,
 opengraph,white device,2,0,rigid,rigid,rigid,
 opengraph,white electronic component,1,0,rigid,rigid,rigid,
 opengraph,white flip-top cap,0,3,squeezable,rigid,rigid,
-opengraph,white glove,2,0,rigid,soft,rigid,object not in the video
+opengraph,white glove,2,0,rigid,soft,rigid,excluded from the experiment
 opengraph,white ketchup cap,5,0,squeezable,rigid,rigid,
 opengraph,white plastic container,7,0,rigid,rigid,rigid,
 opengraph,white plastic lid,19,8,rigid,rigid,rigid,
