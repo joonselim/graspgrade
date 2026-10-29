@@ -279,7 +279,7 @@ def main():
   <h2 class="sec">목록</h2>
   {"".join(idx)}
 {chr(10).join(arts)}
-  <footer>원문: docs/experiments/ ({len(pages)}개). 영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria).</footer>
+  <footer>영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
 </main>
 </body>
 </html>
