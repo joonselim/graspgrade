@@ -46,7 +46,11 @@ video { width: 100%; max-height: 60vh; background: #000; border-radius: 6px; }
 .track .label { position: absolute; left: 0; top: -16px; font-size: 11px; color: var(--muted); white-space: nowrap; }
 .track .seg { position: absolute; top: 0; bottom: 0; border-radius: 3px; opacity: 0.85; }
 .seg.truth { background: var(--truth); }
-.seg.ours { background: var(--ours); }
+.seg.ours, .seg.arm_B { background: var(--ours); }
+.seg.arm_A_shift { background: var(--accent); }
+.seg.arm_C_shift { background: var(--mid); }
+.summary { margin: 12px 20px 0; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.summary[hidden] { display: none; }
 .bar { position: absolute; top: 0; bottom: 0; background: var(--truth); border-radius: 3px; opacity: 0.85; }
 .cursor { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); pointer-events: none; }
 .note { color: var(--muted); font-size: 12px; }

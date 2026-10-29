@@ -1,5 +1,5 @@
 // GraspGrade viewer: reads data/number2.json (clip scores) and data/number1.json (contact timing).
-const state = { clips: [], presets: {}, preset: null, episodes: [] };
+const state = { clips: [], presets: {}, preset: null, episodes: [], arms: {}, n1note: "" };
 
 const gradeName = v => (v >= 1 ? "high" : v >= 0.5 ? "mid" : "low");
 
@@ -14,6 +14,8 @@ function setTab(name) {
   document.getElementById("tab-clips").hidden = name !== "clips";
   document.getElementById("tab-contact").hidden = name !== "contact";
   document.getElementById("presets").style.visibility = name === "clips" ? "visible" : "hidden";
+  document.getElementById("clips-summary").hidden = name !== "clips";
+  document.getElementById("contact-summary").hidden = name !== "contact";
 }
 
 function renderPresets() {
@@ -43,7 +45,7 @@ function renderClipList() {
     const li = document.createElement("li");
     li.className = "item";
     li.innerHTML = `<span>${c.object.replace(/_/g, " ")}</span><span class="pill">${c.score.toFixed(0)}</span>` +
-      `<span class="sub">${c.hand} hand, ${c.person}</span>`;
+      `<span class="sub">${c.hand} hand, ${c.person}, ${c.copyable_truth ? "copyable" : "not copyable"}</span>`;
     li.onclick = () => showClip(c, li);
     list.appendChild(li);
     if (i === 0) showClip(c, li);
@@ -58,7 +60,8 @@ function showClip(c, li) {
   v.play().catch(() => {});
   document.getElementById("clip-score").textContent = c.score.toFixed(0);
   document.getElementById("clip-truth").innerHTML =
-    `Ground truth: <b style="color:var(${c.copyable_truth ? "--good" : "--bad"})">${c.copyable_truth ? "copyable" : "not copyable"}</b>`;
+    `Ground truth: <b style="color:var(${c.copyable_truth ? "--good" : "--bad"})">${c.copyable_truth ? "copyable" : "not copyable"}</b>` +
+    (c.failed_condition ? ` (fails: ${c.failed_condition})` : "");
   const bar = document.getElementById("clip-contact");
   bar.style.left = `${(100 * c.contact[0]) / c.duration}%`;
   bar.style.width = `${(100 * (c.contact[1] - c.contact[0])) / c.duration}%`;
@@ -72,6 +75,8 @@ function showClip(c, li) {
     cards.appendChild(li2);
   });
   document.getElementById("clip-reason").textContent = c.muse_reason;
+  document.getElementById("clip-alone").textContent = c.muse_alone
+    ? `${Math.round(100 * c.muse_alone.probability)}% copyable. ${c.muse_alone.reason}` : "";
   trackCursor(v, document.getElementById("clip-cursor"), c.duration);
 }
 
@@ -85,7 +90,9 @@ function renderEpisodes() {
   state.episodes.forEach((e, i) => {
     const li = document.createElement("li");
     li.className = "item";
-    li.innerHTML = `<span>Episode ${e.episode}</span><span class="sub">${Math.round(e.duration)} s</span>`;
+    const f = k => e.scores[k].boundary_f1_15.toFixed(2);
+    li.innerHTML = `<span>Episode ${e.episode}</span><span class="pill">${f("arm_A_shift")} / ${f("arm_C_shift")}</span>` +
+      `<span class="sub">${Math.round(e.duration)} s</span>`;
     li.onclick = () => showEpisode(e, li);
     list.appendChild(li);
     if (i === 0) showEpisode(e, li);
@@ -99,8 +106,10 @@ function showEpisode(e, li) {
   v.src = e.video;
   const tl = document.getElementById("ep-timeline");
   tl.innerHTML = "";
+  const tracks = [["glove", "truth", "glove (ground truth)"],
+    ...Object.entries(state.arms).map(([key, label]) => [key, key, label])];
   ["left", "right"].forEach(hand => {
-    [["glove", "truth", "glove (ground truth)"], ["arm_B", "ours", "arm B, SAM rule"]].forEach(([key, cls, label]) => {
+    tracks.forEach(([key, cls, label]) => {
       const t = document.createElement("div");
       t.className = "track";
       t.innerHTML = `<span class="label">${hand}: ${label}</span>`;
@@ -122,6 +131,11 @@ function showEpisode(e, li) {
   cur.className = "cursor";
   tl.appendChild(cur);
   trackCursor(v, cur, e.duration);
+  document.getElementById("ep-note").textContent = `Episode ${e.episode}, F1 ±5 / F1 ±15 / IoU: ` +
+    Object.entries(state.arms).map(([k, label]) => {
+      const s = e.scores[k];
+      return `${label.split(",")[0]} ${s.boundary_f1_5.toFixed(2)} / ${s.boundary_f1_15.toFixed(2)} / ${s.contact_iou.toFixed(2)}`;
+    }).join("; ") + ". " + state.n1note + " Click a track to jump in the video.";
 }
 
 async function main() {
@@ -131,6 +145,7 @@ async function main() {
     state.clips = n2.clips;
     state.presets = n2.presets;
     document.getElementById("clip-note").textContent = n2.note;
+    document.getElementById("clips-summary").textContent = n2.summary;
     renderPresets();
     renderClipList();
   } catch (err) {
@@ -139,7 +154,9 @@ async function main() {
   try {
     const n1 = await load("data/number1.json");
     state.episodes = n1.episodes;
-    document.getElementById("ep-note").textContent = n1.note + " Click a track to jump in the video.";
+    state.arms = n1.arms;
+    state.n1note = n1.note;
+    document.getElementById("contact-summary").textContent = n1.summary;
     renderEpisodes();
   } catch (err) {
     document.getElementById("ep-note").textContent = "Could not load data/number1.json: " + err.message;
