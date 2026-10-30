@@ -1,7 +1,7 @@
 # Synthesize the demo narration with a Windows built-in voice, one WAV per shot.
 # Reads out/demo/voice/narration.json in the WSL project (written by
-# tools/demo_video.py --voice-text) and writes <shot>.wav next to it.
-# Then tools/demo_video.py --mux puts the voice under the video.
+# web/tools/demo_video.py --voice-text) and writes <shot>.wav next to it.
+# Then web/tools/demo_video.py puts the voice under the video.
 #
 #   powershell -ExecutionPolicy Bypass -File tools\demo_voice.ps1 [-Voice "Microsoft David Desktop"] [-Rate 0]
 param(

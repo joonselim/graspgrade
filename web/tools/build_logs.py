@@ -12,8 +12,9 @@ import re
 import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-EXP = ROOT / "docs" / "experiments"
+ROOT = Path(__file__).resolve().parent.parent  # web/
+REPO = ROOT.parent
+EXP = REPO / "docs" / "experiments"
 IMG_OUT = ROOT / "assets" / "logs"
 
 

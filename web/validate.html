@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light only">
+<title>GraspGrade 영상 검증</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --page: #eef0f3; --sheet: #ffffff; --ink: #1a1d23; --ink-2: #3b4250; --muted: #6a7382; --faint: #9aa2ae;
+    --rule: #dde1e7; --tint: #f5f6f8; --done: #2350c9; --doing: #d08a00; --bad: #c0392b; --good: #1f7a3f;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 15px; line-height: 1.6; }
+  main { max-width: 980px; margin: 24px auto; background: var(--sheet); border: 1px solid var(--rule); padding: 32px 40px 40px; }
+  @media (max-width: 640px) { main { margin: 0; border: 0; padding: 20px 16px 32px; } }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--ink-2); padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 20px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--faint); }
+  .dot.on { background: var(--good); } .dot.off { background: var(--bad); }
+  h2 { font-size: 16px; margin: 26px 0 10px; }
+  .drop { border: 1.5px dashed #c7cdd6; border-radius: 8px; padding: 22px; text-align: center; background: var(--tint); }
+  .drop.over { border-color: var(--done); background: #eef3ff; }
+  .drop p { margin: 4px 0; color: var(--muted); font-size: 13.5px; }
+  button, .btn { font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 14px; border-radius: 5px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--done); border-color: var(--done); color: #fff; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .msg { font-size: 13.5px; margin-top: 10px; min-height: 1.4em; }
+  .msg.err { color: var(--bad); }
+  progress { width: 100%; height: 8px; margin-top: 10px; }
+  .job { border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; margin: 10px 0; }
+  .job-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .job-name { font-weight: 650; word-break: break-all; }
+  .chip { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 10px; background: var(--tint); color: var(--ink-2); white-space: nowrap; }
+  .chip.done { background: #e6f3ea; color: var(--good); } .chip.failed { background: #fbeaea; color: var(--bad); }
+  .chip.running, .chip.confirmed, .chip.probing { background: #fff4de; color: #8a5b00; }
+  .chip.estimated { background: #eef3ff; color: var(--done); }
+  .job-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .job-act { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .result { margin-top: 14px; }
+  .result video { width: 100%; max-height: 420px; background: #000; border-radius: 6px; }
+  .tl { margin: 10px 0 4px; }
+  .tl-row { display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: center; font-size: 12.5px; color: var(--ink-2); margin: 4px 0; }
+  .tl-track { position: relative; height: 14px; background: var(--tint); border-radius: 3px; cursor: pointer; }
+  .tl-seg { position: absolute; top: 0; bottom: 0; background: var(--done); border-radius: 2px; opacity: 0.8; }
+  .tl-head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px; }
+  th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--ink); padding: 6px 8px; }
+  td { border-bottom: 1px solid var(--rule); padding: 8px; vertical-align: top; }
+  tr.clip { cursor: pointer; } tr.clip:hover td { background: var(--tint); }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .score { font-weight: 750; font-size: 16px; }
+  .grades { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .note { font-size: 12.5px; color: var(--muted); }
+  .warn { font-size: 13px; background: #fff8e6; border: 1px solid #f1dca8; border-radius: 6px; padding: 10px 12px; margin: 0 0 18px; color: #6b4e00; }
+</style>
+</head>
+<body>
+<main>
+  <h1>GraspGrade 영상 검증</h1>
+  <p class="sub">1인칭 손 영상을 올리면 손이 물체에 닿는 구간마다 잘라, 로봇 손이 따라할 수 있는 정도를 0~100점으로 매김.</p>
+  <p class="warn">점수는 HOT3D 실험실 영상(어안 카메라, 단단한 물체)으로 학습했음. 일반 휴대폰 영상에서는 정확도를 확인하지 않았음. 영상은 Meta API(SAM 3.1, Muse Spark)로 보내지고, 처리는 팀 컴퓨터에서 함.</p>
+
+  <div class="bar">
+    <span id="worker"><span class="dot"></span>작업 컴퓨터 확인 중</span>
+    <span id="budget"></span>
+  </div>
+
+  <h2>영상 올리기</h2>
+  <div class="drop" id="drop">
+    <input type="file" id="file" accept="video/mp4,video/quicktime,video/webm" hidden>
+    <button class="primary" id="pick" type="button">영상 고르기</button>
+    <p>60초 이하, 200MB 이하. mp4, mov, webm.</p>
+    <p>올린 뒤 예상 비용을 보고 시작을 눌러야 처리가 시작됨.</p>
+  </div>
+  <progress id="prog" max="100" value="0" hidden></progress>
+  <div class="msg" id="msg"></div>
+
+  <h2>작업</h2>
+  <div id="jobs"><p class="note">불러오는 중</p></div>
+</main>
+
+<script type="module">
+import { upload } from "https://esm.sh/@vercel/blob@2.8.0/client";
+
+const MAX_S = 60, MAX_BYTES = 200 * 1024 * 1024;
+const STATUS = {
+  queued: "대기 중", probing: "영상 확인 중", estimated: "시작 대기", confirmed: "순서 대기",
+  running: "처리 중", done: "완료", failed: "실패",
+};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const money = (x) => "$" + (x || 0).toFixed(2);
+const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+let open = new Set(), lastJobs = "";
+
+async function api(body) {
+  const r = await fetch("/api/validate", body ? {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+  } : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(j.error || r.status), { data: j });
+  return j;
+}
+
+function say(text, err) { $("msg").textContent = text; $("msg").className = "msg" + (err ? " err" : ""); }
+
+function videoLength(file) {
+  return new Promise((ok) => {
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.onloadedmetadata = () => { URL.revokeObjectURL(v.src); ok(v.duration); };
+    v.onerror = () => ok(NaN);
+    v.src = URL.createObjectURL(file);
+  });
+}
+
+async function send(file) {
+  if (!file) return;
+  if (file.size > MAX_BYTES) return say("200MB보다 큰 영상은 올릴 수 없음.", true);
+  const len = await videoLength(file);
+  if (len > MAX_S + 0.5) return say(`영상이 ${len.toFixed(0)}초임. 60초 이하로 잘라서 올려야 함.`, true);
+  $("pick").disabled = true; $("prog").hidden = false; $("prog").value = 0;
+  say("올리는 중");
+  try {
+    const blob = await upload(file.name, file, {
+      access: "public", handleUploadUrl: "/api/validate-upload",
+      onUploadProgress: (e) => { $("prog").value = e.percentage; },
+    });
+    await api({ action: "create", url: blob.url, pathname: blob.pathname, filename: file.name, size: file.size });
+    say("올렸음. 작업 컴퓨터가 영상을 확인하고 예상 비용을 계산하면 시작 버튼이 생김.");
+    refresh();
+  } catch (e) {
+    say("올리지 못했음: " + e.message, true);
+  } finally {
+    $("pick").disabled = false; $("prog").hidden = true; $("file").value = "";
+  }
+}
+
+$("pick").onclick = () => $("file").click();
+$("file").onchange = (e) => send(e.target.files[0]);
+const drop = $("drop");
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); send(e.dataTransfer.files[0]); };
+
+function header(s) {
+  const w = $("worker");
+  if (!s.worker) { w.innerHTML = '<span class="dot off"></span>작업 컴퓨터가 아직 연결된 적 없음'; }
+  else {
+    const ago = (Date.parse(s.now) - Date.parse(s.worker.seen_at)) / 1000;
+    const on = ago < 60;
+    w.innerHTML = `<span class="dot ${on ? "on" : "off"}"></span>작업 컴퓨터 ${on ? "연결됨" : "꺼져 있음"} (마지막 응답 ${ago < 90 ? Math.round(ago) + "초" : Math.round(ago / 60) + "분"} 전)`;
+  }
+  const b = s.budget;
+  $("budget").textContent = `Meta API 사용 ${money(b.used)} / 상한 ${money(b.limit)}` + (b.reserved ? ` (진행 중 예상 ${money(b.reserved)})` : "");
+}
+
+function timeline(job) {
+  const r = job.result, dur = r.duration_s || job.duration_s || 1;
+  const rows = ["left", "right"].map((h) => {
+    const segs = (r.hands?.[h] || []).map(([a, b]) =>
+      `<div class="tl-seg" style="left:${a / dur * 100}%;width:${Math.max(0.4, (b - a) / dur * 100)}%"></div>`).join("");
+    return `<div class="tl-row"><span>${h === "left" ? "왼손" : "오른손"}</span><div class="tl-track" data-dur="${dur}">${segs}<div class="tl-head"></div></div></div>`;
+  }).join("");
+  return `<div class="tl">${rows}</div><p class="note">파란 구간이 접촉으로 판정된 구간. 막대를 누르면 그 시점으로 이동함.</p>`;
+}
+
+function clipsTable(job) {
+  const clips = [...(job.result.clips || [])].sort((a, b) => b.score - a.score);
+  if (!clips.length) return '<p class="note">접촉 구간을 찾지 못했음.</p>';
+  const rows = clips.map((c) => {
+    const top = (c.grades || []).filter((g) => g.value >= 1).map((g) => g.name).slice(0, 4).join(", ");
+    return `<tr class="clip" data-t="${c.start}">
+      <td class="n"><span class="score">${c.score.toFixed(0)}</span></td>
+      <td>${c.hand === "left" ? "왼손" : "오른손"} · ${mmss(c.start)}~${mmss(c.end)}
+        ${c.reason ? `<div class="grades">${esc(c.reason)}</div>` : ""}
+        ${top ? `<div class="grades">"상" 항목: ${esc(top)}</div>` : ""}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th style="width:70px;text-align:right">점수</th><th>잡기 구간 (누르면 재생)</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function jobCard(job) {
+  const st = job.status;
+  const meta = [
+    job.duration_s ? `${job.duration_s.toFixed(1)}초` : "",
+    job.est_cost != null ? `예상 비용 ${money(job.est_cost)}` : "",
+    job.cost != null ? `실제 비용 ${money(job.cost)}` : "",
+    new Date(job.created_at).toLocaleString("ko-KR"),
+  ].filter(Boolean).join(" · ");
+  let act = "";
+  if (st === "estimated") act = `<button class="primary" data-act="confirm" data-id="${job.id}">시작 (${money(job.est_cost)})</button>`;
+  if (st !== "running") act += `<button data-act="cancel" data-id="${job.id}">${st === "done" || st === "failed" ? "영상과 결과 지우기" : "취소"}</button>`;
+  let body = "";
+  if (st === "running" || st === "probing") body = `<div class="job-meta">${esc(job.progress || "")}</div>`;
+  if (st === "failed") body = `<div class="job-meta" style="color:var(--bad)">${esc(job.error || "")}</div>`;
+  if (st === "done" && job.result) {
+    body = open.has(job.id)
+      ? `<div class="result"><video controls playsinline preload="metadata" src="${esc(job.url)}"></video>${timeline(job)}${clipsTable(job)}</div>`
+      : "";
+    act = `<button data-act="toggle" data-id="${job.id}">${open.has(job.id) ? "결과 닫기" : "결과 보기"}</button>` + act;
+  }
+  return `<div class="job" data-id="${job.id}"><div class="job-top"><span class="job-name">${esc(job.filename)}</span>
+    <span class="chip ${st}">${STATUS[st] || st}</span></div>
+    <div class="job-meta">${meta}</div>${body}<div class="job-act">${act}</div></div>`;
+}
+
+function wire() {
+  document.querySelectorAll("[data-act]").forEach((b) => b.onclick = async () => {
+    const id = Number(b.dataset.id), act = b.dataset.act;
+    if (act === "toggle") { open.has(id) ? open.delete(id) : open.add(id); lastJobs = ""; return refresh(); }
+    if (act === "cancel" && !confirm("영상과 결과를 지울까요?")) return;
+    b.disabled = true;
+    try { render(await api({ action: act, id })); say(""); }
+    catch (e) { say(e.message === "budget" ? "상한을 넘어서 시작할 수 없음." : "실패: " + e.message, true); b.disabled = false; }
+  });
+  document.querySelectorAll(".result").forEach((box) => {
+    const v = box.querySelector("video");
+    box.querySelectorAll("tr.clip").forEach((tr) => tr.onclick = () => { v.currentTime = Number(tr.dataset.t); v.play(); });
+    box.querySelectorAll(".tl-track").forEach((t) => {
+      t.onclick = (e) => { const r = t.getBoundingClientRect(); v.currentTime = (e.clientX - r.left) / r.width * Number(t.dataset.dur); };
+    });
+    v.ontimeupdate = () => box.querySelectorAll(".tl-track").forEach((t) => {
+      t.querySelector(".tl-head").style.left = (v.currentTime / Number(t.dataset.dur) * 100) + "%";
+    });
+  });
+}
+
+function render(s) {
+  header(s);
+  const key = JSON.stringify(s.jobs) + [...open].join(",");
+  if (key === lastJobs) return;
+  lastJobs = key;
+  $("jobs").innerHTML = s.jobs.length ? s.jobs.map(jobCard).join("") : '<p class="note">아직 올린 영상이 없음.</p>';
+  wire();
+}
+
+async function refresh() {
+  try { render(await api()); } catch (e) { if (String(e.message) === "401") location.reload(); }
+}
+refresh();
+setInterval(refresh, 4000);
+</script>
+</body>
+</html>

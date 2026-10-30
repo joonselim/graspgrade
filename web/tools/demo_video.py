@@ -8,13 +8,13 @@ written as an .srt file and a plain text script, so a voice can be recorded late
 
 Run in WSL from ~/graspgrade:
 
-    .venv/bin/python tools/demo_video.py            # all scenes and the final video
-    .venv/bin/python tools/demo_video.py --only 3a  # one scene, for checking
+    .venv/bin/python web/tools/demo_video.py            # all scenes and the final video
+    .venv/bin/python web/tools/demo_video.py --only 3a  # one scene, for checking
 
 Output: out/demo/video/ (scene files, captions) and out/demo/graspgrade_demo.mp4.
 
 With a voice: write the text with --voice-text, synthesize one WAV per shot with
-tools/demo_voice.ps1 (Windows built-in voice), then run this again. When
+web/tools/demo_voice.ps1 (Windows built-in voice), then run this again. When
 out/demo/voice/<shot>.wav exists, each shot is as long as its voice plus a short
 pause, the captions follow the voice, and the voice is mixed under the video.
 """
@@ -26,7 +26,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]  # the repository, web/tools/ is two levels down
 VIEW = ROOT / "viewer"
 FIG = ROOT / "out" / "demo"
 WORK = FIG / "video"
