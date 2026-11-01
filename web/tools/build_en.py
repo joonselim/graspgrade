@@ -56,6 +56,7 @@ def main():
     s = between(s, '  <footer>', '</main>', f'''  <footer>
     Video sources: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
     Last updated {stamp}
+    <p class="demo-link"><a href="assets/video/graspgrade_demo.mp4">Watch the 3 minute video →</a></p>
     <p class="demo-link"><a href="logs.html">Full experiment log →</a></p>
   </footer>
 
