@@ -147,11 +147,14 @@ data folders described below.
 `web/tools/demo_video.py` renders the 3 minute demo video from the viewer data,
 the viewer videos and the demo figures, following the scene plan in
 `docs/DEMO_VIDEO.md`. No API call. The narration is a synthesized voice
-(`web/tools/demo_voice.ps1`) with captions on screen.
+(`web/tools/demo_voice.ps1`) with captions on screen. `--lang ko` makes the
+Korean version with the Korean voice (Microsoft Heami, rate 3), its own Korean
+charts and cards, and Malgun Gothic text.
 
 ```bash
 .venv/bin/python scripts/demo_figures.py   # figures and title cards, out/demo/
 .venv/bin/python web/tools/demo_video.py   # out/demo/graspgrade_demo.mp4
+.venv/bin/python web/tools/demo_video.py --lang ko   # out/demo/graspgrade_demo_ko.mp4
 ```
 
 ## Layout
