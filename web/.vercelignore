@@ -1,15 +1,4 @@
-# Deploy only the site. Docs, scripts, splits and the rest of the repository stay out.
-/*
-!index.html
-!demo.html
-!logs.html
-!label.html
-!assets
-!label-media
-!api
-!middleware.js
-!package.json
-!vercel.json
-!robots.txt
-!en.html
-!validate.html
+# Deploy the site only: the page builders and the video check worker stay out.
+# Names without a leading slash, so they match the same folders however the path is read.
+tools
+worker
