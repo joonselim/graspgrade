@@ -52,11 +52,15 @@ WORK = FIG / "video"
 VOICE = FIG / "voice"
 
 
-def setup(lang):
+def setup(lang, voice="sapi"):
+    """voice: sapi for the Windows built-in voice, el for ElevenLabs (English only, web/tools/demo_voice_el.py)."""
     global LANG, WORK, VOICE
     LANG = lang
-    WORK = FIG / ("video" if lang == "en" else f"video_{lang}")
-    VOICE = FIG / ("voice" if lang == "en" else f"voice_{lang}")
+    tag = "" if lang == "en" else f"_{lang}"
+    if voice == "el":
+        tag += "_el"
+    WORK = FIG / f"video{tag}"
+    VOICE = FIG / f"voice{tag}"
 
 
 def font(size, bold=False):
@@ -83,8 +87,9 @@ def header(d, left, right=None):
 TEXT = {
     "en": {
         "title": "Which hand videos can a robot learn from?",
-        "intro_marks": ["Language models", "Robot data", "a human hand", "most hand video"],
-        "intro": ["Physical AI is still far from its ChatGPT moment",
+        "intro_marks": ["So why", "Language models", "Robot data", "a human hand", "most hand video"],
+        "intro_why": "Why?",
+        "intro": ["Physical AI is still far from its GPT moment",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
                   [("Robot data is slow and costly", "Recorded by remote control, one robot at a time"),
                    ("A human hand is not a robot hand", "Each grasp must be moved onto the robot (retargeting)"),
@@ -97,10 +102,10 @@ TEXT = {
                     ("Lab video, 3 held-out people", "Video from homes and factories")]],
         "t1": "Test 1  ·  When does a touch start and end?", "t1_right": "Held-out: 22 episodes, 574 glove boundaries",
         "ep_line": "OpenGraph episode {ep}, {hand} hand, {a:.0f} s to {b:.0f} s",
-        "rows": ["Tactile glove (ground truth)", "Muse Spark alone + shift", "SAM rule", "SAM rule + Muse Spark check"],
+        "rows": ["Tactile glove (measured)", "Muse Spark alone + shift", "SAM rule", "SAM rule + Muse Spark check"],
         "t2": "Test 2  ·  Can a robot hand copy this grasp?", "t2_right": "Held-out: 1,426 clips from 3 people",
         "clip_meta": "{obj}, {hand} hand, {person}", "score_suffix": "/ 100  GraspGrade score",
-        "truth": "Ground truth: ", "truth_ok": "Robot hand can copy it",
+        "truth_ok": "Robot hand can copy it",
         "truth_no": "Robot hand cannot copy it ({why})", "muse_direct": "Muse Spark asked directly: {p:.0f}% copyable",
         "grades_head": "12 grades  ·  weight", "grade": {1.0: "High", 0.5: "Mid", 0.0: "Low"},
         "cmp_head": "Where the score stops working", "cmp_right": "Same object, almost the same score",
@@ -109,8 +114,9 @@ TEXT = {
     },
     "ko": {
         "title": "로봇은 어떤 손 영상으로 배울 수 있을까?",
-        "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "대부분의"],
-        "intro": ["피지컬 AI, 아직 ChatGPT 모먼트까지 갈 길이 멀다",
+        "intro_marks": ["그런데 로봇은 왜", "언어 모델은", "원격 조종", "사람 손은", "대부분의"],
+        "intro_why": "왜?",
+        "intro": ["피지컬 AI, 아직 GPT 모먼트까지 갈 길이 멀다",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
                   [("로봇 데이터는 느리고 비쌈", "원격 조종으로 로봇 한 대씩 기록"),
                    ("사람 손은 로봇 손과 다름", "잡기마다 로봇 손으로 옮겨야 함 (리타게팅)"),
@@ -123,10 +129,10 @@ TEXT = {
                     ("실험실 영상, 검증 3명", "가정과 공장 영상")]],
         "t1": "평가 1  ·  접촉은 언제 시작하고 끝나는가?", "t1_right": "검증: 에피소드 22개, 장갑 경계 574개",
         "ep_line": "OpenGraph 에피소드 {ep}, {hand}, {a:.0f}초 ~ {b:.0f}초",
-        "rows": ["촉각 장갑 (정답)", "Muse Spark 단독 + 시점 보정", "SAM 규칙", "SAM 규칙 + Muse Spark 확인"],
+        "rows": ["촉각 장갑 (실제 접촉)", "Muse Spark 단독 + 시점 보정", "SAM 규칙", "SAM 규칙 + Muse Spark 확인"],
         "t2": "평가 2  ·  로봇 손이 이 잡기를 따라 할 수 있는가?", "t2_right": "검증: 3명의 클립 1,426개",
         "clip_meta": "{obj}, {hand}, {person}", "score_suffix": "/ 100  GraspGrade 점수",
-        "truth": "정답: ", "truth_ok": "로봇 손이 따라 할 수 있음",
+        "truth_ok": "로봇 손이 따라 할 수 있음",
         "truth_no": "로봇 손이 따라 할 수 없음 ({why})", "muse_direct": "Muse Spark에게 바로 물음: {p:.0f}% 가능",
         "grades_head": "등급 12개  ·  가중치", "grade": {1.0: "상", 0.5: "중", 0.0: "하"},
         "cmp_head": "점수가 통하지 않는 곳", "cmp_right": "같은 물체, 거의 같은 점수",
@@ -156,7 +162,7 @@ def T(key):
 NARRATION = {
     "en": {
         "00": "This is GraspGrade. Which hand videos can a robot learn from?",
-        "0a": "Physical AI is growing fast. So why are robots still far from their ChatGPT moment? Language models "
+        "0a": "Physical AI is growing fast. So why are robots still far from their GPT moment? Language models "
               "learned from the whole internet. Robots have no data at that scale. Robot data from remote control is "
               "slow and costly, a human hand is not a robot hand, and most hand video is not usable.",
         "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
@@ -168,8 +174,8 @@ NARRATION = {
               "alone, our SAM rule, and the SAM rule checked by Muse Spark.",
         "3b": "On 22 held-out episodes, Muse Spark with a timing shift learned on tuning data is best, with a boundary "
               "F1 of 0.195 against 0.090 for the SAM rule. All methods are low, because video cannot see pressure.",
-        "4a": "Second, can a robot hand copy this grasp? The ground truth comes from motion capture in Meta's HOT3D "
-              "dataset, with an Allegro robot hand placed on each human grasp. This mug clip scores 78, and the robot "
+        "4a": "Second, can a robot hand copy this grasp? We find the real answer with motion capture from Meta's "
+              "HOT3D dataset, by placing an Allegro robot hand on each human grasp. This mug clip scores 78, and the robot "
               "hand can copy it. The score weighs twelve grades, and every weight is visible.",
         "4b": "This keyboard clip scores 10. The robot hand would pass through the keyboard. Muse Spark alone said "
               "yes, at 85 percent.",
@@ -182,12 +188,12 @@ NARRATION = {
         "7": "In this hackathon we scored rigid objects with one robot hand, on lab video. Next, we would add a touch "
              "check for soft objects, test the top clips with physics-based retargeting and more robot hands, rank "
              "grasps of the same object, and test on video from homes and factories.",
-        "6": "Every rule was fixed before we scored the held-out data. The code, the viewer, and both ground truths "
+        "6": "Every rule was fixed before we scored the held-out data. The code, the viewer, and both labeled datasets "
              "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
         "00": "GraspGrade입니다. 로봇은 어떤 손 영상으로 배울 수 있을까요?",
-        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있습니다. 그런데 로봇은 왜 아직 ChatGPT 모먼트까지 갈 길이 "
+        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있습니다. 그런데 로봇은 왜 아직 GPT 모먼트까지 갈 길이 "
               "멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없습니다. 원격 조종으로 모으는 "
               "로봇 데이터는 느리고 비싸고, 사람 손은 로봇 손과 다르며, 대부분의 손 영상은 쓸 수 없습니다.",
         "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
@@ -200,8 +206,8 @@ NARRATION = {
               "규칙, 그리고 Muse Spark가 확인한 SAM 규칙입니다.",
         "3b": "검증 에피소드 22개에서는 튜닝 데이터로 시점을 보정한 Muse Spark가 가장 좋았습니다. 경계 F1이 0.195로, SAM 규칙의 "
               "0.090보다 높습니다. 영상은 압력을 볼 수 없어서 모든 방법의 점수가 낮습니다.",
-        "4a": "둘째, 로봇 손이 이 잡기를 따라 할 수 있을까요? 정답은 Meta의 HOT3D 모션캡처에서 사람의 잡기마다 "
-              "Allegro 로봇 손을 올려 만들었습니다. 이 머그컵 클립은 78점이고, 로봇 손이 따라 할 수 있습니다. 점수는 "
+        "4a": "둘째, 로봇 손이 이 잡기를 따라 할 수 있을까요? 실제 답은 Meta의 HOT3D 모션캡처에서 사람의 잡기마다 "
+              "Allegro 로봇 손을 올려 확인했습니다. 이 머그컵 클립은 78점이고, 로봇 손이 따라 할 수 있습니다. 점수는 "
               "등급 12개에 가중치를 매겨 계산하고, 모든 가중치가 보입니다.",
         "4b": "이 키보드 클립은 10점입니다. 로봇 손이 키보드를 뚫고 들어갑니다. Muse Spark 단독은 85퍼센트로 된다고 "
               "답했습니다.",
@@ -219,18 +225,23 @@ NARRATION = {
 }
 
 # how the Korean voice should say names and decimals; the captions keep the written form
-SAY_KO = [("ChatGPT", "챗지피티"), ("피지컬 AI", "피지컬 에이아이"), ("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
+SAY_KO = [("GPT", "지피티"), ("피지컬 AI", "피지컬 에이아이"), ("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
           ("Allegro", "알레그로"), ("AUC", "에이유씨"), ("F1", "에프원"), ("Meta", "메타"), ("1인칭", "일인칭")]
 DIGITS_KO = "영일이삼사오육칠팔구"
 
 
+DIGITS_EN = ["oh", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+
 def voice_text(text):
     if LANG != "ko":
-        return text
+        # said the way people say it: 0.771 is "point seven seven one", 0.090 is "point oh nine"
+        return re.sub(r"\b0\.(\d+)", lambda m: "point " + " ".join(DIGITS_EN[int(c)] for c in m.group(1).rstrip("0")),
+                      text)
     for a, b in SAY_KO:
         text = text.replace(a, b)
     return re.sub(r"(\d+)\.(\d+)", lambda m: m.group(1).replace("0", "영") + " 점 " +
-                  " ".join(DIGITS_KO[int(c)] for c in m.group(2)), text)
+                  " ".join(DIGITS_KO[int(c)] for c in m.group(2).rstrip("0")), text)
 
 
 def caption_chunks(text):
@@ -320,17 +331,20 @@ def figure_frame(fig):
     return im
 
 
-def intro_card(stage=4):
+def intro_card(stage=5):
     """Why robots lack data, and the one problem GraspGrade takes (the last row).
-    stage: how much is shown after the title, 0 the title alone, 1 with the line under it, 2 to 4 with rows."""
+    stage: how much is shown after the title, 0 the title alone, 1 with Why?, 2 with the line under it,
+    3 to 5 with rows."""
     im = canvas()
     d = ImageDraw.Draw(im)
     title, sub, rows = T("intro")
     d.text((140, 110), title, font=font(60, True), fill=INK)
     if stage >= 1:
-        d.text((140, 205), sub, font=font(34), fill=MUTED)
-    for i, (head, detail) in enumerate(rows[:max(stage - 1, 0)]):
-        y = 330 + i * 170
+        d.text((140, 200), T("intro_why"), font=font(50, True), fill=BLUE)
+    if stage >= 2:
+        d.text((140, 280), sub, font=font(34), fill=MUTED)
+    for i, (head, detail) in enumerate(rows[:max(stage - 2, 0)]):
+        y = 390 + i * 160
         ours = i == len(rows) - 1
         if ours:
             d.rectangle([110, y - 22, W - 110, y + 128], fill="#eef3fd")
@@ -369,7 +383,7 @@ def intro_scene(out, dur):
     span = wav_len(wav) if wav.exists() else dur - LEAD - TAIL
     times = [LEAD + span * text.index(m) / len(text) for m in T("intro_marks")]
     ins, graph, last = [], [], "0:v"
-    for stage in range(5):
+    for stage in range(len(times) + 1):
         ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(intro_card(stage), f"s0_intro_{stage}.png"))]
     for stage, t in enumerate(times, 1):
         graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
@@ -568,7 +582,7 @@ def clip_scene(out, dur, n2, cid, line):
     ok = c["copyable_truth"]
     why = T("why").get(c["failed_condition"], c["failed_condition"])
     truth = T("truth_ok") if ok else T("truth_no").format(why=why)
-    d.text((px, 312), T("truth") + truth, font=font(28, True), fill=GREEN if ok else RED)
+    d.text((px, 312), truth, font=font(28, True), fill=GREEN if ok else RED)
     d.text((px, 356), T("muse_direct").format(p=c["muse_alone"]["probability"] * 100), font=font(28), fill=INK2)
     d.text((px, 420), T("grades_head"), font=font(22, True), fill=MUTED)
     names = TEXT[LANG].get("grade_names", {})
@@ -637,13 +651,21 @@ def build(only=None):
     voice = {k: wav_len(VOICE / f"{k}.wav") for k, *_ in parts if (VOICE / f"{k}.wav").exists()}
     if voice:
         # each shot as long as its voice, but never shorter than the plan
-        parts = [(k, g, round(max(d * 0.6, LEAD + voice[k] + TAIL), 2), fn) for k, g, d, fn in parts]
+        parts = [(k, g, round(max(d * 0.6, LEAD + voice[k] + TAIL), 2) if k in voice else d, fn)
+                 for k, g, d, fn in parts]
     for key, _, dur, fn in parts:
         if only and key != only:
             continue
         fn(WORK / f"scene_{key}.mp4", dur)
         print("scene", key, dur, "s")
     if only:
+        if only in voice:
+            # one shot with its voice, for listening before the whole video is made
+            run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(WORK / f"scene_{only}.mp4"),
+                 "-i", str(VOICE / f"{only}.wav"), "-filter_complex",
+                 f"[1:a]aresample=48000,adelay={int(LEAD * 1000)},apad[a]", "-map", "0:v", "-map", "[a]",
+                 "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", str(WORK / f"preview_{only}.mp4")])
+            print("wrote", WORK / f"preview_{only}.mp4")
         return
     write_captions([(k, dur, voice.get(k)) for k, _, dur, _ in parts])
     (WORK / "list.txt").write_text("".join(f"file 'scene_{k}.mp4'\n" for k, *_ in parts))
@@ -663,7 +685,7 @@ def build(only=None):
         run(["ffmpeg", "-y", "-loglevel", "error"] + ins + ["-filter_complex", graph, "-map", "[a]",
              "-c:a", "aac", "-b:a", "160k", str(track)])
         audio = ["-i", str(track), "-map", "0:v", "-map", "1:a", "-c:a", "copy", "-shortest"]
-    tag = "" if LANG == "en" else f"_{LANG}"
+    tag = WORK.name.removeprefix("video")
     final = FIG / f"graspgrade_demo{tag}.mp4"
     subs = f"subtitles={WORK / 'captions.ass'}" + (f":fontsdir={WINFONTS}" if LANG == "ko" else "")
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined)] + audio +
@@ -683,10 +705,11 @@ def wav_len(path):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--lang", choices=["en", "ko"], default="en")
+    ap.add_argument("--voice", choices=["sapi", "el"], default="sapi")
     ap.add_argument("--only")
     ap.add_argument("--voice-text", action="store_true", help="write the voice folder's narration.json and stop")
     a = ap.parse_args()
-    setup(a.lang)
+    setup(a.lang, a.voice)
     if a.voice_text:
         VOICE.mkdir(parents=True, exist_ok=True)
         (VOICE / "narration.json").write_text(
