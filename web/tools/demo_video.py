@@ -1,6 +1,7 @@
 """Render the 3 minute submission demo video from the final results, in English or Korean.
 
-Follows the scene plan in docs/DEMO_VIDEO.md. Everything on screen comes from
+Starts from the scene plan in docs/DEMO_VIDEO.md, opens on why robots lack data
+and which problem GraspGrade takes, and closes on what comes next. Everything on screen comes from
 files that already exist: the viewer data and media (viewer/data, viewer/media),
 the demo figures and cards (out/demo, made by scripts/demo_figures.py). No API
 call. The narration is burned in as captions and also written as an .srt file
@@ -81,11 +82,20 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
-        "s1_title": "Not every hand video can teach a robot hand.",
+        "intro": ["Physical AI is still far from its ChatGPT moment",
+                  "Language models learned from the whole internet. Robots have no data at that scale.",
+                  [("Robot data is slow and costly", "Recorded by remote control, one robot at a time"),
+                   ("A human hand is not a robot hand", "Each grasp must be moved onto the robot (retargeting)"),
+                   ("Most hand video is not usable", "83 of 2,000 internet clips passed a quality check (Do as I Do)")]],
+        "s1_title": "First-person hand video: easy to collect, hard to choose",
+        "future": ["Done in this hackathon, and next", "This hackathon", "Next",
+                   [("Rigid objects (HOT3D)", "Touch check for soft objects (now 51.7%, rule 70%)"),
+                    ("One robot hand, geometric check", "Physics-based retargeting and more robot hands"),
+                    ("Score at the object level", "Rank grasps of the same object (now AUC 0.506)"),
+                    ("Lab video, 3 held-out people", "Video from homes and factories")]],
         "t1": "Test 1  ·  When does a touch start and end?", "t1_right": "Held-out: 22 episodes, 574 glove boundaries",
         "ep_line": "OpenGraph episode {ep}, {hand} hand, {a:.0f} s to {b:.0f} s",
         "rows": ["Tactile glove (ground truth)", "Muse Spark alone + shift", "SAM rule", "SAM rule + Muse Spark check"],
-        "note_3c": "Many short touches: here the SAM rule checked by Muse Spark is closer.",
         "t2": "Test 2  ·  Can a robot hand copy this grasp?", "t2_right": "Held-out: 1,426 clips from 3 people",
         "clip_meta": "{obj}, {hand} hand, {person}", "score_suffix": "/ 100  GraspGrade score",
         "truth": "Ground truth: ", "truth_ok": "Robot hand can copy it",
@@ -93,17 +103,23 @@ TEXT = {
         "grades_head": "12 grades  ·  weight", "grade": {1.0: "High", 0.5: "Mid", 0.0: "Low"},
         "cmp_head": "Where the score stops working", "cmp_right": "Same object, almost the same score",
         "cmp_ok": "Score {s:.0f}  ·  robot hand can copy", "cmp_no": "Score {s:.0f}  ·  cannot copy ({why})",
-        "scope": ["Scope: rigid objects", "The score is for rigid objects, which is what HOT3D records.",
-                  "Filtering out soft objects with Muse Spark is not reliable yet:",
-                  "it caught 51.7% of soft segments, below the 70% rule set in advance."],
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
-        "s1_title": "모든 손 영상이 로봇 손을 가르칠 수 있는 것은 아닙니다.",
+        "intro": ["피지컬 AI, 아직 ChatGPT 모먼트까지 갈 길이 멀다",
+                  "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
+                  [("로봇 데이터는 느리고 비쌈", "원격 조종으로 로봇 한 대씩 기록"),
+                   ("사람 손은 로봇 손과 다름", "잡기마다 로봇 손으로 옮겨야 함 (리타게팅)"),
+                   ("대부분의 손 영상은 쓸 수 없음", "인터넷 클립 2,000개 중 83개만 품질 검사 통과 (Do as I Do)")]],
+        "s1_title": "1인칭 손 영상: 모으기는 쉽고, 고르기는 어렵다",
+        "future": ["해커톤에서 한 것과 다음 단계", "이번 해커톤", "다음 단계",
+                   [("단단한 물체 (HOT3D)", "부드러운 물체 촉각 확인 (현재 51.7%, 기준 70%)"),
+                    ("로봇 손 하나, 기하 검사", "물리 기반 리타게팅, 다른 로봇 손"),
+                    ("물체 수준의 점수", "같은 물체 안 잡기 순위 (현재 AUC 0.506)"),
+                    ("실험실 영상, 검증 3명", "가정과 공장 영상")]],
         "t1": "평가 1  ·  접촉은 언제 시작하고 끝나는가?", "t1_right": "검증: 에피소드 22개, 장갑 경계 574개",
         "ep_line": "OpenGraph 에피소드 {ep}, {hand}, {a:.0f}초 ~ {b:.0f}초",
         "rows": ["촉각 장갑 (정답)", "Muse Spark 단독 + 시점 보정", "SAM 규칙", "SAM 규칙 + Muse Spark 확인"],
-        "note_3c": "짧은 접촉이 많은 에피소드: 여기서는 Muse Spark가 확인한 SAM 규칙이 더 가까움.",
         "t2": "평가 2  ·  로봇 손이 이 잡기를 따라 할 수 있는가?", "t2_right": "검증: 3명의 클립 1,426개",
         "clip_meta": "{obj}, {hand}, {person}", "score_suffix": "/ 100  GraspGrade 점수",
         "truth": "정답: ", "truth_ok": "로봇 손이 따라 할 수 있음",
@@ -111,9 +127,6 @@ TEXT = {
         "grades_head": "등급 12개  ·  가중치", "grade": {1.0: "상", 0.5: "중", 0.0: "하"},
         "cmp_head": "점수가 통하지 않는 곳", "cmp_right": "같은 물체, 거의 같은 점수",
         "cmp_ok": "{s:.0f}점  ·  로봇 손이 따라 할 수 있음", "cmp_no": "{s:.0f}점  ·  따라 할 수 없음 ({why})",
-        "scope": ["적용 범위: 단단한 물체", "점수는 HOT3D가 기록한 단단한 물체를 대상으로 합니다.",
-                  "Muse Spark로 부드러운 물체를 걸러내는 방법은 아직 믿을 만하지 않습니다.",
-                  "부드러운 물체 구간의 51.7%만 걸러내, 미리 정한 기준 70%에 못 미쳤습니다."],
         "hand": {"left": "왼손", "right": "오른손"},
         "why": {"collision": "충돌", "grip": "쥐기", "reach": "도달"},
         "obj": {"mug white": "흰 머그컵", "keyboard": "키보드", "aria small": "안경 (Aria)",
@@ -132,78 +145,76 @@ def T(key):
 
 
 # ---------------------------------------------------------------- narration
-# The plan's narration, split by shot so each caption sits on the shot it talks
-# about. Scene 5 states the soft object result as the scope of the score, the
-# way the report does.
+# The narration, split by shot so each caption sits on the shot it talks about.
+# It opens with why robots lack data and which problem GraspGrade takes, shows
+# the two tests in short, and ends with what the hackathon covered and what
+# comes next. The soft object result is part of the next steps (EXP-42).
 NARRATION = {
     "en": {
-        "1": "Robot hands can learn to grasp by watching people. But much hand video cannot teach a robot hand. "
-             "The fingers are hidden, or the grasp is one a robot hand cannot copy.",
-        "2": "GraspGrade takes first-person hand video, cuts it into clips at the moment of touch, and gives each "
-             "clip a score from 0 to 100 for how likely a robot hand can copy it. SAM 3.1 tracks the hands and "
-             "objects. Muse Spark answers a short checklist about each clip. We check both steps against real sensor "
-             "data.",
-        "3a": "First, when does a touch start and end? We check this against a touch-sensing glove. The top track is "
-              "the glove. Below it are three methods: Muse Spark alone, our SAM rule, and the SAM rule checked by "
-              "Muse Spark. Video shows a touch before the glove feels pressure, so we learn one timing shift, on "
-              "tuning episodes only.",
-        "3b": "On 22 held-out episodes, Muse Spark with the shift is best. Its boundary F1 within five frames is "
-              "0.195, against 0.090 for the SAM rule. All methods are low at five frames, because the glove measures "
-              "pressure and video cannot see pressure.",
-        "3c": "When touches are many and short, like in this episode, the SAM rule checked by Muse Spark does better.",
-        "4a": "Second, can a robot hand copy this grasp? The ground truth comes from motion capture in the HOT3D "
-              "dataset from Meta. We place an Allegro robot hand on each human grasp and check if it reaches the "
-              "same contact points without passing through the object. This mug clip scores 78, and the robot hand "
-              "can copy it. The score is a logistic regression on twelve grades, so every weight is visible.",
-        "4b": "This keyboard clip scores 10. The robot hand would pass through the keyboard. Asked alone, Muse Spark "
-              "said yes, at 85 percent.",
-        "4c": "This glasses clip scores 78 and is copyable. Muse Spark alone said 5 percent.",
+        "0a": "Physical AI is growing fast, but robots are still far from their ChatGPT moment. Language models "
+              "learned from the whole internet. Robots have no data at that scale. Robot data from remote control is "
+              "slow and costly, a human hand is not a robot hand, and most hand video is not usable.",
+        "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
+              "grasp onto a robot hand, and choosing which videos are worth using. In one study, only 4 percent of "
+              "internet clips passed. We solve the second problem.",
+        "2": "GraspGrade cuts first-person hand video into clips at each touch, and scores each clip from 0 to 100 "
+             "for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a "
+             "short checklist. We check both steps against real sensor data.",
+        "3a": "First, when does a touch start and end? The top track is a touch-sensing glove. Below it are Muse Spark "
+              "alone, our SAM rule, and the SAM rule checked by Muse Spark.",
+        "3b": "On 22 held-out episodes, Muse Spark with a timing shift learned on tuning data is best, with a boundary "
+              "F1 of 0.195 against 0.090 for the SAM rule. All methods are low, because video cannot see pressure.",
+        "4a": "Second, can a robot hand copy this grasp? The ground truth comes from motion capture in Meta's HOT3D "
+              "dataset, with an Allegro robot hand placed on each human grasp. This mug clip scores 78, and the robot "
+              "hand can copy it. The score weighs twelve grades, and every weight is visible.",
+        "4b": "This keyboard clip scores 10. The robot hand would pass through the keyboard. Muse Spark alone said "
+              "yes, at 85 percent.",
         "4d": "On 1,426 held-out clips from three people, our score reaches an AUC of 0.624. Muse Spark alone, asked "
-              "the same question, is at 0.501, which is chance. The gain comes from asking a checklist instead of "
-              "one question.",
-        "5a": "We also show where the score stops working. When an object was seen in training, its name alone does "
-              "better, at 0.771. On new objects our score keeps 0.571.",
-        "5b": "Inside one object it is at chance. These two mugs get almost the same score, but only one grasp is "
+              "the same question, is at 0.501, which is chance. The gain comes from the checklist.",
+        "5a": "On new objects our score keeps 0.571. When an object was seen before, its name alone does better, "
+              "at 0.771.",
+        "5b": "Inside one object it is at chance. These two mugs score almost the same, but only one grasp is "
               "copyable.",
-        "5c": "The score is for rigid objects. Every rule was written before we scored the held-out data, and we "
-              "scored it once.",
-        "6": "The code, the viewer, and both ground truths are open, as a benchmark with its own scorers. "
-             "GraspGrade finds the hand videos a robot can learn from.",
+        "7": "In this hackathon we scored rigid objects with one robot hand, on lab video. Next, we would add a touch "
+             "check for soft objects, test the top clips with physics-based retargeting and more robot hands, rank "
+             "grasps of the same object, and test on video from homes and factories.",
+        "6": "Every rule was fixed before we scored the held-out data. The code, the viewer, and both ground truths "
+             "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
-        "1": "로봇 손은 사람이 물건을 잡는 모습을 보고 잡는 법을 배울 수 있습니다. 하지만 모든 손 영상이 로봇 손을 "
-             "가르칠 수 있는 것은 아닙니다. 손가락이 가려 있거나, 로봇 손으로는 따라 할 수 없는 잡기이기 때문입니다.",
-        "2": "GraspGrade는 1인칭 손 영상을 손이 물체에 닿는 순간마다 잘라, 클립마다 로봇 손이 따라 할 수 있는 "
-             "정도를 0점에서 100점으로 매깁니다. SAM 3.1이 손과 물체를 추적하고, Muse Spark가 클립마다 짧은 "
-             "체크리스트에 답합니다. 두 단계 모두 실제 센서 데이터로 검증했습니다.",
-        "3a": "첫째, 접촉은 언제 시작하고 언제 끝날까요? 촉각 장갑으로 이를 확인합니다. 맨 위 줄이 장갑이고, 그 "
-              "아래가 세 가지 방법입니다. Muse Spark 단독, SAM 규칙, 그리고 Muse Spark가 확인한 SAM 규칙입니다. "
-              "영상에서는 장갑이 압력을 느끼기 전에 접촉이 보이므로, 튜닝 데이터에서만 시점 보정값 하나를 배웁니다.",
-        "3b": "검증 에피소드 22개에서는 보정을 더한 Muse Spark가 가장 좋았습니다. 5프레임 안의 경계 F1이 0.195로, "
-              "SAM 규칙의 0.090보다 높습니다. 장갑은 압력을 재고 영상은 압력을 볼 수 없어서, 5프레임 기준으로는 "
-              "모든 방법의 점수가 낮습니다.",
-        "3c": "이 에피소드처럼 짧은 접촉이 많을 때는, Muse Spark가 확인한 SAM 규칙이 더 잘 맞습니다.",
-        "4a": "둘째, 로봇 손이 이 잡기를 따라 할 수 있을까요? 정답은 Meta의 HOT3D 데이터셋 모션캡처로 "
-              "만들었습니다. 사람의 잡기마다 Allegro 로봇 손을 올려 보고, 물체를 뚫지 않고 같은 접촉점에 닿는지 "
-              "확인합니다. 이 머그컵 클립은 78점이고, 로봇 손이 따라 할 수 있습니다. 점수는 등급 12개의 로지스틱 "
-              "회귀라서 모든 가중치를 그대로 볼 수 있습니다.",
-        "4b": "이 키보드 클립은 10점입니다. 로봇 손이 키보드를 뚫고 들어가기 때문입니다. Muse Spark에게 바로 "
-              "물으면 85퍼센트로 된다고 답했습니다.",
-        "4c": "이 안경 클립은 78점이고 따라 할 수 있습니다. Muse Spark 단독은 5퍼센트라고 답했습니다.",
+        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있지만, 로봇은 아직 ChatGPT 모먼트까지 갈 길이 멉니다. "
+              "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없습니다. 원격 조종으로 모으는 로봇 "
+              "데이터는 느리고 비싸고, 사람 손은 로봇 손과 다르며, 대부분의 손 영상은 쓸 수 없습니다.",
+        "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
+              "사람의 잡기를 로봇 손으로 옮기는 리타게팅, 그리고 어떤 영상이 쓸 만한지 판단하는 일입니다. 최근 "
+              "연구에서는 인터넷 클립의 4퍼센트만 품질 검사를 통과했습니다. 우리는 이 두 번째 문제를 풉니다.",
+        "2": "GraspGrade는 1인칭 손 영상을 손이 닿는 순간마다 클립으로 자르고, 로봇 손이 따라 할 수 있는 정도를 "
+             "0점에서 100점으로 매깁니다. SAM 3.1이 손과 물체를 추적하고, Muse Spark가 짧은 체크리스트에 답합니다. "
+             "두 단계 모두 실제 센서 데이터로 검증했습니다.",
+        "3a": "첫째, 접촉은 언제 시작하고 언제 끝날까요? 맨 위 줄은 촉각 장갑입니다. 그 아래는 Muse Spark 단독, SAM "
+              "규칙, 그리고 Muse Spark가 확인한 SAM 규칙입니다.",
+        "3b": "검증 에피소드 22개에서는 튜닝 데이터로 시점을 보정한 Muse Spark가 가장 좋았습니다. 경계 F1이 0.195로, SAM 규칙의 "
+              "0.090보다 높습니다. 영상은 압력을 볼 수 없어서 모든 방법의 점수가 낮습니다.",
+        "4a": "둘째, 로봇 손이 이 잡기를 따라 할 수 있을까요? 정답은 Meta의 HOT3D 모션캡처에서 사람의 잡기마다 "
+              "Allegro 로봇 손을 올려 만들었습니다. 이 머그컵 클립은 78점이고, 로봇 손이 따라 할 수 있습니다. 점수는 "
+              "등급 12개에 가중치를 매겨 계산하고, 모든 가중치가 보입니다.",
+        "4b": "이 키보드 클립은 10점입니다. 로봇 손이 키보드를 뚫고 들어갑니다. Muse Spark 단독은 85퍼센트로 된다고 "
+              "답했습니다.",
         "4d": "세 사람의 검증 클립 1,426개에서 우리 점수의 AUC는 0.624입니다. 같은 질문을 받은 Muse Spark 단독은 "
-              "0.501로 우연 수준입니다. 이득은 질문 하나 대신 체크리스트로 묻는 데서 나옵니다.",
-        "5a": "점수가 통하지 않는 곳도 보여 드립니다. 학습에서 본 물체라면 물체 이름만으로 0.771이 더 높습니다. "
-              "처음 보는 물체에서도 우리 점수는 0.571을 유지합니다.",
+              "0.501로 우연 수준입니다. 이득은 체크리스트에서 나옵니다.",
+        "5a": "처음 보는 물체에서도 우리 점수는 0.571을 유지합니다. 본 적 있는 물체라면 물체 이름만으로 0.771이 더 "
+              "높습니다.",
         "5b": "같은 물체 안에서는 우연 수준입니다. 이 두 머그컵은 점수가 거의 같지만, 한 잡기만 따라 할 수 있습니다.",
-        "5c": "점수는 단단한 물체를 대상으로 합니다. 모든 규칙은 검증 데이터를 채점하기 전에 정했고, 채점은 한 번만 "
-              "했습니다.",
-        "6": "코드, 뷰어, 그리고 두 정답 데이터를 채점 코드와 함께 벤치마크로 공개합니다. GraspGrade는 로봇이 배울 "
-             "수 있는 손 영상을 찾아 줍니다.",
+        "7": "이번 해커톤에서는 실험실 영상의 단단한 물체를 로봇 손 하나로 채점했습니다. 다음으로는 부드러운 물체를 "
+             "위한 촉각 확인, 물리 기반 리타게팅과 다른 로봇 손으로 상위 클립 확인, 같은 물체 안의 잡기 순위, 그리고 "
+             "가정과 공장 영상에서의 검증을 고려하고 있습니다.",
+        "6": "모든 규칙은 검증 데이터를 채점하기 전에 정했습니다. 코드, 뷰어, 두 정답 데이터는 벤치마크로 공개합니다. "
+             "GraspGrade는 로봇이 배울 수 있는 손 영상을 찾아 줍니다.",
     },
 }
 
 # how the Korean voice should say names and decimals; the captions keep the written form
-SAY_KO = [("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
+SAY_KO = [("ChatGPT", "챗지피티"), ("피지컬 AI", "피지컬 에이아이"), ("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
           ("Allegro", "알레그로"), ("AUC", "에이유씨"), ("F1", "에프원"), ("Meta", "메타"), ("1인칭", "일인칭")]
 DIGITS_KO = "영일이삼사오육칠팔구"
 
@@ -227,7 +238,8 @@ def caption_chunks(text):
             n = -(-len(sent) // limit)
             for _ in range(n - 1):
                 aim = len(sent) // n
-                cut = min((i for i, ch in enumerate(sent) if ch == " "), key=lambda i: abs(i - aim))
+                inside = {m.start() + j for m in re.finditer(r"Muse Spark|SAM 3\.1", sent) for j in range(len(m[0]))}
+                cut = min((i for i, ch in enumerate(sent) if ch == " " and i not in inside), key=lambda i: abs(i - aim))
                 out.append(sent[:cut])
                 sent, n = sent[cut + 1:], n - 1
             out.append(sent)
@@ -303,15 +315,42 @@ def figure_frame(fig):
     return im
 
 
-def scope_card():
-    """The scope of the score, stated the way the report states it (EXP-42)."""
+def intro_card():
+    """Why robots lack data, and the one problem GraspGrade takes (the last row)."""
     im = canvas()
     d = ImageDraw.Draw(im)
-    x = 240
-    title, *lines = T("scope")
-    d.text((x, 250), title, font=font(64, True), fill=INK)
-    for i, t in enumerate(lines):
-        d.text((x, 400 + i * 64), t, font=font(38), fill=MUTED if i == 2 else INK2)
+    title, sub, rows = T("intro")
+    d.text((140, 110), title, font=font(60, True), fill=INK)
+    d.text((140, 205), sub, font=font(34), fill=MUTED)
+    for i, (head, detail) in enumerate(rows):
+        y = 330 + i * 170
+        ours = i == len(rows) - 1
+        if ours:
+            d.rectangle([110, y - 22, W - 110, y + 128], fill="#eef3fd")
+            f = font(30, True)
+            d.text((W - 150 - d.textlength("GraspGrade", font=f), y + 4), "GraspGrade", font=f, fill=BLUE)
+        d.text((140, y), str(i + 1), font=font(52, True), fill=BLUE if ours else GRAY)
+        d.text((220, y + 2), head, font=font(44, True), fill=INK if ours else INK2)
+        d.text((220, y + 66), detail, font=font(30), fill=MUTED)
+    return im
+
+
+def future_card():
+    """What the hackathon covered, next to the step that would widen each part."""
+    im = canvas()
+    d = ImageDraw.Draw(im)
+    title, left, right, rows = T("future")
+    d.text((140, 90), title, font=font(56, True), fill=INK)
+    lx, rx = 140, 880
+    d.text((lx, 240), left, font=font(30, True), fill=MUTED)
+    d.text((rx, 240), right, font=font(30, True), fill=BLUE)
+    for i, (done, nxt) in enumerate(rows):
+        y = 320 + i * 140
+        d.line([(lx, y - 22), (W - 100, y - 22)], fill=RULE, width=2)
+        d.text((lx, y + 10), done, font=font(32), fill=INK2)
+        d.line([(rx - 120, y + 32), (rx - 50, y + 32)], fill=BLUE, width=6)
+        d.polygon([(rx - 30, y + 32), (rx - 55, y + 16), (rx - 55, y + 48)], fill=BLUE)
+        d.text((rx, y + 10), nxt, font=font(32, True), fill=INK)
     return im
 
 
@@ -538,19 +577,18 @@ def build(only=None):
     fig = lambda name, png, im_ko: (lambda o, d: still(save(im_ko() if ko else figure_frame(png), name), o, d))  # noqa
     card = lambda png, im_ko: (lambda o, d: still(save(im_ko(), png) if ko else FIG / png, o, d))  # noqa: E731
     parts = [
-        ("1", "1", 15, lambda o, d: scene1(o, d, n2)),
-        ("2", "2", 20, card("demo_card_scene2.png", card2_ko)),
-        ("3a", "3", 22, lambda o, d: episode_scene(o, d, n1, 36, "right", None)),
-        ("3b", "3", 15, fig("s3_fig.png", "demo_number1.png", chart_n1_ko)),
-        ("3c", "3", 13, lambda o, d: episode_scene(o, d, n1, 7, "right", T("note_3c"))),
-        ("4a", "4", 22, lambda o, d: clip_scene(o, d, n2, "P0010_99385ad8_left_00073", None)),
-        ("4b", "4", 13, lambda o, d: clip_scene(o, d, n2, "P0012_d6272ce1_left_00290", None)),
-        ("4c", "4", 10, lambda o, d: clip_scene(o, d, n2, "P0001_b2bcbe28_left_03432", None)),
-        ("4d", "4", 15, fig("s4_fig.png", "demo_number2_ours.png", lambda: chart_n2_ko({0: BLUE, 1: ORANGE}))),
-        ("5a", "5", 8, fig("s5_fig.png", "demo_number2_limits.png", lambda: chart_n2_ko({2: ORANGE, 3: BLUE}))),
-        ("5b", "5", 9, lambda o, d: compare_scene(o, d, n2)),
-        ("5c", "5", 6, lambda o, d: still(save(scope_card(), "s5_scope.png"), o, d)),
-        ("6", "6", 12, card("demo_card_scene6.png", card6_ko)),
+        ("0a", "0", 22, lambda o, d: still(save(intro_card(), "s0_intro.png"), o, d)),
+        ("0b", "1", 16, lambda o, d: scene1(o, d, n2)),
+        ("2", "2", 15, card("demo_card_scene2.png", card2_ko)),
+        ("3a", "3", 16, lambda o, d: episode_scene(o, d, n1, 36, "right", None)),
+        ("3b", "3", 12, fig("s3_fig.png", "demo_number1.png", chart_n1_ko)),
+        ("4a", "4", 18, lambda o, d: clip_scene(o, d, n2, "P0010_99385ad8_left_00073", None)),
+        ("4b", "4", 9, lambda o, d: clip_scene(o, d, n2, "P0012_d6272ce1_left_00290", None)),
+        ("4d", "4", 13, fig("s4_fig.png", "demo_number2_ours.png", lambda: chart_n2_ko({0: BLUE, 1: ORANGE}))),
+        ("5a", "5", 9, fig("s5_fig.png", "demo_number2_limits.png", lambda: chart_n2_ko({2: ORANGE, 3: BLUE}))),
+        ("5b", "5", 8, lambda o, d: compare_scene(o, d, n2)),
+        ("7", "7", 18, lambda o, d: still(save(future_card(), "s7_future.png"), o, d)),
+        ("6", "6", 10, card("demo_card_scene6.png", card6_ko)),
     ]
     voice = {k: wav_len(VOICE / f"{k}.wav") for k, *_ in parts if (VOICE / f"{k}.wav").exists()}
     if voice:
