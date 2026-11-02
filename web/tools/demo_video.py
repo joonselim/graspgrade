@@ -1,7 +1,7 @@
 """Render the 3 minute submission demo video from the final results, in English or Korean.
 
-Starts from the scene plan in docs/DEMO_VIDEO.md, opens on why robots lack data
-and which problem GraspGrade takes, and closes on what comes next. Everything on screen comes from
+Starts from the scene plan in docs/DEMO_VIDEO.md, opens on the name and its question,
+then why robots lack data and which problem GraspGrade takes, and closes on what comes next. Everything on screen comes from
 files that already exist: the viewer data and media (viewer/data, viewer/media),
 the demo figures and cards (out/demo, made by scripts/demo_figures.py). No API
 call. The narration is burned in as captions and also written as an .srt file
@@ -82,6 +82,8 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
+        "title": "Which hand videos can a robot learn from?",
+        "intro_marks": ["Language models", "Robot data", "a human hand", "most hand video"],
         "intro": ["Physical AI is still far from its ChatGPT moment",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
                   [("Robot data is slow and costly", "Recorded by remote control, one robot at a time"),
@@ -106,6 +108,8 @@ TEXT = {
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
+        "title": "로봇은 어떤 손 영상으로 배울 수 있을까?",
+        "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "대부분의"],
         "intro": ["피지컬 AI, 아직 ChatGPT 모먼트까지 갈 길이 멀다",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
                   [("로봇 데이터는 느리고 비쌈", "원격 조종으로 로봇 한 대씩 기록"),
@@ -151,12 +155,12 @@ def T(key):
 # comes next. The soft object result is part of the next steps (EXP-42).
 NARRATION = {
     "en": {
-        "0a": "Physical AI is growing fast, but robots are still far from their ChatGPT moment. Language models "
+        "00": "This is GraspGrade. Which hand videos can a robot learn from?",
+        "0a": "Physical AI is growing fast. So why are robots still far from their ChatGPT moment? Language models "
               "learned from the whole internet. Robots have no data at that scale. Robot data from remote control is "
               "slow and costly, a human hand is not a robot hand, and most hand video is not usable.",
         "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
-              "grasp onto a robot hand, and choosing which videos are worth using. In one study, only 4 percent of "
-              "internet clips passed. We solve the second problem.",
+              "grasp onto a robot hand, and choosing which videos are worth using. We solve the second problem.",
         "2": "GraspGrade cuts first-person hand video into clips at each touch, and scores each clip from 0 to 100 "
              "for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a "
              "short checklist. We check both steps against real sensor data.",
@@ -182,12 +186,13 @@ NARRATION = {
              "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
-        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있지만, 로봇은 아직 ChatGPT 모먼트까지 갈 길이 멉니다. "
-              "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없습니다. 원격 조종으로 모으는 로봇 "
-              "데이터는 느리고 비싸고, 사람 손은 로봇 손과 다르며, 대부분의 손 영상은 쓸 수 없습니다.",
+        "00": "GraspGrade입니다. 로봇은 어떤 손 영상으로 배울 수 있을까요?",
+        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있습니다. 그런데 로봇은 왜 아직 ChatGPT 모먼트까지 갈 길이 "
+              "멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없습니다. 원격 조종으로 모으는 "
+              "로봇 데이터는 느리고 비싸고, 사람 손은 로봇 손과 다르며, 대부분의 손 영상은 쓸 수 없습니다.",
         "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
-              "사람의 잡기를 로봇 손으로 옮기는 리타게팅, 그리고 어떤 영상이 쓸 만한지 판단하는 일입니다. 최근 "
-              "연구에서는 인터넷 클립의 4퍼센트만 품질 검사를 통과했습니다. 우리는 이 두 번째 문제를 풉니다.",
+              "사람의 잡기를 로봇 손으로 옮기는 리타게팅, 그리고 어떤 영상이 쓸 만한지 판단하는 일입니다. 우리는 이 "
+              "두 번째 문제를 풉니다.",
         "2": "GraspGrade는 1인칭 손 영상을 손이 닿는 순간마다 클립으로 자르고, 로봇 손이 따라 할 수 있는 정도를 "
              "0점에서 100점으로 매깁니다. SAM 3.1이 손과 물체를 추적하고, Muse Spark가 짧은 체크리스트에 답합니다. "
              "두 단계 모두 실제 센서 데이터로 검증했습니다.",
@@ -315,14 +320,16 @@ def figure_frame(fig):
     return im
 
 
-def intro_card():
-    """Why robots lack data, and the one problem GraspGrade takes (the last row)."""
+def intro_card(stage=4):
+    """Why robots lack data, and the one problem GraspGrade takes (the last row).
+    stage: how much is shown after the title, 0 the title alone, 1 with the line under it, 2 to 4 with rows."""
     im = canvas()
     d = ImageDraw.Draw(im)
     title, sub, rows = T("intro")
     d.text((140, 110), title, font=font(60, True), fill=INK)
-    d.text((140, 205), sub, font=font(34), fill=MUTED)
-    for i, (head, detail) in enumerate(rows):
+    if stage >= 1:
+        d.text((140, 205), sub, font=font(34), fill=MUTED)
+    for i, (head, detail) in enumerate(rows[:max(stage - 1, 0)]):
         y = 330 + i * 170
         ours = i == len(rows) - 1
         if ours:
@@ -333,6 +340,42 @@ def intro_card():
         d.text((220, y + 2), head, font=font(44, True), fill=INK if ours else INK2)
         d.text((220, y + 66), detail, font=font(30), fill=MUTED)
     return im
+
+
+def title_scene(out, dur):
+    """The name and the question, over three hand clips that the later scenes do not use."""
+    im = canvas()
+    d = ImageDraw.Draw(im)
+    c = lambda t, f, y, fill: d.text(((W - d.textlength(t, font=f)) / 2, y), t, font=f, fill=fill)  # noqa: E731
+    c("GraspGrade", font(150, True), 150, INK)
+    c(T("title"), font(54), 360, MUTED)
+    bg = save(im, "s00_bg.png")
+    clips = ["P0001_a68492d5_right_02492", "P0009_37e30628_left_02200", "P0010_b152143e_left_02785"]
+    size, gap, y = 340, 40, 500
+    x0 = (W - 3 * size - 2 * gap) // 2
+    ins, graph, last = ["-loop", "1", "-framerate", str(FPS), "-i", str(bg)], [], "0:v"
+    for i, cid in enumerate(clips, 1):
+        ins += ["-stream_loop", "-1", "-i", str(VIEW / "media" / f"{cid}.mp4")]
+        graph.append(f"[{i}:v]scale={size}:{size}[c{i}];[{last}][c{i}]overlay={x0 + (i - 1) * (size + gap)}:{y}"
+                     + (f"[o{i}]" if i < len(clips) else ""))
+        last = f"o{i}"
+    encode((ins, ";".join(graph)), out, dur)
+
+
+def intro_scene(out, dur):
+    """The intro card, built up line by line as the voice reaches each line."""
+    text = NARRATION[LANG]["0a"]
+    wav = VOICE / "0a.wav"
+    span = wav_len(wav) if wav.exists() else dur - LEAD - TAIL
+    times = [LEAD + span * text.index(m) / len(text) for m in T("intro_marks")]
+    ins, graph, last = [], [], "0:v"
+    for stage in range(5):
+        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(intro_card(stage), f"s0_intro_{stage}.png"))]
+    for stage, t in enumerate(times, 1):
+        graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
+                     f"[{last}][f{stage}]overlay=0:0" + (f"[o{stage}]" if stage < len(times) else ""))
+        last = f"o{stage}"
+    encode((ins, ";".join(graph)), out, dur)
 
 
 def future_card():
@@ -577,7 +620,8 @@ def build(only=None):
     fig = lambda name, png, im_ko: (lambda o, d: still(save(im_ko() if ko else figure_frame(png), name), o, d))  # noqa
     card = lambda png, im_ko: (lambda o, d: still(save(im_ko(), png) if ko else FIG / png, o, d))  # noqa: E731
     parts = [
-        ("0a", "0", 22, lambda o, d: still(save(intro_card(), "s0_intro.png"), o, d)),
+        ("00", "0", 5, title_scene),
+        ("0a", "0", 22, intro_scene),
         ("0b", "1", 16, lambda o, d: scene1(o, d, n2)),
         ("2", "2", 15, card("demo_card_scene2.png", card2_ko)),
         ("3a", "3", 16, lambda o, d: episode_scene(o, d, n1, 36, "right", None)),
