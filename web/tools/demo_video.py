@@ -325,17 +325,15 @@ def figure_frame(fig):
     return im
 
 
-def intro_card(stage=5):
+def intro_card(stage=5, with_title=True):
     """Why robots lack data, and the one problem GraspGrade takes (the last row, in blue).
     stage: how much is shown under the question, 0 the question alone, 1 with the line under it,
     2 to 4 with rows, 5 with the last row marked as the GraspGrade problem."""
     im = canvas()
     d = ImageDraw.Draw(im)
     title, sub, rows = T("intro")
-    size = 60
-    while d.textlength(title, font=font(size, True)) > W - 280:
-        size -= 2
-    d.text((140, 110), title, font=font(size, True), fill=INK)
+    if with_title:
+        d.text((140, 110), title, font=intro_title_font(), fill=INK)
     if stage >= 1:
         d.text((140, 215), sub, font=font(34), fill=MUTED)
     for i, (head, detail) in enumerate(rows[:max(stage - 1, 0)]):
@@ -351,19 +349,39 @@ def intro_card(stage=5):
     return im
 
 
+def intro_title_font():
+    size = 60
+    while ImageDraw.Draw(canvas()).textlength(T("intro")[0], font=font(size, True)) > W - 280:
+        size -= 2
+    return font(size, True)
+
+
 def intro_scene(out, dur):
-    """The intro card, built up line by line as the voice reaches each line."""
+    """The intro card, built up line by line as the voice reaches each line. The question starts
+    a little above the middle, like a title, and moves up to its place as the first line appears."""
     text = NARRATION[LANG]["0a"]
     wav = VOICE / "0a.wav"
     span = wav_len(wav) if wav.exists() else dur - LEAD - TAIL
     times = [LEAD + span * text.index(m) / len(text) for m in T("intro_marks")]
     ins, graph, last = [], [], "0:v"
     for stage in range(len(times) + 1):
-        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(intro_card(stage), f"s0_intro_{stage}.png"))]
+        im = intro_card(stage, with_title=False)
+        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(im, f"s0_intro_{stage}.png"))]
     for stage, t in enumerate(times, 1):
         graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
-                     f"[{last}][f{stage}]overlay=0:0" + (f"[o{stage}]" if stage < len(times) else ""))
+                     f"[{last}][f{stage}]overlay=0:0[o{stage}]")
         last = f"o{stage}"
+    # the question on its own layer, eased from the middle to the top left in 0.7 s
+    f = intro_title_font()
+    q = Image.new("RGBA", (int(ImageDraw.Draw(canvas()).textlength(T("intro")[0], font=f)) + 4, 120), (0, 0, 0, 0))
+    ImageDraw.Draw(q).text((0, 0), T("intro")[0], font=f, fill=INK)
+    ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(q, "s0_question.png"))]
+    t0, move = times[0] - 0.5, 0.7
+    p = f"clip((t-{t0:.2f})/{move},0,1)"
+    ease = f"({p}*{p}*(3-2*{p}))"
+    xc, yc = (W - q.width) // 2, 400
+    graph.append(f"[{last}][{len(times) + 1}:v]overlay=x='{xc}+(140-{xc})*{ease}':y='{yc}+(110-{yc})*{ease}'"
+                 ":eval=frame")
     encode((ins, ";".join(graph)), out, dur)
 
 
