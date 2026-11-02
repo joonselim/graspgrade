@@ -1,8 +1,8 @@
 """Render the 3 minute submission demo video from the final results, in English or Korean.
 
-Starts from the scene plan in docs/DEMO_VIDEO.md, opens on the name and its question,
-then why robots lack data and which problem GraspGrade takes, and closes on what comes next. Everything on screen comes from
-files that already exist: the viewer data and media (viewer/data, viewer/media),
+Starts from the scene plan in docs/DEMO_VIDEO.md, opens on the question of why robots
+lack data and which problem GraspGrade takes, and closes on what comes next.
+Everything on screen comes from files that already exist: the viewer data and media (viewer/data, viewer/media),
 the demo figures and cards (out/demo, made by scripts/demo_figures.py). No API
 call. The narration is burned in as captions and also written as an .srt file
 and a plain text script.
@@ -86,10 +86,8 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
-        "title": "Which hand videos can a robot learn from?",
-        "intro_marks": ["So why", "Language models", "Robot data", "a human hand", "most hand video"],
-        "intro_why": "Why?",
-        "intro": ["Physical AI is still far from its GPT moment",
+        "intro_marks": ["Language models", "Robot data", "A human hand", "And most hand video", "This is where"],
+        "intro": ["Why is physical AI still far from its GPT moment?",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
                   [("Robot data is slow and costly", "Recorded by remote control, one robot at a time"),
                    ("A human hand is not a robot hand", "Each grasp must be moved onto the robot (retargeting)"),
@@ -113,10 +111,8 @@ TEXT = {
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
-        "title": "로봇은 어떤 손 영상으로 배울 수 있을까?",
-        "intro_marks": ["그런데 로봇은 왜", "언어 모델은", "원격 조종", "사람 손은", "대부분의"],
-        "intro_why": "왜?",
-        "intro": ["피지컬 AI, 아직 GPT 모먼트까지 갈 길이 멀다",
+        "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
+        "intro": ["피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까?",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
                   [("로봇 데이터는 느리고 비쌈", "원격 조종으로 로봇 한 대씩 기록"),
                    ("사람 손은 로봇 손과 다름", "잡기마다 로봇 손으로 옮겨야 함 (리타게팅)"),
@@ -161,10 +157,9 @@ def T(key):
 # comes next. The soft object result is part of the next steps (EXP-42).
 NARRATION = {
     "en": {
-        "00": "This is GraspGrade. Which hand videos can a robot learn from?",
-        "0a": "Physical AI is growing fast. So why are robots still far from their GPT moment? Language models "
-              "learned from the whole internet. Robots have no data at that scale. Robot data from remote control is "
-              "slow and costly, a human hand is not a robot hand, and most hand video is not usable.",
+        "0a": "Why is physical AI still so far from its GPT moment? Language models learned from the whole "
+              "internet. Robots have no data at that scale. Robot data from remote control is slow and costly. A "
+              "human hand is not a robot hand. And most hand video is not usable. This is where GraspGrade comes in.",
         "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
               "grasp onto a robot hand, and choosing which videos are worth using. We solve the second problem.",
         "2": "GraspGrade cuts first-person hand video into clips at each touch, and scores each clip from 0 to 100 "
@@ -192,10 +187,9 @@ NARRATION = {
              "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
-        "00": "GraspGrade입니다. 로봇은 어떤 손 영상으로 배울 수 있을까요?",
-        "0a": "피지컬 AI와 로보틱스 시장이 빠르게 커지고 있습니다. 그런데 로봇은 왜 아직 GPT 모먼트까지 갈 길이 "
-              "멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없습니다. 원격 조종으로 모으는 "
-              "로봇 데이터는 느리고 비싸고, 사람 손은 로봇 손과 다르며, 대부분의 손 영상은 쓸 수 없습니다.",
+        "0a": "피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 "
+              "그만한 데이터가 없습니다. 원격 조종으로 모으는 로봇 데이터는 느리고 비쌉니다. 사람 손은 로봇 손과 "
+              "다릅니다. 그리고 대부분의 손 영상은 쓸 수 없습니다. 바로 여기서 GraspGrade가 시작됩니다.",
         "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
               "사람의 잡기를 로봇 손으로 옮기는 리타게팅, 그리고 어떤 영상이 쓸 만한지 판단하는 일입니다. 우리는 이 "
               "두 번째 문제를 풉니다.",
@@ -332,48 +326,29 @@ def figure_frame(fig):
 
 
 def intro_card(stage=5):
-    """Why robots lack data, and the one problem GraspGrade takes (the last row).
-    stage: how much is shown after the title, 0 the title alone, 1 with Why?, 2 with the line under it,
-    3 to 5 with rows."""
+    """Why robots lack data, and the one problem GraspGrade takes (the last row, in blue).
+    stage: how much is shown under the question, 0 the question alone, 1 with the line under it,
+    2 to 4 with rows, 5 with the last row marked as the GraspGrade problem."""
     im = canvas()
     d = ImageDraw.Draw(im)
     title, sub, rows = T("intro")
-    d.text((140, 110), title, font=font(60, True), fill=INK)
+    size = 60
+    while d.textlength(title, font=font(size, True)) > W - 280:
+        size -= 2
+    d.text((140, 110), title, font=font(size, True), fill=INK)
     if stage >= 1:
-        d.text((140, 200), T("intro_why"), font=font(50, True), fill=BLUE)
-    if stage >= 2:
-        d.text((140, 280), sub, font=font(34), fill=MUTED)
-    for i, (head, detail) in enumerate(rows[:max(stage - 2, 0)]):
-        y = 390 + i * 160
-        ours = i == len(rows) - 1
+        d.text((140, 215), sub, font=font(34), fill=MUTED)
+    for i, (head, detail) in enumerate(rows[:max(stage - 1, 0)]):
+        y = 340 + i * 170
+        ours = i == len(rows) - 1 and stage >= 5
         if ours:
             d.rectangle([110, y - 22, W - 110, y + 128], fill="#eef3fd")
-            f = font(30, True)
-            d.text((W - 150 - d.textlength("GraspGrade", font=f), y + 4), "GraspGrade", font=f, fill=BLUE)
+            f = font(40, True)
+            d.text((W - 150 - d.textlength("GraspGrade", font=f), y + 34), "GraspGrade", font=f, fill=BLUE)
         d.text((140, y), str(i + 1), font=font(52, True), fill=BLUE if ours else GRAY)
         d.text((220, y + 2), head, font=font(44, True), fill=INK if ours else INK2)
         d.text((220, y + 66), detail, font=font(30), fill=MUTED)
     return im
-
-
-def title_scene(out, dur):
-    """The name and the question, over three hand clips that the later scenes do not use."""
-    im = canvas()
-    d = ImageDraw.Draw(im)
-    c = lambda t, f, y, fill: d.text(((W - d.textlength(t, font=f)) / 2, y), t, font=f, fill=fill)  # noqa: E731
-    c("GraspGrade", font(150, True), 150, INK)
-    c(T("title"), font(54), 360, MUTED)
-    bg = save(im, "s00_bg.png")
-    clips = ["P0001_a68492d5_right_02492", "P0009_37e30628_left_02200", "P0010_b152143e_left_02785"]
-    size, gap, y = 340, 40, 500
-    x0 = (W - 3 * size - 2 * gap) // 2
-    ins, graph, last = ["-loop", "1", "-framerate", str(FPS), "-i", str(bg)], [], "0:v"
-    for i, cid in enumerate(clips, 1):
-        ins += ["-stream_loop", "-1", "-i", str(VIEW / "media" / f"{cid}.mp4")]
-        graph.append(f"[{i}:v]scale={size}:{size}[c{i}];[{last}][c{i}]overlay={x0 + (i - 1) * (size + gap)}:{y}"
-                     + (f"[o{i}]" if i < len(clips) else ""))
-        last = f"o{i}"
-    encode((ins, ";".join(graph)), out, dur)
 
 
 def intro_scene(out, dur):
@@ -634,7 +609,6 @@ def build(only=None):
     fig = lambda name, png, im_ko: (lambda o, d: still(save(im_ko() if ko else figure_frame(png), name), o, d))  # noqa
     card = lambda png, im_ko: (lambda o, d: still(save(im_ko(), png) if ko else FIG / png, o, d))  # noqa: E731
     parts = [
-        ("00", "0", 5, title_scene),
         ("0a", "0", 22, intro_scene),
         ("0b", "1", 16, lambda o, d: scene1(o, d, n2)),
         ("2", "2", 15, card("demo_card_scene2.png", card2_ko)),
