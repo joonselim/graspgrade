@@ -436,17 +436,17 @@
    }
   },
   {
-   "id": "P0012_d6272ce1_left_00290",
-   "video": "assets/try/P0012_d6272ce1_left_00290.mp4",
-   "object": "keyboard",
-   "hand": "left",
-   "person": "P0012",
-   "duration": 10.03,
+   "id": "P0001_a9d6c83d_right_01403",
+   "video": "assets/try/P0001_a9d6c83d_right_01403.mp4",
+   "object": "carton_oj",
+   "hand": "right",
+   "person": "P0001",
+   "duration": 3.8,
    "contact": [
-    4.0,
-    6.03
+    1.0,
+    2.8
    ],
-   "score": 9.8,
+   "score": 13.9,
    "copyable": false,
    "failed": "collision",
    "grades": [
@@ -468,14 +468,14 @@
      "key": "grade_hand_shape_fit",
      "name": "Hand shape fit",
      "source": "video",
-     "value": 0.5,
+     "value": 0.0,
      "weight": 0.434
     },
     {
      "key": "grade_visibility",
      "name": "Visibility",
      "source": "sam",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.043
     },
     {
@@ -496,21 +496,21 @@
      "key": "object_size",
      "name": "Object size next to the hand",
      "source": "muse",
-     "value": 0.0,
+     "value": 0.5,
      "weight": 0.391
     },
     {
      "key": "object_shape",
      "name": "Object shape",
      "source": "muse",
-     "value": 0.0,
+     "value": 0.5,
      "weight": 1.252
     },
     {
      "key": "object_thickness",
      "name": "Object thickness",
      "source": "muse",
-     "value": 0.5,
+     "value": 1.0,
      "weight": -0.342
     },
     {
@@ -535,10 +535,10 @@
      "weight": -0.171
     }
    ],
-   "muse_reason": "Large thin keyboard held in air with left fingers mostly hidden behind it.",
+   "muse_reason": "Carton held in mid-air with right fingers hidden behind it.",
    "muse_alone": {
-    "probability": 0.85,
-    "reason": "Pinch on thin free-space edge leaves clearance for larger thumb and fingertip placement."
+    "probability": 0.9,
+    "reason": "Right hand uses wide open support with thumb on side and fingertips under bottom leaving ample clearance for larger robot digits."
    }
   },
   {
