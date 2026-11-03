@@ -7,19 +7,19 @@
  },
  "clips": [
   {
-   "id": "P0001_f6cc0cc8_left_01665",
-   "video": "assets/try/P0001_f6cc0cc8_left_01665.mp4",
-   "object": "puzzle_toy",
+   "id": "P0001_15c4300c_left_01513",
+   "video": "assets/try/P0001_15c4300c_left_01513.mp4",
+   "object": "bowl",
    "hand": "left",
    "person": "P0001",
-   "duration": 5.2,
+   "duration": 10.13,
    "contact": [
     1.0,
-    4.2
+    9.13
    ],
-   "score": 60.7,
-   "copyable": true,
-   "failed": null,
+   "score": 14.5,
+   "copyable": false,
+   "failed": "reach",
    "grades": [
     {
      "key": "grade_camera_stability",
@@ -39,35 +39,35 @@
      "key": "grade_hand_shape_fit",
      "name": "Hand shape fit",
      "source": "video",
-     "value": 0.5,
+     "value": 0.0,
      "weight": 0.434
     },
     {
      "key": "grade_visibility",
      "name": "Visibility",
      "source": "sam",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.043
     },
     {
      "key": "grade_contact_clarity",
      "name": "Contact clarity",
      "source": "sam",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.237
     },
     {
      "key": "finger_occlusion",
      "name": "Finger visibility",
      "source": "muse",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.481
     },
     {
      "key": "object_size",
      "name": "Object size next to the hand",
      "source": "muse",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.391
     },
     {
@@ -88,7 +88,7 @@
      "key": "object_width",
      "name": "Width to wrap",
      "source": "muse",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.922
     },
     {
@@ -102,14 +102,14 @@
      "key": "free_space",
      "name": "Free space around the object",
      "source": "muse",
-     "value": 1.0,
+     "value": 0.5,
      "weight": -0.171
     }
    ],
-   "muse_reason": "Small blocky cube held in air far from other objects with fingertips visible.",
+   "muse_reason": "Left hand lifts large wooden bowl hiding most fingers with can nearby.",
    "muse_alone": {
-    "probability": 0.85,
-    "reason": "Rubik's cube pinch uses large flat opposite faces easily matched by Allegro thumb and finger without collision."
+    "probability": 0.9,
+    "reason": "Large bowl rim grasp uses wide thumb-finger opposition with ample clearance for larger robotic digits."
    }
   },
   {
@@ -537,19 +537,19 @@
    }
   },
   {
-   "id": "P0001_15c4300c_left_01513",
-   "video": "assets/try/P0001_15c4300c_left_01513.mp4",
-   "object": "bowl",
+   "id": "P0001_f6cc0cc8_left_01665",
+   "video": "assets/try/P0001_f6cc0cc8_left_01665.mp4",
+   "object": "puzzle_toy",
    "hand": "left",
    "person": "P0001",
-   "duration": 10.13,
+   "duration": 5.2,
    "contact": [
     1.0,
-    9.13
+    4.2
    ],
-   "score": 14.5,
-   "copyable": false,
-   "failed": "reach",
+   "score": 60.7,
+   "copyable": true,
+   "failed": null,
    "grades": [
     {
      "key": "grade_camera_stability",
@@ -569,35 +569,35 @@
      "key": "grade_hand_shape_fit",
      "name": "Hand shape fit",
      "source": "video",
-     "value": 0.0,
+     "value": 0.5,
      "weight": 0.434
     },
     {
      "key": "grade_visibility",
      "name": "Visibility",
      "source": "sam",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.043
     },
     {
      "key": "grade_contact_clarity",
      "name": "Contact clarity",
      "source": "sam",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.237
     },
     {
      "key": "finger_occlusion",
      "name": "Finger visibility",
      "source": "muse",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.481
     },
     {
      "key": "object_size",
      "name": "Object size next to the hand",
      "source": "muse",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.391
     },
     {
@@ -618,7 +618,7 @@
      "key": "object_width",
      "name": "Width to wrap",
      "source": "muse",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.922
     },
     {
@@ -632,14 +632,14 @@
      "key": "free_space",
      "name": "Free space around the object",
      "source": "muse",
-     "value": 0.5,
+     "value": 1.0,
      "weight": -0.171
     }
    ],
-   "muse_reason": "Left hand lifts large wooden bowl hiding most fingers with can nearby.",
+   "muse_reason": "Small blocky cube held in air far from other objects with fingertips visible.",
    "muse_alone": {
-    "probability": 0.9,
-    "reason": "Large bowl rim grasp uses wide thumb-finger opposition with ample clearance for larger robotic digits."
+    "probability": 0.85,
+    "reason": "Rubik's cube pinch uses large flat opposite faces easily matched by Allegro thumb and finger without collision."
    }
   }
  ]

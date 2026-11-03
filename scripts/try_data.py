@@ -26,8 +26,8 @@ N2 = ROOT / "out" / "number2"
 OUT = ROOT / "web" / "assets" / "try"
 # four high scored clips a robot hand can copy, two low scored clips it cannot. Picked so that the
 # touch window from motion capture matches the grasp a person sees in the video.
-CLIPS = ["P0001_f6cc0cc8_left_01665", "P0001_4bf4e21a_left_01577", "P0001_9b6feab7_left_01691",
-         "P0010_1573a837_left_01933", "P0001_a9d6c83d_right_01403", "P0001_15c4300c_left_01513"]
+CLIPS = ["P0001_15c4300c_left_01513", "P0001_4bf4e21a_left_01577", "P0001_9b6feab7_left_01691",
+         "P0010_1573a837_left_01933", "P0001_a9d6c83d_right_01403", "P0001_f6cc0cc8_left_01665"]
 # where each grade comes from
 SOURCE = {"grade_camera_stability": "video", "grade_completeness": "video", "grade_hand_shape_fit": "video",
           "grade_visibility": "sam", "grade_contact_clarity": "sam"}
