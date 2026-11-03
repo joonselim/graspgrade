@@ -1,579 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#08090c">
-<title>GraspGrade Demo</title>
+<meta name="color-scheme" content="light only">
+<title>GraspGrade 데모</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --ink: #f2f2ef;
-    --muted: #8d8d88;
-    --faint: #4b4b48;
-    --accent: #ff7a2f;
-    --hair: rgba(255, 255, 255, 0.16);
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --page: #eef0f3;
+    --sheet: #ffffff;
+    --ink: #1a1d23;
+    --ink-2: #3b4250;
+    --muted: #6a7382;
+    --rule: #dde1e7;
+    --link: #2350c9;
+    --sheet-pad: 48px;
+    color-scheme: light;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); }
   body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
     font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
-      "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    -webkit-font-smoothing: antialiased; overflow: hidden;
+      "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    font-size: 15.5px;
+    line-height: 1.7;
+    word-break: keep-all;
   }
-  button { font: inherit; color: inherit; }
-
-
-  /* ---------- stage ---------- */
-  #stage { position: fixed; inset: 0; overflow: hidden; container-type: size; container-name: stage; }
-  .scene {
-    position: absolute; inset: 0; display: grid; place-items: center;
-    opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .sheet {
+    max-width: 920px; margin: 28px auto 56px;
+    background: var(--sheet); border: 1px solid var(--rule);
+    padding: var(--sheet-pad);
   }
-  .scene.on { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.5s var(--ease), visibility 0s; }
-
-  .headline { font-size: max(24px, 6.4cqmin); line-height: 1.06; font-weight: 800; letter-spacing: -0.04em; margin: 0; }
-  .say { font-size: max(20px, 4.4cqmin); line-height: 1.1; font-weight: 800; letter-spacing: -0.035em; margin: 0; }
-  .sub { font-size: max(13px, 2.1cqmin); line-height: 1.5; color: var(--muted); margin: 1cqmin 0 0; }
-  .note { font-size: max(11px, 1.6cqmin); color: var(--muted); margin: 0 0 1.4cqmin; }
-
-  .rise { opacity: 0; transform: translateY(2.4cqmin); }
-  .on .rise { animation: rise 0.8s var(--ease) forwards; animation-delay: var(--d, 0s); }
-  @keyframes rise { to { opacity: 1; transform: none; } }
-
-  .col { width: min(84cqw, 150cqh); }
-  .rule { border-top: 1px solid var(--hair); padding-top: 2cqmin; margin-top: 2.4cqmin; }
-
-  /* ---------- 1. hook ---------- */
-  #s1 video {
-    position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: cover;
-    filter: brightness(0.3) saturate(0.6) blur(2px); transform: scale(1.06);
+  @media (max-width: 720px) {
+    :root { --sheet-pad: 16px; }
+    .sheet { margin: 0; border: 0; }
   }
-  #s1.on video { animation: drift 2.6s linear forwards; }
-  @keyframes drift { to { transform: scale(1); } }
-  #s1 .copy { position: relative; width: min(84cqw, 150cqh); }
-  #s1 .headline { font-size: max(28px, 8cqmin); }
-  #s1 .headline span { display: block; }
-  #s1 .headline .q { color: var(--accent); }
-
-  /* ---------- 2. segment ---------- */
-  #s2 .col { width: min(84cqw, 118cqh); }
-  #s2 .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
-  #s2 .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  #s2 .seg { clip-path: inset(0 100% 0 0); }
-  #s2.on .seg { animation: wipe 1.3s var(--ease) 0.5s forwards; }
-  @keyframes wipe { to { clip-path: inset(0 0 0 0); } }
-  #s2 .scan { position: absolute; top: 0; bottom: 0; width: 2px; left: 0; opacity: 0; background: var(--ink); }
-  #s2.on .scan { animation: scan 1.3s var(--ease) 0.5s forwards; }
-  @keyframes scan { 0% { left: 0; opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-  #s2 .foot { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4cqmin; }
-  #s2 .num { text-align: right; }
-  #s2 .num b { display: block; font-size: max(26px, 6.4cqmin); font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; font-variant-numeric: tabular-nums; }
-  #s2 .num span { display: block; font-size: max(11px, 1.7cqmin); color: var(--muted); margin-top: 0.8cqmin; }
-
-  /* ---------- 3. cut ---------- */
-  #s3 .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
-  #s3 .cell { aspect-ratio: 16 / 9; position: relative; background-image: url("assets/compare_small_object.jpg"); background-size: 200% 200%; }
-  #s3 .cell span { position: absolute; left: 1cqmin; bottom: 0.8cqmin; font-size: max(10px, 1.5cqmin); color: #fff; text-shadow: 0 0 4px #000; font-variant-numeric: tabular-nums; }
-  #s3 .c0 { background-position: 0 0; } #s3 .c1 { background-position: 100% 0; }
-  #s3 .c2 { background-position: 0 100%; } #s3 .c3 { background-position: 100% 100%; }
-  #s3 .tracks { position: relative; display: grid; gap: 1.6cqmin; margin-top: 2.4cqmin; }
-  #s3 .row { display: grid; grid-template-columns: 18cqmin 1fr; align-items: center; gap: 2cqmin; }
-  #s3 .row label { font-size: max(10px, 1.6cqmin); color: var(--muted); }
-  #s3 svg { width: 100%; height: 6cqmin; overflow: visible; }
-  #s3 .sig { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1000; stroke-dashoffset: 1000; vector-effect: non-scaling-stroke; }
-  #s3.on .sig { animation: draw 1.6s ease-out 0.3s forwards; }
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  #s3 .bar { height: 0.8cqmin; position: relative; background: var(--faint); }
-  #s3 .bar i { position: absolute; left: 34%; top: 0; bottom: 0; width: 0; background: var(--ink); }
-  #s3.on .bar i { animation: grow 1.1s var(--ease) 0.9s forwards; }
-  @keyframes grow { to { width: 66%; } }
-  #s3 .cut {
-    position: absolute; top: -1cqmin; bottom: -1cqmin;
-    left: calc(18cqmin + 2cqmin + (100% - 20cqmin) * 0.34);
-    width: 0; border-left: 2px solid var(--accent); opacity: 0;
+  .topnav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 22px;
+    margin: calc(var(--sheet-pad) * -1) calc(var(--sheet-pad) * -1) 28px;
+    padding: 0 var(--sheet-pad);
+    background: var(--sheet); border-bottom: 1px solid var(--rule);
+    font-size: 14px; overflow-x: auto; white-space: nowrap;
   }
-  #s3 .cut em {
-    position: absolute; top: 48%; left: 1.2cqmin;
-    font-style: normal; font-size: max(11px, 1.7cqmin); white-space: nowrap; color: var(--accent); font-weight: 650;
+  .topnav .brand { font-weight: 800; letter-spacing: -0.02em; margin-right: auto; padding: 14px 0; }
+  .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
+  .topnav a:hover { color: var(--ink); text-decoration: none; }
+  .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  .topnav a.lang {
+    padding: 3px 8px; border: 1px solid var(--rule); border-radius: 4px;
+    font-size: 12px; font-weight: 600; color: var(--ink-2);
   }
-  #s3.on .cut { animation: pop 0.5s var(--ease) 1.6s forwards; }
-  @keyframes pop { from { opacity: 0; transform: scaleY(0.4); } to { opacity: 1; transform: none; } }
-
-  /* ---------- 4. score ---------- */
-  #s4 .col { width: min(88cqw, 132cqh); }
-  #s4 .clips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-  #s4 .clip {
-    position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden;
-    background-size: cover; background-position: center;
-    opacity: 0; transform: translateY(3cqmin);
-    transition: filter 0.6s ease;
-  }
-  #s4.on .clip { animation: rise 0.8s var(--ease) forwards; animation-delay: var(--d); }
-  #s4 .clip::after { content: ""; position: absolute; inset: 45% 0 0 0; background: linear-gradient(transparent, rgba(0, 0, 0, 0.8)); }
-  #s4 .clip figcaption { position: absolute; left: 2cqmin; right: 2cqmin; bottom: 1.6cqmin; z-index: 1; }
-  #s4 .clip b { display: block; font-size: max(36px, 11cqmin); font-weight: 800; letter-spacing: -0.06em; line-height: 0.85; font-variant-numeric: tabular-nums; }
-  #s4 .clip span { display: block; margin-top: 0.8cqmin; font-size: max(11px, 1.8cqmin); color: rgba(255, 255, 255, 0.82); }
-  #s4 .clip.best b { color: var(--accent); }
-  #s4 .clip.dim { filter: grayscale(1) brightness(0.45); }
-
-  /* ---------- 5. proof ---------- */
-  #s5 .col { position: relative; }
-  #s5 .stats { margin-top: 3cqmin; }
-  #s5 .stat { display: grid; grid-template-columns: 34cqmin 1fr; align-items: baseline; gap: 3cqmin; border-top: 1px solid var(--hair); padding: 1.8cqmin 0; }
-  #s5 .stat b { font-size: max(26px, 7cqmin); font-weight: 800; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; line-height: 1; }
-  #s5 .stat > span { font-size: max(12px, 2cqmin); line-height: 1.4; color: var(--muted); }
-
-  /* ---------- 6. end ---------- */
-  #s6 .col { text-align: left; }
-  #s6 .logo { font-size: max(40px, 13cqmin); font-weight: 850; letter-spacing: -0.06em; line-height: 0.9; margin: 0; }
-  #s6 .logo i { font-style: normal; color: var(--accent); }
-  #s6 .tagline { font-size: max(16px, 3.2cqmin); margin: 2.4cqmin 0 0; }
-  #s6 .stack { font-size: max(11px, 1.7cqmin); color: var(--muted); margin: 1.2cqmin 0 0; }
-  #s6 .actions { display: flex; gap: 4cqmin; margin-top: 4.4cqmin; flex-wrap: wrap; }
-  #s6 .actions a, #s6 .actions button {
-    padding: 0; min-height: 40px; display: inline-flex; align-items: center; background: none; border: 0;
-    font-size: max(14px, 2.1cqmin); color: var(--ink); text-decoration: underline; text-underline-offset: 6px;
-    text-decoration-thickness: 1px; cursor: pointer;
-  }
-
-  .instant *, .instant *::before, .instant *::after {
-    animation-duration: 1ms !important; animation-delay: 0s !important; transition: none !important;
-  }
-
-  /* ---------- portrait ---------- */
-  @container stage (aspect-ratio < 1) {
-    .col, #s1 .copy, #s2 .col, #s4 .col { width: 88cqw; }
-    #s2 .foot { grid-template-columns: 1fr; }
-    #s2 .num { text-align: left; }
-    #s3 .strip { grid-template-columns: repeat(2, 1fr); }
-    #s3 .row { grid-template-columns: 1fr; gap: 0.6cqmin; }
-    #s3 .cut { display: none; }
-    #s4 .clips { grid-template-columns: 1fr; }
-    #s4 .clip { aspect-ratio: 16 / 7; }
-    #s4 .clip b { font-size: max(34px, 8cqmin); }
-    #s5 .stat { grid-template-columns: 1fr; gap: 0.8cqmin; }
-  }
-
-
-  /* ---------- what it does ---------- */
-  #sA .io3 { display: grid; grid-template-columns: 1fr auto 1.15fr; gap: 4cqmin; align-items: center; }
-  #sA .lab, #sM .lab { font-size: max(11px, 1.7cqmin); color: var(--muted); margin: 0 0 1.2cqmin; }
-  #sA .in video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-  #sA .in .txt { font-size: max(12px, 1.9cqmin); color: var(--ink); margin: 1.2cqmin 0 0; }
-  #sA .arrow { font-size: max(28px, 8cqmin); color: var(--accent); line-height: 1; }
-  #sA .out ol { list-style: none; margin: 0; padding: 0; }
-  #sA .out li {
-    display: grid; grid-template-columns: 4.4cqmin 1fr; align-items: baseline; gap: 1.4cqmin;
-    border-top: 1px solid var(--hair); padding: 1.6cqmin 0;
-    font-size: max(15px, 2.9cqmin); font-weight: 650; letter-spacing: -0.02em; line-height: 1.25;
-  }
-  #sA .out li:last-child { border-bottom: 1px solid var(--hair); }
-  #sA .out li b { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; }
-
-  /* ---------- Muse Spark answer ---------- */
-  #sM .mgrid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 3cqmin; align-items: center; }
-  #sM .mgrid img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-  #sM pre {
-    margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;
-    font: max(11px, 1.85cqmin) / 1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted);
-  }
-  #sM pre .ln { display: block; opacity: 0; transform: translateX(-1cqmin); }
-  #sM.on pre .ln { animation: rise 0.5s var(--ease) forwards; animation-delay: var(--d); }
-  #sM pre em { font-style: normal; color: var(--ink); }
-  #sM .ok { font-size: max(12px, 1.9cqmin); color: var(--accent); margin: 1.6cqmin 0 0; font-weight: 650; }
-
-  /* ---------- ground truth strip ---------- */
-  #s5 .gt { display: block; width: 100%; aspect-ratio: 4 / 1; object-fit: cover; }
-  #s5 .stats { margin-top: 1.6cqmin; }
-  #s5 .stat { padding: 1.2cqmin 0; }
-  #s5 .stat b { font-size: max(22px, 5.2cqmin); }
-
-  @container stage (aspect-ratio < 1) {
-    #sA .io3 { grid-template-columns: 1fr; gap: 2.4cqmin; }
-    #sA .arrow { transform: rotate(90deg); justify-self: start; }
-    #sM .mgrid { grid-template-columns: 1fr; }
-    #s5 .gt { aspect-ratio: 2 / 1; }
-  }
-
-  /* ---------- chrome ---------- */
-  .chrome {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-    display: flex; align-items: center; gap: 18px;
-    padding: 10px max(18px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));
-  }
-  .chrome button, .chrome a {
-    background: none; border: 0; color: var(--muted); min-width: 32px; height: 40px; padding: 0;
-    cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
-  }
-  .chrome button:hover, .chrome a:hover { color: var(--ink); }
-  .progress { flex: 1; height: 1px; background: var(--hair); }
-  .progress i { display: block; height: 100%; width: 0; background: var(--ink); }
-  .lang { display: flex; gap: 12px; }
-  .lang button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 5px; }
+  h1 { font-size: 30px; line-height: 1.3; letter-spacing: -0.02em; margin: 0 0 18px; }
+  @media (max-width: 720px) { h1 { font-size: 25px; } }
+  video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+  .meta { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
+<main class="sheet">
 
-<div id="app">
-<main id="stage" aria-live="polite">
+  <nav class="topnav" aria-label="Pages">
+    <span class="brand">GraspGrade</span>
+    <a data-k="summary" href="index.html#summary">요약</a>
+    <a data-k="story" href="index.html#story">핵심 실험</a>
+    <a data-k="detail" href="index.html#detail">실험 상세</a>
+    <a class="on" data-k="demo" href="demo.html">데모</a>
+    <a class="lang" data-k="other" href="demo.html?lang=en" hreflang="en" lang="en">EN</a>
+  </nav>
 
-  <!-- 1 problem -->
-  <section class="scene" id="s1">
-    <video id="hookvid" src="assets/clip.mp4" muted playsinline preload="auto"></video>
-    <div class="copy">
-      <h1 class="headline">
-        <span class="rise" style="--d:0.15s" data-i18n="h1a">Robots can learn to grasp by watching people.</span>
-        <span class="rise q" style="--d:0.9s" data-i18n="h1b">But not every hand video can teach a robot hand.</span>
-      </h1>
-    </div>
-  </section>
-
-  <!-- 2 what it does -->
-  <section class="scene" id="sA">
-    <div class="col">
-      <p class="say rise" style="--d:0.1s" data-i18n="sAh">GraspGrade turns raw hand video into grasp clips a robot hand can learn from.</p>
-      <div class="io3 rule">
-        <div class="in rise" style="--d:0.5s">
-          <p class="lab" data-i18n="sAin">Input</p>
-          <video id="whatvid" src="assets/clip.mp4" muted loop playsinline preload="auto"></video>
-          <p class="txt" data-i18n="sAin2">First-person hand video, any length</p>
-        </div>
-        <div class="arrow rise" style="--d:0.9s" aria-hidden="true">→</div>
-        <div class="out">
-          <p class="lab rise" style="--d:1.1s" data-i18n="sAout">Output</p>
-          <ol>
-            <li class="rise" style="--d:1.3s"><b>1</b><span data-i18n="sAo1">One short clip per grasp</span></li>
-            <li class="rise" style="--d:1.6s"><b>2</b><span data-i18n="sAo2">A 0 to 100 score: can a robot hand copy it?</span></li>
-            <li class="rise" style="--d:1.9s"><b>3</b><span data-i18n="sAo3">The reason, in plain words</span></li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3 segment -->
-  <section class="scene" id="s2">
-    <div class="col">
-      <div class="frame rise" style="--d:0s">
-        <img src="assets/frame.jpg" alt="">
-        <img class="seg" src="assets/exp01_sam_hand_f330.jpg" alt="">
-        <div class="scan"></div>
-      </div>
-      <div class="foot rule">
-        <p class="say rise" style="--d:0.2s" data-i18n="s2h">SAM 3.1 finds every hand and object, frame by frame.</p>
-        <div class="num rise" style="--d:1.4s"><b>150 / 150</b><span data-i18n="s2badge">frames with both gloved hands</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4 cut -->
-  <section class="scene" id="s3">
-    <div class="col">
-      <div class="strip rise" style="--d:0s">
-        <div class="cell c0"><span>0.0 s</span></div>
-        <div class="cell c1"><span>1.7 s</span></div>
-        <div class="cell c2"><span>3.3 s</span></div>
-        <div class="cell c3"><span>4.7 s</span></div>
-      </div>
-      <div class="tracks">
-        <div class="row rise" style="--d:0.2s">
-          <label data-i18n="s3sig">Video contact signal</label>
-          <svg viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
-            <path class="sig" d="M0 18 L10 17.5 L20 18 L28 17 L31 15 L33 9 L35 4 L40 3 L48 3.6 L56 2.8 L64 3.4 L72 2.6 L80 3.2 L88 2.9 L100 3"/>
-          </svg>
-        </div>
-        <div class="row rise" style="--d:0.3s">
-          <label data-i18n="s3tac">Tactile glove</label>
-          <div class="bar"><i></i></div>
-        </div>
-        <div class="cut"><em data-i18n="s3cut">cut at touch</em></div>
-      </div>
-      <div class="rule">
-        <p class="say rise" style="--d:0.2s" data-i18n="s3h">Cut at the moment of touch.</p>
-        <p class="sub rise" style="--d:0.4s" data-i18n="s3s">Every cut is scored against tactile glove data.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5 Muse Spark reads the clip -->
-  <section class="scene" id="sM">
-    <div class="col">
-      <div class="mgrid">
-        <img class="rise" style="--d:0s" src="assets/frame.jpg" alt="">
-        <div class="ans">
-          <p class="lab rise" style="--d:0.2s" data-i18n="sMlab">Muse Spark, real answer for this frame</p>
-          <pre><span class="ln" style="--d:0.5s">{"right_hand_touching": <em>true</em>,</span><span class="ln" style="--d:0.8s"> "left_hand_touching": <em>false</em>,</span><span class="ln" style="--d:1.1s"> "object": <em>"mat"</em>,</span><span class="ln" style="--d:1.4s"> "fingertips_visible": <em>"low"</em>,</span><span class="ln" style="--d:1.7s"> "reason": <em>"Right glove presses the dark mat while left hand hovers above it with fingertips curled from view."</em>}</span></pre>
-          <p class="ok rise" style="--d:2.1s" data-i18n="sMok">The tactile glove agrees.</p>
-        </div>
-      </div>
-      <div class="rule">
-        <p class="say rise" style="--d:0.2s" data-i18n="sMh">Muse Spark looks closer and says why.</p>
-        <p class="sub rise" style="--d:0.4s" data-i18n="sMs">Twelve checks per clip: visibility, camera stability, contact clarity, full motion, finger occlusion, hand shape fit, and six about the object: size next to the hand, shape, thickness, width, handle, free space.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6 score -->
-  <section class="scene" id="s4">
-    <div class="col">
-      <p class="note rise" style="--d:0s" data-i18n="s4tag">Illustration. The scoring model is being built.</p>
-      <div class="clips">
-        <figure class="clip best" style="--d:0.1s;background-image:url('assets/frame.jpg')">
-          <figcaption><b data-to="88">0</b><span data-i18n="s4a">copy it</span></figcaption>
-        </figure>
-        <figure class="clip" style="--d:0.25s;background-image:url('assets/ep53_frame.jpg');background-position:62% 50%">
-          <figcaption><b data-to="64">0</b><span data-i18n="s4b">maybe</span></figcaption>
-        </figure>
-        <figure class="clip" data-low="1" style="--d:0.4s;background-image:url('assets/exp09_P0002_016222d1_hands.jpg')">
-          <figcaption><b data-to="27">0</b><span data-i18n="s4c">skip</span></figcaption>
-        </figure>
-      </div>
-      <div class="rule">
-        <p class="say rise" style="--d:0.2s" data-i18n="s4h">Every clip gets a 0 to 100 score.</p>
-        <p class="sub rise" style="--d:0.4s" data-i18n="s4s">The seven checks are combined by a model whose weights you can read.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7 ground truth -->
-  <section class="scene" id="s5">
-    <div class="col">
-      <img class="gt rise" style="--d:0s" src="assets/exp16_strip.jpg" alt="">
-      <p class="sub rise" style="--d:0.3s;margin-top:1.2cqmin" data-i18n="s5img">A robot hand placed on real human grasps from motion capture, then judged: can it copy this grasp or not.</p>
-      <div class="rule">
-        <p class="say rise" style="--d:0.4s" data-i18n="s5h">Checked against real sensors, not guesses.</p>
-        <div class="stats">
-          <div class="stat rise" style="--d:0.7s"><b><span data-count="97">0</span>–<span data-count="99">0</span>%</b><span data-i18n="s5a">contact labels that match the tactile gloves, 138,629 frames</span></div>
-          <div class="stat rise" style="--d:0.9s"><b><span data-count="2.3" data-dec="1">0</span> mm</b><span data-i18n="s5b">fingertip to object while grasping, from motion capture</span></div>
-          <div class="stat rise" style="--d:1.1s"><b><span data-count="3811" data-sep="1">0</span></b><span data-i18n="s5c">HOT3D clips cut from motion capture, each with a robot copy label</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8 end -->
-  <section class="scene" id="s6">
-    <div class="col">
-      <h2 class="logo rise" style="--d:0.05s">Grasp<i>Grade</i></h2>
-      <p class="tagline rise" style="--d:0.3s" data-i18n="s6t">Find the hand videos a robot can learn from.</p>
-      <p class="sub rise" style="--d:0.5s" data-i18n="s6s">Built to sit on top of the data filters robot labs already use.</p>
-      <p class="stack rise" style="--d:0.7s">SAM 3.1 · Muse Spark · Allegro hand</p>
-      <div class="actions rise" style="--d:0.9s">
-        <button id="replay2" type="button" data-i18n="replay">Replay</button>
-        <a href="index.html" data-i18n="report">Progress</a>
-      </div>
-    </div>
-  </section>
+  <h1 data-k="title">3분 데모 영상</h1>
+  <video src="assets/video/graspgrade_demo.mp4" poster="assets/video/graspgrade_demo_poster.jpg"
+         controls playsinline preload="metadata"></video>
+  <p class="meta" data-k="meta">영어 내레이션, 화면 자막 포함 · 2분 54초</p>
+  <p class="meta" data-k="sources">영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta), YouTube @Futur Decoded (첫 장면 대체 화면) · 음성: ElevenLabs</p>
 
 </main>
-
-<div class="chrome">
-  <button id="playbtn" type="button" aria-label="Pause">❚❚</button>
-  <div class="progress"><i id="prog"></i></div>
-  <div class="lang">
-    <button type="button" data-lang="en" class="on">EN</button>
-    <button type="button" data-lang="ko">KO</button>
-  </div>
-  <a href="index.html" aria-label="Progress report">↩</a>
-</div>
-</div>
 
 <script>
 (function () {
   "use strict";
-
-  // ---------- copy ----------
-  var I18N = {
-    ko: {
-      h1a: "로봇은 사람이 잡는 모습을 보고 잡는 법을 배울 수 있다.",
-      h1b: "하지만 모든 손 영상이 로봇 손을 가르칠 수 있는 건 아니다.",
-      sAh: "GraspGrade는 손 영상을 로봇 손이 배울 수 있는 잡기 클립으로 바꾼다.",
-      sAin: "입력",
-      sAin2: "길이와 상관없는 1인칭 손 영상",
-      sAout: "출력",
-      sAo1: "잡기마다 자른 짧은 클립",
-      sAo2: "0~100점: 로봇 손이 따라할 수 있는가",
-      sAo3: "그렇게 본 이유를 한 줄로",
-      s2badge: "프레임, 장갑 낀 양손 검출",
-      s2h: "SAM 3.1이 모든 프레임에서 손과 물체를 찾는다.",
-      s3sig: "영상 접촉 신호",
-      s3tac: "촉각 장갑",
-      s3cut: "닿는 순간 자르기",
-      s3h: "손이 닿는 순간에 자른다.",
-      s3s: "자른 지점은 모두 촉각 장갑 기록으로 채점한다.",
-      sMlab: "이 프레임에 대한 Muse Spark의 실제 응답",
-      sMok: "촉각 장갑 기록과 일치.",
-      sMh: "Muse Spark가 더 자세히 보고 이유를 말한다.",
-      sMs: "클립마다 12개 항목: 가시성, 카메라 안정성, 접촉 명확성, 동작 완결성, 손가락 가림, 손 모양 적합도, 그리고 물체 6개: 손 대비 크기, 모양, 두께, 감쌀 폭, 손잡이, 빈 공간.",
-      s4tag: "예시 화면. 점수 모델은 만드는 중이다.",
-      s4a: "따라 하기 좋음",
-      s4b: "애매함",
-      s4c: "건너뜀",
-      s4h: "모든 클립이 0~100점을 받는다.",
-      s4s: "7개 항목은 가중치가 그대로 보이는 모델로 합친다.",
-      s5img: "모션캡처로 기록한 실제 사람의 잡기 위에 로봇 손을 놓고, 그 잡기를 따라할 수 있는지 판정한다.",
-      s5h: "추측이 아니라 실제 센서로 검증한다.",
-      s5a: "접촉 라벨과 촉각 장갑의 일치율, 138,629 프레임",
-      s5b: "잡는 동안 손가락 끝과 물체 사이 거리, 모션캡처 기준",
-      s5c: "모션캡처로 자르고 로봇 재현 라벨을 붙인 HOT3D 클립",
-      s6t: "로봇이 배울 수 있는 손 영상만 골라낸다.",
-      s6s: "로봇 연구실이 이미 쓰는 데이터 필터 위에 얹어 쓰도록 만들었다.",
-      replay: "다시 보기",
-      report: "진행"
-    }
+  // The same English video for both languages; only the words around it change.
+  var EN = {
+    summary: ["Summary", "en.html#summary"],
+    story: ["Key experiments", "en.html#story"],
+    detail: ["Experiment log", "logs.html"],
+    demo: ["Demo", "demo.html?lang=en"],
+    other: ["KO", "demo.html"],
+    title: ["3 minute demo video"],
+    meta: ["English narration with captions on screen · 2:54"],
+    sources: ["Video sources: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Meta), YouTube @Futur Decoded " +
+              "(stand-in footage in the first scene) · Voice: ElevenLabs"]
   };
-  var EN = {};
-  document.querySelectorAll("[data-i18n]").forEach(function (el) { EN[el.dataset.i18n] = el.textContent; });
-
-  function setLang(lang) {
-    var dict = lang === "ko" ? I18N.ko : EN;
-    document.documentElement.lang = lang;
-    document.querySelectorAll("[data-i18n]").forEach(function (el) {
-      if (dict[el.dataset.i18n]) el.textContent = dict[el.dataset.i18n];
-    });
-    document.querySelectorAll(".lang button").forEach(function (b) { b.classList.toggle("on", b.dataset.lang === lang); });
-    try { localStorage.setItem("gg-demo-lang", lang); } catch (_) {}
-  }
-  document.querySelectorAll(".lang button").forEach(function (b) {
-    b.addEventListener("click", function () { setLang(b.dataset.lang); });
+  if (new URLSearchParams(location.search).get("lang") !== "en") return;
+  document.documentElement.lang = "en";
+  document.title = "GraspGrade demo";
+  document.querySelectorAll("[data-k]").forEach(function (el) {
+    var v = EN[el.dataset.k];
+    el.textContent = v[0];
+    if (v[1]) el.setAttribute("href", v[1]);
   });
-
-  // ---------- timeline ----------
-  var SCENES = [
-    { id: "s1", at: 0.0 },    // problem
-    { id: "sA", at: 3.2 },    // what it does: input and output
-    { id: "s2", at: 7.4 },    // SAM 3.1
-    { id: "s3", at: 10.4 },   // cut at touch
-    { id: "sM", at: 13.4 },   // Muse Spark answer
-    { id: "s4", at: 16.6 },   // score
-    { id: "s5", at: 19.6 },   // ground truth
-    { id: "s6", at: 22.8 }    // end
-  ];
-  var TOTAL = 25.0;
-
-  var els = SCENES.map(function (s) { return document.getElementById(s.id); });
-  var prog = document.getElementById("prog");
-  var playbtn = document.getElementById("playbtn");
-  var vid = document.getElementById("hookvid");
-  var whatvid = document.getElementById("whatvid");
-  var t0 = 0, offset = 0, playing = false, current = -1, raf = 0;
-
-  function countUp(scope) {
-    scope.querySelectorAll("[data-count]").forEach(function (el) {
-      var to = parseFloat(el.dataset.count), dec = +el.dataset.dec || 0, sep = el.dataset.sep;
-      var start = performance.now(), dur = 1100;
-      (function step(now) {
-        var k = Math.min(1, (now - start) / dur), v = to * (1 - Math.pow(1 - k, 3));
-        var txt = v.toFixed(dec);
-        if (sep) txt = Math.round(v).toLocaleString("en-US");
-        el.textContent = txt;
-        if (k < 1) setTimeout(function () { step(performance.now()); }, 16);
-      })(start);
-    });
-  }
-
-  function scoreCards() {
-    document.querySelectorAll("#s4 .clip").forEach(function (clip, i) {
-      var b = clip.querySelector("b[data-to]");
-      var to = +b.dataset.to;
-      setTimeout(function () {
-        var start = performance.now();
-        (function step(now) {
-          var k = Math.min(1, (now - start) / 1000);
-          b.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
-          if (k < 1) setTimeout(function () { step(performance.now()); }, 16);
-          else if (clip.dataset.low) clip.classList.add("dim");
-        })(start);
-      }, 400 + i * 180);
-    });
-  }
-
-  function enter(i) {
-    els.forEach(function (el, k) { el.classList.toggle("on", k === i); });
-    current = i;
-    var id = SCENES[i].id;
-    if (id === "s1") { try { vid.currentTime = 0; vid.play().catch(function () {}); } catch (_) {} }
-    if (id === "sA") { try { whatvid.currentTime = 0; whatvid.play().catch(function () {}); } catch (_) {} }
-    if (id === "s4") scoreCards();
-    if (id === "s5") countUp(els[i]);
-  }
-
-  function resetScene(el) {
-    el.classList.remove("on");
-    el.querySelectorAll("b[data-to]").forEach(function (b) { b.textContent = "0"; });
-    el.querySelectorAll(".clip.dim").forEach(function (c) { c.classList.remove("dim"); });
-    el.querySelectorAll("[data-count]").forEach(function (c) { c.textContent = "0"; });
-  }
-
-  function elapsed() { return playing ? offset + (performance.now() - t0) / 1000 : offset; }
-
-  function tick() {
-    var t = elapsed();
-    if (t >= TOTAL) { t = TOTAL; offset = TOTAL; playing = false; playbtn.textContent = "↻"; playbtn.setAttribute("aria-label", "Replay"); }
-    var i = 0;
-    for (var k = 0; k < SCENES.length; k++) if (t >= SCENES[k].at) i = k;
-    if (i !== current) enter(i);
-    prog.style.width = (t / TOTAL * 100) + "%";
-    // a timer, not requestAnimationFrame, so the scene clock keeps going in a background pane
-    if (playing) raf = setTimeout(tick, 33);
-  }
-
-  function play() {
-    if (offset >= TOTAL) return restart();
-    document.getElementById("stage").classList.remove("instant");
-    playing = true; t0 = performance.now();
-    document.getElementById("stage").classList.remove("paused");
-    playbtn.textContent = "❚❚"; playbtn.setAttribute("aria-label", "Pause");
-    if (current === 0) vid.play().catch(function () {});
-    clearTimeout(raf); raf = setTimeout(tick, 0);
-  }
-  function pause() {
-    offset = elapsed(); playing = false; clearTimeout(raf);
-    playbtn.textContent = "▶"; playbtn.setAttribute("aria-label", "Play");
-    vid.pause(); whatvid.pause();
-  }
-  function restart() {
-    clearTimeout(raf);
-    els.forEach(resetScene);
-    void document.body.offsetWidth;   // let the CSS animations start again
-    current = -1; offset = 0; play();
-  }
-
-  playbtn.addEventListener("click", function () {
-    if (offset >= TOTAL && !playing) restart();
-    else if (playing) pause(); else play();
-  });
-  document.getElementById("replay2").addEventListener("click", restart);
-  document.addEventListener("keydown", function (e) {
-    if (e.key === " ") { e.preventDefault(); playbtn.click(); }
-    if (e.key === "r" || e.key === "R") restart();
-  });
-  document.addEventListener("visibilitychange", function () { if (document.hidden && playing) pause(); });
-
-  function start() {
-    var saved = null;
-    try { saved = localStorage.getItem("gg-demo-lang"); } catch (_) {}
-    var q = new URLSearchParams(location.search);
-    setLang(q.get("lang") === "ko" || (!q.get("lang") && saved === "ko") ? "ko" : "en");
-    // ?at=12 opens the demo paused at second 7, with that scene already drawn
-    var at = parseFloat(q.get("at"));
-    if (at >= 0) {
-      document.getElementById("stage").classList.add("instant");
-      els.forEach(resetScene);
-      current = -1; offset = Math.min(at, TOTAL); playing = false;
-      tick();
-      playbtn.textContent = "▶"; playbtn.setAttribute("aria-label", "Play");
-      return;
-    }
-    restart();
-  }
-
-  start();
+  var other = document.querySelector('[data-k="other"]');
+  other.hreflang = "ko";
+  other.lang = "ko";
 })();
 </script>
 </body>

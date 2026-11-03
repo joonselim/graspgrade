@@ -48,7 +48,7 @@ def main():
     <a href="#summary" data-nav="summary">Summary</a>
     <a href="#story" data-nav="story">Key experiments</a>
     <a href="logs.html">Experiment log</a>
-    <a href="demo.html">Demo</a>
+    <a href="demo.html?lang=en">Demo</a>
     <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 
@@ -56,7 +56,6 @@ def main():
     s = between(s, '  <footer>', '</main>', f'''  <footer>
     Video sources: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
     Last updated {stamp}
-    <p class="demo-link"><a href="assets/video/graspgrade_demo.mp4">Watch the 3 minute video →</a></p>
     <p class="demo-link"><a href="logs.html">Full experiment log →</a></p>
   </footer>
 
