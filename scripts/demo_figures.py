@@ -150,7 +150,7 @@ def cards():
     fig.text(0.06, 0.84, "GraspGrade", fontsize=80, fontweight="bold")
     box(fig, 0.06, 0.30, 0.26, 0.38, "#eef3fc")
     fig.text(0.08, 0.62, "INPUT", fontsize=24, color=HI, fontweight="bold")
-    fig.text(0.08, 0.49, "First-person\nhand video", fontsize=46, fontweight="bold", va="center", linespacing=1.3)
+    fig.text(0.08, 0.49, "Human\negocentric\nvideo", fontsize=40, fontweight="bold", va="center", linespacing=1.2)
     fig.text(0.08, 0.35, "any length", fontsize=28, color=MUTED)
     fig.text(0.37, 0.49, "→", fontsize=110, color=HI, ha="center", va="center")
     fig.text(0.42, 0.62, "OUTPUT", fontsize=24, color=HI, fontweight="bold")

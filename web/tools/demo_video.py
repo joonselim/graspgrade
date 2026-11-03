@@ -86,7 +86,7 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
-        "news": ["Meta is building humanoid robots (reported)", "Meta × Fourier", "Humanoid robots, built together",
+        "news": ["Meta is building humanoid robots (reported)", "Meta", "with Fourier", "Building humanoid robots",
                  "Stand-in footage.", "Source: YouTube @Futur Decoded"],
         "news_cuts": ["Meta has"],
         "hw": ["The robot body is being built.", "What about the physical AI model that drives it?",
@@ -98,7 +98,7 @@ TEXT = {
                   [("Robot data is slow and costly", "Recorded by remote control, one robot at a time"),
                    ("A human hand is not a robot hand", "Each grasp must be moved onto the robot (retargeting)"),
                    ("Most hand video is not usable", "83 of 2,000 internet clips passed a quality check (Do as I Do)")]],
-        "s1_title": "First-person hand video: easy to collect, hard to choose",
+        "s1_title": "Human egocentric video: easy to collect, hard to choose",
         "future": ["Done in this hackathon, and next", "This hackathon", "Next",
                    [("Rigid objects (HOT3D)", "Touch check for soft objects (now 51.7%, rule 70%)"),
                     ("One robot hand, geometric check", "Physics-based retargeting and more robot hands"),
@@ -117,7 +117,7 @@ TEXT = {
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
-        "news": ["Meta가 휴머노이드 로봇을 만들기 시작함 (보도)", "Meta × Fourier", "휴머노이드 로봇 공동 제작",
+        "news": ["Meta가 휴머노이드 로봇을 만들기 시작함 (보도)", "Meta", "Fourier와 함께", "휴머노이드 로봇 제작",
                  "대체 영상.", "출처: YouTube @Futur Decoded"],
         "news_cuts": ["메타가"],
         "hw": ["로봇의 몸은 만들어지고 있다.", "그런데 이 몸을 움직일 피지컬 AI 모델은?", "아직 매우 초기 단계다."],
@@ -175,9 +175,9 @@ NARRATION = {
         "0a": "So why is physical AI still so far from its GPT moment? Language models learned from the whole "
               "internet. Robots have no data at that scale. Robot data from remote control is slow and costly. A "
               "human hand is not a robot hand. And most hand video is not usable. This is where GraspGrade comes in.",
-        "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
+        "0b": "Human egocentric video is the easiest data to collect and grow. It has two problems: moving each "
               "grasp onto a robot hand, and choosing which videos are worth using. We solve the second problem.",
-        "2": "GraspGrade cuts first-person hand video into clips at each touch, and scores each clip from 0 to 100 "
+        "2": "GraspGrade cuts human egocentric video into clips at each touch, and scores each clip from 0 to 100 "
              "for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a "
              "short checklist. We check both steps against real sensor data.",
         "3a": "First, when does a touch start and end? The top track is a touch-sensing glove. Below it are Muse Spark "
@@ -398,14 +398,15 @@ def staged(images, times, name):
 
 
 def news_card():
-    """Meta and Fourier building humanoid robots, next to the stand-in footage."""
+    """Meta building humanoid robots (Fourier in small type), next to the stand-in footage."""
     im = canvas()
     d = ImageDraw.Draw(im)
-    title, big, line, note, source = T("news")
+    title, big, small, line, note, source = T("news")
     header(d, title)
     x = NEWS_X + NEWS_W + 120
-    d.text((x, 360), big, font=font(96, True), fill=INK)
-    d.text((x, 500), line, font=font(44), fill=INK2)
+    d.text((x, 320), big, font=font(120, True), fill=INK)
+    d.text((x + 4, 470), line, font=font(48, True), fill=INK2)
+    d.text((x + 6, 545), small, font=font(34), fill=MUTED)
     d.text((x, NEWS_Y + NEWS_H - 66), note, font=font(24), fill=MUTED)
     d.text((x, NEWS_Y + NEWS_H - 30), source, font=font(24), fill=MUTED)
     return im
