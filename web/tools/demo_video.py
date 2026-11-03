@@ -86,6 +86,12 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
+        "news": ["Meta Max, a humanoid of its own (reported)",
+                 "Stand-in footage. No public images of Max yet.",
+                 [("Height", "about 5 ft"), ("Weight", "about 100 lb"), ("Job", "help with chores"),
+                  ("Built", "in 3 months, with Fourier"), ("Next", "version 2 climbs stairs")]],
+        "news_marks": ["five feet", "100 pounds", "chores", "three months", "second version"],
+        "news_cuts": ["Max stands", "Meta built it"],
         "intro_marks": ["Language models", "Robot data", "A human hand", "And most hand video", "This is where"],
         "intro": ["Why is physical AI still far from its GPT moment?",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
@@ -111,6 +117,12 @@ TEXT = {
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
+        "news": ["Meta의 휴머노이드 맥스 (보도)",
+                 "대체 영상. 맥스의 공개 사진은 아직 없음.",
+                 [("키", "약 152 cm"), ("무게", "약 45 kg"), ("용도", "집안일 돕기"),
+                  ("제작", "3개월, Fourier와 함께"), ("다음", "계단 오르는 2번째 버전")]],
+        "news_marks": ["152", "45", "집안일", "석 달", "두 번째"],
+        "news_cuts": ["이름은 맥스", "메타는 중국"],
         "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
         "intro": ["피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까?",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
@@ -157,7 +169,11 @@ def T(key):
 # comes next. The soft object result is part of the next steps (EXP-42).
 NARRATION = {
     "en": {
-        "0a": "Why is physical AI still so far from its GPT moment? Language models learned from the whole "
+        "n0": "Good morning, robotics enthusiasts. Meta has reportedly built a humanoid of its own. Max stands five "
+              "feet tall, weighs about 100 pounds, and is designed to help with chores. Meta built it in three months "
+              "with Chinese robotics firm Fourier, and a second version that can climb stairs is already in "
+              "development.",
+        "0a": "So why is physical AI still so far from its GPT moment? Language models learned from the whole "
               "internet. Robots have no data at that scale. Robot data from remote control is slow and costly. A "
               "human hand is not a robot hand. And most hand video is not usable. This is where GraspGrade comes in.",
         "0b": "First-person hand video is the easiest data to collect and grow. It has two problems: moving each "
@@ -187,7 +203,10 @@ NARRATION = {
              "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
-        "0a": "피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 "
+        "n0": "로봇 팬 여러분, 좋은 아침입니다. 메타가 자체 휴머노이드를 만들었다는 보도가 나왔습니다. 이름은 맥스로, "
+              "키는 약 152센티미터, 무게는 약 45킬로그램이고, 집안일을 돕도록 설계됐습니다. 메타는 중국 로봇 회사 "
+              "Fourier와 함께 석 달 만에 만들었고, 계단을 오르는 두 번째 버전도 이미 개발 중입니다.",
+        "0a": "그렇다면 피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 "
               "그만한 데이터가 없습니다. 원격 조종으로 모으는 로봇 데이터는 느리고 비쌉니다. 사람 손은 로봇 손과 "
               "다릅니다. 그리고 대부분의 손 영상은 쓸 수 없습니다. 바로 여기서 GraspGrade가 시작됩니다.",
         "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
@@ -219,7 +238,7 @@ NARRATION = {
 }
 
 # how the Korean voice should say names and decimals; the captions keep the written form
-SAY_KO = [("GPT", "지피티"), ("피지컬 AI", "피지컬 에이아이"), ("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
+SAY_KO = [("GPT", "지피티"), ("피지컬 AI", "피지컬 에이아이"), ("GraspGrade", "그래스프 그레이드"), ("Muse Spark", "뮤즈 스파크"), ("Fourier", "푸리에"), ("SAM", "샘"), ("HOT3D", "핫 쓰리디"),
           ("Allegro", "알레그로"), ("AUC", "에이유씨"), ("F1", "에프원"), ("Meta", "메타"), ("1인칭", "일인칭")]
 DIGITS_KO = "영일이삼사오육칠팔구"
 
@@ -349,6 +368,60 @@ def intro_card(stage=5, with_title=True):
     return im
 
 
+# stand-in humanoid footage for the news shot: (start, length) in seconds, one part per sentence.
+# The file is a downloaded YouTube video kept in web/vids, which is not in git.
+NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_YouTube_Media_eGSrUaca0BM_Which-Humanoid-Robots-Are-Actually-"
+                                    "Working-in-2026-One-Is-Remote-Controlled_001_720p.mp4")
+NEWS_PARTS = [(84.0, 3.9), (512.0, 15.9), (0.0, 6.5)]  # robot on a stand, robot in a kitchen, row of robots
+
+
+def voice_times(key, marks, dur):
+    """When the voice of a shot reaches each mark, from the mark's place in the text."""
+    text = NARRATION[LANG][key]
+    wav = VOICE / f"{key}.wav"
+    span = wav_len(wav) if wav.exists() else dur - LEAD - TAIL
+    return [LEAD + span * text.index(m) / len(text) for m in marks]
+
+
+def news_card(stage):
+    """The reported facts about Max, next to the stand-in footage. stage: how many facts are shown."""
+    im = canvas()
+    d = ImageDraw.Draw(im)
+    title, note, rows = T("news")
+    header(d, title)
+    d.text((80, 150 + 648 + 14), note, font=font(24), fill=MUTED)
+    d.text((1300, 160), "Max", font=font(64, True), fill=INK)
+    for i, (lab, val) in enumerate(rows[:stage]):
+        y = 280 + i * 104
+        d.text((1300, y), lab, font=font(26), fill=MUTED)
+        d.text((1300, y + 34), val, font=font(36, True), fill=BLUE if i == len(rows) - 1 else INK)
+    return im
+
+
+def news_scene(out, dur):
+    times = voice_times("n0", T("news_marks"), dur)
+    cuts = voice_times("n0", T("news_cuts"), dur)
+    ins, graph = [], []
+    for stage in range(len(times) + 1):
+        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(news_card(stage), f"sn_news_{stage}.png"))]
+    last = "0:v"
+    for stage, t in enumerate(times, 1):
+        graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
+                     f"[{last}][f{stage}]overlay=0:0[o{stage}]")
+        last = f"o{stage}"
+    # one footage part per sentence, slowed down when the sentence is longer than the part
+    bounds = [0.0] + cuts + [dur]
+    n = len(times) + 1
+    for i, ((start, length), a, b) in enumerate(zip(NEWS_PARTS, bounds, bounds[1:])):
+        need = b - a
+        ins += ["-ss", f"{start}", "-t", f"{min(length, need)}", "-i", str(NEWS_SRC)]
+        slow = max(need / length, 1.0)
+        graph.append(f"[{n + i}:v]setpts=(PTS-STARTPTS)*{slow:.3f},fps={FPS},scale=1152:648,setsar=1[p{i}]")
+    graph.append("".join(f"[p{i}]" for i in range(len(NEWS_PARTS))) + f"concat=n={len(NEWS_PARTS)}:v=1:a=0[foot]")
+    graph.append(f"[{last}][foot]overlay=80:150:eof_action=repeat")
+    encode((ins, ";".join(graph)), out, dur)
+
+
 def intro_title_font():
     size = 60
     while ImageDraw.Draw(canvas()).textlength(T("intro")[0], font=font(size, True)) > W - 280:
@@ -359,10 +432,7 @@ def intro_title_font():
 def intro_scene(out, dur):
     """The intro card, built up line by line as the voice reaches each line. The question starts
     a little above the middle, like a title, and moves up to its place as the first line appears."""
-    text = NARRATION[LANG]["0a"]
-    wav = VOICE / "0a.wav"
-    span = wav_len(wav) if wav.exists() else dur - LEAD - TAIL
-    times = [LEAD + span * text.index(m) / len(text) for m in T("intro_marks")]
+    times = voice_times("0a", T("intro_marks"), dur)
     ins, graph, last = [], [], "0:v"
     for stage in range(len(times) + 1):
         im = intro_card(stage, with_title=False)
@@ -627,6 +697,7 @@ def build(only=None):
     fig = lambda name, png, im_ko: (lambda o, d: still(save(im_ko() if ko else figure_frame(png), name), o, d))  # noqa
     card = lambda png, im_ko: (lambda o, d: still(save(im_ko(), png) if ko else FIG / png, o, d))  # noqa: E731
     parts = [
+        ("n0", "0", 16, news_scene),
         ("0a", "0", 22, intro_scene),
         ("0b", "1", 16, lambda o, d: scene1(o, d, n2)),
         ("2", "2", 15, card("demo_card_scene2.png", card2_ko)),
