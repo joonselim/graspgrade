@@ -5,24 +5,19 @@
   "Balanced": 50,
   "Volume": 30
  },
- "held_out": {
-  "clips": 1426,
-  "auc_ours": 0.624,
-  "auc_muse_alone": 0.501
- },
  "clips": [
   {
-   "id": "P0010_1573a837_right_02542",
-   "video": "assets/try/P0010_1573a837_right_02542.mp4",
-   "object": "mug_patterned",
-   "hand": "right",
-   "person": "P0010",
-   "duration": 10.27,
+   "id": "P0001_f6cc0cc8_left_01665",
+   "video": "assets/try/P0001_f6cc0cc8_left_01665.mp4",
+   "object": "puzzle_toy",
+   "hand": "left",
+   "person": "P0001",
+   "duration": 5.2,
    "contact": [
-    4.0,
-    6.27
+    1.0,
+    4.2
    ],
-   "score": 74.1,
+   "score": 60.7,
    "copyable": true,
    "failed": null,
    "grades": [
@@ -30,7 +25,7 @@
      "key": "grade_camera_stability",
      "name": "Camera stability",
      "source": "video",
-     "value": 1.0,
+     "value": 0.0,
      "weight": -0.03
     },
     {
@@ -44,7 +39,7 @@
      "key": "grade_hand_shape_fit",
      "name": "Hand shape fit",
      "source": "video",
-     "value": 1.0,
+     "value": 0.5,
      "weight": 0.434
     },
     {
@@ -100,21 +95,21 @@
      "key": "object_handle",
      "name": "Handle",
      "source": "muse",
-     "value": 1.0,
+     "value": 0.0,
      "weight": 0.258
     },
     {
      "key": "free_space",
      "name": "Free space around the object",
      "source": "muse",
-     "value": 0.0,
+     "value": 1.0,
      "weight": -0.171
     }
    ],
-   "muse_reason": "Right hand holds small handled mug with visible fingertips close to keyboard.",
+   "muse_reason": "Small blocky cube held in air far from other objects with fingertips visible.",
    "muse_alone": {
-    "probability": 0.9,
-    "reason": "Mug body provides wide-spaced opposite contacts that fit a larger hand without penetration."
+    "probability": 0.85,
+    "reason": "Rubik's cube pinch uses large flat opposite faces easily matched by Allegro thumb and finger without collision."
    }
   },
   {
