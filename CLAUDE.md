@@ -97,7 +97,7 @@ Windows 사본을 WSL로 동기화:
 | `scripts/number1_final_report.py` | 숫자 1 held-out 최종 보고 (EXP-37): `score` 결과와 같은 행을 다시 만들어 일치 확인, 참고 행 2개, 손별, B 지연, 사후 비교 (C-B, A+보정 - C+보정), 짧은 에피소드 9개 왼손. API 호출 없음 |
 | `scripts/check_paid_cache.py` | 가짜 클라이언트로 유료 캐시 점검 (실패/해석 불가 응답은 완료로 저장 안 됨, arm C 구간 변경 시 중단, `--final` 빈 등급 시 중단, 보정 에피소드에 held-out이 있으면 중단). API 호출 없음 |
 | `web/tools/demo_video.py` | 데모 영상 3분을 docs/DEMO_VIDEO.md대로 합성 (뷰어 데이터와 영상, `out/demo/` 그림과 카드). WSL에서 실행, 결과 `out/demo/graspgrade_demo.mp4`. `--only 3a`는 샷 하나, `--voice-text`는 샷별 내레이션 문구만 씀. 샷별 WAV가 있으면 길이를 맞추고 소리를 섞음. 영어 음성은 David -Rate 2, `--lang ko`는 한국어판 (`voice_ko/`, Heami 음성 -Rate 4, 결과 `graspgrade_demo_ko.mp4`). 첫 장면(Meta와 Fourier 휴머노이드 소식)은 `web/vids/`의 @Futur Decoded 쇼츠를 대체 화면으로 씀 (git 제외, WSL `~/graspgrade/web/vids/`에 복사해 둠). API 호출 없음 |
-| `web/tools/demo_voice_el.py` | 영어 내레이션을 ElevenLabs Eric 음성으로 (`out/demo/voice_el/`, 이미 있는 샷은 건너뜀). `--send` 없으면 크레딧만 출력. 무료 크레딧 사용, 사용자가 호출하자고 할 때만. 영상은 `demo_video.py --voice el` |
+| `web/tools/demo_voice_el.py` | 영어 내레이션을 ElevenLabs Eric 음성으로 (`out/demo/voice_el/`, 이미 있는 샷은 건너뜀, 문구를 바꾼 샷은 WAV를 지우고 다시 호출). 사이트 영어 영상은 이 음성 (`demo_video.py --voice el` 결과를 `graspgrade_demo.mp4`로 복사). 받은 MP3를 1.1배로 (`--rewav`). `--send` 없으면 크레딧만 출력. 무료 크레딧 사용, 사용자가 호출하자고 할 때만. 영상은 `demo_video.py --voice el` |
 | `web/tools/demo_voice.ps1` | 샷별 내레이션을 Windows 내장 합성 음성으로 WAV로 만듦 (PowerShell, WSL `out/demo/voice/`) |
 | `web/tools/build_en.py` | 영어 보고서 페이지 `en.html`을 `index.html`과 `tools/en/`에서 만듦 |
 | `web/tools/build_logs.py` | 실험 기록 전체 페이지 `logs.html`을 `docs/experiments/`에서 만들고 그림을 `assets/logs/`로 복사 |
