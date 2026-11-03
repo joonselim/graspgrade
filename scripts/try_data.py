@@ -23,7 +23,7 @@ from viewer_data import LABELS  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "web" / "assets" / "try"
 # four high scored clips a robot hand can copy, two low scored clips it cannot
-CLIPS = ["P0010_99385ad8_left_00073", "P0001_4bf4e21a_left_01577", "P0001_9b6feab7_left_01691",
+CLIPS = ["P0010_1573a837_right_02542", "P0001_4bf4e21a_left_01577", "P0001_9b6feab7_left_01691",
          "P0010_1573a837_left_01933", "P0012_d6272ce1_left_00290", "P0001_15c4300c_left_01513"]
 # where each grade comes from
 SOURCE = {"grade_camera_stability": "video", "grade_completeness": "video", "grade_hand_shape_fit": "video",

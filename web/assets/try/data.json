@@ -12,17 +12,17 @@
  },
  "clips": [
   {
-   "id": "P0010_99385ad8_left_00073",
-   "video": "assets/try/P0010_99385ad8_left_00073.mp4",
-   "object": "mug_white",
-   "hand": "left",
+   "id": "P0010_1573a837_right_02542",
+   "video": "assets/try/P0010_1573a837_right_02542.mp4",
+   "object": "mug_patterned",
+   "hand": "right",
    "person": "P0010",
-   "duration": 8.67,
+   "duration": 10.27,
    "contact": [
-    3.43,
-    4.67
+    4.0,
+    6.27
    ],
-   "score": 78.3,
+   "score": 74.1,
    "copyable": true,
    "failed": null,
    "grades": [
@@ -30,14 +30,14 @@
      "key": "grade_camera_stability",
      "name": "Camera stability",
      "source": "video",
-     "value": 0.0,
+     "value": 1.0,
      "weight": -0.03
     },
     {
      "key": "grade_completeness",
      "name": "Action completeness",
      "source": "video",
-     "value": 0.0,
+     "value": 1.0,
      "weight": -0.331
     },
     {
@@ -51,7 +51,7 @@
      "key": "grade_visibility",
      "name": "Visibility",
      "source": "sam",
-     "value": 0.0,
+     "value": 1.0,
      "weight": 0.043
     },
     {
@@ -107,14 +107,14 @@
      "key": "free_space",
      "name": "Free space around the object",
      "source": "muse",
-     "value": 0.5,
+     "value": 0.0,
      "weight": -0.171
     }
    ],
-   "muse_reason": "White mug with handle grasped with visible fingertips and nearby remote.",
+   "muse_reason": "Right hand holds small handled mug with visible fingertips close to keyboard.",
    "muse_alone": {
-    "probability": 0.85,
-    "reason": "Left hand cups the large open bottom and side of the mug with spread contact that fits larger robot fingertips without penetration."
+    "probability": 0.9,
+    "reason": "Mug body provides wide-spaced opposite contacts that fit a larger hand without penetration."
    }
   },
   {
