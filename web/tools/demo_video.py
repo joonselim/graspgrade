@@ -86,12 +86,12 @@ def header(d, left, right=None):
 # ---------------------------------------------------------------- words on screen
 TEXT = {
     "en": {
-        "news": ["Meta Max, a humanoid of its own (reported)",
-                 "Stand-in footage. No public images of Max yet.", "Source: YouTube @Futur Decoded",
-                 [("Height", "about 5 ft"), ("Weight", "about 100 lb"), ("Job", "help with chores"),
-                  ("Built", "in 3 months, with Fourier"), ("Next", "version 2 climbs stairs")]],
-        "news_marks": ["five feet", "100 pounds", "chores", "three months", "second version"],
-        "news_cuts": ["Max stands", "Meta built it"],
+        "news": ["Meta is building humanoid robots (reported)", "Meta × Fourier", "Humanoid robots, built together",
+                 "Stand-in footage.", "Source: YouTube @Futur Decoded"],
+        "news_cuts": ["Meta has"],
+        "hw": ["The robot body is being built.", "What about the physical AI model that drives it?",
+               "Still at a very early stage."],
+        "hw_marks": ["But how far", "It is still"],
         "intro_marks": ["Language models", "Robot data", "A human hand", "And most hand video", "This is where"],
         "intro": ["Why is physical AI still far from its GPT moment?",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
@@ -117,12 +117,11 @@ TEXT = {
         "hand": {"left": "left", "right": "right"}, "why": {}, "obj": {},
     },
     "ko": {
-        "news": ["Meta의 휴머노이드 맥스 (보도)",
-                 "대체 영상. 맥스의 공개 사진은 아직 없음.", "출처: YouTube @Futur Decoded",
-                 [("키", "약 152 cm"), ("무게", "약 45 kg"), ("용도", "집안일 돕기"),
-                  ("제작", "3개월, Fourier와 함께"), ("다음", "계단 오르는 2번째 버전")]],
-        "news_marks": ["152", "45", "집안일", "석 달", "두 번째"],
-        "news_cuts": ["이름은 맥스", "메타는 중국"],
+        "news": ["Meta가 휴머노이드 로봇을 만들기 시작함 (보도)", "Meta × Fourier", "휴머노이드 로봇 공동 제작",
+                 "대체 영상.", "출처: YouTube @Futur Decoded"],
+        "news_cuts": ["메타가"],
+        "hw": ["로봇의 몸은 만들어지고 있다.", "그런데 이 몸을 움직일 피지컬 AI 모델은?", "아직 매우 초기 단계다."],
+        "hw_marks": ["그렇다면", "아직 매우"],
         "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
         "intro": ["피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까?",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
@@ -169,10 +168,10 @@ def T(key):
 # comes next. The soft object result is part of the next steps (EXP-42).
 NARRATION = {
     "en": {
-        "n0": "Good morning, robotics enthusiasts. Meta has reportedly built a humanoid of its own. Max stands five "
-              "feet tall, weighs about 100 pounds, and is designed to help with chores. Meta built it in three months "
-              "with Chinese robotics firm Fourier, and a second version that can climb stairs is already in "
-              "development.",
+        "n0": "Good morning, robotics enthusiasts. Meta has reportedly started building humanoid robots, together "
+              "with the Chinese robotics firm Fourier.",
+        "n1": "The robot body is being built. But how far along is the physical AI model that drives it? It is still at a "
+              "very early stage.",
         "0a": "So why is physical AI still so far from its GPT moment? Language models learned from the whole "
               "internet. Robots have no data at that scale. Robot data from remote control is slow and costly. A "
               "human hand is not a robot hand. And most hand video is not usable. This is where GraspGrade comes in.",
@@ -203,10 +202,11 @@ NARRATION = {
              "are open as a benchmark. GraspGrade finds the hand videos a robot can learn from.",
     },
     "ko": {
-        "n0": "로봇 팬 여러분, 좋은 아침입니다. 메타가 자체 휴머노이드를 만들었다는 보도가 나왔습니다. 이름은 맥스로, "
-              "키는 약 152센티미터, 무게는 약 45킬로그램이고, 집안일을 돕도록 설계됐습니다. 메타는 중국 로봇 회사 "
-              "Fourier와 함께 석 달 만에 만들었고, 계단을 오르는 두 번째 버전도 이미 개발 중입니다.",
-        "0a": "그렇다면 피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 "
+        "n0": "로봇 팬 여러분, 좋은 아침입니다. 메타가 중국 로봇 회사 Fourier와 함께 휴머노이드 로봇을 만들기 "
+              "시작했다는 보도가 나왔습니다.",
+        "n1": "로봇의 몸은 만들어지고 있습니다. 그렇다면 이 몸을 움직일 피지컬 AI 모델은 어디까지 왔을까요? 아직 매우 "
+              "초기 단계입니다.",
+        "0a": "그럼 피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까요? 언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 "
               "그만한 데이터가 없습니다. 원격 조종으로 모으는 로봇 데이터는 느리고 비쌉니다. 사람 손은 로봇 손과 "
               "다릅니다. 그리고 대부분의 손 영상은 쓸 수 없습니다. 바로 여기서 GraspGrade가 시작됩니다.",
         "0b": "1인칭 손 영상은 가장 쉽게 모으고 가장 크게 키울 수 있는 데이터입니다. 하지만 두 가지 문제가 있습니다. "
@@ -370,10 +370,10 @@ def intro_card(stage=5, with_title=True):
 
 # stand-in humanoid footage for the news shot, from a YouTube Short by @Futur Decoded (vertical, 720x1280).
 # The file is kept in web/vids, which is not in git. Parts as (start, length) in seconds, one per sentence,
-# all without text on screen: a robot walking in a lab, robots in a living room, GR-1 robots in a factory.
+# both without text on screen: a robot walking in a lab, then GR-1 robots in a factory.
 NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_Shorts_Media_ZVXDGCtnItg_Meta-Reportedly-Built-Humanoid-Robot-Max-"
                                     "in-3-Month-with-Fourier-Report_001_720p.mp4")
-NEWS_PARTS = [(3.0, 4.9), (81.0, 6.35), (60.0, 10.0)]
+NEWS_PARTS = [(3.0, 4.9), (60.0, 10.0)]
 NEWS_X, NEWS_Y, NEWS_W, NEWS_H = 160, 125, 405, 720
 
 
@@ -385,46 +385,64 @@ def voice_times(key, marks, dur):
     return [LEAD + span * text.index(m) / len(text) for m in marks]
 
 
-def news_card(stage):
-    """The reported facts about Max, next to the stand-in footage. stage: how many facts are shown."""
+def staged(images, times, name):
+    """ffmpeg inputs and graph that show images[0], then fade in each next image at its time."""
+    ins, graph, last = [], [], "0:v"
+    for i, im in enumerate(images):
+        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(im, f"{name}_{i}.png"))]
+    for i, t in enumerate(times, 1):
+        graph.append(f"[{i}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{i}];"
+                     f"[{last}][f{i}]overlay=0:0[o{i}]")
+        last = f"o{i}"
+    return ins, graph, last
+
+
+def news_card():
+    """Meta and Fourier building humanoid robots, next to the stand-in footage."""
     im = canvas()
     d = ImageDraw.Draw(im)
-    title, note, source, rows = T("news")
+    title, big, line, note, source = T("news")
     header(d, title)
     x = NEWS_X + NEWS_W + 120
-    d.text((x, 130), "Max", font=font(80, True), fill=INK)
-    for i, (lab, val) in enumerate(rows[:stage]):
-        y = 260 + i * 100
-        d.text((x, y), lab, font=font(28), fill=MUTED)
-        d.text((x, y + 36), val, font=font(44, True), fill=BLUE if i == len(rows) - 1 else INK)
+    d.text((x, 360), big, font=font(96, True), fill=INK)
+    d.text((x, 500), line, font=font(44), fill=INK2)
     d.text((x, NEWS_Y + NEWS_H - 66), note, font=font(24), fill=MUTED)
     d.text((x, NEWS_Y + NEWS_H - 30), source, font=font(24), fill=MUTED)
     return im
 
 
 def news_scene(out, dur):
-    times = voice_times("n0", T("news_marks"), dur)
-    ins, graph = [], []
-    for stage in range(len(times) + 1):
-        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(news_card(stage), f"sn_news_{stage}.png"))]
-    last = "0:v"
-    for stage, t in enumerate(times, 1):
-        graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
-                     f"[{last}][f{stage}]overlay=0:0[o{stage}]")
-        last = f"o{stage}"
+    ins, graph, last = staged([news_card()], [], "sn_news")
     # one part per sentence at normal speed, each played once: a part ends at the next sentence
     # or at its own end, and the last part runs to the end of the shot
     cuts = voice_times("n0", T("news_cuts"), dur) + [dur]
-    t, n = 0.0, len(times) + 1
+    t = 0.0
     for i, ((start, length), cut) in enumerate(zip(NEWS_PARTS, cuts)):
         take = min(length, cut - t if i < len(NEWS_PARTS) - 1 else dur - t)
         ins += ["-ss", f"{start}", "-t", f"{take:.3f}", "-i", str(NEWS_SRC)]
-        graph.append(f"[{n + i}:v]setpts=PTS-STARTPTS,fps={FPS},scale={NEWS_W}:{NEWS_H},setsar=1[p{i}]")
+        graph.append(f"[{1 + i}:v]setpts=PTS-STARTPTS,fps={FPS},scale={NEWS_W}:{NEWS_H},setsar=1[p{i}]")
         t += take
     if t < dur - 0.05:
         print(f"news footage ends {dur - t:.2f} s before the shot, the last frame holds")
     graph.append("".join(f"[p{i}]" for i in range(len(NEWS_PARTS))) + f"concat=n={len(NEWS_PARTS)}:v=1:a=0[foot]")
     graph.append(f"[{last}][foot]overlay={NEWS_X}:{NEWS_Y}:eof_action=repeat")
+    encode((ins, ";".join(graph)), out, dur)
+
+
+def hw_card(stage):
+    """The body is being built, the model that drives it is not. stage: 0 the first line, 1 with the question,
+    2 with the answer in blue."""
+    im = canvas()
+    d = ImageDraw.Draw(im)
+    lines = [(T("hw")[0], font(44), MUTED), (T("hw")[1], font(60, True), INK), (T("hw")[2], font(60, True), BLUE)]
+    for i, (t, f, fill) in enumerate(lines[:stage + 1]):
+        d.text(((W - d.textlength(t, font=f)) / 2, [260, 370, 500][i]), t, font=f, fill=fill)
+    return im
+
+
+def hw_scene(out, dur):
+    ins, graph, last = staged([hw_card(i) for i in range(3)], voice_times("n1", T("hw_marks"), dur), "sn_hw")
+    graph[-1] = graph[-1].rsplit("[", 1)[0]  # the last overlay is the output
     encode((ins, ";".join(graph)), out, dur)
 
 
@@ -439,14 +457,7 @@ def intro_scene(out, dur):
     """The intro card, built up line by line as the voice reaches each line. The question starts
     a little above the middle, like a title, and moves up to its place as the first line appears."""
     times = voice_times("0a", T("intro_marks"), dur)
-    ins, graph, last = [], [], "0:v"
-    for stage in range(len(times) + 1):
-        im = intro_card(stage, with_title=False)
-        ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(im, f"s0_intro_{stage}.png"))]
-    for stage, t in enumerate(times, 1):
-        graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
-                     f"[{last}][f{stage}]overlay=0:0[o{stage}]")
-        last = f"o{stage}"
+    ins, graph, last = staged([intro_card(i, with_title=False) for i in range(len(times) + 1)], times, "s0_intro")
     # the question on its own layer, eased from the middle to the top left in 0.7 s
     f = intro_title_font()
     q = Image.new("RGBA", (int(ImageDraw.Draw(canvas()).textlength(T("intro")[0], font=f)) + 4, 120), (0, 0, 0, 0))
@@ -703,7 +714,8 @@ def build(only=None):
     fig = lambda name, png, im_ko: (lambda o, d: still(save(im_ko() if ko else figure_frame(png), name), o, d))  # noqa
     card = lambda png, im_ko: (lambda o, d: still(save(im_ko(), png) if ko else FIG / png, o, d))  # noqa: E731
     parts = [
-        ("n0", "0", 16, news_scene),
+        ("n0", "0", 8, news_scene),
+        ("n1", "0", 8, hw_scene),
         ("0a", "0", 22, intro_scene),
         ("0b", "1", 16, lambda o, d: scene1(o, d, n2)),
         ("2", "2", 15, card("demo_card_scene2.png", card2_ko)),
