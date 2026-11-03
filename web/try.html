@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light only">
+<title>GraspGrade Try</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --page: #eef0f3;
+    --sheet: #ffffff;
+    --ink: #1a1d23;
+    --ink-2: #3b4250;
+    --muted: #6a7382;
+    --faint: #9aa2ae;
+    --rule: #dde1e7;
+    --tint: #f5f6f8;
+    --blue: #2350c9;
+    --blue-soft: #e8eefb;
+    --neg: #c8641e;
+    --ok: #2b8a3e;
+    --bad: #c0392b;
+    --sheet-pad: 48px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+      "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    font-size: 15.5px; line-height: 1.6; word-break: keep-all;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button { font: inherit; color: inherit; }
+  .sheet {
+    max-width: 1080px; margin: 28px auto 56px;
+    background: var(--sheet); border: 1px solid var(--rule); padding: var(--sheet-pad);
+  }
+  @media (max-width: 720px) {
+    :root { --sheet-pad: 16px; }
+    .sheet { margin: 0; border: 0; }
+  }
+  .topnav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 22px;
+    margin: calc(var(--sheet-pad) * -1) calc(var(--sheet-pad) * -1) 28px;
+    padding: 0 var(--sheet-pad);
+    background: var(--sheet); border-bottom: 1px solid var(--rule);
+    font-size: 14px; overflow-x: auto; white-space: nowrap;
+  }
+  .topnav .brand { font-weight: 800; letter-spacing: -0.02em; margin-right: auto; padding: 14px 0; }
+  .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
+  .topnav a:hover { color: var(--ink); text-decoration: none; }
+  .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  .topnav a.lang {
+    padding: 3px 8px; border: 1px solid var(--rule); border-radius: 4px;
+    font-size: 12px; font-weight: 600; color: var(--ink-2);
+  }
+  h1 { font-size: 30px; line-height: 1.3; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .lead { margin: 0 0 22px; color: var(--muted); font-size: 14.5px; }
+  @media (max-width: 720px) { h1 { font-size: 25px; } }
+
+  /* clip picker */
+  .picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 26px; }
+  @media (max-width: 860px) { .picker { grid-template-columns: repeat(3, 1fr); } }
+  .pick {
+    padding: 0; border: 2px solid var(--rule); border-radius: 6px; background: var(--sheet);
+    cursor: pointer; text-align: left; overflow: hidden;
+  }
+  .pick:hover { border-color: var(--faint); }
+  .pick.on { border-color: var(--blue); }
+  .pick video { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #111; pointer-events: none; }
+  .pick span { display: block; padding: 6px 8px 7px; font-size: 13px; font-weight: 600; }
+
+  /* stage */
+  .stage { display: grid; grid-template-columns: 380px 1fr; gap: 32px; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; gap: 20px; } }
+  @media (min-width: 861px) { .left { position: sticky; top: 64px; align-self: start; } }
+  .left video { display: block; width: 100%; aspect-ratio: 1; background: #111; border-radius: 4px; }
+  .timeline { position: relative; height: 10px; background: var(--tint); border-radius: 5px; margin: 12px 0 4px; }
+  .timeline .touch { position: absolute; top: 0; bottom: 0; background: var(--blue); border-radius: 5px; opacity: .85; }
+  .timeline .head { position: absolute; top: -4px; width: 2px; height: 18px; background: var(--ink); }
+  .tl-cap { font-size: 12.5px; color: var(--muted); }
+  .meta { margin-top: 12px; font-size: 13px; color: var(--muted); }
+  .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .controls button {
+    padding: 6px 12px; border: 1px solid var(--rule); border-radius: 4px; background: var(--sheet);
+    cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  .controls button:hover { border-color: var(--muted); }
+
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .step { position: relative; padding: 0 0 18px 34px; opacity: .28; transition: opacity .35s; }
+  .step.on { opacity: 1; }
+  .step::before {
+    content: attr(data-n); position: absolute; left: 0; top: 1px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--rule); color: var(--ink-2); font-size: 12px; font-weight: 700; text-align: center; line-height: 22px;
+  }
+  .step.on::before { background: var(--blue); color: #fff; }
+  .step::after { content: ""; position: absolute; left: 10.5px; top: 27px; bottom: 4px; width: 1px; background: var(--rule); }
+  .step:last-child::after { display: none; }
+  .step h3 { margin: 0 0 2px; font-size: 16px; }
+  .step .by { margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
+
+  .grades { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; align-items: center; font-size: 14px; }
+  .grades .g { display: contents; }
+  .grades .g > * { opacity: 0; transform: translateY(4px); transition: opacity .3s, transform .3s; }
+  .grades .g.in > * { opacity: 1; transform: none; }
+  .chip { min-width: 52px; padding: 1px 10px; border-radius: 11px; font-size: 12px; font-weight: 700; text-align: center; }
+  .chip.v1 { background: var(--blue); color: #fff; }
+  .chip.v05 { background: #cfd6df; color: var(--ink); }
+  .chip.v0 { background: #eef0f3; color: var(--muted); }
+  .quote { margin: 8px 0 0; padding: 6px 10px; border-left: 3px solid var(--rule); font-size: 13px; color: var(--ink-2); }
+
+  /* score: contribution of each grade, then the logistic curve */
+  .contrib { display: grid; grid-template-columns: minmax(140px, 280px) 1fr 52px; gap: 3px 10px; align-items: center; font-size: 12.5px; }
+  .contrib .lab { color: var(--ink-2); line-height: 1.35; }
+  .contrib .bar { position: relative; height: 14px; }
+  .contrib .bar::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--faint); }
+  .contrib .bar i { position: absolute; top: 2px; bottom: 2px; width: 0; border-radius: 2px; transition: width .45s, left .45s; }
+  .contrib .num { font-family: var(--mono); text-align: right; color: var(--ink-2); }
+  .contrib .sum { font-weight: 700; color: var(--ink); border-top: 1px solid var(--rule); padding-top: 4px; }
+  .formula { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); font-family: var(--mono); }
+  .curve-row { display: flex; gap: 18px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .curve { width: 220px; height: 120px; flex: none; }
+  .big { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+  .big small { font-size: 18px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .preset { padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid var(--rule); color: var(--muted); }
+  .preset.pass { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+  .verdict { font-size: 15px; font-weight: 700; margin: 6px 0 2px; }
+  .verdict.ok { color: var(--ok); }
+  .verdict.bad { color: var(--bad); }
+  .muted { color: var(--muted); font-size: 13px; }
+  .foot { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="sheet">
+
+  <nav class="topnav" aria-label="Pages">
+    <span class="brand">GraspGrade</span>
+    <a data-k="nav_summary" href="index.html#summary">요약</a>
+    <a data-k="nav_story" href="index.html#story">핵심 실험</a>
+    <a data-k="nav_detail" href="index.html#detail">실험 상세</a>
+    <a data-k="nav_demo" href="demo.html">데모</a>
+    <a class="on" data-k="nav_try" href="try.html">Try</a>
+    <a class="lang" data-k="nav_other" href="try.html?lang=en" hreflang="en" lang="en">EN</a>
+  </nav>
+
+  <h1 data-k="title">Try: 점수가 나오는 과정</h1>
+  <p class="lead" data-k="lead">검증 세트에서 이미 채점한 클립 6개. 클립을 고르면 저장된 결과로 각 단계를 다시 보여 줌.</p>
+
+  <div class="picker" id="picker"></div>
+
+  <div class="stage">
+    <div class="left">
+      <video id="vid" muted playsinline loop></video>
+      <div class="timeline" id="tl"><div class="touch" id="tl-touch"></div><div class="head" id="tl-head"></div></div>
+      <div class="tl-cap" id="tl-cap"></div>
+      <div class="meta" id="meta"></div>
+      <div class="controls">
+        <button type="button" id="replay" data-k="replay">처음부터 다시</button>
+        <button type="button" id="skip" data-k="skip">결과 바로 보기</button>
+      </div>
+    </div>
+
+    <ol class="steps" id="steps">
+      <li class="step" data-n="1">
+        <h3 data-k="s1">손이 닿는 구간</h3>
+        <p class="by" data-k="s1by">실제 사용에서는 SAM 3.1 손·물체 마스크로 구간을 자름(평가 1). 이 검증 클립은 모션캡처로 자른 구간임</p>
+        <div id="s1"></div>
+      </li>
+      <li class="step" data-n="2">
+        <h3 data-k="s2">영상 계산 항목 3개</h3>
+        <p class="by" data-k="s2by">MediaPipe 손 관절과 광학 흐름으로 계산</p>
+        <div class="grades" id="g-video"></div>
+      </li>
+      <li class="step" data-n="3">
+        <h3 data-k="s3">SAM 3.1 항목 2개</h3>
+        <p class="by" data-k="s3by">손과 물체 마스크</p>
+        <div class="grades" id="g-sam"></div>
+      </li>
+      <li class="step" data-n="4">
+        <h3 data-k="s4">Muse Spark 체크리스트 7개</h3>
+        <p class="by" data-k="s4by">접촉 장면 프레임과 짧은 질문 목록</p>
+        <div class="grades" id="g-muse"></div>
+        <p class="quote" id="muse-reason"></p>
+      </li>
+      <li class="step" data-n="5">
+        <h3 data-k="s5">점수 계산</h3>
+        <p class="by" data-k="s5by">로지스틱 회귀. 가중치는 튜닝 클립 400개에서 배움</p>
+        <div class="contrib" id="contrib"></div>
+        <div class="curve-row">
+          <svg class="curve" id="curve" viewBox="0 0 220 120" role="img"></svg>
+          <div class="big" id="big">0<small> / 100</small></div>
+        </div>
+      </li>
+      <li class="step" data-n="6">
+        <h3 data-k="s6">결과</h3>
+        <p class="by" data-k="s6by">기준별 통과 여부와 모션캡처 확인</p>
+        <div class="presets" id="presets"></div>
+        <div id="truth"></div>
+      </li>
+    </ol>
+  </div>
+
+  <p class="foot" data-k="foot">HOT3D (Meta) 검증 클립. 점수와 등급은 최종 실행(EXP-40)에 저장된 값이고, 이 페이지는 아무것도 새로 실행하지 않음.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var EN = new URLSearchParams(location.search).get("lang") === "en";
+  var T = {
+    ko: {
+      grade: { 1: "상", 0.5: "중", 0: "하" },
+      names: {
+        "Camera stability": "카메라 안정성", "Action completeness": "동작 완결성", "Hand shape fit": "손 모양 적합도",
+        "Visibility": "가시성", "Contact clarity": "접촉 명확성", "Finger visibility": "손가락 보임",
+        "Object size next to the hand": "손 대비 물체 크기", "Object shape": "물체 모양", "Object thickness": "물체 두께",
+        "Width to wrap": "감쌀 폭", "Handle": "손잡이", "Free space around the object": "물체 주변 빈 공간"
+      },
+      obj: { mug_white: "흰 머그컵", food_vegetables: "채소 모형", mouse: "마우스", aria_small: "안경 (Aria)",
+             keyboard: "키보드", bowl: "그릇" },
+      hand: { left: "왼손", right: "오른손" },
+      touch: function (a, b) { return "손이 닿는 구간 " + a.toFixed(1) + "초 ~ " + b.toFixed(1) + "초"; },
+      meta: function (c) { return T.ko.obj[c.object] + " · " + T.ko.hand[c.hand] + " · " + c.person + " · " + c.duration.toFixed(1) + "초"; },
+      s1text: function (c) { return "이 구간을 클립으로 잘라 다음 단계로 넘김 (" + (c.contact[1] - c.contact[0]).toFixed(1) + "초)."; },
+      intercept: "기본값 (절편)", sum: "합계 (로짓)",
+      formula: function (z, s) { return "점수 = 100 / (1 + e^(" + (-z).toFixed(2) + ")) = " + s.toFixed(1); },
+      presets: { Strict: "엄격 70+", Balanced: "균형 50+", Volume: "물량 30+" },
+      kept: "통과", dropped: "탈락",
+      ok: "모션캡처 확인: 로봇 손이 따라 할 수 있음",
+      no: function (w) { return "모션캡처 확인: 로봇 손이 따라 할 수 없음 (" + w + ")"; },
+      why: { collision: "충돌, 로봇 손가락이 물체를 뚫음", reach: "도달, 로봇 손가락이 접촉점에 닿지 못함",
+             grip: "쥐기, 물체를 감싸 쥐지 못함" },
+      truthBy: "사람의 잡기 자세를 Allegro 로봇 손으로 옮겨 충돌, 도달, 쥐기를 검사한 결과",
+      muse: function (p) { return "같은 질문을 Muse Spark에 바로 했을 때: " + Math.round(p * 100) + "% 가능"; },
+      match: function (agree) { return agree ? "점수와 모션캡처 결과가 일치함." : "점수와 모션캡처 결과가 다름."; }
+    },
+    en: {
+      grade: { 1: "High", 0.5: "Mid", 0: "Low" },
+      names: {},
+      obj: { mug_white: "White mug", food_vegetables: "Vegetables", mouse: "Mouse", aria_small: "Glasses (Aria)",
+             keyboard: "Keyboard", bowl: "Bowl" },
+      hand: { left: "left hand", right: "right hand" },
+      touch: function (a, b) { return "Hand touches the object from " + a.toFixed(1) + " s to " + b.toFixed(1) + " s"; },
+      meta: function (c) { return T.en.obj[c.object] + " · " + T.en.hand[c.hand] + " · " + c.person + " · " + c.duration.toFixed(1) + " s"; },
+      s1text: function (c) { return "This part is cut out as the clip for the next steps (" + (c.contact[1] - c.contact[0]).toFixed(1) + " s)."; },
+      intercept: "Base value (intercept)", sum: "Total (logit)",
+      formula: function (z, s) { return "score = 100 / (1 + e^(" + (-z).toFixed(2) + ")) = " + s.toFixed(1); },
+      presets: { Strict: "Strict 70+", Balanced: "Balanced 50+", Volume: "Volume 30+" },
+      kept: "kept", dropped: "dropped",
+      ok: "Motion capture check: the robot hand can copy it",
+      no: function (w) { return "Motion capture check: the robot hand cannot copy it (" + w + ")"; },
+      why: { collision: "collision, a robot finger goes into the object", reach: "reach, a robot finger cannot get to the contact point",
+             grip: "grip, the hand cannot close around the object" },
+      truthBy: "The human grasp is moved onto an Allegro robot hand and checked for collision, reach and grip",
+      muse: function (p) { return "Muse Spark asked the same question directly: " + Math.round(p * 100) + "% copyable"; },
+      match: function (agree) { return agree ? "The score and the motion capture check agree." : "The score and the motion capture check disagree."; }
+    }
+  };
+  var L = EN ? T.en : T.ko;
+  var PAGE_EN = {
+    nav_summary: ["Summary", "en.html#summary"], nav_story: ["Key experiments", "en.html#story"],
+    nav_detail: ["Experiment log", "logs.html"], nav_demo: ["Demo", "demo.html?lang=en"],
+    nav_try: ["Try", "try.html?lang=en"], nav_other: ["KO", "try.html"],
+    title: ["Try: how a clip gets its score"],
+    lead: ["Six held-out clips that were already scored. Pick one to replay each step from the stored results."],
+    replay: ["Play again"], skip: ["Show the result"],
+    s1: ["Touch segment"], s1by: ["In real use, SAM 3.1 hand and object masks cut the segment (test 1). These held-out clips were cut with motion capture"],
+    s2: ["Three grades computed from the video"], s2by: ["Computed from MediaPipe hand joints and optical flow"],
+    s3: ["Two SAM 3.1 grades"], s3by: ["Hand and object masks"],
+    s4: ["Muse Spark checklist, seven grades"], s4by: ["Frames of the touch and a short list of questions"],
+    s5: ["Score"], s5by: ["Logistic regression. The weights were learned on 400 tuning clips"],
+    s6: ["Result"], s6by: ["Pass or drop at each preset, and the motion capture check"],
+    foot: ["Held-out HOT3D (Meta) clips. Scores and grades are the values stored in the final run (EXP-40). This page runs nothing new."]
+  };
+  if (EN) {
+    document.documentElement.lang = "en";
+    document.title = "GraspGrade Try";
+    document.querySelectorAll("[data-k]").forEach(function (el) {
+      var v = PAGE_EN[el.dataset.k];
+      if (!v) return;
+      el.textContent = v[0];
+      if (v[1]) el.setAttribute("href", v[1]);
+    });
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DATA, cur, timers = [];
+  var steps = Array.prototype.slice.call(document.querySelectorAll(".step"));
+
+  function name(g) { return L.names[g.name] || g.name; }
+  function later(ms, fn) { timers.push(setTimeout(fn, reduce ? 0 : ms)); }
+  function clear() { timers.forEach(clearTimeout); timers = []; }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function gradeRows(host, list) {
+    host.textContent = "";
+    return list.map(function (g) {
+      var row = el("div", "g");
+      row.appendChild(el("span", null, name(g)));
+      row.appendChild(el("span", "chip v" + String(g.value).replace(".", ""), L.grade[g.value]));
+      host.appendChild(row);
+      return row;
+    });
+  }
+
+  // one row per grade: weight x grade as a bar left or right of zero
+  function contribRows(c) {
+    var host = $("contrib");
+    host.textContent = "";
+    var rows = [{ lab: L.intercept, v: DATA.intercept }].concat(c.grades.map(function (g) {
+      return { lab: name(g) + " · " + L.grade[g.value] + " × " + g.weight.toFixed(2), v: g.weight * g.value };
+    }));
+    var z = rows.reduce(function (a, r) { return a + r.v; }, 0);
+    var max = Math.max(2.4, Math.abs(z), Math.max.apply(null, rows.map(function (r) { return Math.abs(r.v); })));
+    var bars = rows.map(function (r) {
+      host.appendChild(el("span", "lab", r.lab));
+      var b = el("span", "bar"), i = el("i");
+      i.style.left = "50%";
+      i.style.background = r.v >= 0 ? "var(--blue)" : "var(--neg)";
+      b.appendChild(i);
+      host.appendChild(b);
+      host.appendChild(el("span", "num", (r.v >= 0 ? "+" : "") + r.v.toFixed(2)));
+      return { i: i, v: r.v };
+    });
+    var sl = el("span", "lab sum", L.sum), sb = el("span", "bar sum"), si = el("i"), sn = el("span", "num sum", z.toFixed(2));
+    si.style.left = "50%";
+    si.style.background = "var(--ink)";
+    sb.appendChild(si);
+    [sl, sb, sn].forEach(function (e) { e.style.visibility = "hidden"; host.appendChild(e); });
+    var f = el("p", "formula");
+    f.style.gridColumn = "1 / -1";
+    f.style.visibility = "hidden";
+    host.appendChild(f);
+    return {
+      z: z,
+      show: function (k) {
+        var b = bars[k], w = Math.abs(b.v) / max * 50;
+        b.i.style.width = w + "%";
+        b.i.style.left = (b.v >= 0 ? 50 : 50 - w) + "%";
+      },
+      total: function () {
+        var w = Math.abs(z) / max * 50;
+        [sl, sb, sn].forEach(function (e) { e.style.visibility = "visible"; });
+        si.style.width = w + "%";
+        si.style.left = (z >= 0 ? 50 : 50 - w) + "%";
+        f.textContent = L.formula(z, c.score);
+        f.style.visibility = "visible";
+      },
+      count: bars.length
+    };
+  }
+
+  // logistic curve with the clip's logit marked
+  function curve(z, score) {
+    var svg = $("curve"), W = 220, H = 120, lo = -6, hi = 6;
+    var X = function (v) { return 10 + (v - lo) / (hi - lo) * (W - 20); };
+    var Y = function (p) { return H - 14 - p * (H - 28); };
+    var d = "";
+    for (var v = lo; v <= hi + 1e-9; v += 0.25) d += (d ? "L" : "M") + X(v).toFixed(1) + " " + Y(1 / (1 + Math.exp(-v))).toFixed(1);
+    var zc = Math.max(lo, Math.min(hi, z));
+    svg.innerHTML =
+      '<line x1="10" x2="210" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="#dde1e7"/>' +
+      '<line x1="10" x2="210" y1="' + Y(1) + '" y2="' + Y(1) + '" stroke="#dde1e7"/>' +
+      '<line x1="' + X(0) + '" x2="' + X(0) + '" y1="' + Y(1) + '" y2="' + Y(0) + '" stroke="#dde1e7"/>' +
+      '<path d="' + d + '" fill="none" stroke="#9aa2ae" stroke-width="2"/>' +
+      '<line x1="' + X(zc) + '" x2="' + X(zc) + '" y1="' + Y(0) + '" y2="' + Y(score / 100) + '" stroke="#2350c9" stroke-dasharray="3 3"/>' +
+      '<circle cx="' + X(zc) + '" cy="' + Y(score / 100) + '" r="6" fill="#2350c9" stroke="#fff" stroke-width="2"/>' +
+      '<text x="212" y="' + (Y(1) + 4) + '" font-size="10" fill="#6a7382" text-anchor="end">100</text>' +
+      '<text x="212" y="' + (Y(0) - 3) + '" font-size="10" fill="#6a7382" text-anchor="end">0</text>';
+  }
+
+  function countUp(to) {
+    var big = $("big"), t0 = performance.now(), dur = reduce ? 0 : 900;
+    (function frame(now) {
+      var p = dur ? Math.min(1, (now - t0) / dur) : 1;
+      big.firstChild.nodeValue = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(frame);
+    })(t0);
+  }
+
+  function result(c) {
+    var host = $("presets");
+    host.textContent = "";
+    Object.keys(DATA.presets).forEach(function (k) {
+      var pass = c.score >= DATA.presets[k];
+      host.appendChild(el("span", "preset" + (pass ? " pass" : ""), L.presets[k] + " · " + (pass ? L.kept : L.dropped)));
+    });
+    var t = $("truth");
+    t.textContent = "";
+    t.appendChild(el("p", "verdict " + (c.copyable ? "ok" : "bad"), c.copyable ? L.ok : L.no(L.why[c.failed] || c.failed)));
+    t.appendChild(el("p", "muted", L.truthBy));
+    t.appendChild(el("p", "muted", L.match((c.score >= 50) === c.copyable)));
+    if (c.muse_alone) t.appendChild(el("p", "muted", L.muse(c.muse_alone.probability)));
+  }
+
+  function run(c, instant) {
+    clear();
+    cur = c;
+    document.querySelectorAll(".pick").forEach(function (b) { b.classList.toggle("on", b.dataset.id === c.id); });
+    steps.forEach(function (s) { s.classList.remove("on"); });
+    var v = $("vid");
+    if (v.dataset.id !== c.id) { v.src = c.video; v.dataset.id = c.id; }
+    v.currentTime = 0;
+    v.play().catch(function () {});
+    $("tl-touch").style.left = (c.contact[0] / c.duration * 100) + "%";
+    $("tl-touch").style.width = ((c.contact[1] - c.contact[0]) / c.duration * 100) + "%";
+    $("tl-cap").textContent = L.touch(c.contact[0], c.contact[1]);
+    $("meta").textContent = L.meta(c);
+    $("s1").textContent = "";
+    $("s1").appendChild(el("p", "muted", L.s1text(c)));
+    var by = function (s) { return c.grades.filter(function (g) { return g.source === s; }); };
+    var rows = { video: gradeRows($("g-video"), by("video")), sam: gradeRows($("g-sam"), by("sam")),
+                 muse: gradeRows($("g-muse"), by("muse")) };
+    $("muse-reason").textContent = "Muse Spark: “" + c.muse_reason + "”";
+    $("muse-reason").style.visibility = "hidden";
+    var sc = contribRows(c);
+    $("curve").innerHTML = "";
+    $("big").firstChild.nodeValue = "0";
+    $("presets").textContent = "";
+    $("truth").textContent = "";
+
+    var pace = instant ? 0 : 1, t = 0;
+    var at = function (ms, fn) { t += ms * pace; later(t, fn); };
+    at(0, function () { steps[0].classList.add("on"); });
+    [["video", 1], ["sam", 2], ["muse", 3]].forEach(function (p) {
+      at(1500, function () { steps[p[1]].classList.add("on"); });
+      rows[p[0]].forEach(function (r) { at(260, function () { r.classList.add("in"); }); });
+      if (p[0] === "muse") at(300, function () { $("muse-reason").style.visibility = "visible"; });
+    });
+    at(1300, function () { steps[4].classList.add("on"); });
+    for (var k = 0; k < sc.count; k++) (function (k) { at(170, function () { sc.show(k); }); })(k);
+    at(600, function () { sc.total(); curve(sc.z, c.score); countUp(c.score); });
+    at(1500, function () { steps[5].classList.add("on"); result(c); });
+  }
+
+  function pickers() {
+    var host = $("picker");
+    DATA.clips.forEach(function (c) {
+      var b = el("button", "pick");
+      b.type = "button";
+      b.dataset.id = c.id;
+      var v = el("video");
+      v.src = c.video + "#t=" + ((c.contact[0] + c.contact[1]) / 2).toFixed(1);
+      v.muted = true;
+      v.preload = "metadata";
+      v.playsInline = true;
+      b.appendChild(v);
+      b.appendChild(el("span", null, L.obj[c.object]));
+      b.addEventListener("click", function () { run(c, false); });
+      host.appendChild(b);
+    });
+  }
+
+  // playhead follows the video
+  (function tick() {
+    var v = $("vid");
+    if (cur && v.duration) $("tl-head").style.left = (v.currentTime / v.duration * 100) + "%";
+    requestAnimationFrame(tick);
+  })();
+  $("replay").addEventListener("click", function () { if (cur) run(cur, false); });
+  $("skip").addEventListener("click", function () { if (cur) run(cur, true); });
+
+  fetch("assets/try/data.json").then(function (r) { return r.json(); }).then(function (d) {
+    DATA = d;
+    pickers();
+    run(DATA.clips[0], false);
+  });
+})();
+</script>
+</body>
+</html>

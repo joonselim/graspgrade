@@ -79,7 +79,7 @@
       ]
     },
     {
-      title: "Viewer · demo", from: 8, to: 9, status: "doing",
+      title: "Viewer · demo", from: 8, to: 9, status: "done",
       req: [
         "A viewer with segments ranked by score, boxes on the video and a contact signal chart",
         "Demo video and README"
@@ -90,22 +90,18 @@
         ["done", "README (main results, how to run)"],
         ["done", "Demo video plan: 3 minutes, 6 scenes, viewer recordings and 4 figures for the video"],
         ["done", "Recording setup: direct viewer links, two clips side by side"],
-        ["todo", "Example on first-person video we recorded ourselves"],
-        ["todo", "Record the demo video"]
+        ["done", "3 minute demo video (English, Korean)"]
       ]
     },
     {
-      title: "Final measurement · submission", from: 10, to: 10, status: "doing",
+      title: "Final measurement", from: 10, to: 10, status: "done",
       req: [
-        "Measure the final numbers once on the held-out set",
-        "Submit before 11/04 12:00 ET"
+        "Measure the final numbers once on the held-out set"
       ],
       chk: [
         ["done", "Final held-out measurement (EXP-37, EXP-40, EXP-42)"],
         ["done", "Numbers in the report and README"],
-        ["done", "Ground truth packed as a benchmark: label files and independent scorers (EXP-28)"],
-        ["todo", "Final check"],
-        ["todo", "Submit"]
+        ["done", "Ground truth packed as a benchmark: label files and independent scorers (EXP-28)"]
       ]
     }
   ];

@@ -502,6 +502,7 @@
     <a href="#story" data-nav="story">Key experiments</a>
     <a href="logs.html">Experiment log</a>
     <a href="demo.html?lang=en">Demo</a>
+    <a href="try.html?lang=en">Try</a>
     <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 
@@ -516,7 +517,6 @@
     <div class="gantt" id="gantt"></div>
     <div class="legend">
       <span><i style="background:var(--done)"></i>Done</span>
-      <span><i style="background:var(--doing)"></i>In progress</span>
       <span><i style="background:var(--todo)"></i>Planned</span>
       <span><i style="background:color-mix(in srgb, var(--today) 30%, transparent)"></i>Today</span>
     </div>
@@ -709,7 +709,7 @@
             <tr>
               <td class="first">Lab data only</td>
               <td>Both datasets were recorded in a lab. HOT3D fisheye video is used as recorded (EXP-25)</td>
-              <td>Reported as a limit. The demo includes an example on first-person video we recorded ourselves</td>
+              <td>Reported as a limit</td>
             </tr>
             <tr class="extra">
               <td class="first">Low Test 1 boundary scores</td>
@@ -982,7 +982,7 @@
 
   <footer>
     Video sources: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
-    Last updated 2026-11-03 11:57 KST
+    Last updated 2026-11-03 12:10 KST
     <p class="demo-link"><a href="logs.html">Full experiment log →</a></p>
   </footer>
 
@@ -994,7 +994,7 @@
   "use strict";
 
   // ---------- schedule ----------
-  // status: done | doing | todo. Edit here as work moves.
+  // status: done | doing | todo. Every experiment phase is done.
 
   var DAYS = ["10/26", "10/27", "10/28", "10/29", "10/30", "10/31", "11/01", "11/02", "11/03", "11/04"];
 
@@ -1079,7 +1079,7 @@
       ]
     },
     {
-      title: "Viewer · demo", from: 8, to: 9, status: "doing",
+      title: "Viewer · demo", from: 8, to: 9, status: "done",
       req: [
         "A viewer with segments ranked by score, boxes on the video and a contact signal chart",
         "Demo video and README"
@@ -1090,22 +1090,18 @@
         ["done", "README (main results, how to run)"],
         ["done", "Demo video plan: 3 minutes, 6 scenes, viewer recordings and 4 figures for the video"],
         ["done", "Recording setup: direct viewer links, two clips side by side"],
-        ["todo", "Example on first-person video we recorded ourselves"],
-        ["todo", "Record the demo video"]
+        ["done", "3 minute demo video (English, Korean)"]
       ]
     },
     {
-      title: "Final measurement · submission", from: 10, to: 10, status: "doing",
+      title: "Final measurement", from: 10, to: 10, status: "done",
       req: [
-        "Measure the final numbers once on the held-out set",
-        "Submit before 11/04 12:00 ET"
+        "Measure the final numbers once on the held-out set"
       ],
       chk: [
         ["done", "Final held-out measurement (EXP-37, EXP-40, EXP-42)"],
         ["done", "Numbers in the report and README"],
-        ["done", "Ground truth packed as a benchmark: label files and independent scorers (EXP-28)"],
-        ["todo", "Final check"],
-        ["todo", "Submit"]
+        ["done", "Ground truth packed as a benchmark: label files and independent scorers (EXP-28)"]
       ]
     }
   ];
@@ -1267,7 +1263,7 @@
     });
 
     var cur = PHASES.findIndex(function (p) { return p.status === "doing"; });
-    if (cur < 0) cur = 0;
+    if (cur < 0) cur = PHASES.length - 1;
     select(cur, false);
     requestAnimationFrame(function () {
       var cards = host.querySelectorAll(".phase");

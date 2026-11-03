@@ -272,6 +272,7 @@ def main():
     <a href="en.html#story">Key experiments</a>
     <a href="logs.html" class="on">Experiment log</a>
     <a href="demo.html?lang=en">Demo</a>
+    <a href="try.html?lang=en">Try</a>
     <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
   <header class="doc-head">
