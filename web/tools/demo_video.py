@@ -91,7 +91,6 @@ TEXT = {
                  [("Height", "about 5 ft"), ("Weight", "about 100 lb"), ("Job", "help with chores"),
                   ("Built", "in 3 months, with Fourier"), ("Next", "version 2 climbs stairs")]],
         "news_marks": ["five feet", "100 pounds", "chores", "three months", "second version"],
-        "news_cuts": ["Max stands", "Meta built it"],
         "intro_marks": ["Language models", "Robot data", "A human hand", "And most hand video", "This is where"],
         "intro": ["Why is physical AI still far from its GPT moment?",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
@@ -122,7 +121,6 @@ TEXT = {
                  [("키", "약 152 cm"), ("무게", "약 45 kg"), ("용도", "집안일 돕기"),
                   ("제작", "3개월, Fourier와 함께"), ("다음", "계단 오르는 2번째 버전")]],
         "news_marks": ["152", "45", "집안일", "석 달", "두 번째"],
-        "news_cuts": ["이름은 맥스", "메타는 중국"],
         "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
         "intro": ["피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까?",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
@@ -368,11 +366,11 @@ def intro_card(stage=5, with_title=True):
     return im
 
 
-# stand-in humanoid footage for the news shot: (start, length) in seconds, one part per sentence.
+# stand-in humanoid footage for the news shot: one 16 s take of a robot in a kitchen (start, length in seconds).
 # The file is a downloaded YouTube video kept in web/vids, which is not in git.
 NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_YouTube_Media_eGSrUaca0BM_Which-Humanoid-Robots-Are-Actually-"
                                     "Working-in-2026-One-Is-Remote-Controlled_001_720p.mp4")
-NEWS_PARTS = [(84.0, 3.9), (512.0, 15.9), (0.0, 6.5)]  # robot on a stand, robot in a kitchen, row of robots
+NEWS_TAKE = (512.0, 15.9)
 
 
 def voice_times(key, marks, dur):
@@ -400,7 +398,6 @@ def news_card(stage):
 
 def news_scene(out, dur):
     times = voice_times("n0", T("news_marks"), dur)
-    cuts = voice_times("n0", T("news_cuts"), dur)
     ins, graph = [], []
     for stage in range(len(times) + 1):
         ins += ["-loop", "1", "-framerate", str(FPS), "-i", str(save(news_card(stage), f"sn_news_{stage}.png"))]
@@ -409,15 +406,11 @@ def news_scene(out, dur):
         graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
                      f"[{last}][f{stage}]overlay=0:0[o{stage}]")
         last = f"o{stage}"
-    # one footage part per sentence, slowed down when the sentence is longer than the part
-    bounds = [0.0] + cuts + [dur]
-    n = len(times) + 1
-    for i, ((start, length), a, b) in enumerate(zip(NEWS_PARTS, bounds, bounds[1:])):
-        need = b - a
-        ins += ["-ss", f"{start}", "-t", f"{min(length, need)}", "-i", str(NEWS_SRC)]
-        slow = max(need / length, 1.0)
-        graph.append(f"[{n + i}:v]setpts=(PTS-STARTPTS)*{slow:.3f},fps={FPS},scale=1152:648,setsar=1[p{i}]")
-    graph.append("".join(f"[p{i}]" for i in range(len(NEWS_PARTS))) + f"concat=n={len(NEWS_PARTS)}:v=1:a=0[foot]")
+    # the take, slowed down when the shot is longer than the take
+    start, length = NEWS_TAKE
+    ins += ["-ss", f"{start}", "-t", f"{min(length, dur)}", "-i", str(NEWS_SRC)]
+    slow = max(dur / length, 1.0)
+    graph.append(f"[{len(times) + 1}:v]setpts=(PTS-STARTPTS)*{slow:.3f},fps={FPS},scale=1152:648,setsar=1[foot]")
     graph.append(f"[{last}][foot]overlay=80:150:eof_action=repeat")
     encode((ins, ";".join(graph)), out, dur)
 
