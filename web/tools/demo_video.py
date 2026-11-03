@@ -87,10 +87,11 @@ def header(d, left, right=None):
 TEXT = {
     "en": {
         "news": ["Meta Max, a humanoid of its own (reported)",
-                 "Stand-in footage. No public images of Max yet.",
+                 "Stand-in footage. No public images of Max yet.", "Source: YouTube @Futur Decoded",
                  [("Height", "about 5 ft"), ("Weight", "about 100 lb"), ("Job", "help with chores"),
                   ("Built", "in 3 months, with Fourier"), ("Next", "version 2 climbs stairs")]],
         "news_marks": ["five feet", "100 pounds", "chores", "three months", "second version"],
+        "news_cuts": ["Max stands", "Meta built it"],
         "intro_marks": ["Language models", "Robot data", "A human hand", "And most hand video", "This is where"],
         "intro": ["Why is physical AI still far from its GPT moment?",
                   "Language models learned from the whole internet. Robots have no data at that scale.",
@@ -117,10 +118,11 @@ TEXT = {
     },
     "ko": {
         "news": ["Meta의 휴머노이드 맥스 (보도)",
-                 "대체 영상. 맥스의 공개 사진은 아직 없음.",
+                 "대체 영상. 맥스의 공개 사진은 아직 없음.", "출처: YouTube @Futur Decoded",
                  [("키", "약 152 cm"), ("무게", "약 45 kg"), ("용도", "집안일 돕기"),
                   ("제작", "3개월, Fourier와 함께"), ("다음", "계단 오르는 2번째 버전")]],
         "news_marks": ["152", "45", "집안일", "석 달", "두 번째"],
+        "news_cuts": ["이름은 맥스", "메타는 중국"],
         "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
         "intro": ["피지컬 AI는 왜 아직 GPT 모먼트까지 갈 길이 멀까?",
                   "언어 모델은 인터넷 전체로 배웠지만, 로봇에게는 그만한 데이터가 없음",
@@ -366,11 +368,13 @@ def intro_card(stage=5, with_title=True):
     return im
 
 
-# stand-in humanoid footage for the news shot: one 16 s take of a robot in a kitchen (start, length in seconds).
-# The file is a downloaded YouTube video kept in web/vids, which is not in git.
-NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_YouTube_Media_eGSrUaca0BM_Which-Humanoid-Robots-Are-Actually-"
-                                    "Working-in-2026-One-Is-Remote-Controlled_001_720p.mp4")
-NEWS_TAKE = (512.0, 15.9)
+# stand-in humanoid footage for the news shot, from a YouTube Short by @Futur Decoded (vertical, 720x1280).
+# The file is kept in web/vids, which is not in git. Parts as (start, length) in seconds, one per sentence,
+# all without text on screen: a robot walking in a lab, robots in a living room, GR-1 robots in a factory.
+NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_Shorts_Media_ZVXDGCtnItg_Meta-Reportedly-Built-Humanoid-Robot-Max-"
+                                    "in-3-Month-with-Fourier-Report_001_720p.mp4")
+NEWS_PARTS = [(3.0, 4.9), (81.0, 6.35), (60.0, 10.0)]
+NEWS_X, NEWS_Y, NEWS_W, NEWS_H = 160, 125, 405, 720
 
 
 def voice_times(key, marks, dur):
@@ -385,14 +389,16 @@ def news_card(stage):
     """The reported facts about Max, next to the stand-in footage. stage: how many facts are shown."""
     im = canvas()
     d = ImageDraw.Draw(im)
-    title, note, rows = T("news")
+    title, note, source, rows = T("news")
     header(d, title)
-    d.text((80, 150 + 648 + 14), note, font=font(24), fill=MUTED)
-    d.text((1300, 160), "Max", font=font(64, True), fill=INK)
+    x = NEWS_X + NEWS_W + 120
+    d.text((x, 130), "Max", font=font(80, True), fill=INK)
     for i, (lab, val) in enumerate(rows[:stage]):
-        y = 280 + i * 104
-        d.text((1300, y), lab, font=font(26), fill=MUTED)
-        d.text((1300, y + 34), val, font=font(36, True), fill=BLUE if i == len(rows) - 1 else INK)
+        y = 260 + i * 100
+        d.text((x, y), lab, font=font(28), fill=MUTED)
+        d.text((x, y + 36), val, font=font(44, True), fill=BLUE if i == len(rows) - 1 else INK)
+    d.text((x, NEWS_Y + NEWS_H - 66), note, font=font(24), fill=MUTED)
+    d.text((x, NEWS_Y + NEWS_H - 30), source, font=font(24), fill=MUTED)
     return im
 
 
@@ -406,12 +412,19 @@ def news_scene(out, dur):
         graph.append(f"[{stage}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.35:alpha=1[f{stage}];"
                      f"[{last}][f{stage}]overlay=0:0[o{stage}]")
         last = f"o{stage}"
-    # the take, slowed down when the shot is longer than the take
-    start, length = NEWS_TAKE
-    ins += ["-ss", f"{start}", "-t", f"{min(length, dur)}", "-i", str(NEWS_SRC)]
-    slow = max(dur / length, 1.0)
-    graph.append(f"[{len(times) + 1}:v]setpts=(PTS-STARTPTS)*{slow:.3f},fps={FPS},scale=1152:648,setsar=1[foot]")
-    graph.append(f"[{last}][foot]overlay=80:150:eof_action=repeat")
+    # one part per sentence at normal speed, each played once: a part ends at the next sentence
+    # or at its own end, and the last part runs to the end of the shot
+    cuts = voice_times("n0", T("news_cuts"), dur) + [dur]
+    t, n = 0.0, len(times) + 1
+    for i, ((start, length), cut) in enumerate(zip(NEWS_PARTS, cuts)):
+        take = min(length, cut - t if i < len(NEWS_PARTS) - 1 else dur - t)
+        ins += ["-ss", f"{start}", "-t", f"{take:.3f}", "-i", str(NEWS_SRC)]
+        graph.append(f"[{n + i}:v]setpts=PTS-STARTPTS,fps={FPS},scale={NEWS_W}:{NEWS_H},setsar=1[p{i}]")
+        t += take
+    if t < dur - 0.05:
+        print(f"news footage ends {dur - t:.2f} s before the shot, the last frame holds")
+    graph.append("".join(f"[p{i}]" for i in range(len(NEWS_PARTS))) + f"concat=n={len(NEWS_PARTS)}:v=1:a=0[foot]")
+    graph.append(f"[{last}][foot]overlay={NEWS_X}:{NEWS_Y}:eof_action=repeat")
     encode((ins, ";".join(graph)), out, dur)
 
 
