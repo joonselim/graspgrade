@@ -31,8 +31,7 @@ Run it twice so the table and figure references resolve. The last build
 Overleaf works as well: upload `main.tex` and the `figures/` folder, keeping
 the folder name.
 
-## Before submitting
+## Figures
 
-- Replace the author line in `main.tex` (marked with a `TODO` comment).
-- The figures are copies of `../docs/experiments/img/`. If a figure there
-  changes, copy it again.
+The figures are copies of `../docs/experiments/img/`. If a figure there
+changes, copy it again.
