@@ -48,8 +48,8 @@ def main():
     <a href="#summary" data-nav="summary">Summary</a>
     <a href="#story" data-nav="story">Key experiments</a>
     <a href="logs.html">Experiment log</a>
-    <a href="demo.html?lang=en">Demo</a>
-    <a href="try.html?lang=en">Try</a>
+    <a class="hl" href="demo.html?lang=en">Demo</a>
+    <a class="hl" href="try.html?lang=en">Try</a>
     <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 

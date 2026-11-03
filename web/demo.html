@@ -53,6 +53,10 @@
   .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
   .topnav a:hover { color: var(--ink); text-decoration: none; }
   .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  /* demo and try stand out as pills */
+  .topnav a.hl { padding: 4px 12px; border: 0; border-radius: 999px; background: #e8eefb; color: #2350c9; font-weight: 650; }
+  .topnav a.hl:hover { background: #d6e1f7; color: #2350c9; }
+  .topnav a.hl.on { background: #2350c9; color: #fff; }
   .topnav a.lang {
     padding: 3px 8px; border: 1px solid var(--rule); border-radius: 4px;
     font-size: 12px; font-weight: 600; color: var(--ink-2);
@@ -71,8 +75,8 @@
     <a data-k="summary" href="index.html#summary">요약</a>
     <a data-k="story" href="index.html#story">핵심 실험</a>
     <a data-k="detail" href="index.html#detail">실험 상세</a>
-    <a class="on" data-k="demo" href="demo.html">데모</a>
-    <a data-k="try" href="try.html">Try</a>
+    <a class="hl on" data-k="demo" href="demo.html">데모</a>
+    <a class="hl" data-k="try" href="try.html">Try</a>
     <a class="lang" data-k="other" href="demo.html?lang=en" hreflang="en" lang="en">EN</a>
   </nav>
 

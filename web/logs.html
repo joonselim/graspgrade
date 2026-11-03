@@ -36,6 +36,10 @@
   .topnav a { color: var(--muted); padding: 14px 0 12px; border-bottom: 2px solid transparent; }
   .topnav a:hover { color: var(--ink); text-decoration: none; }
   .topnav a.on { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
+  /* demo and try stand out as pills */
+  .topnav a.hl { padding: 4px 12px; border: 0; border-radius: 999px; background: #e8eefb; color: #2350c9; font-weight: 650; }
+  .topnav a.hl:hover { background: #d6e1f7; color: #2350c9; }
+  .topnav a.hl.on { background: #2350c9; color: #fff; }
   .topnav a.lang { padding: 3px 8px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); position: sticky; right: 0; background: var(--sheet); }
   .doc-head { border-bottom: 2px solid var(--rule-strong); padding-bottom: 16px; }
   .doc-title { font-size: 30px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; margin: 0; }
@@ -73,8 +77,8 @@
     <a href="en.html#summary">Summary</a>
     <a href="en.html#story">Key experiments</a>
     <a href="logs.html" class="on">Experiment log</a>
-    <a href="demo.html?lang=en">Demo</a>
-    <a href="try.html?lang=en">Try</a>
+    <a class="hl" href="demo.html?lang=en">Demo</a>
+    <a class="hl" href="try.html?lang=en">Try</a>
     <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
   </nav>
   <header class="doc-head">
