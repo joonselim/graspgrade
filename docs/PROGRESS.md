@@ -303,14 +303,14 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 1. (해결, EXP-08) HOT3D 보정과 2D 박스는 Aria 원본 방향이다. preview는 원본을 시계 방향 90도 돌린 것: 원본 (u, v) → preview (1407 - v, u). preview 프레임 k = 스트림 214-1의 k번째 RGB 타임스탬프.
 2. (MANO 불필요, EXP-09) 손가락 끝은 UmeTrack 프로필 + 직접 짠 순운동학으로 얻는다. hand 0 = 왼손(프로필 그대로), hand 1 = 오른손(x축 반전). HOT3D 툴킷 / projectaria_tools 설치도 필요 없었다 (투영은 EXP-08 코드).
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다. one-pager는 2026-10-29에 GraspGrade 이름과 최종 결과로 갱신했다 (같은 링크 https://claude.ai/artifact/4so1DrQxogYfb5wsvTmBMv, 버전 2, 맨 위 그림은 held-out 에피소드 36 오른손 실제 트랙).
-4. 데모 영상: 첫 구성안은 [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 영상은 `web/tools/demo_video.py`가 합성한다. 사이트 영상은 `web/assets/video/graspgrade_demo.mp4` (영어, 174.7초, ElevenLabs Eric 음성)와 `graspgrade_demo_ko.mp4` (한국어, 166.2초, Windows Heami 음성)이고, `web/demo.html`은 두 언어 모두 영어 영상을 보여 준다. 첫 장면은 Meta와 Fourier 휴머노이드 소식으로 시작하며 YouTube 쇼츠(@Futur Decoded)를 대체 화면으로 쓴다 (출처 표시, 사용 허락은 없음). 뷰어 바로 열기 링크와 `.claude/launch.json`의 `viewer` 서버는 손으로 녹화할 때용으로 남아 있다.
+4. 데모 영상: 첫 구성안은 [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 영상은 `web/tools/demo_video.py`가 합성한다. 사이트 영상은 `web/assets/video/graspgrade_demo.mp4` (영어, 174.7초, ElevenLabs Eric 음성)와 `graspgrade_demo_ko.mp4` (한국어, 166.2초, Windows Heami 음성)이고, `web/demo.html`은 두 언어 모두 영어 영상을 보여 준다. 첫 장면은 Meta와 Fourier 휴머노이드 소식으로 시작한다. 그 화면의 로봇은 `web/tools/robot_render.py`로 렌더링한 것이다 (MuJoCo 3.3.0, MuJoCo Menagerie의 Apptronik Apollo 모델, Apache 2.0, 별도 venv `.venv-render`, 결과 `out/demo/robot_take.mp4`). 전에 쓰던 YouTube 쇼츠 화면은 커밋 6ba9cef에서 뺐다. 뷰어 바로 열기 링크와 `.claude/launch.json`의 `viewer` 서버는 손으로 녹화할 때용으로 남아 있다.
 5. 측정 계획 대조 (2026-10-29): 약속했는데 빠진 보고 2개를 채웠다. EXP-40에 물체·사람 안 AUC(우리 점수 0.484)와 물체별 AUC 표(27개 물체, 우리 점수 14개가 0.5 초과)를 추가했다. 부드러운 물체 확인이 실패했으므로 뷰어에 Touch check 탭(보류 HOT3D 30클립, "Not validated")을 추가했다 (EXP-42 끝, viewer/data/touch.json). 마지막 재현 점검: regression_check compare 12개 모두 같음, check_paid_cache 53개 통과, number1_final_report / number2_depth / muse_soft score 다시 돌려 결과 파일 바이트 동일 (number2_score --final은 held-out 1회 원칙 때문에 다시 돌리지 않았고, viewer_data.py가 같은 모델로 점수를 다시 계산해 최종 파일과 일치함을 확인함).
 6. 제출 전 확인 (2026-10-30 점검, 2026-11-04 갱신, 남은 것은 사용자 결정):
    - Official Rules: 제출 항목, 영상 길이 제한, 사전 작성 코드 허용 여부, 팀 규모. 웹 검색으로는 원문을 찾지 못했다.
-   - 저장소: 2026-11-04 확인 시 public이다. git에 HOT3D 클립 33개와 사진 33장(`web/label-media/`, 비밀번호 페이지용), Try 페이지 HOT3D 클립 6개(`web/assets/try/`), HOT3D 원본 프레임 그림 약 26장, OpenGraph 클립 71개와 이미지가 있다. HOT3D 라이선스가 이 재배포를 허용하는지 확인하지 않았다. 논문과 README는 "데이터셋을 재배포하지 않는다"고 적고 있어 실제와 다르다.
-   - 데모 영상: HOT3D 화면과 YouTube 쇼츠 화면이 들어 있다.
+   - 저장소: 2026-11-04 확인 시 public이다. git에 HOT3D 클립 33개와 사진 33장(`web/label-media/`, 비밀번호 페이지용), Try 페이지 HOT3D 클립 6개(`web/assets/try/`), HOT3D 원본 프레임 그림 약 26장, OpenGraph 클립 71개와 이미지가 있다.
+   - (해결 2026-11-04, 커밋 c8b980a) 라이선스 표시: HOT3D 영상은 CC BY-SA 4.0, 손 주석은 CC BY-NC-SA 4.0, OpenGraph는 CC BY 4.0이다 (`data/hot3d/assets/license.txt`). `MEDIA_LICENSE.md`와 영상 폴더 3곳의 `LICENSE.txt`에 파일별 출처, 변경, 라이선스를 적었다. 논문과 README의 "재배포하지 않는다"는 "전체 데이터셋은 재배포하지 않고 짧은 클립과 프레임을 출처와 함께 보여 준다"로 고쳤다. 사이트 꼬리말 5곳에 출처와 라이선스를 넣었다. 남은 것: 손 주석 그림(CC BY-NC-SA, 비상업)이 해커톤 제출에 맞는지는 확인하지 않았다.
+   - (해결 2026-11-04, 커밋 6ba9cef) 데모 영상 첫 장면의 YouTube 쇼츠 화면을 MuJoCo 렌더 화면으로 바꿨다. 데모 영상의 HOT3D 화면은 CC BY-SA 4.0으로 표시했다.
    - 코드 LICENSE 파일이 없다. 벤치마크는 `benchmark/`에 데이터별 라이선스 안내가 있다.
-   - 사이트 꼬리말(`web/index.html`, `en.html`)의 영상 출처에 HOT3D가 빠져 있다.
    - (해결) 옛 `demo.html`은 `web/demo.html`로 바뀌어 최종 영상을 재생한다.
    - 뷰어는 `viewer/media`가 git에 없어 심사자가 직접 열 수 없다. 사이트의 Try 페이지가 대신 클립 6개를 보여 준다.
    - (해결 2026-11-04) 방법 서술: README, 논문, Try, 한국어 보고서의 "SAM이 자르고 Muse가 확인한다"류 문장을 "Muse Spark + 장갑으로 배운 보정"으로 고쳤다.
