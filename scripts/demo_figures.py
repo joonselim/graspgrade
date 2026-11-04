@@ -169,10 +169,10 @@ def cards():
     fig.text(0.5, 0.54, "Find the hand videos a robot can learn from.", fontsize=40, ha="center", color=MUTED)
     for x, title, sub in [(0.22, "Code", "every step,\none script each"),
                           (0.50, "Viewer", "held-out clips\nand episodes"),
-                          (0.78, "Benchmark", "both ground truths,\nstandalone scorers")]:
+                          (0.78, "Benchmark", "both label sets,\nstandalone scorers")]:
         fig.text(x, 0.36, title, fontsize=46, fontweight="bold", ha="center", color=HI)
         fig.text(x, 0.33, sub, fontsize=28, ha="center", va="top", color=MUTED, linespacing=1.4)
-    fig.text(0.5, 0.10, "Data: OpenGraph Ego-Tactile (CC-BY-4.0)  ·  HOT3D (Meta)", fontsize=24,
+    fig.text(0.5, 0.10, "Data: OpenGraph Ego-Tactile (CC BY 4.0)  ·  HOT3D, Meta (CC BY-SA 4.0)  ·  Voice: ElevenLabs", fontsize=24,
              ha="center", color=MUTED)
     save(fig, "demo_card_scene6.png")
 

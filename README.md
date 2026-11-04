@@ -38,6 +38,19 @@ visible. Every comparison, threshold and pass rule was written in
 data was scored. Both sensor label sets and their scorers are packed as a
 benchmark in [benchmark/](benchmark/) (EXP-28).
 
+## Built during the hackathon
+
+All of this repository was written by our team between Oct 26 and Nov 4.
+The first commit is from Oct 27.
+
+| Built by us | Used as is, not ours |
+| --- | --- |
+| The pipeline: contact rules, timing shift, checklist prompts (`scripts/prompts/`), grades and the logistic regression score | Meta models through the API: SAM 3.1, Muse Spark |
+| The two sensor label sets: cleaned glove contact, and the robot copy label (retargeting onto the Allegro hand, collision, reach and grip) | Datasets: OpenGraph Ego-Tactile, HOT3D |
+| The benchmark files and their scorers, the measurement plan and all 42 experiments | Libraries: MediaPipe, dex-retargeting (with its Allegro hand model), scikit-learn, OpenCV, numba, trimesh, meta-sam-parser, MuJoCo |
+| The site: report, viewer, Try page, demo page | Robot model in the first demo scene: Apptronik Apollo from MuJoCo Menagerie (Apache 2.0), rendered by us |
+| The demo video: script, charts, cards, robot render and editing | English voice: ElevenLabs. Korean voice: Windows built-in voice |
+
 ## Results
 
 | Question | Metric | Muse Spark asked directly | Our method | Notes |

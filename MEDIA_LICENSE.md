@@ -37,6 +37,12 @@ under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 | `benchmark/number2/clips.csv` | labels built from HOT3D hand annotations, object poses and object models | see `benchmark/number2/LICENSE.txt` | CC BY-NC-SA 4.0, not for sale |
 | `benchmark/number1/ground_truth.json` | contact intervals from the OpenGraph gloves | see `benchmark/number1/LICENSE.txt` | CC BY 4.0 |
 
+Other parts of the demo videos: the robot in the first scene is our render
+of the Apptronik Apollo model from MuJoCo Menagerie (Apache 2.0, made by
+`web/tools/robot_render.py`). The English narration is an ElevenLabs voice,
+credited on the end card and the demo page. The Korean narration is the
+Windows built-in voice.
+
 The figures sit in `docs/experiments/img/`, and copies sit in `web/assets/`,
 `web/assets/logs/` and `paper/figures/`. Charts that show only numbers are
 our own work.
