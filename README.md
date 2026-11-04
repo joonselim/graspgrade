@@ -23,7 +23,7 @@ reaches AUC 0.624, where Muse Spark asked directly is at chance (0.501).
 </p>
 
 <p align="center">
-  <a href="https://graspgrade.vercel.app/en">Live site</a> ·
+  <a href="https://graspgrade.vercel.app/en">Progress report</a> ·
   <a href="https://graspgrade.vercel.app/demo?lang=en">Demo video</a> ·
   <a href="https://graspgrade.vercel.app/try?lang=en">Try it</a> ·
   <a href="https://graspgrade.vercel.app/logs">Experiment log</a> ·
