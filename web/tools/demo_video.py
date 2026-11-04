@@ -87,8 +87,7 @@ def header(d, left, right=None):
 TEXT = {
     "en": {
         "news": ["Meta is building humanoid robots (reported)", "Meta", "with Fourier", "Building humanoid robots",
-                 "Stand-in footage.", "Source: YouTube @Futur Decoded"],
-        "news_cuts": ["Meta has"],
+                 "Rendered stand-in.", "Robot model: MuJoCo Menagerie"],
         "hw": ["The robot body is being built.", "What about the physical AI model that drives it?",
                "Still at a very early stage."],
         "hw_marks": ["But how far", "It is still"],
@@ -118,8 +117,7 @@ TEXT = {
     },
     "ko": {
         "news": ["Meta가 휴머노이드 로봇을 만들기 시작함 (보도)", "Meta", "Fourier와 함께", "휴머노이드 로봇 제작",
-                 "대체 영상.", "출처: YouTube @Futur Decoded"],
-        "news_cuts": ["메타가"],
+                 "렌더링한 대체 화면.", "로봇 모델: MuJoCo Menagerie"],
         "hw": ["로봇의 몸은 만들어지고 있다.", "그런데 이 몸을 움직일 피지컬 AI 모델은?", "아직 매우 초기 단계다."],
         "hw_marks": ["그렇다면", "아직 매우"],
         "intro_marks": ["언어 모델은", "원격 조종", "사람 손은", "그리고 대부분의", "바로 여기서"],
@@ -368,13 +366,10 @@ def intro_card(stage=5, with_title=True):
     return im
 
 
-# stand-in humanoid footage for the news shot, from a YouTube Short by @Futur Decoded (vertical, 720x1280).
-# The file is kept in web/vids, which is not in git. Parts as (start, length) in seconds, one per sentence,
-# both without text on screen: a robot walking in a lab, then GR-1 robots in a factory.
-NEWS_SRC = ROOT / "web" / "vids" / ("YTDown.com_Shorts_Media_ZVXDGCtnItg_Meta-Reportedly-Built-Humanoid-Robot-Max-"
-                                    "in-3-Month-with-Fourier-Report_001_720p.mp4")
-NEWS_PARTS = [(3.0, 4.9), (60.0, 10.0)]
-NEWS_X, NEWS_Y, NEWS_W, NEWS_H = 160, 125, 405, 720
+# stand-in humanoid shot for the news scene, rendered by web/tools/robot_render.py (MuJoCo, the Apptronik
+# Apollo model from MuJoCo Menagerie, Apache 2.0). No public image of the robot in the news exists.
+NEWS_TAKE = FIG / "robot_take.mp4"
+NEWS_X, NEWS_Y, NEWS_W, NEWS_H = 80, 150, 1152, 648
 
 
 def voice_times(key, marks, dur):
@@ -403,10 +398,10 @@ def news_card():
     d = ImageDraw.Draw(im)
     title, big, small, line, note, source = T("news")
     header(d, title)
-    x = NEWS_X + NEWS_W + 120
-    d.text((x, 320), big, font=font(120, True), fill=INK)
-    d.text((x + 4, 470), line, font=font(48, True), fill=INK2)
-    d.text((x + 6, 545), small, font=font(34), fill=MUTED)
+    x = NEWS_X + NEWS_W + 64
+    d.text((x, 300), big, font=font(120, True), fill=INK)
+    d.text((x + 4, 450), line, font=font(40, True), fill=INK2)
+    d.text((x + 6, 515), small, font=font(32), fill=MUTED)
     d.text((x, NEWS_Y + NEWS_H - 66), note, font=font(24), fill=MUTED)
     d.text((x, NEWS_Y + NEWS_H - 30), source, font=font(24), fill=MUTED)
     return im
@@ -414,18 +409,9 @@ def news_card():
 
 def news_scene(out, dur):
     ins, graph, last = staged([news_card()], [], "sn_news")
-    # one part per sentence at normal speed, each played once: a part ends at the next sentence
-    # or at its own end, and the last part runs to the end of the shot
-    cuts = voice_times("n0", T("news_cuts"), dur) + [dur]
-    t = 0.0
-    for i, ((start, length), cut) in enumerate(zip(NEWS_PARTS, cuts)):
-        take = min(length, cut - t if i < len(NEWS_PARTS) - 1 else dur - t)
-        ins += ["-ss", f"{start}", "-t", f"{take:.3f}", "-i", str(NEWS_SRC)]
-        graph.append(f"[{1 + i}:v]setpts=PTS-STARTPTS,fps={FPS},scale={NEWS_W}:{NEWS_H},setsar=1[p{i}]")
-        t += take
-    if t < dur - 0.05:
-        print(f"news footage ends {dur - t:.2f} s before the shot, the last frame holds")
-    graph.append("".join(f"[p{i}]" for i in range(len(NEWS_PARTS))) + f"concat=n={len(NEWS_PARTS)}:v=1:a=0[foot]")
+    # the rendered take from its start, played once (it is longer than the shot)
+    ins += ["-t", f"{dur:.3f}", "-i", str(NEWS_TAKE)]
+    graph.append(f"[1:v]setpts=PTS-STARTPTS,fps={FPS},scale={NEWS_W}:{NEWS_H},setsar=1[foot]")
     graph.append(f"[{last}][foot]overlay={NEWS_X}:{NEWS_Y}:eof_action=repeat")
     encode((ins, ";".join(graph)), out, dur)
 
