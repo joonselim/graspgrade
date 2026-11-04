@@ -43,7 +43,7 @@ def main():
 
     # head, top bar, footer
     s = rep(s, '<html lang="ko">', '<html lang="en">')
-    s = rep(s, '<title>GraspGrade 진행</title>', '<title>GraspGrade progress</title>')
+    s = rep(s, '<title>GraspGrade</title>', '<title>GraspGrade</title>')
     s = between(s, '  <nav class="topnav"', '  <div class="page" data-page="summary">', '''  <nav class="topnav" aria-label="Pages">
     <span class="brand">GraspGrade</span>
     <a href="#summary" data-nav="summary">Summary</a>
@@ -78,8 +78,8 @@ def main():
         ('top.appendChild(el("span", null, "단계 " + (i + 1)));', 'top.appendChild(el("span", null, "Phase " + (i + 1)));'),
         ('c.appendChild(el("div", "ph-h", "요구사항"));', 'c.appendChild(el("div", "ph-h", "Requirements"));'),
         ('c.appendChild(el("div", "ph-h", "체크리스트"));', 'c.appendChild(el("div", "ph-h", "Checklist"));'),
-        ('document.title = { detail: "GraspGrade 실험 상세", story: "GraspGrade 핵심 실험" }[page] || "GraspGrade 진행";',
-         'document.title = { detail: "GraspGrade experiment detail", story: "GraspGrade key experiments" }[page] || "GraspGrade progress";'),
+        ('document.title = { detail: "GraspGrade 실험 상세", story: "GraspGrade 핵심 실험" }[page] || "GraspGrade";',
+         'document.title = { detail: "GraspGrade experiment detail", story: "GraspGrade key experiments" }[page] || "GraspGrade";'),
         # experiment references open the English write-ups in logs.html
         ("document.querySelectorAll('td.first > a[href^=\"#exp-\"]')", "document.querySelectorAll('td.first > a[href^=\"#exp-\"]')"),
         ('a.href = "#" + m[0].toLowerCase();', 'a.href = "logs.html#" + m[0].toLowerCase();'),

@@ -1,27 +1,88 @@
   <div class="page" data-page="summary">
   <header class="doc-head">
-    <h1 class="doc-title">GraspGrade progress</h1>
-    <p class="doc-sub">Cut human egocentric hand videos at the moment a hand touches an object, and score each segment from 0 to 100 for how well a robot hand could copy it.</p>
+    <h1 class="doc-title">GraspGrade</h1>
+    <p class="doc-sub">Find the hand videos a robot can learn from.</p>
   </header>
 
-  <section id="s-plan">
-    <h2><span class="no">1</span>Schedule</h2>
-    <div class="gantt" id="gantt"></div>
-    <div class="legend">
-      <span><i style="background:var(--done)"></i>Done</span>
-      <span><i style="background:var(--todo)"></i>Planned</span>
-      <span><i style="background:color-mix(in srgb, var(--today) 30%, transparent)"></i>Today</span>
-    </div>
+  <section id="s-problem">
+    <h2><span class="no">1</span>Problem</h2>
+    <p class="lead">Physical AI is still far from its GPT moment. Language models learned from the whole internet. Robots have no data at that scale.</p>
+    <ul class="plain">
+      <li>Recording robot data by remote control is slow and costly, one robot at a time.</li>
+      <li>Human egocentric video is the easiest data to collect and to grow. But a human hand is not a robot hand, and most hand video cannot teach one: fingers are hidden, the object is too big for a robot hand, or the moment of touch is unclear. In one study only 83 of 2,000 internet clips passed a quality check (Do as I Do).</li>
+      <li>Today clips are picked by looking at the video. There is no check against real contact or a real robot hand.</li>
+    </ul>
+  </section>
 
-    <details class="fold"><summary><span class="o">Show the details of each phase</span><span class="c">Hide</span></summary>
-      <div class="phases-wrap">
-        <div class="phases" id="phases"></div>
+  <section id="s-overview">
+    <h2><span class="no">2</span>Overview</h2>
+    <p class="lead">GraspGrade cuts human egocentric hand video at each touch and scores every clip from 0 to 100 for how well a robot hand could copy the grasp. Video is the only input.</p>
+    <dl class="brief">
+      <dt>How it works</dt>
+      <dd>
+        <ol class="steps">
+          <li>Take frames at 5 per second and ask Muse Spark, for each hand, whether it touches an object.</li>
+          <li>Move each contact start 7 frames (about 0.23 s) later and each end 7 frames earlier. This shift was learned from the tactile gloves.</li>
+          <li>Cut a grasp clip for each contact and get hand and object masks from SAM 3.1.</li>
+          <li>Grade the 12 checklist items of each clip (7 from Muse Spark, 2 from SAM masks, 3 computed from video) as high, mid or low, and turn them into a 0 to 100 score with the learned weights.</li>
+          <li>Use the clips with high scores for robot training. The formulas and thresholds are in <a href="#k-calc">Rules and formulas</a> on the key experiments page.</li>
+        </ol>
+      </dd>
+
+      <dt>How we checked it</dt>
+      <dd>We built answers for both questions from sensors: tactile gloves (OpenGraph) for when a touch starts and ends, and motion capture (HOT3D) moved onto an Allegro robot hand for whether a grasp can be copied. Every rule was fixed before the held-out data was scored. Both label sets and their scorers are open as a benchmark (EXP-28).</dd>
+
+      <dt>Numbers</dt>
+      <dd>
+        <div class="tbl">
+          <div class="wrap">
+            <table class="min">
+              <thead><tr><th>Question</th><th>Metric</th><th>Muse Spark asked directly</th><th>Our method</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="first">Contact timing<br><span class="note">22 held-out episodes</span></td><td>Boundary F1 ±5 frames</td><td class="n">0.074</td><td class="n"><b>0.195</b></td><td>Contact IoU 0.821 → 0.850 (EXP-37)</td></tr>
+                <tr><td class="first">Copyable grasps<br><span class="note">1,426 held-out clips</span></td><td>AUC (0.5 is chance)</td><td class="n">0.501</td><td class="n"><b>0.624</b></td><td>Unseen objects 0.571. Object name baseline 0.771 (EXP-40)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </dd>
+    </dl>
+
+    <div class="viz viz-n1" data-chart="n1"></div>
+    <div class="viz viz-dots" data-chart="n2"></div>
+  </section>
+
+  <section id="s-try">
+    <h2><span class="no">3</span>Try it</h2>
+    <div class="try-card">
+      <a class="try-shot" href="try.html"><img src="assets/try_en.jpg" alt="The Try page with a held-out clip, its touch segment and its grades" loading="lazy" width="1400" height="1128"></a>
+      <div class="try-text">
+        <p>Pick one of six held-out clips and follow it step by step: the touch segment, twelve grades from the video, SAM 3.1 and Muse Spark, the weighted sum and the final score, and what the motion capture check says.</p>
+        <p class="more"><a href="try.html">Open Try →</a> &nbsp; <a href="demo.html">Watch the 3 minute demo →</a></p>
       </div>
-    </details>
+    </div>
+  </section>
+
+  <section id="s-concl">
+    <h2><span class="no">4</span>What the results mean</h2>
+    <p class="lead">Measured against sensor ground truth, the best video-only method changes. For contact timing, one shift learned from the glove makes Muse Spark asked directly the best method. For robot copyable grasps, asking a checklist instead of one question is what helps, and learning weights from labels adds nothing.</p>
+    <dl class="brief">
+      <dt>Limits</dt>
+      <dd>
+        <ul class="plain">
+          <li>The score is for rigid objects. Filtering out soft objects automatically is not yet reliable (EXP-42).</li>
+          <li>The grasp score works at the object level. It can pick objects it has not seen, but it cannot rank grasps of the same object (0.506). For objects that already have labels, the per object rate is more accurate.</li>
+          <li>With a strict 2 mm depth limit in the ground truth, the grasp score drops to chance (0.521, EXP-41). Both datasets were recorded in a lab.</li>
+        </ul>
+      </dd>
+
+      <dt>Use on other video</dt>
+      <dd>The same steps apply to human egocentric video without sensors. All it needs is the video and calls to SAM 3.1 and Muse Spark, and it uses the timing shift and checklist weights learned here. This has not been measured yet. Contact timing and the score were tested on two separate datasets, the joined steps were not scored end to end, and no third dataset was tried. Data with sensor ground truth can be measured with the same metrics using the benchmark scorers.</dd>
+    </dl>
   </section>
 
   <section id="s-measure">
-    <h2><span class="no">2</span>Measurement plan</h2>
+    <h2><span class="no">5</span>Measurement plan</h2>
     <ul class="plain">
       <li><b>Test 1.</b> Find when each hand starts and stops touching an object, from video alone. Three methods (A Muse Spark alone, B a SAM rule, C B plus a Muse Spark boundary check) are compared with the OpenGraph tactile glove data. The metrics are boundary F1 (±5 and ±15 frames) and contact IoU.</li>
       <li><b>Test 2.</b> Score each grasp clip from 0 to 100 for whether a robot hand could copy it. The score is compared with a robot hand ground truth built from HOT3D motion capture, and the result is an AUC. The main comparison is Muse Spark asked the same question in one go.</li>
@@ -43,7 +104,7 @@
   </section>
 
   <section>
-    <h2><span class="no">3</span>Experiments</h2>
+    <h2><span class="no">6</span>Experiments</h2>
     <div class="tbl foldable" id="exp-list">
       <div class="wrap">
         <table class="min">
@@ -99,61 +160,8 @@
     <p class="more"><a href="#story">Read the key experiments →</a> &nbsp; <a href="logs.html">Full experiment log →</a></p>
   </section>
 
-  <section id="s-concl">
-    <h2><span class="no">4</span>Conclusion</h2>
-    <p class="lead">Measured against sensor ground truth, the best video-only method changes. For contact timing, one shift learned from the glove makes Muse Spark asked directly the best method. For robot copyable grasps, asking a checklist instead of one question is what helps, and learning weights from labels adds nothing.</p>
-    <dl class="brief">
-      <dt>Problem</dt>
-      <dd>To train robots on human egocentric video, you need to find when a hand touches and leaves an object, and which grasps a robot hand could copy. Today this selection is done by looking at the video only, and there is no way to check it against real contact or a real robot.</dd>
-
-      <dt>What we solved</dt>
-      <dd>We built ground truth for both questions from tactile gloves (OpenGraph) and motion capture (HOT3D), and scored selection methods made with SAM 3.1 and Muse Spark against it. The ground truth and the scoring code are packed as a benchmark (EXP-28).</dd>
-
-      <dt>Numbers</dt>
-      <dd>
-        <div class="tbl">
-          <div class="wrap">
-            <table class="min">
-              <thead><tr><th>Question</th><th>Metric</th><th>Muse Spark asked directly</th><th>Our method</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="first">Contact timing<br><span class="note">22 held-out episodes</span></td><td>Boundary F1 ±5 frames</td><td class="n">0.074</td><td class="n"><b>0.195</b></td><td>Contact IoU 0.821 → 0.850 (EXP-37)</td></tr>
-                <tr><td class="first">Copyable grasps<br><span class="note">1,426 held-out clips</span></td><td>AUC (0.5 is chance)</td><td class="n">0.501</td><td class="n"><b>0.624</b></td><td>Unseen objects 0.571. Object name baseline 0.771 (EXP-40)</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </dd>
-
-      <dt>Conditions</dt>
-      <dd>
-        <ul class="plain">
-          <li>The score is for rigid objects. Filtering out soft objects automatically is not yet reliable (EXP-42).</li>
-          <li>The grasp score works at the object level. It can pick objects it has not seen, but it cannot rank grasps of the same object (0.506). For objects that already have labels, the per object rate is more accurate.</li>
-          <li>With a strict 2 mm depth limit in the ground truth, the grasp score drops to chance (0.521, EXP-41). Both datasets were recorded in a lab.</li>
-        </ul>
-      </dd>
-
-      <dt>Use on other video</dt>
-      <dd>The same steps apply to human egocentric video without sensors. All it needs is the video and calls to SAM 3.1 and Muse Spark, and it uses the timing shift and checklist weights learned here. This has not been measured yet. Contact timing and the score were tested on two separate datasets, the joined steps were not scored end to end, and no third dataset was tried. Data with sensor ground truth can be measured with the same metrics using the benchmark scorers.</dd>
-
-      <dt>Method</dt>
-      <dd>
-        <ol class="steps">
-          <li>Take frames at 5 per second and ask Muse Spark, for each hand, whether it touches an object.</li>
-          <li>Move each contact start 7 frames (about 0.23 s) later and each end 7 frames earlier. This shift was learned from the tactile gloves.</li>
-          <li>Cut a grasp clip for each contact and get hand and object masks from SAM 3.1.</li>
-          <li>Grade the 12 checklist items of each clip (7 from Muse Spark, 2 from SAM masks, 3 computed from video) as high, mid or low, and turn them into a 0 to 100 score with the learned weights.</li>
-          <li>Use the clips with high scores for robot training. The formulas and thresholds are in <a href="#k-calc">Rules and formulas</a> on the key experiments page.</li>
-        </ol>
-      </dd>
-    </dl>
-
-    <div class="viz viz-n1" data-chart="n1"></div>
-    <div class="viz viz-dots" data-chart="n2"></div>
-  </section>
-
   <section>
-    <h2><span class="no">5</span>Open problems</h2>
+    <h2><span class="no">7</span>Open problems</h2>
     <div class="tbl foldable" id="open-list">
       <div class="wrap">
         <table class="min">
@@ -191,33 +199,20 @@
     <button class="fold-btn" type="button" data-target="open-list" data-more="Show 4 more" data-less="Hide"></button>
   </section>
 
-  <section>
-    <h2><span class="no">6</span>Risks</h2>
-    <div class="tbl foldable" id="risk-list">
-      <div class="wrap">
-        <table class="min">
-          <thead><tr><th>Risk</th><th>Detail</th><th>Response</th></tr></thead>
-          <tbody>
-            <tr>
-              <td class="first">Lab data only</td>
-              <td>Both datasets were recorded in a lab. HOT3D fisheye video is used as recorded (EXP-25)</td>
-              <td>Reported as a limit</td>
-            </tr>
-            <tr class="extra">
-              <td class="first">Low Test 1 boundary scores</td>
-              <td>The glove measures pressure and video cannot see pressure, so boundary F1 at ±5 frames is low (best held-out 0.195, EXP-37)</td>
-              <td>Contact IoU (0.850) and ±15 frame F1 (0.376) are reported together. The claim rests on the effect of the sensor based timing shift (EXP-37)</td>
-            </tr>
-            <tr class="extra">
-              <td class="first">Small held-out set</td>
-              <td>3 HOT3D persons, 22 OpenGraph episodes</td>
-              <td>Bootstrap intervals by sequence and episode, and AUC per person, are reported together</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <section id="s-plan">
+    <h2><span class="no">8</span>Schedule</h2>
+    <div class="gantt" id="gantt"></div>
+    <div class="legend">
+      <span><i style="background:var(--done)"></i>Done</span>
+      <span><i style="background:var(--todo)"></i>Planned</span>
+      <span><i style="background:color-mix(in srgb, var(--today) 30%, transparent)"></i>Today</span>
     </div>
-    <button class="fold-btn" type="button" data-target="risk-list" data-more="Show 2 more" data-less="Hide"></button>
+
+    <details class="fold"><summary><span class="o">Show the details of each phase</span><span class="c">Hide</span></summary>
+      <div class="phases-wrap">
+        <div class="phases" id="phases"></div>
+      </div>
+    </details>
   </section>
 
   </div>
