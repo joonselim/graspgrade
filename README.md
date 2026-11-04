@@ -1,16 +1,42 @@
-# GraspGrade
+<h1 align="center">GraspGrade</h1>
 
-Cut human egocentric hand videos at the moment a hand touches an object, and
-score each clip from 0 to 100 for how well a robot hand could copy it.
+<p align="center"><b>Find the hand videos a robot can learn from.</b></p>
 
-**Site: [graspgrade.vercel.app](https://graspgrade.vercel.app)** (report in
-Korean and [English](https://graspgrade.vercel.app/en))
+<p align="center">
+GraspGrade cuts human egocentric hand video at the moment a hand touches an
+object, and scores each clip from 0 to 100 for how well a robot hand could
+copy the grasp. Video is the only input. SAM 3.1 tracks hands and objects,
+Muse Spark answers a short checklist, and a logistic regression turns twelve
+grades into the score, so every weight is visible. Every step is checked
+against sensors: a tactile glove for contact timing, and motion capture moved
+onto an Allegro robot hand for the grasp. On 1,426 held-out clips the score
+reaches AUC 0.624, where Muse Spark asked directly is at chance (0.501).
+</p>
 
-- [Demo](https://graspgrade.vercel.app/demo?lang=en): the 3 minute video
-- [Try](https://graspgrade.vercel.app/try?lang=en): six held-out clips, step by
-  step from the touch segment to the final score
-- [Experiment log](https://graspgrade.vercel.app/logs): all 42 experiments
-  with setup, numbers and figures
+<p align="center">
+  <img alt="Meta models" src="https://img.shields.io/badge/Meta-SAM%203.1%20%7C%20Muse%20Spark-0866ff">
+  <img alt="held-out AUC" src="https://img.shields.io/badge/held--out%20AUC-0.624-2350c9">
+  <img alt="contact F1" src="https://img.shields.io/badge/contact%20F1%20%C2%B15%20frames-0.195-2350c9">
+  <img alt="experiments" src="https://img.shields.io/badge/experiments-42-555">
+  <img alt="python" src="https://img.shields.io/badge/python-3.12-3776ab">
+  <img alt="media license" src="https://img.shields.io/badge/media-CC%20BY--SA%204.0-lightgrey">
+</p>
+
+<p align="center">
+  <a href="https://graspgrade.vercel.app/en">Live site</a> ·
+  <a href="https://graspgrade.vercel.app/demo?lang=en">Demo video</a> ·
+  <a href="https://graspgrade.vercel.app/try?lang=en">Try it</a> ·
+  <a href="https://graspgrade.vercel.app/logs">Experiment log</a> ·
+  <a href="benchmark/">Benchmark</a> ·
+  <a href="paper/main.pdf">Paper</a> ·
+  <a href="docs/MEASUREMENT_PLAN.md">Measurement plan</a>
+</p>
+
+<p align="center">
+  <a href="https://graspgrade.vercel.app/try?lang=en">
+    <img alt="The Try page: pick a held-out clip and watch it go from the touch segment through twelve grades to its score" src="docs/readme/try_page.png" width="860">
+  </a>
+</p>
 
 ## Problem
 
