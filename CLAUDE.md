@@ -102,6 +102,7 @@ Windows 사본을 WSL로 동기화:
 | `web/tools/demo_voice_el.py` | 영어 내레이션을 ElevenLabs Eric 음성으로 (`out/demo/voice_el/`, 이미 있는 샷은 건너뜀, 문구를 바꾼 샷은 WAV를 지우고 다시 호출). 사이트 영어 영상은 이 음성 (`demo_video.py --voice el` 결과를 `graspgrade_demo.mp4`로 복사). 받은 MP3를 1.1배로 (`--rewav`). `--send` 없으면 크레딧만 출력. 무료 크레딧 사용, 사용자가 호출하자고 할 때만. 영상은 `demo_video.py --voice el` |
 | `web/tools/demo_voice.ps1` | 샷별 내레이션을 Windows 내장 합성 음성으로 WAV로 만듦 (PowerShell, WSL `out/demo/voice/`) |
 | `web/tools/build_en.py` | 영어 보고서 페이지이자 사이트 첫 페이지 `index.html`을 한국어 `kr.html`(주소 `/kr`)과 `tools/en/`에서 만듦. 데모·Try는 기본 영어, `?lang=ko`면 한국어 |
+| `web/tools/try_record.ps1`, `web/tools/try_clip.py` | 요약 맨 위 Try 영상: Edge 헤드리스에 개발자 도구(CDP)로 붙어 Try 페이지가 클립을 고르고 단계가 나타나는 모습을 녹화(PowerShell), 프레임을 시각대로 이어 `web/assets/try_en.mp4`, `try_ko.mp4`와 포스터로 만듦(WSL python3 -I). 녹화 때는 첫 클립을 바로 끝난 상태로 띄우는 임시 복사본을 씀. API 호출 없음 |
 | `web/tools/build_logs.py` | 실험 기록 전체 페이지 `logs.html`을 `docs/experiments/`에서 만들고 그림을 `assets/logs/`로 복사 |
 | `web/tools/label_media.py` | 부드러운 물체 라벨링 페이지용 물체별 사진과 짧은 클립 (`label-media/`) |
 | `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |

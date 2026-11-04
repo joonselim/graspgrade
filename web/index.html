@@ -326,11 +326,11 @@
   .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
   .tag { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--rule); color: var(--ink-2); }
 
-  /* ---------- try teaser ---------- */
-  .try-card { display: grid; grid-template-columns: 3fr 2fr; gap: 22px; align-items: center; }
-  .try-card .try-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
-  .try-card .try-text p { margin: 0 0 10px; }
-  @media (max-width: 720px) { .try-card { grid-template-columns: 1fr; } }
+  /* ---------- clip of the Try page at the top of the summary ---------- */
+  .hero-clip { margin: 0 0 34px; }
+  .hero-clip video { display: block; width: 100%; height: auto; border: 1px solid var(--rule); background: var(--sheet); }
+  .hero-clip .cap { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+  .topnav a.gh { color: var(--ink-2); }
 
   footer {
     margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--rule);
@@ -513,6 +513,7 @@
     <a href="logs.html">Experiment log</a>
     <a class="hl" href="demo.html">Demo</a>
     <a class="hl" href="try.html">Try</a>
+    <a class="gh" href="https://github.com/joonselim/graspgrade" target="_blank" rel="noopener">GitHub</a>
     <a class="lang" href="kr.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 
@@ -521,6 +522,11 @@
     <h1 class="doc-title">GraspGrade</h1>
     <p class="doc-sub">Find the hand videos a robot can learn from.</p>
   </header>
+
+  <div class="hero-clip">
+    <a href="try.html"><video src="assets/try_en.mp4" poster="assets/try_en.jpg" autoplay muted loop playsinline preload="auto" width="1440" height="984"></video></a>
+    <p class="cap">The Try page: one held-out clip goes from the touch segment through twelve grades to its score and the motion capture check. <a href="try.html">Try it →</a></p>
+  </div>
 
   <section id="s-problem">
     <h2><span class="no">1</span>Problem</h2>
@@ -572,13 +578,8 @@
 
   <section id="s-try">
     <h2><span class="no">3</span>Try it</h2>
-    <div class="try-card">
-      <a class="try-shot" href="try.html"><img src="assets/try_en.jpg" alt="The Try page with a held-out clip, its touch segment and its grades" loading="lazy" width="1400" height="1128"></a>
-      <div class="try-text">
-        <p>Pick one of six held-out clips and follow it step by step: the touch segment, twelve grades from the video, SAM 3.1 and Muse Spark, the weighted sum and the final score, and what the motion capture check says.</p>
-        <p class="more"><a href="try.html">Open Try →</a> &nbsp; <a href="demo.html">Watch the 3 minute demo →</a></p>
-      </div>
-    </div>
+    <p>Pick one of six held-out clips and follow it step by step: the touch segment, twelve grades from the video, SAM 3.1 and Muse Spark, the weighted sum and the final score, and what the motion capture check says.</p>
+    <p class="more"><a href="try.html">Open Try →</a> &nbsp; <a href="demo.html">Watch the 3 minute demo →</a></p>
   </section>
 
   <section id="s-concl">
@@ -987,7 +988,7 @@
 
   <footer>
     Video and figure sources: OpenGraph Ego-Tactile Manipulation, OpenGraph Labs (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · HOT3D, Meta Platforms Technologies (video <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, hand annotations <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>). Cut and resized. License of each file: <a href="https://github.com/joonselim/graspgrade/blob/main/MEDIA_LICENSE.md">MEDIA_LICENSE.md</a><br>
-    Last updated 2026-11-04 12:44 KST
+    Last updated 2026-11-04 13:37 KST
     <p class="demo-link"><a href="logs.html">Full experiment log →</a></p>
   </footer>
 

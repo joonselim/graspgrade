@@ -51,6 +51,7 @@ def main():
     <a href="logs.html">Experiment log</a>
     <a class="hl" href="demo.html">Demo</a>
     <a class="hl" href="try.html">Try</a>
+    <a class="gh" href="https://github.com/joonselim/graspgrade" target="_blank" rel="noopener">GitHub</a>
     <a class="lang" href="kr.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 

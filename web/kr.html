@@ -326,11 +326,11 @@
   .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
   .tag { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--rule); color: var(--ink-2); }
 
-  /* ---------- try teaser ---------- */
-  .try-card { display: grid; grid-template-columns: 3fr 2fr; gap: 22px; align-items: center; }
-  .try-card .try-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
-  .try-card .try-text p { margin: 0 0 10px; }
-  @media (max-width: 720px) { .try-card { grid-template-columns: 1fr; } }
+  /* ---------- clip of the Try page at the top of the summary ---------- */
+  .hero-clip { margin: 0 0 34px; }
+  .hero-clip video { display: block; width: 100%; height: auto; border: 1px solid var(--rule); background: var(--sheet); }
+  .hero-clip .cap { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+  .topnav a.gh { color: var(--ink-2); }
 
   footer {
     margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--rule);
@@ -513,6 +513,7 @@
     <a href="#detail" data-nav="detail">실험 상세</a>
     <a class="hl" href="demo.html?lang=ko">데모</a>
     <a class="hl" href="try.html?lang=ko">Try</a>
+    <a class="gh" href="https://github.com/joonselim/graspgrade" target="_blank" rel="noopener">GitHub</a>
     <a class="lang" href="index.html" hreflang="en" lang="en">EN</a>
   </nav>
 
@@ -521,6 +522,11 @@
     <h1 class="doc-title">GraspGrade</h1>
     <p class="doc-sub">로봇이 배울 수 있는 손 영상을 찾아 줌.</p>
   </header>
+
+  <div class="hero-clip">
+    <a href="try.html?lang=ko"><video src="assets/try_ko.mp4" poster="assets/try_ko.jpg" autoplay muted loop playsinline preload="auto" width="1440" height="984"></video></a>
+    <p class="cap">Try 페이지: 검증 클립 하나가 손이 닿는 구간에서 등급 12개를 거쳐 점수와 모션캡처 확인 결과까지 감. <a href="try.html?lang=ko">직접 보기 →</a></p>
+  </div>
 
   <section id="s-problem">
     <h2><span class="no">1</span>문제</h2>
@@ -572,13 +578,8 @@
 
   <section id="s-try">
     <h2><span class="no">3</span>Try</h2>
-    <div class="try-card">
-      <a class="try-shot" href="try.html?lang=ko"><img src="assets/try_ko.jpg" alt="검증 클립 하나와 손이 닿는 구간, 등급이 보이는 Try 페이지" loading="lazy" width="1400" height="1128"></a>
-      <div class="try-text">
-        <p>검증 클립 6개 중 하나를 골라 단계별로 따라감. 손이 닿는 구간, 영상과 SAM 3.1, Muse Spark에서 나온 등급 12개, 가중합과 최종 점수, 모션캡처 확인 결과를 보여 줌.</p>
-        <p class="more"><a href="try.html?lang=ko">Try 열기 →</a> &nbsp; <a href="demo.html?lang=ko">3분 데모 보기 →</a></p>
-      </div>
-    </div>
+    <p>검증 클립 6개 중 하나를 골라 단계별로 따라감. 손이 닿는 구간, 영상과 SAM 3.1, Muse Spark에서 나온 등급 12개, 가중합과 최종 점수, 모션캡처 확인 결과를 보여 줌.</p>
+    <p class="more"><a href="try.html?lang=ko">Try 열기 →</a> &nbsp; <a href="demo.html?lang=ko">3분 데모 보기 →</a></p>
   </section>
 
   <section id="s-concl">
@@ -4096,7 +4097,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
 
   <footer>
     영상과 그림 출처: OpenGraph Ego-Tactile Manipulation, OpenGraph Labs (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · HOT3D, Meta Platforms Technologies (영상 <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, 손 주석 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>). 잘라 내고 크기를 줄여 썼음. 파일별 라이선스: <a href="https://github.com/joonselim/graspgrade/blob/main/MEDIA_LICENSE.md">MEDIA_LICENSE.md</a><br>
-    마지막 갱신 2026-11-04 12:44 KST
+    마지막 갱신 2026-11-04 13:37 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>
 
