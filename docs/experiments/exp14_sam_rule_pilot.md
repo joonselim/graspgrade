@@ -79,7 +79,7 @@ touches into one long block.*
   labels, with parameters chosen on other episodes. The code is ready for
   the 50 tuning episodes.
 - Arm B beats "always in contact" on IoU (0.75 against 0.67) but finds only
-  52 of 190 to 248 boundaries. In a first-person view the hand stays within a
+  52 of 190 to 248 boundaries. In a human egocentric view the hand stays within a
   few pixels of some object most of the time, so near-runs rarely break
   between touches. This was already visible in EXP-02 and EXP-03.
 - That limits arm C as well. Arm C only moves the boundaries that arm B

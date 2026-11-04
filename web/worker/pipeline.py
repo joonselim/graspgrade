@@ -1,4 +1,4 @@
-"""Score one new first-person video with the GraspGrade pipeline.
+"""Score one new human egocentric video with the GraspGrade pipeline.
 
 Same steps and the same learned values as the final runs (EXP-37, EXP-40), with
 the code of scripts/ imported read-only:
@@ -48,7 +48,7 @@ SIDES = ["left", "right"]
 MAX_CLIPS = 20
 MERGE_GAP, MIN_LEN, PAD = 15, 9, 30          # scripts/hot3d_clips.py, 30 fps frames
 SMALL = 352                                   # optical flow size, scripts/hot3d_local_checks.py
-FLIP = {"Left": 1, "Right": 0}                # MediaPipe label -> slot, first-person view is not mirrored
+FLIP = {"Left": 1, "Right": 0}                # MediaPipe label -> slot, human egocentric view is not mirrored
 NAMES = {
     "grade_camera_stability": "Camera stability", "grade_completeness": "Action completeness",
     "grade_hand_shape_fit": "Hand shape fit", "grade_visibility": "Visibility",

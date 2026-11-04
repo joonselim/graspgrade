@@ -513,7 +513,7 @@
   <div class="page" data-page="summary">
   <header class="doc-head">
     <h1 class="doc-title">GraspGrade progress</h1>
-    <p class="doc-sub">Cut first-person hand videos at the moment a hand touches an object, and score each segment from 0 to 100 for how well a robot hand could copy it.</p>
+    <p class="doc-sub">Cut human egocentric hand videos at the moment a hand touches an object, and score each segment from 0 to 100 for how well a robot hand could copy it.</p>
   </header>
 
   <section id="s-plan">
@@ -613,10 +613,10 @@
 
   <section id="s-concl">
     <h2><span class="no">4</span>Conclusion</h2>
-    <p class="lead">When models that only see video are corrected with sensor ground truth, they pick out contact timing and robot copyable grasps in first-person video more accurately.</p>
+    <p class="lead">Measured against sensor ground truth, the best video-only method changes. For contact timing, one shift learned from the glove makes Muse Spark asked directly the best method. For robot copyable grasps, asking a checklist instead of one question is what helps, and learning weights from labels adds nothing.</p>
     <dl class="brief">
       <dt>Problem</dt>
-      <dd>To train robots on first-person human video, you need to find when a hand touches and leaves an object, and which grasps a robot hand could copy. Today this selection is done by looking at the video only, and there is no way to check it against real contact or a real robot.</dd>
+      <dd>To train robots on human egocentric video, you need to find when a hand touches and leaves an object, and which grasps a robot hand could copy. Today this selection is done by looking at the video only, and there is no way to check it against real contact or a real robot.</dd>
 
       <dt>What we solved</dt>
       <dd>We built ground truth for both questions from tactile gloves (OpenGraph) and motion capture (HOT3D), and scored selection methods made with SAM 3.1 and Muse Spark against it. The ground truth and the scoring code are packed as a benchmark (EXP-28).</dd>
@@ -646,7 +646,7 @@
       </dd>
 
       <dt>Use on other video</dt>
-      <dd>The same steps apply to first-person video without sensors. All it needs is the video and calls to SAM 3.1 and Muse Spark, and it uses the timing shift and checklist weights learned here. Data with sensor ground truth can be measured with the same metrics using the benchmark scorers.</dd>
+      <dd>The same steps apply to human egocentric video without sensors. All it needs is the video and calls to SAM 3.1 and Muse Spark, and it uses the timing shift and checklist weights learned here. This has not been measured yet. Contact timing and the score were tested on two separate datasets, the joined steps were not scored end to end, and no third dataset was tried. Data with sensor ground truth can be measured with the same metrics using the benchmark scorers.</dd>
 
       <dt>Method</dt>
       <dd>
@@ -742,7 +742,7 @@
   <section id="k-intro">
     <h2><span class="no">1</span>Two questions</h2>
     <ul class="plain">
-      <li><b>Test 1, contact timing.</b> From first-person video alone, find the moment a hand touches an object and the moment it lets go. The ground truth is tactile glove data that measures palm pressure in the OpenGraph dataset.</li>
+      <li><b>Test 1, contact timing.</b> From human egocentric video alone, find the moment a hand touches an object and the moment it lets go. The ground truth is tactile glove data that measures palm pressure in the OpenGraph dataset.</li>
       <li><b>Test 2, grasps a robot can copy.</b> Score each grasp clip for whether a robot hand could copy that grasp. The ground truth comes from moving the motion capture hand in the HOT3D dataset onto an Allegro robot hand and checking whether the robot hand can make the same grasp.</li>
     </ul>
   </section>

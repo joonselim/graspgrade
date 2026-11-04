@@ -73,9 +73,9 @@
 
 ### 2. GraspGrade가 하는 일 (0:15-0:35)
 
-화면: `demo_card_scene2.png`. 왼쪽 입력 "First-person hand video", 오른쪽 출력 3줄 "Clips cut at each touch", "A 0 to 100 score: can a robot hand copy it?", "A one-line reason". 아래에 "SAM 3.1 · Muse Spark".
+화면: `demo_card_scene2.png`. 왼쪽 입력 "Human egocentric video", 오른쪽 출력 3줄 "Clips cut at each touch", "A 0 to 100 score: can a robot hand copy it?", "A one-line reason". 아래에 "SAM 3.1 · Muse Spark".
 
-> GraspGrade takes first-person hand video, cuts it into clips at the moment of touch, and gives each clip a score from 0 to 100 for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a short checklist about each clip. We check both steps against real sensor data.
+> GraspGrade takes human egocentric hand video, cuts it into clips at the moment of touch, and gives each clip a score from 0 to 100 for how likely a robot hand can copy it. SAM 3.1 tracks the hands and objects. Muse Spark answers a short checklist about each clip. We check both steps against real sensor data.
 
 ### 3. 숫자 1: 접촉 시점 (0:35-1:25)
 

@@ -23,7 +23,7 @@
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.1}
 
-\title{\textbf{GraspGrade: Scoring First-Person Video Clips for Robot Hand
+\title{\textbf{GraspGrade: Scoring Human Egocentric Video Clips for Robot Hand
 Imitation, Checked Against Touch Gloves and Motion Capture}}
 
 \author{Inseok Lee \qquad Joonse Lim\\
@@ -36,10 +36,10 @@ Imitation, Checked Against Touch Gloves and Motion Capture}}
 \maketitle
 
 \begin{abstract}
-Robot hand teams want first-person human video because it is cheap and
+Robot hand teams want human egocentric video because it is cheap and
 plentiful, but most of it cannot teach a robot hand. Today clips are picked
 by looking at the video only, and there is no way to check the choice against
-real contact or a real robot. GraspGrade cuts first-person video into clips at
+real contact or a real robot. GraspGrade cuts human egocentric video into clips at
 the moment of contact and gives each clip a score from 0 to 100 for how likely
 it is that a robot hand can copy the grasp. Video is the only input. We build
 ground truth for both steps from sensors, a touch-sensing glove for contact
@@ -142,7 +142,7 @@ dex-retargeting \cite{dexretargeting} for the human to robot hand mapping.
 
 \section{Data and splits}
 
-\paragraph{OpenGraph Ego-Tactile.} 72 episodes of first-person video at 30 fps,
+\paragraph{OpenGraph Ego-Tactile.} 72 episodes of human egocentric video at 30 fps,
 138,629 frames, 1.28 hours. Both hands wear a glove with 80 taxels. The camera
 is an iPhone ultrawide, about 107 degrees horizontal field of view. Splits:
 50 tuning episodes, 22 held-out episodes.
@@ -776,7 +776,7 @@ a geometric score, so the scope stays at rigid objects.
 \section{The method as one pipeline}
 \label{sec:pipeline}
 
-The steps below run on first-person video with no sensors. They need the video
+The steps below run on human egocentric video with no sensors. They need the video
 and calls to SAM 3.1 and Muse Spark, and they use the timing shift and the
 checklist weights learned here.
 
@@ -914,7 +914,7 @@ one glove setup and one motion capture setup. Everything here is lab data.
 \section{Conclusion}
 
 Sensor ground truth changes which video-only method looks best for contact
-timing and copyable grasps in first-person video. Two results hold on
+timing and copyable grasps in human egocentric video. Two results hold on
 held-out data.
 
 \begin{table}[h]
