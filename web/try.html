@@ -150,12 +150,12 @@
 
   <nav class="topnav" aria-label="Pages">
     <span class="brand">GraspGrade</span>
-    <a data-k="nav_summary" href="index.html#summary">요약</a>
-    <a data-k="nav_story" href="index.html#story">핵심 실험</a>
-    <a data-k="nav_detail" href="index.html#detail">실험 상세</a>
-    <a class="hl" data-k="nav_demo" href="demo.html">데모</a>
-    <a class="hl on" data-k="nav_try" href="try.html">Try</a>
-    <a class="lang" data-k="nav_other" href="try.html?lang=en" hreflang="en" lang="en">EN</a>
+    <a data-k="nav_summary" href="kr.html#summary">요약</a>
+    <a data-k="nav_story" href="kr.html#story">핵심 실험</a>
+    <a data-k="nav_detail" href="kr.html#detail">실험 상세</a>
+    <a class="hl" data-k="nav_demo" href="demo.html?lang=ko">데모</a>
+    <a class="hl on" data-k="nav_try" href="try.html?lang=ko">Try</a>
+    <a class="lang" data-k="nav_other" href="try.html" hreflang="en" lang="en">EN</a>
   </nav>
 
   <h1 data-k="title">Try: 점수가 나오는 과정</h1>
@@ -220,7 +220,7 @@
 <script>
 (function () {
   "use strict";
-  var EN = new URLSearchParams(location.search).get("lang") === "en";
+  var EN = new URLSearchParams(location.search).get("lang") !== "ko";
   var T = {
     ko: {
       grade: { 1: "상", 0.5: "중", 0: "하" },
@@ -270,9 +270,9 @@
   };
   var L = EN ? T.en : T.ko;
   var PAGE_EN = {
-    nav_summary: ["Summary", "en.html#summary"], nav_story: ["Key experiments", "en.html#story"],
-    nav_detail: ["Experiment log", "logs.html"], nav_demo: ["Demo", "demo.html?lang=en"],
-    nav_try: ["Try", "try.html?lang=en"], nav_other: ["KO", "try.html"],
+    nav_summary: ["Summary", "index.html#summary"], nav_story: ["Key experiments", "index.html#story"],
+    nav_detail: ["Experiment log", "logs.html"], nav_demo: ["Demo", "demo.html"],
+    nav_try: ["Try", "try.html"], nav_other: ["KO", "try.html?lang=ko"],
     title: ["Try: how a clip gets its score"],
     sub: ["To the eye, every grasp looks alike. Only some of them can teach a robot hand. GraspGrade cuts out the moment the hand touches the object and scores from 0 to 100 how well a robot hand can copy that grasp."],
     replay: ["Play again"], skip: ["Show the result"],

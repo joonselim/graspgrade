@@ -72,12 +72,12 @@
 
   <nav class="topnav" aria-label="Pages">
     <span class="brand">GraspGrade</span>
-    <a data-k="summary" href="index.html#summary">요약</a>
-    <a data-k="story" href="index.html#story">핵심 실험</a>
-    <a data-k="detail" href="index.html#detail">실험 상세</a>
-    <a class="hl on" data-k="demo" href="demo.html">데모</a>
-    <a class="hl" data-k="try" href="try.html">Try</a>
-    <a class="lang" data-k="other" href="demo.html?lang=en" hreflang="en" lang="en">EN</a>
+    <a data-k="summary" href="kr.html#summary">요약</a>
+    <a data-k="story" href="kr.html#story">핵심 실험</a>
+    <a data-k="detail" href="kr.html#detail">실험 상세</a>
+    <a class="hl on" data-k="demo" href="demo.html?lang=ko">데모</a>
+    <a class="hl" data-k="try" href="try.html?lang=ko">Try</a>
+    <a class="lang" data-k="other" href="demo.html" hreflang="en" lang="en">EN</a>
   </nav>
 
   <h1 data-k="title">3분 데모 영상</h1>
@@ -92,19 +92,19 @@
   "use strict";
   // The same English video for both languages; only the words around it change.
   var EN = {
-    summary: ["Summary", "en.html#summary"],
-    story: ["Key experiments", "en.html#story"],
+    summary: ["Summary", "index.html#summary"],
+    story: ["Key experiments", "index.html#story"],
     detail: ["Experiment log", "logs.html"],
-    demo: ["Demo", "demo.html?lang=en"],
-    try: ["Try", "try.html?lang=en"],
-    other: ["KO", "demo.html"],
+    demo: ["Demo", "demo.html"],
+    try: ["Try", "try.html"],
+    other: ["KO", "demo.html?lang=ko"],
     title: ["3 minute demo video"],
     sources: ["Video sources: OpenGraph Ego-Tactile, OpenGraph Labs (CC BY 4.0), HOT3D, Meta Platforms Technologies " +
               "(CC BY-SA 4.0, cut and resized, this video is also CC BY-SA 4.0, license of each file in MEDIA_LICENSE.md on GitHub), " +
               "MuJoCo Menagerie " +
               "(robot model in the first scene, Apache 2.0) · Voice: ElevenLabs"]
   };
-  if (new URLSearchParams(location.search).get("lang") !== "en") return;
+  if (new URLSearchParams(location.search).get("lang") === "ko") return;
   document.documentElement.lang = "en";
   document.title = "GraspGrade demo";
   document.querySelectorAll("[data-k]").forEach(function (el) {

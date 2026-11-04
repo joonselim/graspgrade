@@ -11,7 +11,7 @@
   },
   "rewrites": [
     {
-      "source": "/((?!api/|label|validate|assets/|demo|logs|en).*)",
+      "source": "/((?!api/|label|validate|assets/|demo|logs|try|kr).*)",
       "destination": "/index.html"
     }
   ],
@@ -50,6 +50,18 @@
           "value": "private, max-age=3600"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/en",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/ko",
+      "destination": "/kr",
+      "permanent": false
     }
   ]
 }

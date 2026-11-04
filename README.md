@@ -23,9 +23,9 @@ reaches AUC 0.624, where Muse Spark asked directly is at chance (0.501).
 </p>
 
 <p align="center">
-  <a href="https://graspgrade.vercel.app/en">Progress report</a> ·
-  <a href="https://graspgrade.vercel.app/demo?lang=en">Demo video</a> ·
-  <a href="https://graspgrade.vercel.app/try?lang=en">Try it</a> ·
+  <a href="https://graspgrade.vercel.app">Progress report</a> ·
+  <a href="https://graspgrade.vercel.app/demo">Demo video</a> ·
+  <a href="https://graspgrade.vercel.app/try">Try it</a> ·
   <a href="https://graspgrade.vercel.app/logs">Experiment log</a> ·
   <a href="benchmark/">Benchmark</a> ·
   <a href="paper/main.pdf">Paper</a> ·
@@ -33,7 +33,7 @@ reaches AUC 0.624, where Muse Spark asked directly is at chance (0.501).
 </p>
 
 <p align="center">
-  <a href="https://graspgrade.vercel.app/try?lang=en">
+  <a href="https://graspgrade.vercel.app/try">
     <img alt="The Try page: pick a held-out clip and watch it go from the touch segment through twelve grades to its score" src="docs/readme/try_page.png" width="860">
   </a>
 </p>

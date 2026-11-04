@@ -1,13 +1,14 @@
-"""Build en.html, the English report page, from index.html.
+"""Build index.html, the English report page and the site front page, from kr.html.
 
-The summary and key experiments pages come from tools/en/summary.html and
-tools/en/story.html. The schedule data and the chart data come from
-tools/en/phases.js and tools/en/charts.js. The detail page is replaced by a
-link to logs.html, which already holds the English write-ups. Everything else,
-the styles and the page code, is taken from index.html, so a layout change
-there reaches the English page on the next build.
+kr.html is the Korean report, served at /kr. The summary and key experiments
+pages come from tools/en/summary.html and tools/en/story.html. The schedule
+data and the chart data come from tools/en/phases.js and tools/en/charts.js.
+The detail page is replaced by a link to logs.html, which already holds the
+English write-ups. Everything else, the styles and the page code, is taken
+from kr.html, so a layout change there reaches the English page on the next
+build.
 
-When index.html changes its words, change the matching English file in
+When kr.html changes its words, change the matching English file in
 tools/en/ and run this again:
 
     python3 -I tools/build_en.py
@@ -30,7 +31,7 @@ def rep(s, a, b):
 
 
 def main():
-    s = (ROOT / "index.html").read_text(encoding="utf-8")
+    s = (ROOT / "kr.html").read_text(encoding="utf-8")
     stamp = s[s.index("마지막 갱신 ") + len("마지막 갱신 "):]
     stamp = stamp[:stamp.index("<")].strip()
 
@@ -48,9 +49,9 @@ def main():
     <a href="#summary" data-nav="summary">Summary</a>
     <a href="#story" data-nav="story">Key experiments</a>
     <a href="logs.html">Experiment log</a>
-    <a class="hl" href="demo.html?lang=en">Demo</a>
-    <a class="hl" href="try.html?lang=en">Try</a>
-    <a class="lang" href="index.html" hreflang="ko" lang="ko">KO</a>
+    <a class="hl" href="demo.html">Demo</a>
+    <a class="hl" href="try.html">Try</a>
+    <a class="lang" href="kr.html" hreflang="ko" lang="ko">KO</a>
   </nav>
 
 ''')
@@ -120,9 +121,9 @@ def main():
     s = rep(s, "document.querySelectorAll('a[href^=\"#exp-\"]')", "document.querySelectorAll('a[href*=\"#exp-\"]')")
 
     left = [line for line in s.splitlines() if any("가" <= ch <= "힣" for ch in line)]
-    assert not left, "Korean text left in en.html:\n" + "\n".join(x.strip()[:120] for x in left[:20])
-    (ROOT / "en.html").write_text(s, encoding="utf-8", newline="\n")
-    print("en.html written")
+    assert not left, "Korean text left in index.html:\n" + "\n".join(x.strip()[:120] for x in left[:20])
+    (ROOT / "index.html").write_text(s, encoding="utf-8", newline="\n")
+    print("index.html written")
 
 
 if __name__ == "__main__":

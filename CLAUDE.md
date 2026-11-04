@@ -101,7 +101,7 @@ Windows 사본을 WSL로 동기화:
 | `web/tools/robot_render.py` | 첫 장면 로봇 화면 렌더링: MuJoCo Menagerie의 Apollo 모델(Apache 2.0)을 손으로 정한 자세로 움직이고 카메라를 돌려 10초 촬영. 별도 venv `.venv-render` (mujoco 3.3.0), 모델은 `ext/mujoco_menagerie/`, `MUJOCO_GL=egl`. 결과 `out/demo/robot_take.mp4`. API 호출 없음 |
 | `web/tools/demo_voice_el.py` | 영어 내레이션을 ElevenLabs Eric 음성으로 (`out/demo/voice_el/`, 이미 있는 샷은 건너뜀, 문구를 바꾼 샷은 WAV를 지우고 다시 호출). 사이트 영어 영상은 이 음성 (`demo_video.py --voice el` 결과를 `graspgrade_demo.mp4`로 복사). 받은 MP3를 1.1배로 (`--rewav`). `--send` 없으면 크레딧만 출력. 무료 크레딧 사용, 사용자가 호출하자고 할 때만. 영상은 `demo_video.py --voice el` |
 | `web/tools/demo_voice.ps1` | 샷별 내레이션을 Windows 내장 합성 음성으로 WAV로 만듦 (PowerShell, WSL `out/demo/voice/`) |
-| `web/tools/build_en.py` | 영어 보고서 페이지 `en.html`을 `index.html`과 `tools/en/`에서 만듦 |
+| `web/tools/build_en.py` | 영어 보고서 페이지이자 사이트 첫 페이지 `index.html`을 한국어 `kr.html`(주소 `/kr`)과 `tools/en/`에서 만듦. 데모·Try는 기본 영어, `?lang=ko`면 한국어 |
 | `web/tools/build_logs.py` | 실험 기록 전체 페이지 `logs.html`을 `docs/experiments/`에서 만들고 그림을 `assets/logs/`로 복사 |
 | `web/tools/label_media.py` | 부드러운 물체 라벨링 페이지용 물체별 사진과 짧은 클립 (`label-media/`) |
 | `scripts/muse_soft.py` | 부드러운 물체 확인: `segments` (OpenGraph 장갑 접촉 구간과 물체), `frames` (구간당 3장), `send --set pilot/hot3d/opengraph` (`--send` 없으면 비용만, 라벨 시트 미완성이면 중단, 크레딧 사용), `score` (잡은 비율, 보류 비율, 합격) |
