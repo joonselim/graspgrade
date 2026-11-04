@@ -1002,7 +1002,7 @@
 <tr><td>Our score minus R3</td><td>+0.007</td><td>-0.012 to 0.030</td></tr>
 </tbody></table></div>
 <ul><li>Learned weights: size +2.13, width -1.04, handle -0.21. Equal weights count width and handle in the direction of their meaning, which the labels say is wrong (EXP-19). That is where learning gains.</li><li>The local and SAM checks add nothing on top of R3 (+0.007), as expected from EXP-17.</li><li>The earlier <code>--check</code> outputs did not change. The R1 rows ran on the 5 P1 clips only, as a code path.</li></ul>
-<p>Power, pseudo held-out sets of 3 persons (median 1,192 clips, 41 sequences; held-out has 1,426 clips, 51 sequences):</p>
+<p>Power, pseudo held-out sets of 3 persons (median 1,192 clips, 41 sequences, held-out has 1,426 clips, 51 sequences):</p>
 <div class="wrap"><table>
 <thead><tr><th>Grades</th><th>Sets</th><th>R3 minus R2, median (range)</th><th>Interval above 0</th></tr></thead>
 <tbody>
@@ -1506,7 +1506,7 @@
 <tr><td>whiteboard_eraser</td><td>55</td><td>23</td><td>0.552</td><td>0.533</td><td>0.535</td></tr>
 <tr><td>whiteboard_marker</td><td>65</td><td>52</td><td>0.547</td><td>0.331</td><td>0.433</td></tr>
 </tbody></table></div>
-<ul><li>AUC for each failure reason (copyable clips against clips that fail for that reason; held-out: 662 copyable, 538 collision, 146 reach, 80 grip):</li></ul>
+<ul><li>AUC for each failure reason (copyable clips against clips that fail for that reason. Held-out: 662 copyable, 538 collision, 146 reach, 80 grip):</li></ul>
 <div class="wrap"><table>
 <thead><tr><th>Failure reason</th><th>Our score</th><th>Object reference</th><th>Checklist learned</th><th>Muse Spark alone</th></tr></thead>
 <tbody>
@@ -1600,7 +1600,7 @@
 <p>The soft object check fails the rule fixed in advance. Muse Spark leaves rigid HOT3D clips alone (2.1% held back) but catches only half of the segments labeled soft (51.7%, rule 70%). Most misses are tape, which Muse Spark calls squeezable or rigid. Bubble wrap, gloves and mats are mostly caught. It also holds back 18% of rigid OpenGraph segments. So the soft object step of the proposal is not supported as it stands: a "soft or unsure" answer from Muse Spark is not enough to keep soft objects out of the score. Dropping the held-back HOT3D clips leaves the number 2 AUC unchanged.</p>
 <p>As the measurement plan asks for a failed check, the viewer has a Touch check tab (added 2026-10-29, <code>scripts/viewer_data.py</code>, no call). It lists the 30 held-back HOT3D held-out clips, marked as not validated: 28 answered soft and 2 unsure, from 12 objects, led by coffee_pot (6), food_vegetables (5), holder_black (5) and spatula_red (5). All 12 objects are labeled rigid.</p>
 </article>
-  <footer>Video sources: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
+  <footer>Video and figure sources: OpenGraph Ego-Tactile Manipulation, OpenGraph Labs (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · HOT3D, Meta Platforms Technologies (video <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, hand annotations <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>). Cut and resized, figures add our drawings. License of each file: <a href="https://github.com/joonselim/graspgrade/blob/main/MEDIA_LICENSE.md">MEDIA_LICENSE.md</a></footer>
 </main>
 </body>
 </html>

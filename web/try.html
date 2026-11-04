@@ -178,7 +178,7 @@
     <ol class="steps" id="steps">
       <li class="step" data-n="1">
         <h3 data-k="s1">손이 닿는 구간</h3>
-        <p class="by" data-k="s1by">실제 사용에서는 SAM 3.1 손·물체 마스크로 구간을 자름(평가 1). 이 검증 클립은 모션캡처로 자른 구간임</p>
+        <p class="by" data-k="s1by">실제 사용에서는 Muse Spark가 접촉을 찾고 장갑으로 배운 보정을 더해 구간을 자름(평가 1). 이 검증 클립은 모션캡처로 자른 구간임</p>
       </li>
       <li class="step" data-n="2">
         <h3 data-k="s2">영상 계산 항목 3개</h3>
@@ -214,7 +214,7 @@
     </ol>
   </div>
 
-  <p class="foot" data-k="foot">영상 출처: HOT3D (Meta)</p>
+  <p class="foot" data-k="foot">영상 출처: HOT3D, Meta Platforms Technologies (CC BY-SA 4.0). 잘라 내고 크기를 줄임. 이 클립들도 CC BY-SA 4.0. 파일별 라이선스: GitHub의 MEDIA_LICENSE.md</p>
 </main>
 
 <script>
@@ -276,13 +276,13 @@
     title: ["Try: how a clip gets its score"],
     sub: ["To the eye, every grasp looks alike. Only some of them can teach a robot hand. GraspGrade cuts out the moment the hand touches the object and scores from 0 to 100 how well a robot hand can copy that grasp."],
     replay: ["Play again"], skip: ["Show the result"],
-    s1: ["Touch segment"], s1by: ["In real use, SAM 3.1 hand and object masks cut the segment (test 1). These held-out clips were cut with motion capture"],
+    s1: ["Touch segment"], s1by: ["In real use, Muse Spark finds the touch and a timing shift learned from the glove sets the cut (test 1). These held-out clips were cut with motion capture"],
     s2: ["Three grades computed from the video"], s2by: ["Computed from MediaPipe hand joints and optical flow"],
     s3: ["Two SAM 3.1 grades"], s3by: ["Hand and object masks"],
     s4: ["Muse Spark checklist, seven grades"], s4by: ["Frames of the touch and a short list of questions"],
     s5: ["Score"], s5by: ["Logistic regression. The weights were learned on 400 tuning clips"],
     s6: ["Result"], s6by: ["Pass or drop at each preset, and the motion capture check"],
-    foot: ["Video source: HOT3D (Meta)"]
+    foot: ["Video source: HOT3D, Meta Platforms Technologies (CC BY-SA 4.0). Cut and resized. These clips are also CC BY-SA 4.0. License of each file: MEDIA_LICENSE.md on GitHub"]
   };
   if (EN) {
     document.documentElement.lang = "en";

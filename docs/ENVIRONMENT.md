@@ -44,7 +44,7 @@ The project lives at `~/graspgrade`, on the WSL filesystem. Working under
   on 0.4.x and numpy stays on 1.
 - torch, CPU build, installed from the PyTorch CPU index. dex-retargeting fails
   at import without torch. A plain `pip install torch` pulls a multi-GB CUDA
-  build on Linux for no benefit. Swap it if local SAM is ever needed; the 3070
+  build on Linux for no benefit. Swap it if local SAM is ever needed. The 3070
   has 8 GB of VRAM and whether SAM 3 fits has not been checked.
 - `--recurse-submodules` on the dex-retargeting clone. Without it the robot URDF
   folders, Allegro included, are empty.

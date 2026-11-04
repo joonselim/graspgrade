@@ -1,6 +1,6 @@
 # GraspGrade 진행 상황
 
-마지막 갱신: 2026-10-30 (해커톤 Day 5). 마감 2026-11-04 정오 ET.
+마지막 갱신: 2026-11-04 (해커톤 마지막 날). 마감 2026-11-04 정오 ET.
 
 ## 한 줄 상태
 
@@ -10,7 +10,7 @@
 
 숫자 2 held-out 최종 채점을 1회 했다 (EXP-40): 우리 점수 AUC 0.624 (0.589~0.661), Muse 단독 0.501, 물체 기준선 0.771, Muse + 우리 항목 0.624. 처음 보는 물체에서 우리 점수 0.571 vs 물체 기준선 0.5. 체크리스트 효과 R2-R1 +0.117 (0.073~0.166), 학습 효과 R3-R2 +0.005 (없음), 로컬+SAM 항목 +0.001 (없음). 물체 안 AUC 0.506. 비교 6은 라벨 5개부터 물체 비율 단독과 결합이 같다. 정답은 copyable v2 (EXP-16, held-out EXP-20)이고 체크리스트는 물체 항목 중심이다 (EXP-18, 19). 깊이 한도 보고 (EXP-41, 무료, 계획에 규칙 먼저): 5 mm로 배운 점수를 2 mm / 10 mm 라벨로 채점. 10 mm는 그림 유지 (우리 0.632, Muse 단독 0.541), 2 mm는 우리 0.521 (우연 수준), Muse 단독 0.417, 물체 기준선 0.761. 부드러운 물체 확인은 합격 못 했다 (EXP-42): soft 구간 51.7% 잡기 (합격선 70% 이상, 미달), HOT3D 보류 2.1% (합격선 10% 이하, 충족). 뷰어 Touch check 탭에 "Not validated"로 표시했다.
 
-남은 것은 제출 작업이다: 데모 영상 확정, Official Rules 확인, 저장소 공개 범위와 라이선스 (아래 "미해결" 4, 6).
+남은 것은 제출 작업이다: Official Rules 확인, 공개된 데이터 영상과 라이선스, 코드 LICENSE (아래 "미해결" 6). 데모 영상, Try 페이지, 논문은 만들어져 있다 (미해결 4, 7).
 
 무엇을 무엇과 비교하는지는 [docs/MEASUREMENT_PLAN.md](MEASUREMENT_PLAN.md)가 기준이다. 유료 실행 순서와 사용자 결정은 아래 "실행 기록".
 
@@ -23,7 +23,7 @@
 부드러운 물체 확인 코드 (2026-10-28, API 호출 없음): `scripts/muse_soft.py`, 프롬프트 `scripts/prompts/soft_object.txt` (측정 계획 원문). OpenGraph 구간 1,239개 (held-out 286, 튜닝 953, 3개 제외)와 3프레임씩 추출 완료 (`out/soft/`, 218 MB, sponge 구간 눈으로 확인). 해석 못 한 답은 바로 한 번 더 보내고, 두 번 실패하면 unsure로 저장. 예외는 저장 안 함. 라벨 시트의 `agreed`가 하나라도 비면 `--send`가 멈춘다. `number2_score.py`가 클립별 점수를 `number2_{check,final}_scores.csv`로 저장 (보류 후 AUC용). 가짜 점검 42개 통과, 회귀 11개 동일. 부드러운 물체 확인은 두 사람이 라벨 시트를 채우고 커밋한 뒤에만 보낸다.
 
 실험 기록(제출용 영어, 이미지 포함)은 [docs/experiments/](experiments/README.md)에 있다. 새 실험을 하면 같은 형식으로 추가한다.
-git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, private)를 보고서 세션이 커밋하고 푸시한다. 실험 세션은 파일만 고친다. WSL `~/graspgrade`의 별도 로컬 이력은 더 쓰지 않는다.
+git: Windows 폴더 저장소 (origin = github.com/joonselim/graspgrade, 2026-11-04 확인 시 public)를 보고서 세션이 커밋하고 푸시한다. 실험 세션은 파일만 고친다. WSL `~/graspgrade`의 별도 로컬 이력은 더 쓰지 않는다.
 
 ## copyable 라벨 v2로 교체 (EXP-16, 2026-10-27)
 
@@ -193,7 +193,7 @@ Muse Spark 경계 확인과 Muse 단독 기준선은 SAM 결과를 본 뒤 따�
 - (2026-10-29 갱신) 데이터는 `scripts/viewer_data.py`가 최종 held-out 결과로 만든다. 클립 점수 탭: held-out 점수 상위 15개 + 하위 15개, 최종 실행과 같은 모델 (점수 일치 확인), 12개 등급과 가중치, 정답과 실패 원인, Muse 체크리스트 이유, Muse 단독 확률과 이유, 상단에 AUC 요약. 접촉 시점 탭: held-out 22개 에피소드, 손별 장갑 / A+보정 / B / C+보정 트랙, 에피소드별 F1과 IoU, 상단에 합산 요약. 영상 `viewer/media/` (WSL, 약 45 MB, 이전 튜닝 영상 포함)는 git에서 제외.
 - 로컬 확인: WSL에서 `cd ~/graspgrade/viewer && python3 -m http.server 8765` 후 http://localhost:8765. 두 탭 모두 동작 확인.
 - (2026-10-29) Touch check 탭(부드러운 물체 확인이 보류한 HOT3D 30클립, "Not validated")과 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`)를 추가했다.
-- 배포: 뷰어는 배포하지 않았다 (`viewer/media`가 git에 없음). 원격 저장소는 private (D3). 보고서 페이지(`index.html`, `en.html`, `logs.html`)와 라벨링 페이지는 보고서 세션이 Vercel 설정(`vercel.json`, noindex)으로 배포한다.
+- 배포: 뷰어는 배포하지 않았다 (`viewer/media`가 git에 없음). 원격 저장소는 2026-11-04 확인 시 public이다. 보고서 페이지(`web/index.html`, `web/en.html`, `web/logs.html`)와 라벨링 페이지는 보고서 세션이 Vercel 설정(`vercel.json`, noindex)으로 배포한다.
 
 ## 숫자 1 Muse 비교군 준비 (EXP-21, 무료)
 
@@ -303,15 +303,19 @@ P7 게이트 (측정 계획에 계산 전 기록, 2026-10-28): score_train 400�
 1. (해결, EXP-08) HOT3D 보정과 2D 박스는 Aria 원본 방향이다. preview는 원본을 시계 방향 90도 돌린 것: 원본 (u, v) → preview (1407 - v, u). preview 프레임 k = 스트림 214-1의 k번째 RGB 타임스탬프.
 2. (MANO 불필요, EXP-09) 손가락 끝은 UmeTrack 프로필 + 직접 짠 순운동학으로 얻는다. hand 0 = 왼손(프로필 그대로), hand 1 = 오른손(x축 반전). HOT3D 툴킷 / projectaria_tools 설치도 필요 없었다 (투영은 EXP-08 코드).
 3. 브리프 9장 할 일 중 Official Rules 확인, 제안서 프레이밍 반영, 이인석 지원서, 한국 일정은 이 환경 작업과 무관해서 손대지 않았다. one-pager는 2026-10-29에 GraspGrade 이름과 최종 결과로 갱신했다 (같은 링크 https://claude.ai/artifact/4so1DrQxogYfb5wsvTmBMv, 버전 2, 맨 위 그림은 held-out 에피소드 36 오른손 실제 트랙).
-4. 데모 영상: 구성안은 [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 3:00, 장면 6개, 뷰어 화면(에피소드 36, 7, HOT3D 클립 5개), 영상용 그림 4장, 글자 카드 3장(`scripts/demo_figures.py`, `docs/demo/`), 영어 내레이션 454단어. 영상은 `tools/demo_video.py`가 구성안대로 그렸다 (WSL `out/demo/graspgrade_demo.mp4`, 179.4초, 1920x1080, 자막 포함, 자막 없는 판 `graspgrade_demo_no_captions.mp4`). 목소리는 `tools/demo_voice.ps1`의 Windows 내장 합성 음성이다. 손으로 녹화할 때 쓰는 바로 열기 링크(`#clip=`, `#episode=..&hand=right`, `#compare=`)와 `.claude/launch.json`의 `viewer` 서버도 남아 있다. 영상 길이 규칙, HOT3D 영상 공개 가능 여부, 합성 음성을 그대로 쓸지는 사용자 결정. 루트 demo.html은 최종 결과와 맞지 않아 쓰지 않는다.
+4. 데모 영상: 첫 구성안은 [docs/DEMO_VIDEO.md](DEMO_VIDEO.md) (2026-10-29). 영상은 `web/tools/demo_video.py`가 합성한다. 사이트 영상은 `web/assets/video/graspgrade_demo.mp4` (영어, 174.7초, ElevenLabs Eric 음성)와 `graspgrade_demo_ko.mp4` (한국어, 166.2초, Windows Heami 음성)이고, `web/demo.html`은 두 언어 모두 영어 영상을 보여 준다. 첫 장면은 Meta와 Fourier 휴머노이드 소식으로 시작하며 YouTube 쇼츠(@Futur Decoded)를 대체 화면으로 쓴다 (출처 표시, 사용 허락은 없음). 뷰어 바로 열기 링크와 `.claude/launch.json`의 `viewer` 서버는 손으로 녹화할 때용으로 남아 있다.
 5. 측정 계획 대조 (2026-10-29): 약속했는데 빠진 보고 2개를 채웠다. EXP-40에 물체·사람 안 AUC(우리 점수 0.484)와 물체별 AUC 표(27개 물체, 우리 점수 14개가 0.5 초과)를 추가했다. 부드러운 물체 확인이 실패했으므로 뷰어에 Touch check 탭(보류 HOT3D 30클립, "Not validated")을 추가했다 (EXP-42 끝, viewer/data/touch.json). 마지막 재현 점검: regression_check compare 12개 모두 같음, check_paid_cache 53개 통과, number1_final_report / number2_depth / muse_soft score 다시 돌려 결과 파일 바이트 동일 (number2_score --final은 held-out 1회 원칙 때문에 다시 돌리지 않았고, viewer_data.py가 같은 모델로 점수를 다시 계산해 최종 파일과 일치함을 확인함).
-6. 제출 전 확인 (2026-10-30 점검, 모두 사용자 결정):
+6. 제출 전 확인 (2026-10-30 점검, 2026-11-04 갱신, 남은 것은 사용자 결정):
    - Official Rules: 제출 항목, 영상 길이 제한, 사전 작성 코드 허용 여부, 팀 규모. 웹 검색으로는 원문을 찾지 못했다.
-   - 저장소 공개 범위: 지금 private (D3). git에 HOT3D 클립 33개와 OpenGraph 클립 71개(`label-media/*.mp4`, 라벨링 페이지용)와 `assets/clip.mp4`가 들어 있어, 공개하면 같이 공개된다. HOT3D 라이선스가 재배포를 허용하는지 확인하지 않았다. 데모 영상에도 HOT3D 영상이 나온다.
+   - 저장소: 2026-11-04 확인 시 public이다. git에 HOT3D 클립 33개와 사진 33장(`web/label-media/`, 비밀번호 페이지용), Try 페이지 HOT3D 클립 6개(`web/assets/try/`), HOT3D 원본 프레임 그림 약 26장, OpenGraph 클립 71개와 이미지가 있다. HOT3D 라이선스가 이 재배포를 허용하는지 확인하지 않았다. 논문과 README는 "데이터셋을 재배포하지 않는다"고 적고 있어 실제와 다르다.
+   - 데모 영상: HOT3D 화면과 YouTube 쇼츠 화면이 들어 있다.
    - 코드 LICENSE 파일이 없다. 벤치마크는 `benchmark/`에 데이터별 라이선스 안내가 있다.
-   - 루트 `demo.html`은 옛 결과("seven checks")이고 `vercel.json` 설정상 배포 대상에 들어간다. 지우거나 고쳐야 한다.
-   - 뷰어는 `viewer/media`가 git에 없어 심사자가 직접 열 수 없다.
-   - 제출 설명 글: 자르기는 "Muse Spark 단독 + 장갑으로 배운 보정"이 가장 좋았고, 라벨이 있는 물체는 물체 비율이 우리 점수보다 낫다는 결과대로 쓴다. 제안서의 "SAM이 자르고 Muse가 확인한다" 문장을 그대로 옮기지 않는다.
+   - 사이트 꼬리말(`web/index.html`, `en.html`)의 영상 출처에 HOT3D가 빠져 있다.
+   - (해결) 옛 `demo.html`은 `web/demo.html`로 바뀌어 최종 영상을 재생한다.
+   - 뷰어는 `viewer/media`가 git에 없어 심사자가 직접 열 수 없다. 사이트의 Try 페이지가 대신 클립 6개를 보여 준다.
+   - (해결 2026-11-04) 방법 서술: README, 논문, Try, 한국어 보고서의 "SAM이 자르고 Muse가 확인한다"류 문장을 "Muse Spark + 장갑으로 배운 보정"으로 고쳤다.
+7. 2026-10-30 이후 (보고서 세션): 사이트와 도구를 `web/`으로 옮김, Try 페이지(`web/try.html`, `scripts/try_data.py`), 영상 업로드 검증 페이지(`web/validate.html`, `web/api/`, `web/worker/`, 비밀번호), 논문 복귀(`paper/main.tex`, 저자 Inseok Lee, Joonse Lim), README 재작성.
+8. 외부 검증 (숫자 2): H2O는 ETH 서버가 다운로드를 막아 중단했다. OakInk2(`E:\oakink2`, CC BY-SA 4.0)로 바꿨지만 MANO 파일을 기다리는 상태에서 멈췄다. 측정 계획 절, 라벨, 유료 호출, 기록 모두 없다. 인계 메모는 [docs/H2O_VALIDATION_BRIEF.md](H2O_VALIDATION_BRIEF.md).
 
 ## 디스크
 

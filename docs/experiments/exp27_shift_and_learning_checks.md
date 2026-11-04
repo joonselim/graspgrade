@@ -77,7 +77,7 @@ stand-in, so R2 and R3 use the six object items):
 - The earlier `--check` outputs did not change. The R1 rows ran on the 5 P1
   clips only, as a code path.
 
-Power, pseudo held-out sets of 3 persons (median 1,192 clips, 41 sequences;
+Power, pseudo held-out sets of 3 persons (median 1,192 clips, 41 sequences,
 held-out has 1,426 clips, 51 sequences):
 
 | Grades | Sets | R3 minus R2, median (range) | Interval above 0 |

@@ -4019,7 +4019,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     <ul class="plain">
       <li>평균 82.3%. 배경이 장갑과 비슷한 색일수록 낮음 (에피소드 48 스프레이병 14%, 에피소드 66 어두운 매트 100%).</li>
       <li>미검출은 좌우 라벨 오류가 아니라 손 자체를 놓친 것. 양손이 잡힌 7,101프레임에서 좌우 판정은 모두 맞음.</li>
-      <li>영향 범위는 MediaPipe를 쓰는 "리타게팅 복원성" 항목에 한정. 평가 1은 SAM 3.1을 쓰고(EXP-03), 평가 2는 맨손인 HOT3D에서 진행.</li>
+      <li>영향 범위는 MediaPipe를 쓰는 "손 모양 적합도" 항목에 한정. 평가 1은 MediaPipe를 쓰지 않고(Muse Spark, SAM 3.1), 평가 2는 맨손인 HOT3D에서 진행.</li>
     </ul>
   </section>
 
@@ -4028,12 +4028,12 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
     <h2><span class="no">4</span>방법 개요</h2>
     <h3 style="margin-top:0">처리 흐름</h3>
     <ol class="flow">
-      <li><b>분할.</b> SAM 3.1에 10fps 영상과 프롬프트 <code>hand</code>, <code>small object</code>를 넣어 프레임마다 손과 물체의 박스와 마스크를 얻음.</li>
-      <li><b>접촉 신호.</b> 손과 물체 마스크의 겹침과 동반 이동으로 접촉 구간을 정함. 기준값은 튜닝 에피소드에서.</li>
-      <li><b>경계 확정.</b> 접촉 시작과 끝 주변 약 7프레임(30fps)만 Muse Spark에 보내 경계와 근거를 받음.</li>
-      <li><b>자르기.</b> 경계 앞뒤에 여유를 두고 구간을 잘라냄.</li>
-      <li><b>채점.</b> 구간마다 12개 항목을 등급으로 매기고 로지스틱 회귀로 0~100점 산출.</li>
+      <li><b>접촉 시점.</b> 5fps 프레임을 10장씩 Muse Spark에 보내 손마다 물체에 닿았는지 물음. 장갑으로 배운 보정(시작 +7, 끝 -7프레임)을 더함. 평가 1에서 가장 좋은 방법(A + 보정, EXP-37).</li>
+      <li><b>자르기.</b> 0.5초 이하 끊김은 잇고 0.3초 이상인 접촉만 남겨, 앞뒤 1초씩 붙여 클립으로 자름.</li>
+      <li><b>SAM 3.1.</b> 10fps 영상과 프롬프트 <code>hand</code>, <code>small object</code>로 손과 물체 마스크를 얻어 가시성과 접촉 명확성 등급을 매김.</li>
+      <li><b>채점.</b> 클립마다 12개 항목을 등급으로 매기고 로지스틱 회귀로 0~100점 산출.</li>
     </ol>
+    <p class="note">SAM 마스크 규칙(B)과 그 경계를 Muse Spark로 확인하는 방법(C)도 평가 1에서 비교했지만 A + 보정보다 낮았음. 평가 2의 클립은 모션캡처로 잘랐으므로, 접촉 시점과 채점을 이어 붙인 전체 흐름은 따로 채점하지 않았음.</p>
 
     <h3>채점 항목</h3>
     <div class="tags">
@@ -4045,7 +4045,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
       <span class="tag">물체: 감쌀 폭</span><span class="tag">물체: 손잡이</span><span class="tag">물체: 빈 공간</span>
     </div>
     <p class="note">"물체 성질" 하나를 물체 항목 6개로 늘림(EXP-17~19). 화면 속 사람 손(손목–중지 끝 약 19cm)을 자로 삼아 상·중·하로 매김. 가시성과 접촉 명확성은 SAM 결과에서, 카메라 안정성·동작 완결성·손 모양 적합도는 영상에서 계산하고, 손가락 가림과 물체 항목 6개는 Muse Spark가 클립 프레임 6장을 보고 매김.</p>
-    <p class="note">장면 전환이 있거나 접촉이 없으면 0점. 등급(상 1, 중 0.5, 하 0)을 입력으로 로지스틱 회귀를 학습하고, 확률에 100을 곱해 점수로 씀. 가중치를 그대로 읽을 수 있어 점수의 근거를 설명할 수 있음.</p>
+    <p class="note">등급(상 1, 중 0.5, 하 0)을 입력으로 로지스틱 회귀를 학습하고, 확률에 100을 곱해 점수로 씀. 가중치를 그대로 읽을 수 있어 점수의 근거를 설명할 수 있음.</p>
 
     <div class="tbl" style="margin-top:18px">
       <p class="cap">두 가지 평가</p>
@@ -4097,7 +4097,7 @@ Answer with JSON only: {"copyable_probability": 0 to 100, "reason": "one short s
   </div>
 
   <footer>
-    영상 출처: OpenGraph Ego-Tactile (CC-BY-4.0)<br>
+    영상과 그림 출처: OpenGraph Ego-Tactile Manipulation, OpenGraph Labs (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · HOT3D, Meta Platforms Technologies (영상 <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, 손 주석 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>). 잘라 내고 크기를 줄여 썼음. 파일별 라이선스: <a href="https://github.com/joonselim/graspgrade/blob/main/MEDIA_LICENSE.md">MEDIA_LICENSE.md</a><br>
     마지막 갱신 2026-11-03 12:36 KST
     <p class="demo-link"><a href="logs.html">실험 기록 전체 보기 →</a></p>
   </footer>

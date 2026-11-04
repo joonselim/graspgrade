@@ -4,20 +4,20 @@
 화면은 뷰어 데이터와 영상(`viewer/data`, `viewer/media`), 영상용 그림 4장, 글자 카드 3장이 전부다. 새 계산이나 API 호출은 없다.
 내레이션과 화면 글자는 영어(쉬운 영어, em-dash, 축약형, 세미콜론 없음). 내레이션은 454단어로, 분당 150단어로 읽으면 약 3분이다.
 
-## 만든 영상
+## 만든 영상 (2026-11-04 기준)
 
-`tools/demo_video.py`가 이 구성안대로 영상을 그렸다 (보고서 세션, 2026-10-29). 브라우저 녹화가 아니라, 뷰어 데이터와 영상, 그림, 카드를 화면 크기에 맞춰 직접 합성한다.
+`web/tools/demo_video.py`가 영상을 합성한다 (보고서 세션). 브라우저 녹화가 아니라, 뷰어 데이터와 영상, 그림, 카드를 화면 크기에 맞춰 직접 합성한다. 아래 "장면 순서"부터는 2026-10-29 첫 구성안이다. 지금 영상은 그 뒤로 시작과 끝이 바뀌었으므로 장면 문구는 `web/tools/demo_video.py`의 내레이션이 기준이다.
 
-- 결과: WSL `out/demo/graspgrade_demo.mp4` (179.4초, 1920x1080, 30fps, 자막을 화면에 넣음). 자막 없는 판 `out/demo/graspgrade_demo_no_captions.mp4`. 장면별 파일과 자막(`captions.srt`), 내레이션 원문(`narration.txt`)은 `out/demo/video/`.
-- 장면은 샷 13개로 나뉜다: 1, 2, 3a~3c, 4a~4d, 5a~5c, 6. 내레이션은 아래 문구를 샷별로 나눈 것이다.
-- 목소리: `--voice-text`로 샷별 문구를 쓰고, `tools/demo_voice.ps1`가 Windows 내장 합성 음성(기본값 Microsoft David Desktop)으로 샷마다 WAV를 만든 뒤, 다시 돌리면 샷 길이를 목소리에 맞추고 소리를 섞는다. 그래서 장면 시간은 아래 표의 계획 시간과 조금 다를 수 있다.
-- 다시 만들기 (WSL `~/graspgrade`): `.venv/bin/python scripts/demo_figures.py` → `.venv/bin/python tools/demo_video.py` (`--only 3a`는 샷 하나만).
+- 사이트 영상: `web/assets/video/graspgrade_demo.mp4` (영어, 174.7초, ElevenLabs Eric 음성, `web/tools/demo_voice_el.py`), `graspgrade_demo_ko.mp4` (한국어, 166.2초, Windows Heami 음성). `web/demo.html`은 두 언어 모두 영어 영상을 보여 준다.
+- 바뀐 점: 첫 장면은 Meta와 Fourier 휴머노이드 소식으로 시작하고, 로봇 데이터가 왜 부족한지 묻는다. 그 화면의 로봇은 MuJoCo로 렌더링한 대체 화면이다 (`web/tools/robot_render.py`, MuJoCo Menagerie Apollo 모델, Apache 2.0). 끝은 다음 할 일로 맺는다.
+- 목소리 만드는 순서: `--voice-text`로 샷별 문구를 쓰고, 음성 WAV를 만든 뒤 (영어 `demo_voice_el.py`, Windows 음성 `demo_voice.ps1`), 다시 돌리면 샷 길이를 목소리에 맞추고 소리를 섞는다.
+- 다시 만들기 (WSL `~/graspgrade`): `.venv/bin/python scripts/demo_figures.py` → `.venv/bin/python web/tools/demo_video.py --voice el` (영어), `--lang ko` (한국어), `--only 3a` (샷 하나).
 
 ## 장면 순서
 
 | # | 시간 | 장면 | 화면 |
 | --- | --- | --- | --- |
-| 1 | 0:00-0:15 | 문제 | HOT3D 클립 2개 전체 화면 (컵, 키보드) |
+| 1 | 0:00-0:15 | 문제 | HOT3D 클립 2개 전체 화면 (컵, 키보드). 지금 영상은 휴머노이드 소식과 "왜" 질문으로 바뀜 |
 | 2 | 0:15-0:35 | GraspGrade가 하는 일 | 제목 카드, 입력과 출력 3줄 |
 | 3 | 0:35-1:25 | 숫자 1: 접촉 시점 | 뷰어 Contact timing, 에피소드 36과 7, 그림 `demo_number1.png` |
 | 4 | 1:25-2:25 | 숫자 2: 로봇 손 점수 | 뷰어 Clip scores, 클립 3개, 그림 `demo_number2_ours.png` |
@@ -59,7 +59,7 @@
 - `docs/demo/demo_soft.png`: 부드러운 물체 확인. 합격선 대비 51.7%(미달), 2.1%(충족)
 - `docs/demo/demo_card_scene1.png`: 장면 1 화면 글자. 배경이 투명한 PNG이고, 아래쪽 반투명 검은 띠 위에 흰 글자. 영상 위에 겹친다
 - `docs/demo/demo_card_scene2.png`: 장면 2 제목 카드. 입력 상자, 화살표, 출력 3줄, 아래에 "SAM 3.1 · Muse Spark"
-- `docs/demo/demo_card_scene6.png`: 장면 6 끝 카드. 이름, 한 줄 소개 "Find the hand videos a robot can learn from.", Code / Viewer / Benchmark, 데이터 출처. 저장소 주소는 공개 범위가 정해지지 않아 넣지 않았다
+- `docs/demo/demo_card_scene6.png`: 장면 6 끝 카드. 이름, 한 줄 소개 "Find the hand videos a robot can learn from.", Code / Viewer / Benchmark, 데이터 출처. 저장소 주소는 공개 범위가 정해지지 않아 넣지 않았다 (논문에는 2026-11-03부터 코드 주소가 들어 있다)
 
 ## 장면별 화면과 내레이션
 
@@ -141,7 +141,7 @@
 2. 장면마다 위의 링크(`#clip=`, `#episode=…&hand=right`, `#compare=`)로 바로 연다. 해시 없이 열면 예전처럼 첫 탭이 나온다. `viewer_data.py`를 다시 돌린 뒤에는 캐시를 비우고 새로 고친다 (Ctrl+Shift+R). 안 그러면 예전 길이의 영상이 그대로 나온다.
 3. 화면 1920x1080, 브라우저 확대 100%, 라이트 테마, 전체 화면(F11). 이 크기에서 뷰어 화면 6개(클립 3개, 비교 1개, 에피소드 2개)가 모두 세로 1080 안에 들어가는 것을 확인했다. 확대하면 오른쪽 등급 목록이 잘린다. 장면마다 따로 녹화해 편집에서 잇는다.
 4. 내레이션은 장면별로 따로 녹음해 길이를 맞춘다. 자막은 내레이션 문구 그대로 쓴다.
-5. 루트의 `demo.html`은 쓰지 않는다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
+5. 옛 `demo.html`(지금은 `web/demo.html`로 바뀌어 위의 영상을 재생한다)의 첫 판은 쓰지 않았다. 4번 장면이 "Illustration. The scoring model is being built"와 "seven checks"로 최종 결과와 맞지 않는다.
 
 ## 사용자 결정 필요
 

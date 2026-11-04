@@ -44,16 +44,18 @@ the moment of contact and gives each clip a score from 0 to 100 for how likely
 it is that a robot hand can copy the grasp. Video is the only input. We build
 ground truth for both steps from sensors, a touch-sensing glove for contact
 timing and motion capture of hands and objects for robot copyability, and use
-it to correct and score methods built from Meta SAM 3.1 and Muse Spark. The
-main finding is that models which only see video pick contact timing and
-copyable grasps more accurately once they are corrected with sensor ground
-truth. On 22 held-out glove episodes, a vision language model asked
+it to tune and score methods built from Meta SAM 3.1 and Muse Spark. The
+main finding is that the sensors change which video-only method looks best.
+For contact timing, one shift learned from the glove makes the plain model
+question the best arm. For robot copyability, the way the model is asked
+matters, and learning weights on labels adds nothing. On 22 held-out glove episodes, a vision language model asked
 directly about touch, plus one timing shift learned from the glove on tuning
 episodes, gives the best contact timing of the arms we compare (boundary F1
 0.195 at $\pm 5$ frames, 0.376 at $\pm 15$ frames, contact IoU 0.850). On
 1,426 held-out motion capture clips, the same model asked the plain question
-``can a robot hand copy this?'' is at chance (AUC 0.501), while a fixed
-checklist of object and hand questions reaches 0.624. The gain comes from the
+``can a robot hand copy this?'' is at chance (AUC 0.501), while a checklist
+of object and hand questions reaches 0.617 with equal weights, and our score
+of twelve checks reaches 0.624. The gain comes from the
 checklist ($+0.117$), not from learning weights on labels ($+0.005$). The name
 of the object alone reaches 0.771 when the object was labeled before, and our
 score keeps 0.571 on objects it has never seen, where the object name has
@@ -118,8 +120,10 @@ scored against the same sensors (Section \ref{sec:bench}).
 \end{itemize}
 
 Everything was run under a pre-registration discipline. Every threshold,
-prompt and weight was chosen on a tuning split, and every reported number
-comes from a held-out split that was scored once.
+prompt and weight was chosen on a tuning split, and every result in the main
+comparisons comes from a held-out split that was scored once. Some supporting
+numbers come from the tuning split: the checks of the copyable label, the
+object checks, and most soft object segments.
 
 \section{Related work}
 
@@ -148,8 +152,15 @@ and object pose ground truth, 480,375 RGB frames at 30 fps, fisheye,
 1408 by 1408. There are 33 objects with 3D models. Splits by person: 6 persons
 and 85 sequences for tuning, 3 persons and 51 sequences held out.
 
-Both splits were drawn once with a fixed seed and never re-rolled. Neither
-dataset is redistributed here.
+Both splits were drawn once with a fixed seed and never re-rolled. The full
+datasets are not redistributed. The figures, the project page and the demo
+video show short cuts of both datasets with credit. HOT3D is by Meta Platforms
+Technologies under the HOT3D Dataset License Agreement: its video is
+CC BY-SA 4.0, its hand annotations are CC BY-NC-SA 4.0, and its object models
+are CC BY-SA 4.0 and may not be sold. OpenGraph Ego-Tactile is by OpenGraph
+Labs under CC BY 4.0. Figures that draw HOT3D hands are therefore shared for
+non-commercial use. The repository file \texttt{MEDIA\_LICENSE.md} lists each
+shared file, its changes and its license.
 
 \paragraph{Clips.} A grasp clip is cut from motion capture: two fingertips
 within 15 mm of an object, one second added before and after, the object moved
@@ -828,8 +839,8 @@ limits. 2,385 tuning clips and 1,426 held-out clips over 33 objects.
 The two scorers were written apart from the project code and need only numpy,
 pandas and scikit-learn. They reproduce the project numbers exactly on every
 case we checked, including boundary F1, contact IoU and the object share
-reference AUC with its bootstrap interval. No video, sensor value or motion
-capture pose is redistributed. Task 1 labels can be shared under CC BY 4.0.
+reference AUC with its bootstrap interval. The benchmark files hold no video,
+sensor value or motion capture pose. Task 1 labels can be shared under CC BY 4.0.
 Task 2 labels derive from HOT3D hand data, so they go out under
 CC BY-NC-SA 4.0 and may not be sold. This is our reading of the license texts
 and not legal advice.
@@ -902,9 +913,9 @@ one glove setup and one motion capture setup. Everything here is lab data.
 
 \section{Conclusion}
 
-Models that only see video pick contact timing and copyable grasps in
-first-person video more accurately once they are corrected with sensor ground
-truth. Two results hold on held-out data.
+Sensor ground truth changes which video-only method looks best for contact
+timing and copyable grasps in first-person video. Two results hold on
+held-out data.
 
 \begin{table}[h]
 \centering
@@ -935,7 +946,7 @@ averaged with no learning reach 0.617, and learning the weights adds 0.005.
 The object name alone reaches 0.771 where the object has been measured before,
 so a filter can look strong by recognising the object and nothing else, and a
 single pooled AUC does not show this. On objects never seen in training, where
-the object name gives 0.5, the checklist keeps 0.571.
+the object name gives 0.5, our score keeps 0.571.
 
 What did not work is reported as well. The score is for rigid objects because
 the soft object step misses its rule, the score cannot rank two grasps of the

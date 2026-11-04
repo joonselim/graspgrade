@@ -1,0 +1,13 @@
+Video clips and frames in this folder are cut from public datasets.
+
+HOT3D files: from HOT3D by Meta Platforms Technologies, LLC
+(https://www.projectaria.com/datasets/hot3D/), sequence data under CC BY-SA 4.0
+(https://creativecommons.org/licenses/by-sa/4.0/). We cut them in time, resized
+and re-encoded them. These files are shared under CC BY-SA 4.0.
+
+OpenGraph files: from OpenGraph Ego-Tactile Manipulation by OpenGraph Labs
+(https://huggingface.co/datasets/OpenGraphLabs-Research/ego-tactile-manipulation),
+under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Same changes.
+
+The full list and the license of each file is in MEDIA_LICENSE.md at the
+root of the repository.

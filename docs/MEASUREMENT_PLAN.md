@@ -7,6 +7,22 @@ which data. It brings the work back to the comparisons promised in the
 proposal (October 21). Where an experiment page says something different,
 this page wins.
 
+Note added 2026-11-04. The body below is kept as it was written before the
+held-out runs. Some lines were replaced later by rules that are also written
+on this page or on the experiment pages:
+
+- The copyable ground truth is label v2 (EXP-16, the section on the v2
+  label), not the EXP-10 rule given in the number 2 data section. The object
+  shares "26% to 94%" and the person range "30% to 73%" come from the EXP-10
+  label. With v2 the object shares are 1% to 96% on tuning (EXP-16), and the
+  person shares are 44% to 54% on tuning and 43% to 51% held out (EXP-20).
+- The score has twelve checks, not the seven listed under the number 2 score:
+  seven Muse Spark grades, two SAM grades and three video checks (EXP-13,
+  EXP-19). The gate for no contact or a scene cut was not used.
+- The final rule B uses a gap of at most 2 px between masks, not mask overlap
+  (EXP-32).
+- No code license file exists yet, although the release table names one.
+
 ## Why this page exists
 
 After the first experiments the work drifted from the proposal:

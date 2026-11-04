@@ -286,7 +286,7 @@ def main():
   <h2 class="sec">All experiments</h2>
   {"".join(idx)}
 {chr(10).join(arts)}
-  <footer>Video sources: OpenGraph Ego-Tactile (CC-BY-4.0), HOT3D (Project Aria)</footer>
+  <footer>Video and figure sources: OpenGraph Ego-Tactile Manipulation, OpenGraph Labs (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · HOT3D, Meta Platforms Technologies (video <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, hand annotations <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>). Cut and resized, figures add our drawings. License of each file: <a href="https://github.com/joonselim/graspgrade/blob/main/MEDIA_LICENSE.md">MEDIA_LICENSE.md</a></footer>
 </main>
 </body>
 </html>

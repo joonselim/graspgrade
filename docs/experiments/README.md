@@ -8,6 +8,10 @@ What we compare, and on which data, is set in [MEASUREMENT_PLAN.md](../MEASUREME
 Two pages have a narrower role since that plan: EXP-06 tests a logistic
 regression that is now an appendix, not one of the compared arms, and
 EXP-07 counts clips for pricing only. The clip set for number 2 is EXP-11.
+EXP-10 to EXP-13 use the first copyable label, which EXP-15 withdrew. Their
+copyable rates and AUCs do not hold for the final label. The final label is
+v2 (EXP-16), and EXP-17 repeats the checks of EXP-12 and EXP-13 on it. The
+clips of EXP-11 are still the clip set.
 
 | ID | Date | Topic | Meta API cost | Result in one line |
 | --- | --- | --- | --- | --- |

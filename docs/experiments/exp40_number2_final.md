@@ -115,7 +115,7 @@ Extra rows:
 | whiteboard_marker | 65 | 52 | 0.547 | 0.331 | 0.433 |
 
 - AUC for each failure reason (copyable clips against clips that fail for
-  that reason; held-out: 662 copyable, 538 collision, 146 reach, 80 grip):
+  that reason. Held-out: 662 copyable, 538 collision, 146 reach, 80 grip):
 
 | Failure reason | Our score | Object reference | Checklist learned | Muse Spark alone |
 | --- | --- | --- | --- | --- |
